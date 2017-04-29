@@ -1,0 +1,62 @@
+﻿<Window x:Class="DaemonMaster.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DaemonMaster"
+        mc:Ignorable="d"
+        Title="DaemonMaster" Height="383.811" Width="525" Background="White" Foreground="Black" ResizeMode="NoResize" Closing="Window_Closing">
+    <Grid>
+        <Button x:Name="buttonAdd" Content="Add" HorizontalAlignment="Left" Margin="271,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonAdd_Click"/>
+        <Button x:Name="buttonDelete" Content="Delete" HorizontalAlignment="Left" Margin="431,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonDelete_Click"/>
+        <Button x:Name="buttonEdit" Content="Edit" HorizontalAlignment="Left" Margin="351,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonEdit_Click"/>
+        <Button x:Name="buttonSwitchToSession0" Content="Switch to Session 0" HorizontalAlignment="Left" Margin="271,319,0,0" VerticalAlignment="Top" Width="235" Click="buttonSwitchToSession0_Click"/>
+
+        <GroupBox x:Name="groupBoxFilter" Header="Filter" HorizontalAlignment="Left" Height="64" Margin="10,281,0,0" VerticalAlignment="Top" Width="257" Foreground="Black">
+            <Grid>
+                <Button x:Name="buttonFilter" Content="Search" HorizontalAlignment="Left" Margin="160,10,0,0" VerticalAlignment="Top" Width="75" Height="23" Click="buttonFilter_Click"/>
+                <TextBox x:Name="textBoxFilter" HorizontalAlignment="Left" Height="23" Margin="1,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="154"/>
+            </Grid>
+        </GroupBox>
+        
+        <ListBox x:Name="listBoxDaemons" HorizontalAlignment="Left" Height="255" Margin="10,21,0,0" VerticalAlignment="Top" Width="497" MouseDoubleClick="listBoxDaemons_MouseDoubleClick">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{Binding Path=Icon}"/>
+                        <TextBlock Text="{Binding Path=Name}" FontSize="17" Margin="5,5,0,0"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+
+            <ListBox.Resources>
+                <!--http://stackoverflow.com/questions/9549231/how-to-right-click-on-item-from-listbox-and-open-menu-on-wpf-->
+                <!--Defines a context menu-->
+                <ContextMenu x:Key="MyElementMenu">
+                    <MenuItem Header="Create Service" Click="MenuItemCreate_Click"/>
+                    <MenuItem Header="Start Service" Click="MenuItemStart_Click"/>
+                    <MenuItem Header="Stop Service" Click="MenuItemStop_Click"/>
+                    <MenuItem Header="Delete Service" Click="MenuItemDelete_Click"/>
+                </ContextMenu>
+
+                <!--Sets a context menu for each ListBoxItem in the current ListBox-->
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="ContextMenu" Value="{StaticResource MyElementMenu}"/>
+                </Style>
+            </ListBox.Resources>
+        </ListBox>
+        
+        <Menu x:Name="menu" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="519">
+            <MenuItem Header="File">
+                <MenuItem Header="Add new Deamon" Click="MenuItem_Click_AddDaemon"/>
+                <MenuItem Header="Export list" Click="MenuItem_Click_Export"/>
+                <MenuItem Header="Import list" Click="MenuItem_Click_Import"/>
+            </MenuItem>
+            <MenuItem Header="Edit">
+                <MenuItem Header="Edit selected Deamon" Click="MenuItem_Click_EditDaemon"/>
+                <MenuItem Header="Remove selected Deamon" Click="MenuItem_Click_RemoveDaemon"/>
+            </MenuItem>
+            <MenuItem Header="Credits" Click="MenuItem_Click_Credits"/>
+        </Menu>
+    </Grid>
+</Window>

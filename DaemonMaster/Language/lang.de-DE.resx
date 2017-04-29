@@ -1,0 +1,210 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="test" xml:space="preserve">
+    <value>TEST GER</value>
+  </data>
+  <data name="error_ui0service" xml:space="preserve">
+    <value>Der Service UI0Detect konnte nicht gestartet werden!</value>
+  </data>
+  <data name="cannot_start_the_service" xml:space="preserve">
+    <value>Der Dienst kann nicht gestartet werden!</value>
+  </data>
+  <data name="cannot_start_the_service_already_running" xml:space="preserve">
+    <value>Der Dienst läuft bereits!</value>
+  </data>
+  <data name="cannot_stop_the_service" xml:space="preserve">
+    <value>Der Dienst kann nicht gestoppt werden!</value>
+  </data>
+  <data name="cannot_stop_the_service_already_stopped" xml:space="preserve">
+    <value>Der Dienst wurde schon gestoppt!</value>
+  </data>
+  <data name="information" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="interactive_service_regkey_not_set" xml:space="preserve">
+    <value>Ein Registrierungsschlüssel verhindert das ausführen von Interaktiven Prozessen. Wollen Sie diesen abschalten?</value>
+  </data>
+  <data name="max_limit_reached" xml:space="preserve">
+    <value>Es können derzeit Maximal 10 Programme hinzugefügt werden!</value>
+  </data>
+  <data name="problem_occurred" xml:space="preserve">
+    <value>Ein Problem ist aufgetreten</value>
+  </data>
+  <data name="question" xml:space="preserve">
+    <value>Frage</value>
+  </data>
+  <data name="service_start_was_successful" xml:space="preserve">
+    <value>Der Start des Dienstes war erfolgreich!</value>
+  </data>
+  <data name="service_stop_was_successful" xml:space="preserve">
+    <value>Das Anhalten des Dienstes war erfolgreich!</value>
+  </data>
+  <data name="success" xml:space="preserve">
+    <value>Erfolgreich</value>
+  </data>
+  <data name="the_service_deletion_was_successful" xml:space="preserve">
+    <value>Das Löschen des Dienstes war erfolgreich!</value>
+  </data>
+  <data name="the_service_deletion_was_unsuccessful" xml:space="preserve">
+    <value>Der Löschen des Dienstes ist fehlgeschlagen!</value>
+  </data>
+  <data name="the_service_installation_was_successful" xml:space="preserve">
+    <value>Die Installation des Dienstes war erfolgreich!</value>
+  </data>
+  <data name="the_service_installation_was_unsuccessful" xml:space="preserve">
+    <value>Die Installation des Dienstes ist fehlgeschlagen!</value>
+  </data>
+  <data name="cannot_delete_deamonfile" xml:space="preserve">
+    <value>Die Deamon-Datei kann nicht gelöscht werden!\n</value>
+  </data>
+  <data name="cannot_delete_regkeys" xml:space="preserve">
+    <value>Die Registery-Schlüssel können nicht gelöscht werden!\n</value>
+  </data>
+  <data name="cannot_load_deamonfile" xml:space="preserve">
+    <value>Die Deamon-Datei kann nicht geladen werden!\n</value>
+  </data>
+  <data name="cannot_save_deamonfile" xml:space="preserve">
+    <value>Die Deamon-Datei kann nicht gestartet werden!\n</value>
+  </data>
+  <data name="data_cannot_be_saved" xml:space="preserve">
+    <value>Daten können nicht gespeichert werden!\n</value>
+  </data>
+  <data name="error" xml:space="preserve">
+    <value>Fehler</value>
+  </data>
+  <data name="failed_start_UI0detect_service" xml:space="preserve">
+    <value>Fehler beim Starten des UI0Detect Service!</value>
+  </data>
+  <data name="invalid_path" xml:space="preserve">
+    <value>Es wurde ein ungültiger Pfad zur Datei angegeben oder die Datei existiert nicht mehr!</value>
+  </data>
+  <data name="invalid_values" xml:space="preserve">
+    <value>Ungültige Werte!</value>
+  </data>
+  <data name="warning" xml:space="preserve">
+    <value>WARNUNG</value>
+  </data>
+  <data name="windows10_mouse_keyboard" xml:space="preserve">
+    <value>WARNUNG: In Windows 10 können sie ihre Maus und ihre tastatur nicht benutzen!</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>DaemonMaster Version 1</value>
+  </data>
+</root>
