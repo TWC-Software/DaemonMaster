@@ -1,12 +1,12 @@
 # DaemonMaster Alpha
 Daemon Master is a software which makes it possible to create a service from any program.
 
-# Thanks to 
+## Thanks to 
 pinvoke.net
 
-# Copyright 
+## Copyright 
 MCPC10
 stuffi3000
 
-# License 
+## License 
 GPL 3.0
