@@ -1,4 +1,4 @@
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/stuffi3000)
+
 # DaemonMaster Alpha
 Daemon Master is a software which makes it possible to create and manage a Windows-service from any program.
 
@@ -17,6 +17,9 @@ pinvoke.net
 ## Copyright 
 MCPC10,
 stuffi3000
+
+## Donation
+[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://paypal.me/stuffi3000)
 
 ## License 
 GPL 3.0
