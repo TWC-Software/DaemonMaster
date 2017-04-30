@@ -1,3 +1,4 @@
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](paypal.me/stuffi3000)
 # DaemonMaster Alpha
 Daemon Master is a software which makes it possible to create and manage a Windows-service from any program.
 
