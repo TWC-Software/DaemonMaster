@@ -61,7 +61,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Cannot delete Daemon file!\n ähnelt.
         /// </summary>
         public static string cannot_delete_deamonfile {
             get {
@@ -70,7 +70,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Cannot delete registery-keys!\n ähnelt.
         /// </summary>
         public static string cannot_delete_regkeys {
             get {
@@ -79,7 +79,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Cannot load Daemon file!\n ähnelt.
         /// </summary>
         public static string cannot_load_deamonfile {
             get {
@@ -88,7 +88,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Cannot save Daemon file!\n ähnelt.
         /// </summary>
         public static string cannot_save_deamonfile {
             get {
@@ -97,7 +97,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Cannot start the service! ähnelt.
         /// </summary>
         public static string cannot_start_the_service {
             get {
@@ -106,7 +106,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die The service is aleady running! ähnelt.
         /// </summary>
         public static string cannot_start_the_service_already_running {
             get {
@@ -115,7 +115,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Cannit stop the service! ähnelt.
         /// </summary>
         public static string cannot_stop_the_service {
             get {
@@ -124,7 +124,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die The service was already stopped! ähnelt.
         /// </summary>
         public static string cannot_stop_the_service_already_stopped {
             get {
@@ -133,7 +133,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Data cannot be saved!\n ähnelt.
         /// </summary>
         public static string data_cannot_be_saved {
             get {
@@ -142,7 +142,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Error ähnelt.
         /// </summary>
         public static string error {
             get {
@@ -151,7 +151,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die The UI0Detect Service cannot be started! ähnelt.
         /// </summary>
         public static string error_ui0service {
             get {
@@ -160,7 +160,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Failed to start UI0Detect service! ähnelt.
         /// </summary>
         public static string failed_start_UI0detect_service {
             get {
@@ -169,7 +169,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Information ähnelt.
         /// </summary>
         public static string information {
             get {
@@ -178,7 +178,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Interactive processes are being blocked by a registery-key. Would you like to turn it off? (The Application cannot run without interactive processes!) ähnelt.
         /// </summary>
         public static string interactive_service_regkey_not_set {
             get {
@@ -187,7 +187,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Invalid path ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Path to file is invalid or file was deleted! ähnelt.
         /// </summary>
         public static string invalid_path {
             get {
@@ -232,7 +232,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Service successfully started! ähnelt.
         /// </summary>
         public static string service_start_was_successful {
             get {
@@ -241,7 +241,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Service successfully stopped! ähnelt.
         /// </summary>
         public static string service_stop_was_successful {
             get {
@@ -250,16 +250,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
-        /// </summary>
-        public static string String1 {
-            get {
-                return ResourceManager.GetString("String1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Success ähnelt.
         /// </summary>
         public static string success {
             get {
@@ -268,7 +259,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die TEST ENG ähnelt.
         /// </summary>
         public static string test {
             get {
@@ -277,7 +268,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Service deletion was successful! ähnelt.
         /// </summary>
         public static string the_service_deletion_was_successful {
             get {
@@ -286,7 +277,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Service deletion was not successful! ähnelt.
         /// </summary>
         public static string the_service_deletion_was_unsuccessful {
             get {
@@ -295,7 +286,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Service-installation was successful! ähnelt.
         /// </summary>
         public static string the_service_installation_was_successful {
             get {
@@ -304,7 +295,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Service-installation was not succesful! ähnelt.
         /// </summary>
         public static string the_service_installation_was_unsuccessful {
             get {
@@ -313,7 +304,16 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die DeamonMaster Version 1 ähnelt.
+        /// </summary>
+        public static string title {
+            get {
+                return ResourceManager.GetString("title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die WARNING ähnelt.
         /// </summary>
         public static string warning {
             get {
@@ -322,7 +322,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die WARNING: In Windows 10 you can&apos;t use your mouse or keyboard! ähnelt.
         /// </summary>
         public static string windows10_mouse_keyboard {
             get {

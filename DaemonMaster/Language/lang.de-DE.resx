@@ -139,7 +139,7 @@
     <value>Information</value>
   </data>
   <data name="interactive_service_regkey_not_set" xml:space="preserve">
-    <value>Ein Registrierungsschlüssel verhindert das ausführen von Interaktiven Prozessen. Wollen Sie diesen abschalten?</value>
+    <value>Ein Registrierungsschlüssel verhindert das ausführen von Interaktiven Prozessen. Wollen Sie diesen abschalten? (Die Anwendung funktioniert ohne Interaktive Prozesse nicht!)</value>
   </data>
   <data name="max_limit_reached" xml:space="preserve">
     <value>Es können derzeit Maximal 10 Programme hinzugefügt werden!</value>
