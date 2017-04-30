@@ -5,7 +5,7 @@ Daemon Master is a software which makes it possible to create a service from any
 pinvoke.net
 
 ## Copyright 
-MCPC10
+MCPC10,
 stuffi3000
 
 ## License 
