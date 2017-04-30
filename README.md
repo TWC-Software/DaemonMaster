@@ -1,5 +1,5 @@
 # DaemonMaster Alpha
-Daemon Master is a software which makes it possible to create a service from any program.
+Daemon Master is a software which makes it possible to create and manage a Windows-service from any program.
 
 ## Thanks to 
 pinvoke.net
