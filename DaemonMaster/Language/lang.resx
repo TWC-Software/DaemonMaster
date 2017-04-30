@@ -118,52 +118,52 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="test" xml:space="preserve">
-    <value />
+    <value>TEST ENG </value>
   </data>
   <data name="cannot_delete_deamonfile" xml:space="preserve">
-    <value />
+    <value>Cannot delete Daemon file!\n</value>
   </data>
   <data name="cannot_delete_regkeys" xml:space="preserve">
-    <value />
+    <value>Cannot delete registery-keys!\n</value>
   </data>
   <data name="cannot_load_deamonfile" xml:space="preserve">
-    <value />
+    <value>Cannot load Daemon file!\n</value>
   </data>
   <data name="cannot_save_deamonfile" xml:space="preserve">
-    <value />
+    <value>Cannot save Daemon file!\n</value>
   </data>
   <data name="cannot_start_the_service" xml:space="preserve">
-    <value />
+    <value>Cannot start the service!</value>
   </data>
   <data name="cannot_start_the_service_already_running" xml:space="preserve">
-    <value />
+    <value>The service is aleady running!</value>
   </data>
   <data name="cannot_stop_the_service" xml:space="preserve">
-    <value />
+    <value>Cannit stop the service!</value>
   </data>
   <data name="cannot_stop_the_service_already_stopped" xml:space="preserve">
-    <value />
+    <value>The service was already stopped!</value>
   </data>
   <data name="data_cannot_be_saved" xml:space="preserve">
-    <value />
+    <value>Data cannot be saved!\n</value>
   </data>
   <data name="error" xml:space="preserve">
-    <value />
+    <value>Error</value>
   </data>
   <data name="error_ui0service" xml:space="preserve">
-    <value />
+    <value>The UI0Detect Service cannot be started!</value>
   </data>
   <data name="failed_start_UI0detect_service" xml:space="preserve">
-    <value />
+    <value>Failed to start UI0Detect service!</value>
   </data>
   <data name="information" xml:space="preserve">
-    <value />
+    <value>Information</value>
   </data>
   <data name="interactive_service_regkey_not_set" xml:space="preserve">
-    <value />
+    <value>Interactive processes are being blocked by a registery-key. Would you like to turn it off? (The Application cannot run without interactive processes!)</value>
   </data>
   <data name="invalid_path" xml:space="preserve">
-    <value>Invalid path</value>
+    <value>Path to file is invalid or file was deleted!</value>
   </data>
   <data name="invalid_values" xml:space="preserve">
     <value>Invalid values</value>
@@ -178,33 +178,33 @@
     <value>Question</value>
   </data>
   <data name="service_start_was_successful" xml:space="preserve">
-    <value />
+    <value>Service successfully started!</value>
   </data>
   <data name="service_stop_was_successful" xml:space="preserve">
-    <value />
+    <value>Service successfully stopped!</value>
   </data>
-  <data name="String1" xml:space="preserve">
-    <value />
+  <data name="title" xml:space="preserve">
+    <value>DeamonMaster Version 1</value>
   </data>
   <data name="success" xml:space="preserve">
-    <value />
+    <value>Success</value>
   </data>
   <data name="the_service_deletion_was_successful" xml:space="preserve">
-    <value />
+    <value>Service deletion was successful!</value>
   </data>
   <data name="the_service_deletion_was_unsuccessful" xml:space="preserve">
-    <value />
+    <value>Service deletion was not successful!</value>
   </data>
   <data name="the_service_installation_was_successful" xml:space="preserve">
-    <value />
+    <value>Service-installation was successful!</value>
   </data>
   <data name="the_service_installation_was_unsuccessful" xml:space="preserve">
-    <value />
+    <value>Service-installation was not succesful!</value>
   </data>
   <data name="warning" xml:space="preserve">
-    <value />
+    <value>WARNING</value>
   </data>
   <data name="windows10_mouse_keyboard" xml:space="preserve">
-    <value />
+    <value>WARNING: In Windows 10 you can't use your mouse or keyboard!</value>
   </data>
 </root>
