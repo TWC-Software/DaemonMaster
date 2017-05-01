@@ -23,6 +23,7 @@ using System;
 using System.Diagnostics;
 using System.ServiceProcess;
 using System.Threading;
+using DaemonMasterService.Win32;
 
 namespace DaemonMasterService
 {
@@ -37,6 +38,9 @@ namespace DaemonMasterService
         private readonly string userName = String.Empty;
         private readonly string password = String.Empty;
         private readonly int maxRestarts = 0;
+        private readonly bool noPause = true;
+        private readonly bool noPowerEvents = true;
+
 
         private uint restarts = 0;
 
@@ -57,11 +61,16 @@ namespace DaemonMasterService
                 if (key == null)
                     throw new Exception();
 
-                filePath = (string)key.GetValue("FilePath");
-                parameter = (string)key.GetValue("Parameter");
-                userName = (string)key.GetValue("UserName");
-                password = (string)key.GetValue("Password");
-                maxRestarts = (int)key.GetValue("MaxRestarts");
+                filePath = (string)(key.GetValue("FilePath") ?? filePath);
+                parameter = (string)(key.GetValue("Parameter") ?? parameter);
+                userName = (string)(key.GetValue("UserName") ?? userName);
+                password = (string)(key.GetValue("Password") ?? password);
+                maxRestarts = (int)(key.GetValue("MaxRestarts") ?? maxRestarts);
+                noPause = (bool)(key.GetValue("NoPause") ?? noPause);
+                noPowerEvents = (bool)(key.GetValue("NoPowerEvents") ?? noPowerEvents);
+
+                CanHandlePowerEvent = !noPowerEvents;
+                CanPauseAndContinue = !noPause;
             }
             catch (Exception)
             {
@@ -76,6 +85,22 @@ namespace DaemonMasterService
 
         protected override void OnStop()
         {
+            StopProcess();
+        }
+
+        protected override void OnPause()
+        {
+            PauseProcess();
+        }
+
+        protected override void OnContinue()
+        {
+            ResumeProcess();
+        }
+
+
+        private void StopProcess()
+        {
             try
             {
                 if (process != null)
@@ -85,6 +110,7 @@ namespace DaemonMasterService
                     process.Kill();
 
                     process.Dispose();
+                    process = null;
                 }
             }
             catch (Exception)
@@ -92,13 +118,12 @@ namespace DaemonMasterService
             }
         }
 
-
         private void StartProcess()
         {
             try
             {
                 if (filePath == String.Empty)
-                    return;
+                    throw new Exception("Invalid filepath!");
 
                 ProcessStartInfo startInfo = new ProcessStartInfo(filePath, parameter);
 
@@ -143,6 +168,70 @@ namespace DaemonMasterService
             {
                 Stop();
             }
+        }
+
+        private int PauseProcess()
+        {
+            if (process == null)
+                return 0;
+
+
+            IntPtr processHandle = KERNEL32.OpenThread(KERNEL32.ThreadAccess.SUSPEND_RESUME, true, (uint)process.Id);
+
+            if (processHandle != IntPtr.Zero)
+            {
+                try
+                {
+                    bool value = KERNEL32.SuspendThread(processHandle);
+
+                    if (value)
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        return -1;
+                    }
+                }
+                finally
+                {
+                    KERNEL32.CloseHandle(processHandle);
+                }
+            }
+
+            return -1;
+        }
+
+        private int ResumeProcess()
+        {
+            if (process == null)
+                return 0;
+
+
+            IntPtr processHandle = KERNEL32.OpenThread(KERNEL32.ThreadAccess.SUSPEND_RESUME, true, (uint)process.Id);
+
+            if (processHandle != IntPtr.Zero)
+            {
+                try
+                {
+                    bool value = KERNEL32.ResumeThread(processHandle);
+
+                    if (value)
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        return -1;
+                    }
+                }
+                finally
+                {
+                    KERNEL32.CloseHandle(processHandle);
+                }
+            }
+
+            return -1;
         }
     }
 }

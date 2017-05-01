@@ -58,33 +58,43 @@ namespace DaemonMaster.Core
 
             IntPtr scManager = ADVAPI.OpenSCManager(null, null, (uint)ADVAPI.SCM_ACCESS.SC_MANAGER_CREATE_SERVICE);
 
-            if (scManager == IntPtr.Zero)
+            if (scManager != IntPtr.Zero)
+            {
+                try
+                {
+                    IntPtr svManager = ADVAPI.CreateService(
+                                                            scManager,
+                                                            "dm_" + daemon.Name,
+                                                            daemon.Name,
+                                                            (uint)ADVAPI.SERVICE_ACCESS.SERVICE_ALL_ACCESS,
+                                                            (uint)ADVAPI.SERVICE_TYPE.SERVICE_INTERACTIVE_PROCESS | (uint)ADVAPI.SERVICE_TYPE.SERVICE_WIN32_OWN_PROCESS,
+                                                            (uint)ADVAPI.SERVICE_START.SERVICE_AUTO_START,
+                                                            (uint)ADVAPI.SERVICE_ERROR_CONTROLE.SERVICE_ERROR_IGNORE,
+                                                            DaemonMasterServicePath + DaemonMasterServiceFile + DaemonMasterServiceParameter + daemon.Name,
+                                                            null,
+                                                            null,
+                                                            "UI0Detect",
+                                                            null,
+                                                            null);
+
+                    if (svManager == IntPtr.Zero)
+                    {
+                        throw new Win32Exception(Marshal.GetLastWin32Error());
+                    }
+                    else
+                    {
+                        ADVAPI.CloseServiceHandle(svManager);
+                    }
+                }
+                finally
+                {
+                    ADVAPI.CloseServiceHandle(scManager);
+                }
+            }
+            else
             {
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             }
-
-            IntPtr svManager = ADVAPI.CreateService(
-                scManager,
-                "dm_" + daemon.Name,
-                daemon.Name,
-                (uint)ADVAPI.SERVICE_ACCESS.SERVICE_ALL_ACCESS,
-                (uint)ADVAPI.SERVICE_TYPE.SERVICE_INTERACTIVE_PROCESS | (uint)ADVAPI.SERVICE_TYPE.SERVICE_WIN32_OWN_PROCESS,
-                (uint)ADVAPI.SERVICE_START.SERVICE_AUTO_START,
-                (uint)ADVAPI.SERVICE_ERROR_CONTROLE.SERVICE_ERROR_IGNORE,
-                DaemonMasterServicePath + DaemonMasterServiceFile + DaemonMasterServiceParameter + daemon.Name,
-                null,
-                null,
-                "UI0Detect",
-                null,
-                null);
-
-            if (svManager == IntPtr.Zero)
-            {
-                ADVAPI.CloseServiceHandle(scManager);
-                throw new Win32Exception(Marshal.GetLastWin32Error());
-            }
-
-            ADVAPI.CloseServiceHandle(svManager);
         }
 
         public static int StartService(Daemon daemon)
