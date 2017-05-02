@@ -84,6 +84,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Daemon.cs" />
     <Compile Include="CreditsWindow.xaml.cs">
       <DependentUpon>CreditsWindow.xaml</DependentUpon>
     </Compile>
@@ -113,7 +114,6 @@
     </Page>
     <Compile Include="DaemonMasterCore.cs" />
     <Compile Include="Win32\ADVAPI.cs" />
-    <Compile Include="Daemon.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>

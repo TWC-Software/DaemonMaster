@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -10,7 +10,7 @@ namespace DaemonMasterService.Win32
     //FROM PINVOKE.NET
     public static class KERNEL32
     {
-        [DllImport("kernel32", SetLastError = true)]
+        [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CloseHandle(IntPtr handle);
 
@@ -24,6 +24,11 @@ namespace DaemonMasterService.Win32
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ResumeThread(IntPtr hThread);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GenerateConsoleCtrlEvent(uint dwCtrlEvent, uint dwProcessGroupId);
+
 
         //FLAGS
 
@@ -39,6 +44,13 @@ namespace DaemonMasterService.Win32
             SET_THREAD_TOKEN = (0x0080),
             IMPERSONATE = (0x0100),
             DIRECT_IMPERSONATION = (0x0200)
+        }
+
+        [Flags]
+        public enum CtrlEvent : int
+        {
+            CTRL_C_EVENT = (0x0000),
+            CTRL_BREAK_EVENT = (0x0001)
         }
     }
 }

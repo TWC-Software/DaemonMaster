@@ -1,4 +1,4 @@
-﻿/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 //  DaemonMaster: EDIT/ADD GUI 
 //  
 //  This file is part of DeamonMaster.
@@ -33,10 +33,16 @@ namespace DaemonMaster
     {
         //Erstellt ein Event 
         internal delegate void DaemonSavedDelegate(Daemon daemon);
-        internal event DaemonSavedDelegate DaemonSavedEvent;
+        internal delegate void DaemonEditDelegate(Daemon daemon, int index);
+        internal static event DaemonSavedDelegate DaemonSavedEvent;
+        internal static event DaemonEditDelegate DaemonEditEvent;
 
         private string fileName = String.Empty;
-        private string fullPath = String.Empty;
+        private string fileDir = String.Empty;
+
+
+        private readonly bool onEdit = false;
+        private readonly int index = 0;
 
 
         public EditAddWindow()
@@ -49,14 +55,16 @@ namespace DaemonMaster
             textBoxPassword.IsEnabled = false;
         }
 
-        public EditAddWindow(Daemon daemon) : this() // This = Konstruktor davor wird auch ausgeführt (=> Ableitung vom Oberen)
+        public EditAddWindow(Daemon daemon, int index) : this() // This = Konstruktor davor wird auch ausgeführt (=> Ableitung vom Oberen)
         {
-            fullPath = daemon.FilePath; // Holt sich Parameter aus dem Deamon und schreibt sie in das Fenster rein
-            textBoxFilePath.Text = fullPath;
+            onEdit = true;
+            this.index = index;
+
+            textBoxFilePath.Text = daemon.FullPath; // Holt sich Parameter aus dem Deamon und schreibt sie in das Fenster rein
 
             fileName = daemon.FileName;
 
-            textBoxName.Text = daemon.Name;
+            textBoxName.Text = daemon.DisplayName;
             textBoxParam.Text = daemon.Parameter;
 
             if (daemon.UserName != String.Empty && daemon.UserPassword != String.Empty)
@@ -88,9 +96,9 @@ namespace DaemonMaster
             //Wenn eine Datei gewählt worden ist
             if (openFileDialog.ShowDialog() == true)
             {
-                fullPath = openFileDialog.FileName;
-                textBoxFilePath.Text = fullPath;
-                fileName = openFileDialog.SafeFileName.Split('.')[0];
+                textBoxFilePath.Text = openFileDialog.FileName;
+                fileDir = Path.GetDirectoryName(openFileDialog.FileName);
+                fileName = openFileDialog.SafeFileName;
 
                 //Wenn der Name noch leer oder der Standart Name geladen ist, soll er ihn mit dem Datei namen befüllen
                 if (textBoxName.Text == String.Empty || textBoxName.Text == "<Please enter a Name> (default = filename)")
@@ -114,12 +122,13 @@ namespace DaemonMaster
             try
             {
 
-                if (Directory.Exists(Path.GetDirectoryName(fullPath)) && File.Exists(fullPath))
+                if (Directory.Exists(fileDir) && File.Exists(fileDir + @"\" + fileName))
                 {
                     if (textBoxName.Text != String.Empty && textBoxFilePath.Text != String.Empty)
                     {
                         //Erstellt einen neunen "Daemon"
-                        Daemon daemon = new Daemon(textBoxName.Text, fullPath, fileName, textBoxParam.Text);
+                        Daemon daemon = new Daemon(textBoxName.Text, "DaemonMaster_" + fileName.Split('.')[0], fileDir, fileName);
+                        daemon.Parameter = textBoxParam.Text;
 
                         if (checkBoxCustomUsername.IsChecked ?? false && textBoxUsername.Text != String.Empty && textBoxPassword.Text != String.Empty && textBoxUsername.Text != "<Enter Service Username>" && textBoxPassword.Text != "<Enter Service Password>")
                         {
@@ -132,7 +141,14 @@ namespace DaemonMaster
                             daemon.UserPassword = String.Empty;
                         }
 
-                        DaemonSaved(daemon);
+                        if (onEdit)
+                        {
+                            DaemonEditEvent(daemon, index);
+                        }
+                        else
+                        {
+                            DaemonSaved(daemon);
+                        }
 
                         this.Close();
                     }

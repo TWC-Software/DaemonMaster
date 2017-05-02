@@ -1,4 +1,4 @@
-﻿/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 //  DaemonMaster: MAIN GUI 
 //  
 //  This file is part of DeamonMaster.
@@ -47,8 +47,12 @@ namespace DaemonMaster
             LanguageSystem.SetCulture("de-DE");
 
             processCollection = DaemonMasterCore.LoadFromRegistry();
-            //Fügt das Event hinzu
+
+            //Add events
             processCollection.CollectionChanged += ProcessList_CollectionChanged;
+            EditAddWindow.DaemonSavedEvent += EditAddWindow_DaemonSavedEvent;
+            EditAddWindow.DaemonEditEvent += EditAddWindow_DaemonEditEvent;
+
             //Aktualisiert die Liste zum start
             listBoxDaemons.ItemsSource = processCollection;
 
@@ -95,7 +99,7 @@ namespace DaemonMaster
 
             foreach (Daemon d in processCollection)
             {
-                if (d.Name.Contains(textBoxFilter.Text))
+                if (d.DisplayName.Contains(textBoxFilter.Text))
                 {
                     listBoxDaemons.SelectedItem = d;
                     break;
@@ -112,10 +116,6 @@ namespace DaemonMaster
 
         private void MenuItemCreate_Click(object sender, RoutedEventArgs e)
         {
-            if (listBoxDaemons.SelectedItem == null)
-                return;
-
-            CreateDaemon(listBoxDaemons.SelectedItem as Daemon);
         }
 
         private void MenuItemStart_Click(object sender, RoutedEventArgs e)
@@ -180,13 +180,7 @@ namespace DaemonMaster
 
         private void MenuItem_Click_Import(object sender, RoutedEventArgs e)
         {
-            DaemonMasterCore.DeleteAllServices(processCollection);
-            DaemonMasterCore.DeleteAllRegistryKeys();
-            processCollection.Clear();
 
-            processCollection = DaemonMasterCore.ImportList();
-            //Aktualisisert die Liste
-            ProcessList_CollectionChanged(null, null);
         }
 
         #endregion
@@ -205,21 +199,12 @@ namespace DaemonMaster
         private void OpenAddDaemonWindow()
         {
             EditAddWindow addProcessWindow = new EditAddWindow(); // Neues Event Im EditAddWindow Fenster
-            addProcessWindow.DaemonSavedEvent += AddProcessWindow_DaemonSavedEvent; // Das DeamonSavedEvent wird ausgeführt
             addProcessWindow.ShowDialog(); // Fenster geht auf, Code geht erst weiter wenn Fesnter geschlossen ist
-            addProcessWindow.DaemonSavedEvent -= AddProcessWindow_DaemonSavedEvent; // Das DeamonSavedEvent stoppt
-        }
-
-        private void AddProcessWindow_DaemonSavedEvent(Daemon daemon) // Fügt Deamon Objekt der Liste hinzu
-        {
-            processCollection.Add(daemon);
-            DaemonMasterCore.SaveInRegistry(processCollection);
         }
 
         private void OpenEditDaemonWindow(int index)
         {
-            EditAddWindow addProcessWindow = new EditAddWindow(processCollection[index] as Daemon);
-            addProcessWindow.DaemonSavedEvent += (daemon) => processCollection[index] = daemon;
+            EditAddWindow addProcessWindow = new EditAddWindow(processCollection[index] as Daemon, index);
             addProcessWindow.ShowDialog();
         }
 
@@ -267,9 +252,8 @@ namespace DaemonMaster
 
             try
             {
-                DaemonMasterCore.DeleteRegistryKey(daemon);
-                processCollection.RemoveAt(listBoxDaemons.SelectedIndex);
                 DaemonMasterCore.DeleteService(daemon);
+                processCollection.RemoveAt(listBoxDaemons.SelectedIndex);
 
                 MessageBox.Show(LanguageSystem.resManager.GetString("the_service_deletion_was_successful"), LanguageSystem.resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -277,23 +261,6 @@ namespace DaemonMaster
             {
                 MessageBox.Show(LanguageSystem.resManager.GetString("the_service_deletion_was_unsuccessful"), LanguageSystem.resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-
-        private void CreateDaemon(Daemon daemon)
-        {
-            if (daemon == null)
-                return;
-
-            try
-            {
-                DaemonMasterCore.CreateInteractiveService(daemon);
-                MessageBox.Show(LanguageSystem.resManager.GetString("the_service_installation_was_successful"), LanguageSystem.resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(LanguageSystem.resManager.GetString("the_service_installation_was_unsuccessful") + "\n\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-
         }
 
         private void EditDaemon()
@@ -348,9 +315,46 @@ namespace DaemonMaster
 
         #endregion
 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                          EVENT HANDLER                                               //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        #region EventHandler
+
+        private void EditAddWindow_DaemonSavedEvent(Daemon daemon) // Fügt Deamon Objekt der Liste hinzu
+        {
+            try
+            {
+                DaemonMasterCore.CreateInteractiveService(daemon);
+                MessageBox.Show(LanguageSystem.resManager.GetString("the_service_installation_was_successful"), LanguageSystem.resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
+
+                DaemonMasterCore.SaveInRegistry(daemon);
+                processCollection.Add(daemon);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(LanguageSystem.resManager.GetString("the_service_installation_was_unsuccessful") + "\n\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void EditAddWindow_DaemonEditEvent(Daemon daemon, int index) // Fügt Deamon Objekt der Liste hinzu
+        {
+            try
+            {
+                DaemonMasterCore.SaveInRegistry(daemon);
+                processCollection[index] = daemon;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(LanguageSystem.resManager.GetString("data_cant_be_saved", LanguageSystem.culture) + ex.Message, LanguageSystem.resManager.GetString("error", LanguageSystem.culture), MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        #endregion
+
+
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            DaemonMasterCore.SaveInRegistry(processCollection);
         }
     }
 }

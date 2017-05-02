@@ -1,4 +1,4 @@
-﻿/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 //  DaemonMaster: CORE FILE 
 //  
 //  This file is part of DeamonMaster.
@@ -39,11 +39,9 @@ namespace DaemonMaster.Core
         //Timeout Start/Stop Services (in ms)
         private const int timeout = 10000;
 
-        private const string regPath = @"SOFTWARE\DaemonMaster\Services\";
-
         private static string DaemonMasterServicePath = AppDomain.CurrentDomain.BaseDirectory;
         private const string DaemonMasterServiceFile = "DaemonMasterService.exe";
-        private const string DaemonMasterServiceParameter = " -service ";
+        private const string DaemonMasterServiceParameter = " -service";
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                            Service                                                   //
@@ -64,13 +62,13 @@ namespace DaemonMaster.Core
                 {
                     IntPtr svManager = ADVAPI.CreateService(
                                                             scManager,
-                                                            "dm_" + daemon.Name,
-                                                            daemon.Name,
+                                                            daemon.ServiceName,
+                                                            daemon.DisplayName,
                                                             (uint)ADVAPI.SERVICE_ACCESS.SERVICE_ALL_ACCESS,
                                                             (uint)ADVAPI.SERVICE_TYPE.SERVICE_INTERACTIVE_PROCESS | (uint)ADVAPI.SERVICE_TYPE.SERVICE_WIN32_OWN_PROCESS,
                                                             (uint)ADVAPI.SERVICE_START.SERVICE_AUTO_START,
                                                             (uint)ADVAPI.SERVICE_ERROR_CONTROLE.SERVICE_ERROR_IGNORE,
-                                                            DaemonMasterServicePath + DaemonMasterServiceFile + DaemonMasterServiceParameter + daemon.Name,
+                                                            DaemonMasterServicePath + DaemonMasterServiceFile + DaemonMasterServiceParameter,
                                                             null,
                                                             null,
                                                             "UI0Detect",
@@ -104,7 +102,7 @@ namespace DaemonMaster.Core
                 if (!CheckUI0DetectService())
                     return -1;
 
-                using (ServiceController scManager = new ServiceController("dm_" + daemon.Name))
+                using (ServiceController scManager = new ServiceController("dm_" + daemon.ServiceName))
                 {
                     if (scManager.Status == ServiceControllerStatus.Running)
                         return 0;
@@ -129,7 +127,7 @@ namespace DaemonMaster.Core
         {
             try
             {
-                using (ServiceController scManager = new ServiceController("dm_" + daemon.Name))
+                using (ServiceController scManager = new ServiceController("dm_" + daemon.ServiceName))
                 {
 
                     if (scManager.Status == ServiceControllerStatus.Stopped)
@@ -161,7 +159,7 @@ namespace DaemonMaster.Core
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             }
 
-            IntPtr svManager = ADVAPI.OpenService(scManager, "dm_" + daemon.Name, (uint)ADVAPI.SERVICE_ACCESS.DELETE | (uint)ADVAPI.SERVICE_ACCESS.SERVICE_QUERY_STATUS | (uint)ADVAPI.SERVICE_ACCESS.SERVICE_ENUMERATE_DEPENDENTS);
+            IntPtr svManager = ADVAPI.OpenService(scManager, daemon.ServiceName, (uint)ADVAPI.SERVICE_ACCESS.DELETE | (uint)ADVAPI.SERVICE_ACCESS.SERVICE_QUERY_STATUS | (uint)ADVAPI.SERVICE_ACCESS.SERVICE_ENUMERATE_DEPENDENTS);
 
             if (svManager == IntPtr.Zero)
             {
@@ -414,21 +412,28 @@ namespace DaemonMaster.Core
 
         #region Registry
 
-        public static void SaveInRegistry(ObservableCollection<Daemon> daemons)
+        public static void SaveInRegistry(Daemon daemon)
         {
             try
             {
-                foreach (Daemon d in daemons)
+                using (RegistryKey serviceKey = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Services\" + daemon.ServiceName + @"\Parameters"))
                 {
-                    using (RegistryKey serviceKey = Registry.LocalMachine.CreateSubKey(regPath + d.Name))
-                    {
-                        serviceKey.SetValue("FileName", d.FileName, RegistryValueKind.String);
-                        serviceKey.SetValue("FilePath", d.FilePath, RegistryValueKind.String);
-                        serviceKey.SetValue("Parameter", d.Parameter, RegistryValueKind.String);
-                        serviceKey.SetValue("UserName", d.UserName, RegistryValueKind.String);
-                        serviceKey.SetValue("Password", d.UserPassword, RegistryValueKind.String);
-                        serviceKey.SetValue("MaxRestarts", d.MaxRestarts, RegistryValueKind.DWord);
-                    }
+                    serviceKey.SetValue("DisplayName", daemon.DisplayName, RegistryValueKind.String);
+                    serviceKey.SetValue("ServiceName", daemon.ServiceName, RegistryValueKind.String);
+
+                    serviceKey.SetValue("FileDir", daemon.FileDir, RegistryValueKind.String);
+                    serviceKey.SetValue("FileName", daemon.FileName, RegistryValueKind.String);
+
+                    serviceKey.SetValue("Parameter", daemon.Parameter, RegistryValueKind.String);
+                    serviceKey.SetValue("UserName", daemon.UserName, RegistryValueKind.String);
+                    serviceKey.SetValue("UserPassword", daemon.UserPassword, RegistryValueKind.String);
+                    serviceKey.SetValue("MaxRestarts", daemon.MaxRestarts, RegistryValueKind.DWord);
+
+                    serviceKey.SetValue("ProcessKillTime", daemon.ProcessKillTime, RegistryValueKind.DWord);
+                    serviceKey.SetValue("ProcessRestartDelay", daemon.ProcessRestartDelay, RegistryValueKind.DWord);
+
+                    serviceKey.SetValue("ConsoleApplication", daemon.ConsoleApplication, RegistryValueKind.DWord);
+                    serviceKey.SetValue("UseCtrlC", daemon.UseCtrlC, RegistryValueKind.DWord);
                 }
             }
             catch (Exception ex)
@@ -443,24 +448,20 @@ namespace DaemonMaster.Core
             {
                 ObservableCollection<Daemon> daemons = new ObservableCollection<Daemon>();
 
-                //Open Regkey folder
-                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(regPath))
-                {
-                    foreach (string subKey in key.GetSubKeyNames())
-                    {
-                        using (RegistryKey serviceKey = Registry.LocalMachine.OpenSubKey(regPath + subKey))
-                        {
-                            Daemon daemon = new Daemon();
-                            daemon.Name = subKey;
-                            daemon.FileName = (string)serviceKey.GetValue("FileName");
-                            daemon.FilePath = (string)serviceKey.GetValue("FilePath");
-                            daemon.Parameter = (string)serviceKey.GetValue("Parameter");
-                            daemon.UserName = (string)serviceKey.GetValue("UserName");
-                            daemon.UserPassword = (string)serviceKey.GetValue("Password");
-                            daemon.MaxRestarts = (int)serviceKey.GetValue("MaxRestarts");
+                ServiceController[] sc = ServiceController.GetServices();
 
-                            daemons.Add(daemon);
+                foreach (ServiceController service in sc)
+                {
+                    try
+                    {
+                        if (service.ServiceName.Contains("DaemonMaster_"))
+                        {
+                            daemons.Add(LoadDaemonFromRegistry(service.ServiceName));
                         }
+                    }
+                    catch (Exception)
+                    {
+                        continue;
                     }
                 }
                 return daemons;
@@ -472,48 +473,35 @@ namespace DaemonMaster.Core
             }
         }
 
-        public static bool DeleteRegistryKey(Daemon daemon)
+        private static Daemon LoadDaemonFromRegistry(string serviceName)
         {
-            try
-            {
-                //Open Regkey folder
-                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(regPath, true))
-                {
-                    if (key == null)
-                        return true;
 
-                    key.DeleteSubKeyTree(daemon.Name);
-                    return true;
-                }
-            }
-            catch (Exception ex)
+            //Open Regkey folder
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\" + serviceName + @"\Parameters", false))
             {
-                MessageBox.Show(LanguageSystem.resManager.GetString("cant_delete_deamonfile", LanguageSystem.culture) + ex.Message);
-                return false;
-            }
-        }
+                if (key == null)
+                    throw new Exception("Can't open registry key!");
 
-        public static bool DeleteAllRegistryKeys()
-        {
-            try
-            {
-                //Open Regkey folder
-                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(regPath, true))
-                {
-                    if (key == null)
-                        return true;
+                Daemon daemon = new Daemon();
 
-                    foreach (string s in key.GetSubKeyNames())
-                    {
-                        key.DeleteSubKeyTree(s);
-                    }
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(LanguageSystem.resManager.GetString("cant_delete_regkeys", LanguageSystem.culture) + ex.Message);
-                return false;
+                daemon.DisplayName = (string)key.GetValue("DisplayName");
+                daemon.ServiceName = (string)key.GetValue("ServiceName");
+
+                daemon.FileDir = (string)key.GetValue("FileDir");
+                daemon.FileName = (string)key.GetValue("FileName");
+
+                daemon.Parameter = (string)(key.GetValue("Parameter") ?? String.Empty);
+                daemon.UserName = (string)(key.GetValue("UserName") ?? String.Empty);
+                daemon.UserPassword = (string)(key.GetValue("UserPassword") ?? String.Empty);
+                daemon.MaxRestarts = (int)(key.GetValue("MaxRestarts") ?? 3);
+
+                daemon.ProcessKillTime = (int)(key.GetValue("ProcessKillTime") ?? 5000);
+                daemon.ProcessRestartDelay = (int)(key.GetValue("ProcessRestartDelay") ?? 0);
+
+                daemon.ConsoleApplication = Convert.ToBoolean((key.GetValue("ConsoleApplication") ?? false));
+                daemon.UseCtrlC = Convert.ToBoolean((key.GetValue("UseCtrlC") ?? false));
+
+                return daemon;
             }
         }
 

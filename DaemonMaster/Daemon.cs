@@ -1,5 +1,5 @@
-﻿/////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: DAEMON OBJECT FILE
+/////////////////////////////////////////////////////////////////////////////////////////
+//  DaemonMaster: DAEMON CONFIG FILE
 //  
 //  This file is part of DeamonMaster.
 // 
@@ -21,78 +21,23 @@
 using DaemonMaster.Core;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace DaemonMaster
 {
     public class Daemon
     {
-        private string _name = String.Empty;
-        private string _filePath = String.Empty;
-        private string _fileName = String.Empty;
-        private string _parameter = String.Empty;
-        private string _userName = String.Empty;
-        private string _userPassword = String.Empty;
-        private int _maxRestarts = 3;
-
-
-        public string Name
-        {
-            get { return _name; }
-            set { _name = value; }
-        }
-
-        public string FilePath
-        {
-            get { return _filePath; }
-            set { _filePath = value; }
-        }
-
-        public string FileName
-        {
-            get { return _fileName; }
-            set { _fileName = value; }
-        }
-
-        public string Parameter
-        {
-            get { return _parameter; }
-            set { _parameter = value; }
-        }
-
-        public string UserName
-        {
-            get { return _userName; }
-            set { _userName = value; }
-        }
-
-        public string UserPassword
-        {
-            get { return _userPassword; }
-            set { _userPassword = value; }
-        }
-
-        public int MaxRestarts
-        {
-            get { return _maxRestarts; }
-            set { _maxRestarts = value; }
-        }
-
-
-        [JsonIgnore]
-        public ImageSource Icon
-        {
-            get { return DaemonMasterCore.GetIcon(_filePath); }
-        }
-
-
         //Konstruktoren
-        public Daemon(string name, string filePath, string fileName, string parameter)
+        public Daemon(string displayName, string serviceName, string fileDir, string fileName)
         {
-            _name = name;
-            _filePath = filePath;
-            _fileName = fileName;
-            _parameter = parameter;
+            DisplayName = displayName;
+            ServiceName = serviceName;
+            FileDir = fileDir;
+            FileName = fileName;
         }
 
         [JsonConstructor]
@@ -102,7 +47,34 @@ namespace DaemonMaster
 
         public override string ToString()
         {
-            return _name;
+            return DisplayName;
+        }
+
+        public string DisplayName { get; set; }
+        public string ServiceName { get; set; }
+
+        public string FileDir { get; set; }
+        public string FileName { get; set; }
+        public string FullPath
+        {
+            get { return FileDir + @"\" + FileName; }
+        }
+
+        public string Parameter { get; set; }
+        public string UserName { get; set; }
+        public string UserPassword { get; set; }
+        public int MaxRestarts { get; set; }
+
+        public int ProcessKillTime { get; set; }
+        public int ProcessRestartDelay { get; set; }
+
+        public bool ConsoleApplication { get; set; }
+        public bool UseCtrlC { get; set; }
+
+        [JsonIgnore]
+        public ImageSource Icon
+        {
+            get { return DaemonMasterCore.GetIcon(FullPath); }
         }
     }
 }

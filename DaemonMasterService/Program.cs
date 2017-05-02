@@ -1,4 +1,4 @@
-﻿/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 //  DaemonMaster: MAIN SERVICE CLASS 
 //  
 //  This file is part of DeamonMaster.
@@ -18,6 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
+using System;
 using System.ServiceProcess;
 
 namespace DaemonMasterService
@@ -27,11 +28,6 @@ namespace DaemonMasterService
         /// <summary>
         /// Der Haupteinstiegspunkt für die Anwendung.
         /// </summary>
-        //static void Main()
-        //{
-        //    StartService();
-        //}
-
         static void Main(string[] args)
         {
             if (args.Length <= 0)
@@ -43,18 +39,25 @@ namespace DaemonMasterService
                     break;
 
                 case "-service":
-                    StartService(args[1]);
+                    if (args.Length > 1 && args[1] == "-enablePause")
+                    {
+                        StartService(true);
+                    }
+                    else
+                    {
+                        StartService(false);
+                    }
                     break;
             }
         }
 
-        private static void StartService(string serviceName)
+        private static void StartService(bool enablePause)
         {
 
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
-                new Service1(serviceName)
+                new Service1(enablePause)
             };
             ServiceBase.Run(ServicesToRun);
         }
