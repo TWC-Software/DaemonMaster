@@ -33,7 +33,6 @@
                 <!--http://stackoverflow.com/questions/9549231/how-to-right-click-on-item-from-listbox-and-open-menu-on-wpf-->
                 <!--Defines a context menu-->
                 <ContextMenu x:Key="MyElementMenu">
-                    <MenuItem Header="Create Service" Click="MenuItemCreate_Click"/>
                     <MenuItem Header="Start Service" Click="MenuItemStart_Click"/>
                     <MenuItem Header="Stop Service" Click="MenuItemStop_Click"/>
                     <MenuItem Header="Delete Service" Click="MenuItemDelete_Click"/>

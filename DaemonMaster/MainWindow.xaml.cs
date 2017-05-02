@@ -113,11 +113,6 @@ namespace DaemonMaster
         }
 
         //ListBox
-
-        private void MenuItemCreate_Click(object sender, RoutedEventArgs e)
-        {
-        }
-
         private void MenuItemStart_Click(object sender, RoutedEventArgs e)
         {
             if (listBoxDaemons.SelectedItem == null)
@@ -175,12 +170,13 @@ namespace DaemonMaster
 
         private void MenuItem_Click_Export(object sender, RoutedEventArgs e)
         {
-            DaemonMasterCore.ExportList(processCollection);
+            //DaemonMasterCore.ExportList(processCollection);
+            MessageBox.Show(LanguageSystem.resManager.GetString("currently_unavailable"), LanguageSystem.resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void MenuItem_Click_Import(object sender, RoutedEventArgs e)
         {
-
+            MessageBox.Show(LanguageSystem.resManager.GetString("currently_unavailable"), LanguageSystem.resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         #endregion

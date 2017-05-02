@@ -31,15 +31,6 @@ namespace DaemonMaster
 {
     public class Daemon
     {
-        //Konstruktoren
-        public Daemon(string displayName, string serviceName, string fileDir, string fileName)
-        {
-            DisplayName = displayName;
-            ServiceName = serviceName;
-            FileDir = fileDir;
-            FileName = fileName;
-        }
-
         [JsonConstructor]
         public Daemon()
         {

@@ -133,6 +133,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Currently unavailable :( ähnelt.
+        /// </summary>
+        public static string currently_unavailable {
+            get {
+                return ResourceManager.GetString("currently_unavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Data cannot be saved!\n ähnelt.
         /// </summary>
         public static string data_cannot_be_saved {

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -206,5 +206,8 @@
   </data>
   <data name="windows10_mouse_keyboard" xml:space="preserve">
     <value>WARNING: In Windows 10 you can't use your mouse or keyboard!</value>
+  </data>
+  <data name="currently_unavailable" xml:space="preserve">
+    <value>Currently unavailable :(</value>
   </data>
 </root>

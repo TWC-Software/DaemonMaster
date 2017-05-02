@@ -50,9 +50,6 @@ namespace DaemonMaster
             InitializeComponent();
 
             textBoxFilePath.IsReadOnly = true;
-            checkBoxCustomUsername.IsChecked = false;
-            textBoxUsername.IsEnabled = false;
-            textBoxPassword.IsEnabled = false;
         }
 
         public EditAddWindow(Daemon daemon, int index) : this() // This = Konstruktor davor wird auch ausgeführt (=> Ableitung vom Oberen)
@@ -64,12 +61,12 @@ namespace DaemonMaster
 
             fileName = daemon.FileName;
 
-            textBoxName.Text = daemon.DisplayName;
+            textBoxDisplayName.Text = daemon.DisplayName;
             textBoxParam.Text = daemon.Parameter;
 
             if (daemon.UserName != String.Empty && daemon.UserPassword != String.Empty)
             {
-                checkBoxCustomUsername.IsChecked = true;
+                checkBoxUseLocalSystem.IsChecked = false;
                 textBoxUsername.Text = daemon.UserName;
                 textBoxPassword.Text = daemon.UserPassword;
             }
@@ -101,9 +98,9 @@ namespace DaemonMaster
                 fileName = openFileDialog.SafeFileName;
 
                 //Wenn der Name noch leer oder der Standart Name geladen ist, soll er ihn mit dem Datei namen befüllen
-                if (textBoxName.Text == String.Empty || textBoxName.Text == "<Please enter a Name> (default = filename)")
+                if (textBoxDisplayName.Text == String.Empty || textBoxDisplayName.Text == "<Please enter a Name> (default = filename)")
                 {
-                    textBoxName.Text = fileName;
+                    textBoxDisplayName.Text = fileName;
                 }
             }
         }
@@ -124,13 +121,17 @@ namespace DaemonMaster
 
                 if (Directory.Exists(fileDir) && File.Exists(fileDir + @"\" + fileName))
                 {
-                    if (textBoxName.Text != String.Empty && textBoxFilePath.Text != String.Empty)
+                    if (textBoxDisplayName.Text != String.Empty && textBoxFilePath.Text != String.Empty)
                     {
                         //Erstellt einen neunen "Daemon"
-                        Daemon daemon = new Daemon(textBoxName.Text, "DaemonMaster_" + fileName.Split('.')[0], fileDir, fileName);
+                        Daemon daemon = new Daemon();
+                        daemon.DisplayName = textBoxDisplayName.Text;
+                        daemon.ServiceName = textBoxDisplayName.Text;
+                        daemon.FileDir = fileDir;
+                        daemon.FileName = fileName;
                         daemon.Parameter = textBoxParam.Text;
 
-                        if (checkBoxCustomUsername.IsChecked ?? false && textBoxUsername.Text != String.Empty && textBoxPassword.Text != String.Empty && textBoxUsername.Text != "<Enter Service Username>" && textBoxPassword.Text != "<Enter Service Password>")
+                        if (!checkBoxUseLocalSystem.IsChecked ?? true && textBoxUsername.Text != String.Empty && textBoxPassword.Text != String.Empty && textBoxUsername.Text != "<Enter Service Username>" && textBoxPassword.Text != "<Enter Service Password>")
                         {
                             daemon.UserName = textBoxUsername.Text;
                             daemon.UserPassword = textBoxPassword.Text;
@@ -177,16 +178,16 @@ namespace DaemonMaster
 
         #endregion
 
-        private void checkBoxCustomUsername_Checked(object sender, RoutedEventArgs e)
-        {
-            textBoxUsername.IsEnabled = true;
-            textBoxPassword.IsEnabled = true;
-        }
-
-        private void checkBoxCustomUsername_Unchecked(object sender, RoutedEventArgs e)
+        private void checkBoxUseLocalSystem_Checked(object sender, RoutedEventArgs e)
         {
             textBoxUsername.IsEnabled = false;
             textBoxPassword.IsEnabled = false;
+        }
+
+        private void checkBoxUseLocalSystem_Unchecked(object sender, RoutedEventArgs e)
+        {
+            textBoxUsername.IsEnabled = true;
+            textBoxPassword.IsEnabled = true;
         }
     }
 }
