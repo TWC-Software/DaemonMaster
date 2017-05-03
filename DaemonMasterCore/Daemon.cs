@@ -18,20 +18,13 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
-using DaemonMaster.Core;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace DaemonMaster
+namespace DaemonMasterCore
 {
     public class Daemon
     {
-        [JsonConstructor]
         public Daemon()
         {
         }
@@ -65,7 +58,7 @@ namespace DaemonMaster
         [JsonIgnore]
         public ImageSource Icon
         {
-            get { return DaemonMasterCore.GetIcon(FullPath); }
+            get { return DaemonMasterUtils.GetIcon(FullPath); }
         }
     }
 }

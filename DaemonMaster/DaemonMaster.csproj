@@ -84,7 +84,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Daemon.cs" />
     <Compile Include="CreditsWindow.xaml.cs">
       <DependentUpon>CreditsWindow.xaml</DependentUpon>
     </Compile>
@@ -112,7 +111,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="DaemonMasterCore.cs" />
     <Compile Include="Win32\ADVAPI.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -181,6 +179,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="DeamonMaster Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DaemonMasterCore\DaemonMasterCore.csproj">
+      <Project>{fa9d9d3d-af33-4ff0-acb3-3d7278e5a90b}</Project>
+      <Name>DaemonMasterCore</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

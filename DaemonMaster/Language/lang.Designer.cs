@@ -39,7 +39,7 @@ namespace DaemonMaster.Language {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DaemonMaster.Language.lang", typeof(lang).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DaemonMasterCore.Language.lang", typeof(lang).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

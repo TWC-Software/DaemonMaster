@@ -18,7 +18,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
-using DaemonMaster.Core;
 using DaemonMaster.Language;
 using System;
 using System.Collections.ObjectModel;
@@ -26,6 +25,7 @@ using System.Globalization;
 using System.Resources;
 using System.Windows;
 using System.Windows.Input;
+using DaemonMasterCore;
 
 
 
@@ -46,21 +46,32 @@ namespace DaemonMaster
             //Setzt die standart Sprache
             LanguageSystem.SetCulture("de-DE");
 
-            processCollection = DaemonMasterCore.LoadFromRegistry();
-
             //Add events
             processCollection.CollectionChanged += ProcessList_CollectionChanged;
             EditAddWindow.DaemonSavedEvent += EditAddWindow_DaemonSavedEvent;
             EditAddWindow.DaemonEditEvent += EditAddWindow_DaemonEditEvent;
 
-            //Aktualisiert die Liste zum start
-            listBoxDaemons.ItemsSource = processCollection;
+
 
             //Fragt, wenn der RegKey nicht gesetzt ist, ob dieser gesetzt werden soll
             if (!AskToEnableInteractiveServices())
                 this.Close();
 
-            if (!DaemonMasterCore.CheckUI0DetectService())
+            //Bei einem Problem bei laden aus der Registry wird eine leere Liste geladen und eine Fehlermeldung angezeigt
+            try
+            {
+                processCollection = RegistryManagment.LoadFromRegistry();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(LanguageSystem.resManager.GetString("cant_load_deamonfile", LanguageSystem.culture) + ex.Message);
+                processCollection = new ObservableCollection<Daemon>();
+            }
+
+            //Aktualisiert die Liste zum start
+            listBoxDaemons.ItemsSource = processCollection;
+
+            if (!ServiceManagment.CheckUI0DetectService())
             {
                 MessageBox.Show(LanguageSystem.resManager.GetString("error_ui0service", LanguageSystem.culture), LanguageSystem.resManager.GetString("error", LanguageSystem.culture), MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -83,6 +94,9 @@ namespace DaemonMaster
 
         private void buttonEdit_Click(object sender, RoutedEventArgs e)
         {
+            if (listBoxDaemons.SelectedItem == null)
+                return;
+
             EditDaemon();
         }
 
@@ -109,7 +123,7 @@ namespace DaemonMaster
 
         private void buttonSwitchToSession0_Click(object sender, RoutedEventArgs e)
         {
-            DaemonMasterCore.SwitchToSession0();
+            SwitchToSession0();
         }
 
         //ListBox
@@ -139,6 +153,9 @@ namespace DaemonMaster
 
         private void listBoxDaemons_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            if (listBoxDaemons.SelectedItem == null)
+                return;
+
             EditDaemon();
         }
 
@@ -159,6 +176,9 @@ namespace DaemonMaster
 
         private void MenuItem_Click_EditDaemon(object sender, RoutedEventArgs e)
         {
+            if (listBoxDaemons.SelectedItem == null)
+                return;
+
             EditDaemon();
         }
 
@@ -192,6 +212,7 @@ namespace DaemonMaster
             listBoxDaemons.ItemsSource = processCollection;
         }
 
+
         private void OpenAddDaemonWindow()
         {
             EditAddWindow addProcessWindow = new EditAddWindow(); // Neues Event Im EditAddWindow Fenster
@@ -204,15 +225,16 @@ namespace DaemonMaster
             addProcessWindow.ShowDialog();
         }
 
+
         private bool AskToEnableInteractiveServices()
         {
             //Wenn der RegKey nicht gestetzt ist, soll der Nutzer gefragt werden
-            if (!DaemonMasterCore.CheckNoInteractiveServicesRegKey())
+            if (!ServiceManagment.CheckNoInteractiveServicesRegKey())
             {
                 MessageBoxResult result = MessageBox.Show(LanguageSystem.resManager.GetString("interactive_service_regkey_not_set"), LanguageSystem.resManager.GetString("question"), MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
                 {
-                    if (DaemonMasterCore.ActivateInteractiveServices())
+                    if (ServiceManagment.ActivateInteractiveServices())
                     {
                         return true;
                     }
@@ -228,10 +250,9 @@ namespace DaemonMaster
             return true;
         }
 
-
         private void AddDaemon()
         {
-            if (listBoxDaemons.Items.Count <= 10)
+            if (listBoxDaemons.Items.Count <= 256)
             {
                 OpenAddDaemonWindow();
             }
@@ -248,7 +269,7 @@ namespace DaemonMaster
 
             try
             {
-                DaemonMasterCore.DeleteService(daemon);
+                ServiceManagment.DeleteService(daemon);
                 processCollection.RemoveAt(listBoxDaemons.SelectedIndex);
 
                 MessageBox.Show(LanguageSystem.resManager.GetString("the_service_deletion_was_successful"), LanguageSystem.resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
@@ -261,9 +282,6 @@ namespace DaemonMaster
 
         private void EditDaemon()
         {
-            if (listBoxDaemons.SelectedItem == null)
-                return;
-
             OpenEditDaemonWindow(listBoxDaemons.SelectedIndex);
         }
 
@@ -272,7 +290,7 @@ namespace DaemonMaster
             if (daemon == null)
                 return;
 
-            switch (DaemonMasterCore.StartService(daemon))
+            switch (ServiceManagment.StartService(daemon))
             {
                 case -1:
                     MessageBox.Show(LanguageSystem.resManager.GetString("cannot_start_the_service"), LanguageSystem.resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
@@ -293,7 +311,7 @@ namespace DaemonMaster
             if (daemon == null)
                 return;
 
-            switch (DaemonMasterCore.StopService(daemon))
+            switch (ServiceManagment.StopService(daemon))
             {
                 case -1:
                     MessageBox.Show(LanguageSystem.resManager.GetString("cannot_stop_the_service"), LanguageSystem.resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
@@ -309,6 +327,22 @@ namespace DaemonMaster
             }
         }
 
+        private void SwitchToSession0()
+        {
+            if (ServiceManagment.CheckUI0DetectService())
+            {
+                MessageBoxResult result = MessageBox.Show(LanguageSystem.resManager.GetString("windows10_mouse_keyboard", LanguageSystem.culture), LanguageSystem.resManager.GetString("warning", LanguageSystem.culture), MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                if (result == MessageBoxResult.OK)
+                {
+                    DaemonMasterCore.Win32.WINSTA.WinStationSwitchToServicesSession();
+                }
+            }
+            else
+            {
+                MessageBox.Show(LanguageSystem.resManager.GetString("failed_start_UI0detect_service", LanguageSystem.culture), LanguageSystem.resManager.GetString("error", LanguageSystem.culture), MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         #endregion
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -321,15 +355,15 @@ namespace DaemonMaster
         {
             try
             {
-                DaemonMasterCore.CreateInteractiveService(daemon);
-                MessageBox.Show(LanguageSystem.resManager.GetString("the_service_installation_was_successful"), LanguageSystem.resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
-
-                DaemonMasterCore.SaveInRegistry(daemon);
+                ServiceManagment.CreateInteractiveService(daemon);
+                RegistryManagment.SaveInRegistry(daemon);
                 processCollection.Add(daemon);
+
+                MessageBox.Show(LanguageSystem.resManager.GetString("the_service_installation_was_successful", LanguageSystem.culture), LanguageSystem.resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(LanguageSystem.resManager.GetString("the_service_installation_was_unsuccessful") + "\n\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(LanguageSystem.resManager.GetString("the_service_installation_was_unsuccessful", LanguageSystem.culture) + "\n\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -337,7 +371,7 @@ namespace DaemonMaster
         {
             try
             {
-                DaemonMasterCore.SaveInRegistry(daemon);
+                RegistryManagment.SaveInRegistry(daemon);
                 processCollection[index] = daemon;
             }
             catch (Exception ex)
