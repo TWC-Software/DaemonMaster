@@ -60,7 +60,7 @@ namespace DaemonMasterCore
             return daemons;
         }
 
-        private static Daemon LoadDaemonFromRegistry(string serviceName)
+        public static Daemon LoadDaemonFromRegistry(string serviceName)
         {
             //Open Regkey folder
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\" + serviceName + @"\Parameters", false))

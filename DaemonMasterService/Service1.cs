@@ -23,15 +23,16 @@ using System;
 using System.Diagnostics;
 using System.ServiceProcess;
 using System.Threading;
-using DaemonMasterService.Win32;
-using DaemonMasterService.Core;
+using DaemonMasterCore;
+using DaemonMasterCore.Win32;
+using System.Runtime.InteropServices;
 
 namespace DaemonMasterService
 {
     public partial class Service1 : ServiceBase
     {
         Process process = null;
-        Config config = null;
+        Daemon daemon = null;
 
         private uint restarts = 0;
 
@@ -48,12 +49,15 @@ namespace DaemonMasterService
         {
             base.OnStart(args);
 
-            //Load config from registry
-            config = DaemonMasterServiceCore.GetConfigFromRegistry(DaemonMasterServiceCore.GetServiceName());
-
-            //Stop when config is null
-            if (config == null)
+            try
+            {
+                //Load config from registry
+                daemon = RegistryManagment.LoadDaemonFromRegistry(DaemonMasterUtils.GetServiceName());
+            }
+            catch (Exception)
+            {
                 Stop();
+            }
 
             StartProcess();
         }
@@ -68,7 +72,7 @@ namespace DaemonMasterService
         protected override void OnPause()
         {
 
-            DaemonMasterServiceCore.PauseProcess((uint)process.Id);
+            ProcessManagment.PauseProcess((uint)process.Id);
 
             base.OnPause();
         }
@@ -77,7 +81,7 @@ namespace DaemonMasterService
         {
             base.OnContinue();
 
-            DaemonMasterServiceCore.ResumeProcess((uint)process.Id);
+            ProcessManagment.ResumeProcess((uint)process.Id);
         }
 
 
@@ -87,16 +91,28 @@ namespace DaemonMasterService
             {
                 if (process != null)
                 {
-                    process.CloseMainWindow();
+                    IntPtr handle = process.MainWindowHandle;
 
-                    if (config.ConsoleApplication)
+                    if (handle != IntPtr.Zero)
                     {
-                        DaemonMasterServiceCore.CloseConsoleApplication(config.UseCtrlC, (uint)process.Id);
+                        USER32.PostMessage(handle, USER32._SYSCOMMAND, (IntPtr)USER32.wParam.SC_CLOSE, IntPtr.Zero);
+                    }
+                    else
+                    {
+                        if (!process.CloseMainWindow())
+                        {
+                            //Schließt, wenn es eine Consolen Anwendung ist, das fenster mit einem Ctrl-C / Ctrl-Break Befehl
+                            if (daemon.ConsoleApplication)
+                            {
+                                ProcessManagment.CloseConsoleApplication(daemon.UseCtrlC, (uint)process.Id);
+                            }
+                        }
                     }
 
-                    process.WaitForExit(config.ProcessKillTime);
+                    process.WaitForExit(daemon.ProcessKillTime);
                     process.Kill();
 
+                    process.Close();
                     process.Dispose();
                     process = null;
                 }
@@ -110,10 +126,10 @@ namespace DaemonMasterService
         {
             try
             {
-                if (config.FullPath == String.Empty)
+                if (daemon.FullPath == String.Empty)
                     throw new Exception("Invalid filepath!");
 
-                ProcessStartInfo startInfo = new ProcessStartInfo(config.FullPath, config.Parameter);
+                ProcessStartInfo startInfo = new ProcessStartInfo(daemon.FullPath, daemon.Parameter);
 
                 //if (userName != String.Empty && password != String.Empty)
                 //{
@@ -141,9 +157,9 @@ namespace DaemonMasterService
         {
             try
             {
-                if (config.MaxRestarts == 0 || restarts < config.MaxRestarts)
+                if (daemon.MaxRestarts == 0 || restarts < daemon.MaxRestarts)
                 {
-                    Thread.Sleep(config.ProcessRestartDelay);
+                    Thread.Sleep(daemon.ProcessRestartDelay);
                     process.Start();
                     restarts++;
                 }

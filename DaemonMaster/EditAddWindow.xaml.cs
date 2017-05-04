@@ -57,13 +57,14 @@ namespace DaemonMaster
         {
             onEdit = true;
             this.index = index;
-
-            textBoxFilePath.Text = daemon.FullPath; // Holt sich Parameter aus dem Deamon und schreibt sie in das Fenster rein
+            textBoxServiceName.IsReadOnly = true;
 
             fileName = daemon.FileName;
 
+            textBoxFilePath.Text = daemon.FullPath; // Holt sich Parameter aus dem Deamon und schreibt sie in das Fenster rein
             textBoxDisplayName.Text = daemon.DisplayName;
             textBoxParam.Text = daemon.Parameter;
+            textBoxServiceName.Text = daemon.ServiceName.Substring(13);
 
             if (daemon.UserName != String.Empty && daemon.UserPassword != String.Empty)
             {
@@ -122,12 +123,12 @@ namespace DaemonMaster
 
                 if (Directory.Exists(fileDir) && File.Exists(fileDir + @"\" + fileName))
                 {
-                    if (textBoxDisplayName.Text != String.Empty && textBoxFilePath.Text != String.Empty)
+                    if (!String.IsNullOrWhiteSpace(textBoxDisplayName.Text) && !String.IsNullOrWhiteSpace(textBoxFilePath.Text) && !String.IsNullOrWhiteSpace(textBoxServiceName.Text))
                     {
                         //Erstellt einen neunen "Daemon"
                         Daemon daemon = new Daemon();
                         daemon.DisplayName = textBoxDisplayName.Text;
-                        daemon.ServiceName = textBoxDisplayName.Text;
+                        daemon.ServiceName = "DaemonMaster_" + textBoxServiceName.Text;
                         daemon.FileDir = fileDir;
                         daemon.FileName = fileName;
                         daemon.Parameter = textBoxParam.Text;

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DaemonMasterService.Win32
+namespace DaemonMasterCore.Win32
 {
     //FROM PINVOKE.NET
     public static class KERNEL32

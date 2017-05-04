@@ -83,7 +83,7 @@ namespace DaemonMasterCore
                 if (!CheckUI0DetectService())
                     return -1;
 
-                using (ServiceController scManager = new ServiceController("dm_" + daemon.ServiceName))
+                using (ServiceController scManager = new ServiceController(daemon.ServiceName))
                 {
                     if (scManager.Status == ServiceControllerStatus.Running)
                         return 0;
@@ -108,7 +108,7 @@ namespace DaemonMasterCore
         {
             try
             {
-                using (ServiceController scManager = new ServiceController("dm_" + daemon.ServiceName))
+                using (ServiceController scManager = new ServiceController(daemon.ServiceName))
                 {
 
                     if (scManager.Status == ServiceControllerStatus.Stopped)

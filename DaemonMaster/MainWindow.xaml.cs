@@ -47,7 +47,6 @@ namespace DaemonMaster
             LanguageSystem.SetCulture("de-DE");
 
             //Add events
-            processCollection.CollectionChanged += ProcessList_CollectionChanged;
             EditAddWindow.DaemonSavedEvent += EditAddWindow_DaemonSavedEvent;
             EditAddWindow.DaemonEditEvent += EditAddWindow_DaemonEditEvent;
 
@@ -67,6 +66,9 @@ namespace DaemonMaster
                 MessageBox.Show(LanguageSystem.resManager.GetString("cant_load_deamonfile", LanguageSystem.culture) + ex.Message);
                 processCollection = new ObservableCollection<Daemon>();
             }
+
+            //Add Event
+            processCollection.CollectionChanged += ProcessList_CollectionChanged;
 
             //Aktualisiert die Liste zum start
             listBoxDaemons.ItemsSource = processCollection;

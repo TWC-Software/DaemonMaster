@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Management;
 using System.Windows.Media;
 
 namespace DaemonMasterCore
@@ -26,6 +23,30 @@ namespace DaemonMasterCore
             {
                 return null;
             }
+        }
+
+        //From: http://stackoverflow.com/questions/1841790/how-can-a-windows-service-determine-its-servicename, 02.05.2017
+        public static String GetServiceName()
+        {
+            // Calling System.ServiceProcess.ServiceBase::ServiceNamea allways returns
+            // an empty string,
+            // see https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=387024
+
+            // So we have to do some more work to find out our service name, this only works if
+            // the process contains a single service, if there are more than one services hosted
+            // in the process you will have to do something else
+
+            int processId = System.Diagnostics.Process.GetCurrentProcess().Id;
+            String query = "SELECT * FROM Win32_Service where ProcessId = " + processId;
+            ManagementObjectSearcher searcher =
+                new ManagementObjectSearcher(query);
+
+            foreach (ManagementObject queryObj in searcher.Get())
+            {
+                return queryObj["Name"].ToString();
+            }
+
+            throw new Exception("Can not get the ServiceName");
         }
     }
 }

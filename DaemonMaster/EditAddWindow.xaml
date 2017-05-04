@@ -28,8 +28,8 @@
                 </GroupBox>
                 <Label x:Name="labelDisplayName" Content="Display name:" HorizontalAlignment="Left" Margin="-8,40,0,0" VerticalAlignment="Top"/>
                 <TextBox x:Name="textBoxDisplayName" Height="23" Margin="81,41,0,0" TextWrapping="Wrap" Text="&lt;Please enter a display name&gt;" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
-                <TextBox x:Name="textBoxDisplayName_Copy" Height="23" Margin="81,68,0,0" TextWrapping="Wrap" Text="&lt;Please enter a description&gt;" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
-                <Label x:Name="labelDisplayName_Copy" Content="Description:" HorizontalAlignment="Left" Margin="3,67,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxDescription" Height="23" Margin="81,68,0,0" TextWrapping="Wrap" Text="&lt;Please enter a description&gt;" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
+                <Label x:Name="labelDescription" Content="Description:" HorizontalAlignment="Left" Margin="3,67,0,0" VerticalAlignment="Top"/>
             </Grid>
         </TabItem>
         <TabItem Header="Security" />
