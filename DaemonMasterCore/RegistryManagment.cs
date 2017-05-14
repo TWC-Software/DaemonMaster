@@ -1,3 +1,22 @@
+/////////////////////////////////////////////////////////////////////////////////////////
+//  DaemonMaster: REGISTRY MANAGMENT FILE
+//  
+//  This file is part of DeamonMaster.
+// 
+//  DeamonMaster is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//   DeamonMaster is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//
+//   You should have received a copy of the GNU General Public License
+//   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+/////////////////////////////////////////////////////////////////////////////////////////
+
 using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
@@ -31,6 +50,7 @@ namespace DaemonMasterCore
 
                 serviceKey.SetValue("ProcessKillTime", daemon.ProcessKillTime, RegistryValueKind.DWord);
                 serviceKey.SetValue("ProcessRestartDelay", daemon.ProcessRestartDelay, RegistryValueKind.DWord);
+                serviceKey.SetValue("CounterResetTime", daemon.CounterResetTime, RegistryValueKind.DWord);
 
                 serviceKey.SetValue("ConsoleApplication", daemon.ConsoleApplication, RegistryValueKind.DWord);
                 serviceKey.SetValue("UseCtrlC", daemon.UseCtrlC, RegistryValueKind.DWord);
@@ -83,6 +103,7 @@ namespace DaemonMasterCore
 
                 daemon.ProcessKillTime = (int)(key.GetValue("ProcessKillTime") ?? 5000);
                 daemon.ProcessRestartDelay = (int)(key.GetValue("ProcessRestartDelay") ?? 0);
+                daemon.CounterResetTime = (int)(key.GetValue("CounterResetTime") ?? 2000);
 
                 daemon.ConsoleApplication = Convert.ToBoolean((key.GetValue("ConsoleApplication") ?? false));
                 daemon.UseCtrlC = Convert.ToBoolean((key.GetValue("UseCtrlC") ?? false));

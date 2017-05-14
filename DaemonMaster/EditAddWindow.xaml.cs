@@ -18,12 +18,13 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
-using Microsoft.Win32;
 using System;
+using System.Globalization;
 using System.IO;
+using System.Resources;
 using System.Windows;
-using DaemonMaster.Language;
 using DaemonMasterCore;
+using Microsoft.Win32;
 
 namespace DaemonMaster
 {
@@ -32,6 +33,8 @@ namespace DaemonMaster
     /// </summary>
     public partial class EditAddWindow : Window
     {
+        private readonly ResourceManager resManager = new ResourceManager("DaemonMaster.Language.lang", typeof(EditAddWindow).Assembly);
+
         //Erstellt ein Event 
         internal delegate void DaemonSavedDelegate(Daemon daemon);
         internal delegate void DaemonEditDelegate(Daemon daemon, int index);
@@ -157,17 +160,17 @@ namespace DaemonMaster
                     }
                     else
                     {
-                        MessageBox.Show(LanguageSystem.resManager.GetString("invalid_values", LanguageSystem.culture));
+                        MessageBox.Show(resManager.GetString("invalid_values", CultureInfo.CurrentUICulture));
                     }
                 }
                 else
                 {
-                    MessageBox.Show(LanguageSystem.resManager.GetString("invalid_path", LanguageSystem.culture));
+                    MessageBox.Show(resManager.GetString("invalid_path", CultureInfo.CurrentUICulture));
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, LanguageSystem.resManager.GetString("error", LanguageSystem.culture), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

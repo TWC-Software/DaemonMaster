@@ -210,4 +210,43 @@
   <data name="currently_unavailable" xml:space="preserve">
     <value>Currently unavailable :(</value>
   </data>
+  <data name="button_switch_to_session_0" xml:space="preserve">
+    <value>Switch to Session 0</value>
+  </data>
+  <data name="button_add_service" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="button_delete_service" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="button_edit_service" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="button_credits" xml:space="preserve">
+    <value>Credits</value>
+  </data>
+  <data name="button_export" xml:space="preserve">
+    <value>Export list</value>
+  </data>
+  <data name="button_file" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="button_import" xml:space="preserve">
+    <value>Import list</value>
+  </data>
+  <data name="button_save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="button_search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="button_start_service" xml:space="preserve">
+    <value>Start Service</value>
+  </data>
+  <data name="button_stop_service" xml:space="preserve">
+    <value>Stop Service</value>
+  </data>
+  <data name="label_filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
 </root>

@@ -39,7 +39,7 @@ namespace DaemonMaster.Language {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DaemonMasterCore.Language.lang", typeof(lang).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DaemonMaster.Language.lang", typeof(lang).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,114 @@ namespace DaemonMaster.Language {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Add ähnelt.
+        /// </summary>
+        public static string button_add_service {
+            get {
+                return ResourceManager.GetString("button_add_service", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Credits ähnelt.
+        /// </summary>
+        public static string button_credits {
+            get {
+                return ResourceManager.GetString("button_credits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Delete ähnelt.
+        /// </summary>
+        public static string button_delete_service {
+            get {
+                return ResourceManager.GetString("button_delete_service", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Edit ähnelt.
+        /// </summary>
+        public static string button_edit_service {
+            get {
+                return ResourceManager.GetString("button_edit_service", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Export list ähnelt.
+        /// </summary>
+        public static string button_export {
+            get {
+                return ResourceManager.GetString("button_export", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die File ähnelt.
+        /// </summary>
+        public static string button_file {
+            get {
+                return ResourceManager.GetString("button_file", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Import list ähnelt.
+        /// </summary>
+        public static string button_import {
+            get {
+                return ResourceManager.GetString("button_import", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Save ähnelt.
+        /// </summary>
+        public static string button_save {
+            get {
+                return ResourceManager.GetString("button_save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Search ähnelt.
+        /// </summary>
+        public static string button_search {
+            get {
+                return ResourceManager.GetString("button_search", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Start Service ähnelt.
+        /// </summary>
+        public static string button_start_service {
+            get {
+                return ResourceManager.GetString("button_start_service", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Stop Service ähnelt.
+        /// </summary>
+        public static string button_stop_service {
+            get {
+                return ResourceManager.GetString("button_stop_service", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Switch to Session 0 ähnelt.
+        /// </summary>
+        public static string button_switch_to_session_0 {
+            get {
+                return ResourceManager.GetString("button_switch_to_session_0", resourceCulture);
             }
         }
         
@@ -210,6 +318,15 @@ namespace DaemonMaster.Language {
         public static string invalid_values {
             get {
                 return ResourceManager.GetString("invalid_values", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Filter ähnelt.
+        /// </summary>
+        public static string label_filter {
+            get {
+                return ResourceManager.GetString("label_filter", resourceCulture);
             }
         }
         

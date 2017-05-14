@@ -51,6 +51,7 @@ namespace DaemonMasterCore
 
         public int ProcessKillTime { get; set; }
         public int ProcessRestartDelay { get; set; }
+        public int CounterResetTime { get; set; }
 
         public bool ConsoleApplication { get; set; }
         public bool UseCtrlC { get; set; }

@@ -84,6 +84,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Config.cs" />
+    <Compile Include="ConfigManagment.cs" />
     <Compile Include="CreditsWindow.xaml.cs">
       <DependentUpon>CreditsWindow.xaml</DependentUpon>
     </Compile>
@@ -97,7 +99,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>lang.resx</DependentUpon>
     </Compile>
-    <Compile Include="Language\LanguageSystem.cs" />
+    <Compile Include="Language\lang.fr-FR.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>lang.fr-FR.resx</DependentUpon>
+    </Compile>
     <Compile Include="Win32\WINSTA.cs" />
     <Page Include="CreditsWindow.xaml">
       <SubType>Designer</SubType>
@@ -142,7 +148,10 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>lang.de-DE.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Language\lang.fr-FR.resx" />
+    <EmbeddedResource Include="Language\lang.fr-FR.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>lang.fr-FR.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Language\lang.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>lang.Designer.cs</LastGenOutput>

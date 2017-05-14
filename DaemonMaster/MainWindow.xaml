@@ -4,17 +4,18 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DaemonMaster"
+        xmlns:resx="clr-namespace:DaemonMaster.Language"
         mc:Ignorable="d"
         Title="DaemonMaster" Height="383.811" Width="525" Background="White" Foreground="Black" ResizeMode="NoResize" Closing="Window_Closing">
     <Grid>
-        <Button x:Name="buttonAdd" Content="Add" HorizontalAlignment="Left" Margin="271,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonAdd_Click"/>
-        <Button x:Name="buttonDelete" Content="Delete" HorizontalAlignment="Left" Margin="431,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonDelete_Click"/>
-        <Button x:Name="buttonEdit" Content="Edit" HorizontalAlignment="Left" Margin="351,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonEdit_Click"/>
-        <Button x:Name="buttonSwitchToSession0" Content="Switch to Session 0" HorizontalAlignment="Left" Margin="271,319,0,0" VerticalAlignment="Top" Width="235" Click="buttonSwitchToSession0_Click"/>
+        <Button x:Name="buttonAdd" Content="{x:Static resx:lang.button_add_service}" HorizontalAlignment="Left" Margin="271,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonAdd_Click"/>
+        <Button x:Name="buttonDelete" Content="{x:Static resx:lang.button_delete_service}" HorizontalAlignment="Left" Margin="431,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonDelete_Click"/>
+        <Button x:Name="buttonEdit" Content="{x:Static resx:lang.button_edit_service}" HorizontalAlignment="Left" Margin="351,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonEdit_Click"/>
+        <Button x:Name="buttonSwitchToSession0" Content="{x:Static resx:lang.button_switch_to_session_0}" HorizontalAlignment="Left" Margin="271,319,0,0" VerticalAlignment="Top" Width="235" Click="buttonSwitchToSession0_Click"/>
 
-        <GroupBox x:Name="groupBoxFilter" Header="Filter" HorizontalAlignment="Left" Height="64" Margin="10,281,0,0" VerticalAlignment="Top" Width="257" Foreground="Black">
+        <GroupBox x:Name="groupBoxFilter" Header="{x:Static resx:lang.label_filter}" HorizontalAlignment="Left" Height="64" Margin="10,281,0,0" VerticalAlignment="Top" Width="257" Foreground="Black">
             <Grid>
-                <Button x:Name="buttonFilter" Content="Search" HorizontalAlignment="Left" Margin="160,10,0,0" VerticalAlignment="Top" Width="75" Height="23" Click="buttonFilter_Click"/>
+                <Button x:Name="buttonFilter" Content="{x:Static resx:lang.button_search}" HorizontalAlignment="Left" Margin="160,10,0,0" VerticalAlignment="Top" Width="75" Height="23" Click="buttonFilter_Click"/>
                 <TextBox x:Name="textBoxFilter" HorizontalAlignment="Left" Height="23" Margin="1,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="154"/>
             </Grid>
         </GroupBox>
@@ -33,9 +34,9 @@
                 <!--http://stackoverflow.com/questions/9549231/how-to-right-click-on-item-from-listbox-and-open-menu-on-wpf-->
                 <!--Defines a context menu-->
                 <ContextMenu x:Key="MyElementMenu">
-                    <MenuItem Header="Start Service" Click="MenuItemStart_Click"/>
-                    <MenuItem Header="Stop Service" Click="MenuItemStop_Click"/>
-                    <MenuItem Header="Delete Service" Click="MenuItemDelete_Click"/>
+                    <MenuItem Header="{x:Static resx:lang.button_start_service}" Click="MenuItemStart_Click"/>
+                    <MenuItem Header="{x:Static resx:lang.button_stop_service}" Click="MenuItemStop_Click"/>
+                    <MenuItem Header="{x:Static resx:lang.button_delete_service}" Click="MenuItemDelete_Click"/>
                 </ContextMenu>
 
                 <!--Sets a context menu for each ListBoxItem in the current ListBox-->
@@ -46,16 +47,16 @@
         </ListBox>
         
         <Menu x:Name="menu" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="519">
-            <MenuItem Header="File">
-                <MenuItem Header="Add new Deamon" Click="MenuItem_Click_AddDaemon"/>
-                <MenuItem Header="Export list" Click="MenuItem_Click_Export"/>
-                <MenuItem Header="Import list" Click="MenuItem_Click_Import"/>
+            <MenuItem Header="{x:Static resx:lang.button_file}">
+                <MenuItem Header="{x:Static resx:lang.button_export}" Click="MenuItem_Click_Export"/>
+                <MenuItem Header="{x:Static resx:lang.button_import}" Click="MenuItem_Click_Import"/>
             </MenuItem>
-            <MenuItem Header="Edit">
-                <MenuItem Header="Edit selected Deamon" Click="MenuItem_Click_EditDaemon"/>
-                <MenuItem Header="Remove selected Deamon" Click="MenuItem_Click_RemoveDaemon"/>
+            <MenuItem Header="{x:Static resx:lang.button_edit_service}">
+                <MenuItem Header="{x:Static resx:lang.button_add_service}" Click="MenuItem_Click_AddDaemon"/>
+                <MenuItem Header="{x:Static resx:lang.button_edit_service}" Click="MenuItem_Click_EditDaemon"/>
+                <MenuItem Header="{x:Static resx:lang.button_delete_service}" Click="MenuItem_Click_RemoveDaemon"/>
             </MenuItem>
-            <MenuItem Header="Credits" Click="MenuItem_Click_Credits"/>
+            <MenuItem Header="{x:Static resx:lang.button_credits}" Click="MenuItem_Click_Credits"/>
         </Menu>
     </Grid>
 </Window>

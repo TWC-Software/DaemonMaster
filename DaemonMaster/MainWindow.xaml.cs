@@ -18,7 +18,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
-using DaemonMaster.Language;
 using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -36,15 +35,21 @@ namespace DaemonMaster
     /// </summary>
     public partial class MainWindow : Window
     {
-        ObservableCollection<Daemon> processCollection = null;
+        private ObservableCollection<Daemon> processCollection = null;
+        private readonly ResourceManager resManager = new ResourceManager("DaemonMaster.Language.lang", typeof(MainWindow).Assembly);
 
         public MainWindow()
         {
-            InitializeComponent();
-            //Erstellt die Liste (leere oder mit gespeicherten Elementen)
+            //Set the language of the threads
+            //Thread.CurrentThread.CurrentCulture = CultureInfo.CurrentCulture;
+            //Thread.CurrentThread.CurrentUICulture = CultureInfo.CurrentCulture;
+            //CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture;
+            //CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.CurrentCulture;
 
-            //Setzt die standart Sprache
-            LanguageSystem.SetCulture("de-DE");
+            //Initialize GUI
+            InitializeComponent();
+
+            //Erstellt die Liste (leere oder mit gespeicherten Elementen)
 
             //Add events
             EditAddWindow.DaemonSavedEvent += EditAddWindow_DaemonSavedEvent;
@@ -63,7 +68,7 @@ namespace DaemonMaster
             }
             catch (Exception ex)
             {
-                MessageBox.Show(LanguageSystem.resManager.GetString("cant_load_deamonfile", LanguageSystem.culture) + ex.Message);
+                MessageBox.Show(resManager.GetString("cant_load_deamonfile", CultureInfo.CurrentUICulture) + ex.Message);
                 processCollection = new ObservableCollection<Daemon>();
             }
 
@@ -75,7 +80,7 @@ namespace DaemonMaster
 
             if (!ServiceManagment.CheckUI0DetectService())
             {
-                MessageBox.Show(LanguageSystem.resManager.GetString("error_ui0service", LanguageSystem.culture), LanguageSystem.resManager.GetString("error", LanguageSystem.culture), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(resManager.GetString("error_ui0service", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -193,12 +198,12 @@ namespace DaemonMaster
         private void MenuItem_Click_Export(object sender, RoutedEventArgs e)
         {
             //DaemonMasterCore.ExportList(processCollection);
-            MessageBox.Show(LanguageSystem.resManager.GetString("currently_unavailable"), LanguageSystem.resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(resManager.GetString("currently_unavailable"), resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void MenuItem_Click_Import(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(LanguageSystem.resManager.GetString("currently_unavailable"), LanguageSystem.resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(resManager.GetString("currently_unavailable"), resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         #endregion
@@ -233,7 +238,7 @@ namespace DaemonMaster
             //Wenn der RegKey nicht gestetzt ist, soll der Nutzer gefragt werden
             if (!ServiceManagment.CheckNoInteractiveServicesRegKey())
             {
-                MessageBoxResult result = MessageBox.Show(LanguageSystem.resManager.GetString("interactive_service_regkey_not_set"), LanguageSystem.resManager.GetString("question"), MessageBoxButton.YesNo, MessageBoxImage.Question);
+                MessageBoxResult result = MessageBox.Show(resManager.GetString("interactive_service_regkey_not_set"), resManager.GetString("question"), MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
                 {
                     if (ServiceManagment.ActivateInteractiveServices())
@@ -242,7 +247,7 @@ namespace DaemonMaster
                     }
                     else
                     {
-                        MessageBox.Show(LanguageSystem.resManager.GetString("problem_occurred"), LanguageSystem.resManager.GetString("error"), MessageBoxButton.OK);
+                        MessageBox.Show(resManager.GetString("problem_occurred"), resManager.GetString("error"), MessageBoxButton.OK);
                     }
                 }
 
@@ -260,7 +265,7 @@ namespace DaemonMaster
             }
             else
             {
-                MessageBox.Show(LanguageSystem.resManager.GetString("max_limit_reached"), LanguageSystem.resManager.GetString("warning"), MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(resManager.GetString("max_limit_reached"), resManager.GetString("warning"), MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -274,11 +279,11 @@ namespace DaemonMaster
                 ServiceManagment.DeleteService(daemon);
                 processCollection.RemoveAt(listBoxDaemons.SelectedIndex);
 
-                MessageBox.Show(LanguageSystem.resManager.GetString("the_service_deletion_was_successful"), LanguageSystem.resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(resManager.GetString("the_service_deletion_was_successful"), resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception)
             {
-                MessageBox.Show(LanguageSystem.resManager.GetString("the_service_deletion_was_unsuccessful"), LanguageSystem.resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(resManager.GetString("the_service_deletion_was_unsuccessful"), resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -295,15 +300,15 @@ namespace DaemonMaster
             switch (ServiceManagment.StartService(daemon))
             {
                 case -1:
-                    MessageBox.Show(LanguageSystem.resManager.GetString("cannot_start_the_service"), LanguageSystem.resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(resManager.GetString("cannot_start_the_service"), resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
 
                 case 0:
-                    MessageBox.Show(LanguageSystem.resManager.GetString("cannot_start_the_service_already_running"), LanguageSystem.resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(resManager.GetString("cannot_start_the_service_already_running"), resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
 
                 case 1:
-                    MessageBox.Show(LanguageSystem.resManager.GetString("service_start_was_successful"), LanguageSystem.resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(resManager.GetString("service_start_was_successful"), resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
             }
         }
@@ -316,15 +321,15 @@ namespace DaemonMaster
             switch (ServiceManagment.StopService(daemon))
             {
                 case -1:
-                    MessageBox.Show(LanguageSystem.resManager.GetString("cannot_stop_the_service"), LanguageSystem.resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(resManager.GetString("cannot_stop_the_service"), resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
 
                 case 0:
-                    MessageBox.Show(LanguageSystem.resManager.GetString("cannot_stop_the_service_already_stopped"), LanguageSystem.resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(resManager.GetString("cannot_stop_the_service_already_stopped"), resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
 
                 case 1:
-                    MessageBox.Show(LanguageSystem.resManager.GetString("service_stop_was_successful"), LanguageSystem.resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(resManager.GetString("service_stop_was_successful"), resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
             }
         }
@@ -333,7 +338,7 @@ namespace DaemonMaster
         {
             if (ServiceManagment.CheckUI0DetectService())
             {
-                MessageBoxResult result = MessageBox.Show(LanguageSystem.resManager.GetString("windows10_mouse_keyboard", LanguageSystem.culture), LanguageSystem.resManager.GetString("warning", LanguageSystem.culture), MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                MessageBoxResult result = MessageBox.Show(resManager.GetString("windows10_mouse_keyboard", CultureInfo.CurrentUICulture), resManager.GetString("warning", CultureInfo.CurrentUICulture), MessageBoxButton.OKCancel, MessageBoxImage.Warning);
                 if (result == MessageBoxResult.OK)
                 {
                     DaemonMasterCore.Win32.WINSTA.WinStationSwitchToServicesSession();
@@ -341,7 +346,7 @@ namespace DaemonMaster
             }
             else
             {
-                MessageBox.Show(LanguageSystem.resManager.GetString("failed_start_UI0detect_service", LanguageSystem.culture), LanguageSystem.resManager.GetString("error", LanguageSystem.culture), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(resManager.GetString("failed_start_UI0detect_service", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -361,11 +366,11 @@ namespace DaemonMaster
                 RegistryManagment.SaveInRegistry(daemon);
                 processCollection.Add(daemon);
 
-                MessageBox.Show(LanguageSystem.resManager.GetString("the_service_installation_was_successful", LanguageSystem.culture), LanguageSystem.resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(resManager.GetString("the_service_installation_was_successful", CultureInfo.CurrentUICulture), resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(LanguageSystem.resManager.GetString("the_service_installation_was_unsuccessful", LanguageSystem.culture) + "\n\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(resManager.GetString("the_service_installation_was_unsuccessful", CultureInfo.CurrentUICulture) + "\n\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -378,7 +383,7 @@ namespace DaemonMaster
             }
             catch (Exception ex)
             {
-                MessageBox.Show(LanguageSystem.resManager.GetString("data_cant_be_saved", LanguageSystem.culture) + ex.Message, LanguageSystem.resManager.GetString("error", LanguageSystem.culture), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(resManager.GetString("data_cant_be_saved", CultureInfo.CurrentUICulture) + ex.Message, resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
