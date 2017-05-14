@@ -68,7 +68,7 @@ namespace DaemonMaster
             }
             catch (Exception ex)
             {
-                MessageBox.Show(resManager.GetString("cant_load_deamonfile", CultureInfo.CurrentUICulture) + ex.Message);
+                MessageBox.Show(resManager.GetString("cannot_load_deamonfile", CultureInfo.CurrentUICulture) + ex.Message);
                 processCollection = new ObservableCollection<Daemon>();
             }
 
@@ -383,7 +383,7 @@ namespace DaemonMaster
             }
             catch (Exception ex)
             {
-                MessageBox.Show(resManager.GetString("data_cant_be_saved", CultureInfo.CurrentUICulture) + ex.Message, resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(resManager.GetString("data_cannot_be_saved", CultureInfo.CurrentUICulture) + ex.Message, resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
