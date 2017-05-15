@@ -51,11 +51,11 @@
   <ItemGroup>
     <Compile Include="Daemon.cs" />
     <Compile Include="DaemonMasterUtils.cs" />
-    <Compile Include="JSONManagment.cs" />
-    <Compile Include="ProcessManagment.cs" />
-    <Compile Include="RegistryManagment.cs" />
-    <Compile Include="SecurityManagment.cs" />
-    <Compile Include="ServiceManagment.cs" />
+    <Compile Include="JsonManagement.cs" />
+    <Compile Include="ProcessManagement.cs" />
+    <Compile Include="RegistryManagement.cs" />
+    <Compile Include="SecurityManagement.cs" />
+    <Compile Include="ServiceManagement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Win32\ADVAPI.cs" />
     <Compile Include="Win32\KERNEL32.cs" />

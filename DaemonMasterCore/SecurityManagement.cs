@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: SECURITY MANAGMENT FILE
+//  DaemonMaster: SECURITY MANAGEMENT FILE
 //  
 //  This file is part of DeamonMaster.
 // 
@@ -23,7 +23,7 @@ using System.Security;
 
 namespace DaemonMasterCore
 {
-    public static class SecurityManagment
+    public static class SecurityManagement
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                            Security                                                  //

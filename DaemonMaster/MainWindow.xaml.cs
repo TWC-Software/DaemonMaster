@@ -64,7 +64,7 @@ namespace DaemonMaster
             //Bei einem Problem bei laden aus der Registry wird eine leere Liste geladen und eine Fehlermeldung angezeigt
             try
             {
-                processCollection = RegistryManagment.LoadFromRegistry();
+                processCollection = RegistryManagement.LoadFromRegistry();
             }
             catch (Exception ex)
             {
@@ -78,7 +78,7 @@ namespace DaemonMaster
             //Aktualisiert die Liste zum start
             listBoxDaemons.ItemsSource = processCollection;
 
-            if (!ServiceManagment.CheckUI0DetectService())
+            if (!ServiceManagement.CheckUI0DetectService())
             {
                 MessageBox.Show(resManager.GetString("error_ui0service", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -236,12 +236,12 @@ namespace DaemonMaster
         private bool AskToEnableInteractiveServices()
         {
             //Wenn der RegKey nicht gestetzt ist, soll der Nutzer gefragt werden
-            if (!ServiceManagment.CheckNoInteractiveServicesRegKey())
+            if (!ServiceManagement.CheckNoInteractiveServicesRegKey())
             {
                 MessageBoxResult result = MessageBox.Show(resManager.GetString("interactive_service_regkey_not_set"), resManager.GetString("question"), MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
                 {
-                    if (ServiceManagment.ActivateInteractiveServices())
+                    if (ServiceManagement.ActivateInteractiveServices())
                     {
                         return true;
                     }
@@ -276,7 +276,7 @@ namespace DaemonMaster
 
             try
             {
-                ServiceManagment.DeleteService(daemon);
+                ServiceManagement.DeleteService(daemon);
                 processCollection.RemoveAt(listBoxDaemons.SelectedIndex);
 
                 MessageBox.Show(resManager.GetString("the_service_deletion_was_successful"), resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
@@ -297,7 +297,7 @@ namespace DaemonMaster
             if (daemon == null)
                 return;
 
-            switch (ServiceManagment.StartService(daemon))
+            switch (ServiceManagement.StartService(daemon))
             {
                 case -1:
                     MessageBox.Show(resManager.GetString("cannot_start_the_service"), resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
@@ -318,7 +318,7 @@ namespace DaemonMaster
             if (daemon == null)
                 return;
 
-            switch (ServiceManagment.StopService(daemon))
+            switch (ServiceManagement.StopService(daemon))
             {
                 case -1:
                     MessageBox.Show(resManager.GetString("cannot_stop_the_service"), resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
@@ -336,7 +336,7 @@ namespace DaemonMaster
 
         private void SwitchToSession0()
         {
-            if (ServiceManagment.CheckUI0DetectService())
+            if (ServiceManagement.CheckUI0DetectService())
             {
                 MessageBoxResult result = MessageBox.Show(resManager.GetString("windows10_mouse_keyboard", CultureInfo.CurrentUICulture), resManager.GetString("warning", CultureInfo.CurrentUICulture), MessageBoxButton.OKCancel, MessageBoxImage.Warning);
                 if (result == MessageBoxResult.OK)
@@ -362,8 +362,8 @@ namespace DaemonMaster
         {
             try
             {
-                ServiceManagment.CreateInteractiveService(daemon);
-                RegistryManagment.SaveInRegistry(daemon);
+                ServiceManagement.CreateInteractiveService(daemon);
+                RegistryManagement.SaveInRegistry(daemon);
                 processCollection.Add(daemon);
 
                 MessageBox.Show(resManager.GetString("the_service_installation_was_successful", CultureInfo.CurrentUICulture), resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
@@ -378,7 +378,7 @@ namespace DaemonMaster
         {
             try
             {
-                RegistryManagment.SaveInRegistry(daemon);
+                RegistryManagement.SaveInRegistry(daemon);
                 processCollection[index] = daemon;
             }
             catch (Exception ex)

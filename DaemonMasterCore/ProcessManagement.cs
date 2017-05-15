@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: PROCESS MANAGMENT CONFIG FILE
+//  DaemonMaster: PROCESS MANAGEMENT CONFIG FILE
 //  
 //  This file is part of DeamonMaster.
 // 
@@ -26,7 +26,7 @@ using DaemonMasterCore.Win32;
 
 namespace DaemonMasterCore
 {
-    public static class ProcessManagment
+    public static class ProcessManagement
     {
         public static bool CloseConsoleApplication(bool useCtrlC, uint Id)
         {
@@ -44,38 +44,34 @@ namespace DaemonMasterCore
         {
             IntPtr processHandle = KERNEL32.OpenThread(KERNEL32.ThreadAccess.SUSPEND_RESUME, true, Id);
 
-            if (processHandle != IntPtr.Zero)
-            {
-                try
-                {
-                    return KERNEL32.SuspendThread(processHandle);
-                }
-                finally
-                {
-                    KERNEL32.CloseHandle(processHandle);
-                }
-            }
+            if (processHandle == IntPtr.Zero)
+                return false;
 
-            return false;
+            try
+            {
+                return KERNEL32.SuspendThread(processHandle);
+            }
+            finally
+            {
+                KERNEL32.CloseHandle(processHandle);
+            }
         }
 
         public static bool ResumeProcess(uint Id)
         {
             IntPtr processHandle = KERNEL32.OpenThread(KERNEL32.ThreadAccess.SUSPEND_RESUME, true, (uint)Id);
 
-            if (processHandle != IntPtr.Zero)
-            {
-                try
-                {
-                    return KERNEL32.ResumeThread(processHandle);
-                }
-                finally
-                {
-                    KERNEL32.CloseHandle(processHandle);
-                }
-            }
+            if (processHandle == IntPtr.Zero)
+                return false;
 
-            return false;
+            try
+            {
+                return KERNEL32.ResumeThread(processHandle);
+            }
+            finally
+            {
+                KERNEL32.CloseHandle(processHandle);
+            }
         }
     }
 }

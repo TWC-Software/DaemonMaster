@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: JSON MANAGMENT FILE
+//  DaemonMaster: JSON MANAGEMENT FILE
 //  
 //  This file is part of DeamonMaster.
 // 
@@ -30,7 +30,7 @@ using System.Windows.Forms;
 namespace DaemonMasterCore
 {
     //Try CATCH REMOVE
-    public static class JSONManagment
+    public static class JsonManagement
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                             JSON                                                     //

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: SERVICE MANAGMENT FILE
+//  DaemonMaster: SERVICE MANAGEMENT FILE
 //  
 //  This file is part of DeamonMaster.
 // 
@@ -33,12 +33,12 @@ using Microsoft.Win32;
 namespace DaemonMasterCore
 {
 
-    public static class ServiceManagment
+    public static class ServiceManagement
     {
         //Timeout Start/Stop Services (in ms)
         private const int timeout = 10000;
 
-        private static string DaemonMasterServicePath = AppDomain.CurrentDomain.BaseDirectory;
+        private static readonly string DaemonMasterServicePath = AppDomain.CurrentDomain.BaseDirectory;
         private const string DaemonMasterServiceFile = "DaemonMasterService.exe";
         private const string DaemonMasterServiceParameter = " -service";
 

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: REGISTRY MANAGMENT FILE
+//  DaemonMaster: REGISTRY MANAGEMENT FILE
 //  
 //  This file is part of DeamonMaster.
 // 
@@ -19,13 +19,14 @@
 
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.ServiceProcess;
 
 namespace DaemonMasterCore
 {
-    public static class RegistryManagment
+    public static class RegistryManagement
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                            REGISTRY                                                  //
@@ -88,28 +89,46 @@ namespace DaemonMasterCore
                 if (key == null)
                     throw new Exception("Can't open registry key!");
 
-                Daemon daemon = new Daemon();
-
-                daemon.DisplayName = (string)key.GetValue("DisplayName");
-                daemon.ServiceName = (string)key.GetValue("ServiceName");
-
-                daemon.FileDir = (string)key.GetValue("FileDir");
-                daemon.FileName = (string)key.GetValue("FileName");
-
-                daemon.Parameter = (string)(key.GetValue("Parameter") ?? String.Empty);
-                daemon.UserName = (string)(key.GetValue("UserName") ?? String.Empty);
-                daemon.UserPassword = (string)(key.GetValue("UserPassword") ?? String.Empty);
-                daemon.MaxRestarts = (int)(key.GetValue("MaxRestarts") ?? 3);
-
-                daemon.ProcessKillTime = (int)(key.GetValue("ProcessKillTime") ?? 5000);
-                daemon.ProcessRestartDelay = (int)(key.GetValue("ProcessRestartDelay") ?? 0);
-                daemon.CounterResetTime = (int)(key.GetValue("CounterResetTime") ?? 2000);
-
-                daemon.ConsoleApplication = Convert.ToBoolean((key.GetValue("ConsoleApplication") ?? false));
-                daemon.UseCtrlC = Convert.ToBoolean((key.GetValue("UseCtrlC") ?? false));
+                Daemon daemon = new Daemon
+                {
+                    DisplayName = (string)key.GetValue("DisplayName"),
+                    ServiceName = (string)key.GetValue("ServiceName"),
+                    FileDir = (string)key.GetValue("FileDir"),
+                    FileName = (string)key.GetValue("FileName"),
+                    Parameter = (string)(key.GetValue("Parameter") ?? String.Empty),
+                    UserName = (string)(key.GetValue("UserName") ?? String.Empty),
+                    UserPassword = (string)(key.GetValue("UserPassword") ?? String.Empty),
+                    MaxRestarts = (int)(key.GetValue("MaxRestarts") ?? 3),
+                    ProcessKillTime = (int)(key.GetValue("ProcessKillTime") ?? 5000),
+                    ProcessRestartDelay = (int)(key.GetValue("ProcessRestartDelay") ?? 0),
+                    CounterResetTime = (int)(key.GetValue("CounterResetTime") ?? 2000),
+                    ConsoleApplication = Convert.ToBoolean((key.GetValue("ConsoleApplication") ?? false)),
+                    UseCtrlC = Convert.ToBoolean((key.GetValue("UseCtrlC") ?? false))
+                };
 
                 return daemon;
             }
+        }
+
+        public static List<string> LoadDaemonsFromRegistry()
+        {
+            List<string> daemons = null;
+
+            ServiceController[] sc = ServiceController.GetServices();
+
+            foreach (ServiceController service in sc)
+            {
+                try
+                {
+                    if (service.ServiceName.Contains("DaemonMaster_"))
+                        daemons.Add(service.DisplayName);
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+            }
+            return daemons;
         }
 
         #endregion

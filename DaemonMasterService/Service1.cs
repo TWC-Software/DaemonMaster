@@ -52,7 +52,7 @@ namespace DaemonMasterService
             try
             {
                 //Load config from registry
-                daemon = RegistryManagment.LoadDaemonFromRegistry(DaemonMasterUtils.GetServiceName());
+                daemon = RegistryManagement.LoadDaemonFromRegistry(DaemonMasterUtils.GetServiceName());
             }
             catch (Exception)
             {
@@ -72,7 +72,7 @@ namespace DaemonMasterService
         protected override void OnPause()
         {
 
-            ProcessManagment.PauseProcess((uint)process.Id);
+            ProcessManagement.PauseProcess((uint)process.Id);
 
             base.OnPause();
         }
@@ -81,7 +81,7 @@ namespace DaemonMasterService
         {
             base.OnContinue();
 
-            ProcessManagment.ResumeProcess((uint)process.Id);
+            ProcessManagement.ResumeProcess((uint)process.Id);
         }
 
 
@@ -104,7 +104,7 @@ namespace DaemonMasterService
                             //Schließt, wenn es eine Consolen Anwendung ist, das fenster mit einem Ctrl-C / Ctrl-Break Befehl
                             if (daemon.ConsoleApplication)
                             {
-                                ProcessManagment.CloseConsoleApplication(daemon.UseCtrlC, (uint)process.Id);
+                                ProcessManagement.CloseConsoleApplication(daemon.UseCtrlC, (uint)process.Id);
                             }
                         }
                     }
