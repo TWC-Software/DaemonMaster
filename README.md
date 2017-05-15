@@ -1,6 +1,7 @@
 
 # DaemonMaster Alpha
 Daemon Master is a software which makes it possible to create and manage a Windows-service from any program.
+WARNING SOFTWARE IS IN EARLY ALPHA !
 
 ## Features
 - Easy and fast creation / deletion of services
