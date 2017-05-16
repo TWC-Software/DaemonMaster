@@ -95,14 +95,14 @@ namespace DaemonMasterCore
             }
         }
 
-        public static int StartService(Daemon daemon)
+        public static int StartService(string serviceName)
         {
             try
             {
                 if (!CheckUI0DetectService())
                     return -1;
 
-                using (ServiceController scManager = new ServiceController(daemon.ServiceName))
+                using (ServiceController scManager = new ServiceController(serviceName))
                 {
                     if (scManager.Status == ServiceControllerStatus.Running)
                         return 0;
@@ -123,11 +123,11 @@ namespace DaemonMasterCore
             }
         }
 
-        public static int StopService(Daemon daemon)
+        public static int StopService(string serviceName)
         {
             try
             {
-                using (ServiceController scManager = new ServiceController(daemon.ServiceName))
+                using (ServiceController scManager = new ServiceController(serviceName))
                 {
 
                     if (scManager.Status == ServiceControllerStatus.Stopped)
@@ -139,7 +139,6 @@ namespace DaemonMasterCore
 
                     //Prüft ob der Service gestoppt ist oder einen Timeout gemacht hat
                     scManager.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromMilliseconds(timeout));
-
                     return 1;
                 }
             }
@@ -149,7 +148,7 @@ namespace DaemonMasterCore
             }
         }
 
-        public static void DeleteService(Daemon daemon)
+        public static void DeleteService(string serviceName)
         {
 
             IntPtr scManager = ADVAPI.OpenSCManager(null, null, (uint)ADVAPI.SCM_ACCESS.SC_MANAGER_CONNECT);
@@ -159,7 +158,7 @@ namespace DaemonMasterCore
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             }
 
-            IntPtr svManager = ADVAPI.OpenService(scManager, daemon.ServiceName, (uint)ADVAPI.SERVICE_ACCESS.DELETE | (uint)ADVAPI.SERVICE_ACCESS.SERVICE_QUERY_STATUS | (uint)ADVAPI.SERVICE_ACCESS.SERVICE_ENUMERATE_DEPENDENTS);
+            IntPtr svManager = ADVAPI.OpenService(scManager, serviceName, (uint)ADVAPI.SERVICE_ACCESS.DELETE | (uint)ADVAPI.SERVICE_ACCESS.SERVICE_QUERY_STATUS | (uint)ADVAPI.SERVICE_ACCESS.SERVICE_ENUMERATE_DEPENDENTS);
 
             if (svManager == IntPtr.Zero)
             {
@@ -170,7 +169,7 @@ namespace DaemonMasterCore
             //Prüft ob der Service gestoppt ist
             if (QueryServiceStatusEx(svManager).currentState != (int)ADVAPI.SERVICE_STATE.SERVICE_STOPPED)
             {
-                if (StopService(daemon) < 0)
+                if (StopService(serviceName) < 0)
                 {
                     ADVAPI.CloseServiceHandle(scManager);
                     ADVAPI.CloseServiceHandle(svManager);
@@ -187,22 +186,6 @@ namespace DaemonMasterCore
             ADVAPI.CloseServiceHandle(scManager);
             ADVAPI.CloseServiceHandle(svManager);
         }
-
-        public static void DeleteAllServices(ObservableCollection<Daemon> daemons)
-        {
-            foreach (Daemon d in daemons)
-            {
-                try
-                {
-                    DeleteService(d);
-                }
-                catch (Exception)
-                {
-                    continue;
-                }
-            }
-        }
-
 
         //http://www.pinvoke.net/default.aspx/advapi32.QueryServiceStatusEx
         public static ADVAPI.SERVICE_STATUS_PROCESS QueryServiceStatusEx(IntPtr svManager)

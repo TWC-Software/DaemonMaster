@@ -18,6 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
+using System;
 using Newtonsoft.Json;
 using System.Windows.Media;
 
@@ -27,6 +28,17 @@ namespace DaemonMasterCore
     {
         public Daemon()
         {
+            Parameter = String.Empty;
+            UserName = String.Empty;
+            UserPassword = String.Empty;
+
+            MaxRestarts = 3;
+            ProcessKillTime = 9500;
+            ProcessRestartDelay = 2500;
+            CounterResetTime = 10000;
+
+            ConsoleApplication = false;
+            UseCtrlC = false;
         }
 
         public override string ToString()
@@ -39,16 +51,13 @@ namespace DaemonMasterCore
 
         public string FileDir { get; set; }
         public string FileName { get; set; }
-        public string FullPath
-        {
-            get { return FileDir + @"\" + FileName; }
-        }
+        public string FullPath => FileDir + @"\" + FileName;
 
         public string Parameter { get; set; }
         public string UserName { get; set; }
         public string UserPassword { get; set; }
-        public int MaxRestarts { get; set; }
 
+        public int MaxRestarts { get; set; }
         public int ProcessKillTime { get; set; }
         public int ProcessRestartDelay { get; set; }
         public int CounterResetTime { get; set; }
@@ -57,9 +66,6 @@ namespace DaemonMasterCore
         public bool UseCtrlC { get; set; }
 
         [JsonIgnore]
-        public ImageSource Icon
-        {
-            get { return DaemonMasterUtils.GetIcon(FullPath); }
-        }
+        public ImageSource Icon => DaemonMasterUtils.GetIcon(FullPath);
     }
 }

@@ -187,6 +187,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Cannot load data from registry ähnelt.
+        /// </summary>
+        public static string cannot_load_data_from_registry {
+            get {
+                return ResourceManager.GetString("cannot_load_data_from_registry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Cannot load Daemon file!\n ähnelt.
         /// </summary>
         public static string cannot_load_deamonfile {

@@ -249,4 +249,7 @@
   <data name="label_filter" xml:space="preserve">
     <value>Filter</value>
   </data>
+  <data name="cannot_load_data_from_registry" xml:space="preserve">
+    <value>Cannot load data from registry</value>
+  </data>
 </root>

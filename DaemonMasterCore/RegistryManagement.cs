@@ -95,24 +95,24 @@ namespace DaemonMasterCore
                     ServiceName = (string)key.GetValue("ServiceName"),
                     FileDir = (string)key.GetValue("FileDir"),
                     FileName = (string)key.GetValue("FileName"),
-                    Parameter = (string)(key.GetValue("Parameter") ?? String.Empty),
-                    UserName = (string)(key.GetValue("UserName") ?? String.Empty),
-                    UserPassword = (string)(key.GetValue("UserPassword") ?? String.Empty),
-                    MaxRestarts = (int)(key.GetValue("MaxRestarts") ?? 3),
-                    ProcessKillTime = (int)(key.GetValue("ProcessKillTime") ?? 5000),
-                    ProcessRestartDelay = (int)(key.GetValue("ProcessRestartDelay") ?? 0),
-                    CounterResetTime = (int)(key.GetValue("CounterResetTime") ?? 2000),
-                    ConsoleApplication = Convert.ToBoolean((key.GetValue("ConsoleApplication") ?? false)),
-                    UseCtrlC = Convert.ToBoolean((key.GetValue("UseCtrlC") ?? false))
+                    Parameter = (string)key.GetValue("Parameter"),
+                    UserName = (string)key.GetValue("UserName"),
+                    UserPassword = (string)key.GetValue("UserPassword"),
+                    MaxRestarts = (int)key.GetValue("MaxRestarts"),
+                    ProcessKillTime = (int)key.GetValue("ProcessKillTime"),
+                    ProcessRestartDelay = (int)key.GetValue("ProcessRestartDelay"),
+                    CounterResetTime = (int)key.GetValue("CounterResetTime"),
+                    ConsoleApplication = Convert.ToBoolean(key.GetValue("ConsoleApplication")),
+                    UseCtrlC = Convert.ToBoolean(key.GetValue("UseCtrlC"))
                 };
 
                 return daemon;
             }
         }
 
-        public static List<string> LoadDaemonsFromRegistry()
+        public static ObservableCollection<DaemonInfo> LoadDaemonInfosFromRegistry()
         {
-            List<string> daemons = null;
+            ObservableCollection<DaemonInfo> daemons = new ObservableCollection<DaemonInfo>();
 
             ServiceController[] sc = ServiceController.GetServices();
 
@@ -121,7 +121,15 @@ namespace DaemonMasterCore
                 try
                 {
                     if (service.ServiceName.Contains("DaemonMaster_"))
-                        daemons.Add(service.DisplayName);
+                    {
+                        DaemonInfo daemonInfo = new DaemonInfo
+                        {
+                            DisplayName = service.DisplayName,
+                            ServiceName = service.ServiceName
+                        };
+
+                        daemons.Add(daemonInfo);
+                    }
                 }
                 catch (Exception)
                 {
