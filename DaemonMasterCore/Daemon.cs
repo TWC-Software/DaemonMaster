@@ -26,6 +26,7 @@ namespace DaemonMasterCore
 {
     public class Daemon
     {
+        //Default parameter
         public Daemon()
         {
             Parameter = String.Empty;
@@ -64,8 +65,5 @@ namespace DaemonMasterCore
 
         public bool ConsoleApplication { get; set; }
         public bool UseCtrlC { get; set; }
-
-        [JsonIgnore]
-        public ImageSource Icon => DaemonMasterUtils.GetIcon(FullPath);
     }
 }

@@ -169,7 +169,8 @@ namespace DaemonMaster
                             DaemonInfo daemonInfo = new DaemonInfo
                             {
                                 DisplayName = daemon.DisplayName,
-                                ServiceName = daemon.ServiceName
+                                ServiceName = daemon.ServiceName,
+                                FullPath = daemon.FullPath
                             };
 
                             OnDaemonSavedEvent(daemonInfo);
