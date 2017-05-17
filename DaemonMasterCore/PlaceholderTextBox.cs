@@ -42,7 +42,6 @@ namespace DaemonMasterCore
         {
             get
             {
-                //Get String.Empty
                 if (base.Text == placeholder)
                     return String.Empty;
 
@@ -51,8 +50,15 @@ namespace DaemonMasterCore
 
             set
             {
-                base.Text = value;
-                Foreground = System.Windows.Media.Brushes.Black;
+                if (String.IsNullOrWhiteSpace(value))
+                {
+                    SetPlaceholder();
+                }
+                else
+                {
+                    base.Text = value;
+                    Foreground = System.Windows.Media.Brushes.Black;
+                }
             }
         }
 
