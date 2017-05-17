@@ -249,4 +249,13 @@
   <data name="label_filter" xml:space="preserve">
     <value>Filter</value>
   </data>
+  <data name="switch_to_session_0" xml:space="preserve">
+    <value>Wechsle zu Sitzung 0</value>
+  </data>
+  <data name="add" xml:space="preserve">
+    <value>Hinzufügen</value>
+  </data>
+  <data name="cannot_load_data_from_registry" xml:space="preserve">
+    <value>Daten konnten nicht von der Registry geladen werden!</value>
+  </data>
 </root>

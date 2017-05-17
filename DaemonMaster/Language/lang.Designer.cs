@@ -63,6 +63,15 @@ namespace DaemonMaster.Language {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Add ähnelt.
         /// </summary>
+        public static string add {
+            get {
+                return ResourceManager.GetString("add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Add ähnelt.
+        /// </summary>
         public static string button_add_service {
             get {
                 return ResourceManager.GetString("button_add_service", resourceCulture);
@@ -187,7 +196,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Cannot load data from registry ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Cannot load data from registry! ähnelt.
         /// </summary>
         public static string cannot_load_data_from_registry {
             get {
@@ -390,6 +399,15 @@ namespace DaemonMaster.Language {
         public static string success {
             get {
                 return ResourceManager.GetString("success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Switch to Session 0 ähnelt.
+        /// </summary>
+        public static string switch_to_session_0 {
+            get {
+                return ResourceManager.GetString("switch_to_session_0", resourceCulture);
             }
         }
         

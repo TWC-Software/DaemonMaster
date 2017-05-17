@@ -250,6 +250,12 @@
     <value>Filter</value>
   </data>
   <data name="cannot_load_data_from_registry" xml:space="preserve">
-    <value>Cannot load data from registry</value>
+    <value>Cannot load data from registry!</value>
+  </data>
+  <data name="add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="switch_to_session_0" xml:space="preserve">
+    <value>Switch to Session 0</value>
   </data>
 </root>
