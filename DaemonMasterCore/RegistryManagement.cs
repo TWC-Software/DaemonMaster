@@ -122,13 +122,20 @@ namespace DaemonMasterCore
                 {
                     if (service.ServiceName.Contains("DaemonMaster_"))
                     {
-                        DaemonInfo daemonInfo = new DaemonInfo
+                        using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\" + service.ServiceName + @"\Parameters", false))
                         {
-                            DisplayName = service.DisplayName,
-                            ServiceName = service.ServiceName
-                        };
+                            if (key == null)
+                                throw new Exception("Can't open registry key!");
 
-                        daemons.Add(daemonInfo);
+                            DaemonInfo daemonInfo = new DaemonInfo
+                            {
+                                DisplayName = service.DisplayName,
+                                ServiceName = service.ServiceName,
+                                FullPath = (string)key.GetValue("FileDir") + @"/" + (string)key.GetValue("FileName")
+                            };
+
+                            daemons.Add(daemonInfo);
+                        }
                     }
                 }
                 catch (Exception)
