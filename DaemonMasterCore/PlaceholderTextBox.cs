@@ -1,5 +1,23 @@
+/////////////////////////////////////////////////////////////////////////////////////////
+//  DaemonMaster: PLACEHOLDERTEXTBOX FILE
+//  
+//  This file is part of DeamonMaster.
+// 
+//  DeamonMaster is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//   DeamonMaster is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//
+//   You should have received a copy of the GNU General Public License
+//   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+/////////////////////////////////////////////////////////////////////////////////////////
+
 using System;
-using System.Xaml;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -19,6 +37,25 @@ namespace DaemonMasterCore
             }
         }
 
+
+        public new string Text
+        {
+            get
+            {
+                //Get String.Empty
+                if (base.Text == placeholder)
+                    return String.Empty;
+
+                return base.Text;
+            }
+
+            set
+            {
+                base.Text = value;
+                Foreground = System.Windows.Media.Brushes.Black;
+            }
+        }
+
         protected override void OnGotFocus(RoutedEventArgs e)
         {
             base.OnGotFocus(e);
@@ -35,18 +72,18 @@ namespace DaemonMasterCore
 
         private void SetPlaceholder()
         {
-            if (String.IsNullOrWhiteSpace(Text))
+            if (String.IsNullOrWhiteSpace(base.Text))
             {
-                Text = placeholder;
+                base.Text = placeholder;
                 Foreground = System.Windows.Media.Brushes.Gray;
             }
         }
 
         private void RemovePlaceholder()
         {
-            if (Text == placeholder)
+            if (base.Text == placeholder)
             {
-                Text = String.Empty;
+                base.Text = String.Empty;
                 Foreground = System.Windows.Media.Brushes.Black;
             }
         }

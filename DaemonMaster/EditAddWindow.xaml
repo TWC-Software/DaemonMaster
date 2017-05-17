@@ -4,10 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DaemonMaster"
-        xmlns:resx="clr-namespace:DaemonMaster.Language"
         xmlns:core="clr-namespace:DaemonMasterCore;assembly=DaemonMasterCore"
+        xmlns:resx="clr-namespace:DaemonMaster.Language"
         mc:Ignorable="d"
         Title="Edit / Add a Process" Height="298.496" Width="705.731" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
+    
     <TabControl VerticalContentAlignment="Center">
         <TabItem Header="General">
             <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,-1,-2" Height="217">
