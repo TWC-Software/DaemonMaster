@@ -5,11 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DaemonMaster"
         mc:Ignorable="d"
-        Title="CreditsWindow" Height="434.275" Width="317.983">
+        Title="CreditsWindow" Height="434.275" Width="336.384">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="31*"/>
-            <ColumnDefinition Width="42*"/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <ScrollViewer Grid.ColumnSpan="2">
             <Grid>
@@ -17,7 +17,7 @@
                    Margin="10,184,10,10" 
                    ScrollViewer.VerticalScrollBarVisibility="Visible"
                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                   ScrollViewer.CanContentScroll="True"><Run Text="The program &quot;DeamonMaster&quot; was originally &#xA;created by MCPC10"/><Run Text=" (Main Developer) "/><Run Text="and "/><Run Text="Stuffi3000"/><Run Text="&#xA;&#xA;GUI: Stuffi3000, MCPC10&#xA;Code: MCPC10 &#xA;Icon: Stuffi3000&#xA;&#xA;Used Librarys:&#xA;Newtonsoft.Json&#xA;&#xA;Thanks to :&#xA;Pinvoke.net&#xA;stackoverflow.com (for help from the user"/><Run Text="s"/><Run Text=")"/></TextBlock>
+                   ScrollViewer.CanContentScroll="True" HorizontalAlignment="Center"><Run Text="The program &quot;DeamonMaster&quot; was originally &#xA;created by MCPC10"/><Run Text=" (Main Developer) "/><Run Text="and "/><Run Text="Stuffi3000"/><Run Text="&#xA;&#xA;GUI: Stuffi3000, MCPC10&#xA;Code: MCPC10 &#xA;Icon: Stuffi3000&#xA;&#xA;Used Librarys:&#xA;Newtonsoft.Json&#xA;&#xA;Thanks to :&#xA;Pinvoke.net&#xA;stackoverflow.com (for help from the user"/><Run Text="s"/><Run Text=")"/></TextBlock>
                 <Image x:Name="image" Height="159" Margin="64,13,64,0" VerticalAlignment="Top" Source="DeamonMaster Icon.bmp"/>
             </Grid>
         </ScrollViewer>
