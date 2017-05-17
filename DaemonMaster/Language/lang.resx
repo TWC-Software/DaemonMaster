@@ -139,7 +139,7 @@
     <value>The service is aleady running!</value>
   </data>
   <data name="cannot_stop_the_service" xml:space="preserve">
-    <value>Cannit stop the service!</value>
+    <value>Cannot stop the service!</value>
   </data>
   <data name="cannot_stop_the_service_already_stopped" xml:space="preserve">
     <value>The service was already stopped!</value>

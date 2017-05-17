@@ -241,7 +241,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Cannit stop the service! ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Cannot stop the service! ähnelt.
         /// </summary>
         public static string cannot_stop_the_service {
             get {
