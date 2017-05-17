@@ -34,12 +34,14 @@
       <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,6 +55,7 @@
     <Compile Include="DaemonMasterUtils.cs" />
     <Compile Include="JsonManagement.cs" />
     <Compile Include="DaemonInfo.cs" />
+    <Compile Include="PlaceholderTextBox.cs" />
     <Compile Include="ProcessManagement.cs" />
     <Compile Include="RegistryManagement.cs" />
     <Compile Include="SecurityManagement.cs" />

@@ -104,8 +104,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>lang.fr-FR.resx</DependentUpon>
     </Compile>
-    <Compile Include="PlaceholderTextbox.cs" />
-    <Compile Include="Win32\WINSTA.cs" />
     <Page Include="CreditsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -118,7 +116,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Win32\ADVAPI.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
