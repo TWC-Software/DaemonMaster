@@ -30,6 +30,7 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Windows.Documents;
 using Microsoft.Win32;
+using DaemonMasterCore.Exceptions;
 
 namespace DaemonMasterCore
 {
@@ -175,8 +176,9 @@ namespace DaemonMasterCore
                 //Check if the service has been stopped
                 if (DaemonMasterUtils.QueryServiceStatusEx(svManager).currentState != (int)ADVAPI.SERVICE_STATE.SERVICE_STOPPED)
                 {
-                    if (StopService(serviceName) < 0)
-                        throw new Win32Exception("Cannot stop the service!, error:\n" + Marshal.GetLastWin32Error());
+                    //if (StopService(serviceName) < 0)
+                    //    throw new Win32Exception("Cannot stop the service!, error:\n" + Marshal.GetLastWin32Error());
+                    throw new ServiceNotStoppedException();
                 }
 
                 //Delete the service
@@ -213,19 +215,22 @@ namespace DaemonMasterCore
 
             try
             {
+
                 //Query status of the service
                 if (DaemonMasterUtils.QueryServiceStatusEx(svManager).currentState != (int)ADVAPI.SERVICE_STATE.SERVICE_STOPPED)
+                    throw new ServiceNotStoppedException();
+
+
+                if (description != null)
                 {
-                    return false;
+                    //create an struct with description of the service
+                    ADVAPI.SERVICE_DESCRIPTION serviceDescription;
+                    serviceDescription.lpDescription = description;
+
+                    //Set the description of the service
+                    if (!ADVAPI.ChangeServiceConfig2(svManager, (uint)ADVAPI.DW_INFO_LEVEL.SERVICE_CONFIG_DESCRIPTION, ref serviceDescription))
+                        throw new Win32Exception("Cannot set the description of the service!, error:\n" + Marshal.GetLastWin32Error());
                 }
-
-                //create an struct with description of the service
-                ADVAPI.SERVICE_DESCRIPTION serviceDescription;
-                serviceDescription.lpDescription = description;
-
-                //Set the description of the service
-                if (!ADVAPI.ChangeServiceConfig2(svManager, (uint)ADVAPI.DW_INFO_LEVEL.SERVICE_CONFIG_DESCRIPTION, ref serviceDescription))
-                    throw new Win32Exception("Cannot set the description of the service!, error:\n" + Marshal.GetLastWin32Error());
 
                 return true;
             }

@@ -25,6 +25,7 @@ using System.Resources;
 using System.Windows;
 using System.Windows.Input;
 using DaemonMasterCore;
+using DaemonMasterCore.Exceptions;
 
 
 
@@ -272,7 +273,12 @@ namespace DaemonMaster
                 ServiceManagement.DeleteService(daemonInfo.ServiceName);
                 processCollection.RemoveAt(listBoxDaemons.SelectedIndex);
 
-                MessageBox.Show(resManager.GetString("the_service_deletion_was_successful"), resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(resManager.GetString("the_service_deletion_was_successful"),
+                    resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (ServiceNotStoppedException)
+            {
+                MessageBox.Show(resManager.GetString("you_must_stop_the_service_first"), resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception)
             {

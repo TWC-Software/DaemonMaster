@@ -482,5 +482,14 @@ namespace DaemonMaster.Language {
                 return ResourceManager.GetString("windows10_mouse_keyboard", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die You must stop the service first ähnelt.
+        /// </summary>
+        public static string you_must_stop_the_service_first {
+            get {
+                return ResourceManager.GetString("you_must_stop_the_service_first", resourceCulture);
+            }
+        }
     }
 }
