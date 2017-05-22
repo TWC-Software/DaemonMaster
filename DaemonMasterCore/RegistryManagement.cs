@@ -55,30 +55,9 @@ namespace DaemonMasterCore
 
                 serviceKey.SetValue("ConsoleApplication", daemon.ConsoleApplication, RegistryValueKind.DWord);
                 serviceKey.SetValue("UseCtrlC", daemon.UseCtrlC, RegistryValueKind.DWord);
+
+                serviceKey.Close();
             }
-        }
-
-        public static ObservableCollection<Daemon> LoadFromRegistry()
-        {
-            ObservableCollection<Daemon> daemons = new ObservableCollection<Daemon>();
-
-            ServiceController[] sc = ServiceController.GetServices();
-
-            foreach (ServiceController service in sc)
-            {
-                try
-                {
-                    if (service.ServiceName.Contains("DaemonMaster_"))
-                    {
-                        daemons.Add(LoadDaemonFromRegistry(service.ServiceName));
-                    }
-                }
-                catch (Exception)
-                {
-                    continue;
-                }
-            }
-            return daemons;
         }
 
         public static Daemon LoadDaemonFromRegistry(string serviceName)
@@ -144,6 +123,50 @@ namespace DaemonMasterCore
                 }
             }
             return daemons;
+        }
+
+
+
+
+
+
+
+
+        //�ndert den Regkey so das Interactive Services erlaubt werden (Set NoInteractiveServices to 0)
+        public static bool ActivateInteractiveServices()
+        {
+            try
+            {
+                using (RegistryKey regKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Windows", true))
+                {
+                    if (regKey == null)
+                        return false;
+
+                    regKey.SetValue("NoInteractiveServices", "0", RegistryValueKind.DWord);
+                    regKey.Close();
+                    return true;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        //�ndert den Regkey so das Interactive Services erlaubt werden (Set NoInteractiveServices to 0)
+        public static bool CheckNoInteractiveServicesRegKey()
+        {
+            try
+            {
+                using (RegistryKey regKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Windows", true))
+                {
+                    return regKey != null && Convert.ToBoolean(regKey.GetValue("NoInteractiveServices").ToString());
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         #endregion

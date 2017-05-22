@@ -60,6 +60,7 @@ namespace DaemonMaster
         public EditAddWindow(DaemonInfo daemonInfo) : this() // This = Konstruktor davor wird auch ausgeführt (=> Ableitung vom Oberen)
         {
             textBoxServiceName.IsReadOnly = true;
+            textBoxDescription.IsReadOnly = true;
 
             try
             {
@@ -88,6 +89,7 @@ namespace DaemonMaster
             textBoxDescription.Text = "";
             textBoxPassword.Text = daemon.UserPassword;
             textBoxUsername.Text = daemon.UserName;
+            textBoxDescription.Text = daemon.Description;
 
             fileDir = daemon.FileDir;
             fileName = daemon.FileName;
@@ -143,7 +145,6 @@ namespace DaemonMaster
                 if (Directory.Exists(fileDir) && File.Exists(textBoxFilePath.Text))
                 {
                     if (!String.IsNullOrWhiteSpace(textBoxDisplayName.Text) &&
-                        !String.IsNullOrWhiteSpace(textBoxFilePath.Text) &&
                         !String.IsNullOrWhiteSpace(textBoxServiceName.Text))
                     {
                         daemon.DisplayName = textBoxDisplayName.Text;
@@ -152,6 +153,7 @@ namespace DaemonMaster
                         daemon.FileDir = Path.GetDirectoryName(textBoxFilePath.Text);
                         daemon.FileName = fileName;
                         daemon.Parameter = textBoxParam.Text;
+                        daemon.Description = textBoxDescription.Text;
                     }
                     else
                     {

@@ -4,8 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DaemonMaster"
-        xmlns:core="clr-namespace:DaemonMasterCore;assembly=DaemonMasterCore"
         xmlns:resx="clr-namespace:DaemonMaster.Language"
+        xmlns:CoreWPF="clr-namespace:DaemonMasterCore.WPF;assembly=DaemonMasterCore"
         mc:Ignorable="d"
         Title="Edit / Add a Process" Height="298.496" Width="705.731" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
     
@@ -13,10 +13,10 @@
         <TabItem Header="General">
             <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,-1,-2" Height="217">
                 <Label x:Name="labelServiceName" Content="Service:" HorizontalAlignment="Left" Margin="26,14,0,0" VerticalAlignment="Top"/>
-                <core:PlaceholderTextBox x:Name="textBoxServiceName" Height="23" Margin="81,14,0,0" TextWrapping="Wrap" Placeholder="&lt;Please enter a Name&gt; (default = filename)" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" />
+                <CoreWPF:PlaceholderTextBox x:Name="textBoxServiceName" Height="23" Margin="81,14,0,0" TextWrapping="Wrap" Placeholder="&lt;Please enter a Name&gt; (default = filename)" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" />
                 <Button x:Name="buttonSearchPath" Content="Search file" HorizontalAlignment="Left" Margin="81,149,0,0" VerticalAlignment="Top" Width="321" Click="buttonSearchPath_Click"/>
                 <Button x:Name="buttonSave" Content="{x:Static resx:lang.button_save}" Margin="275,190,0,-13" Click="buttonSave_Click" Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139"/>
-                <core:PlaceholderTextBox x:Name="textBoxFilePath" Height="23" Margin="81,123,0,0" TextWrapping="Wrap" Placeholder="&lt;Click on &quot;Search file&quot; to locate the .exe&gt;" VerticalAlignment="Top" IsReadOnly="True" HorizontalAlignment="Left" Width="321" UndoLimit="0"/>
+                <CoreWPF:PlaceholderTextBox x:Name="textBoxFilePath" Height="23" Margin="81,123,0,0" TextWrapping="Wrap" Placeholder="&lt;Click on &quot;Search file&quot; to locate the .exe&gt;" VerticalAlignment="Top" IsReadOnly="True" HorizontalAlignment="Left" Width="321" UndoLimit="0"/>
                 <Label x:Name="labelFilePath" Content="File path:" HorizontalAlignment="Left" Margin="18,120,0,0" VerticalAlignment="Top"/>
                 <TextBox x:Name="textBoxParam" Height="23" Width="321" Margin="81,95,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                 <Label x:Name="labelParam" Content="Parameter(s):" HorizontalAlignment="Left" Margin="-3,93,0,0" VerticalAlignment="Top"/>
@@ -30,8 +30,8 @@
                     </Grid>
                 </GroupBox>
                 <Label x:Name="labelDisplayName" Content="Display name:" HorizontalAlignment="Left" Margin="-8,40,0,0" VerticalAlignment="Top"/>
-                <core:PlaceholderTextBox x:Name="textBoxDisplayName" Height="23" Margin="81,41,0,0" TextWrapping="Wrap" Placeholder="&lt;Please enter a display name&gt;" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
-                <core:PlaceholderTextBox x:Name="textBoxDescription" Height="23" Margin="81,68,0,0" TextWrapping="Wrap" Placeholder="&lt;Please enter a description&gt;" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
+                <CoreWPF:PlaceholderTextBox x:Name="textBoxDisplayName" Height="23" Margin="81,41,0,0" TextWrapping="Wrap" Placeholder="&lt;Please enter a display name&gt;" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
+                <CoreWPF:PlaceholderTextBox x:Name="textBoxDescription" Height="23" Margin="81,68,0,0" TextWrapping="Wrap" Placeholder="&lt;Please enter a description&gt;" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
                 <Label x:Name="labelDescription" Content="Description:" HorizontalAlignment="Left" Margin="3,67,0,0" VerticalAlignment="Top"/>
             </Grid>
         </TabItem>

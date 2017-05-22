@@ -10,7 +10,7 @@ namespace DaemonMasterCore.Win32
     //FROM PINVOKE.NET
     public static class ADVAPI
     {
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport("advapi32.dll", SetLastError = true)]
         public static extern IntPtr CreateService
         (
             IntPtr hSCManager,
@@ -33,13 +33,13 @@ namespace DaemonMasterCore.Win32
 
         [DllImport("advapi32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool CloseServiceHandle(IntPtr hSCObject);
+        public static extern bool CloseServiceHandle(IntPtr hSCManager);
 
         [DllImport("advapi32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool StartService(IntPtr hService, int dwNumServiceArgs, string[] lpServiceArgVectors);
+        public static extern bool StartService(IntPtr hService, uint dwNumServiceArgs, string[] lpServiceArgVectors);
 
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport("advapi32.dll", SetLastError = true)]
         public static extern IntPtr OpenService(IntPtr hSCManager, string lpServiceName, uint dwDesiredAccess);
 
         [DllImport("advapi32.dll", SetLastError = true)]
@@ -49,10 +49,15 @@ namespace DaemonMasterCore.Win32
         [DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern bool QueryServiceStatusEx(IntPtr serviceHandle, int infoLevel, IntPtr buffer, int bufferSize, out int bytesNeeded);
 
+        [DllImport("advapi32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ChangeServiceConfig2(IntPtr hService, uint dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_DESCRIPTION lpInfo);
+
+
 
         //---------------------//
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        [StructLayout(LayoutKind.Sequential)]
         public struct SERVICE_STATUS_PROCESS
         {
             public int serviceType;
@@ -64,6 +69,12 @@ namespace DaemonMasterCore.Win32
             public int waitHint;
             public int processID;
             public int serviceFlags;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SERVICE_DESCRIPTION
+        {
+            public string lpDescription;
         }
 
         //---------------------//
@@ -336,7 +347,7 @@ namespace DaemonMasterCore.Win32
         }
 
         [Flags]
-        public enum SERVICE_STATE : int
+        public enum SERVICE_STATE : uint
         {
             SERVICE_CONTINUE_PENDING = 0x00000005,
             SERVICE_PAUSE_PENDING = 0x00000006,
@@ -396,6 +407,18 @@ namespace DaemonMasterCore.Win32
             WINSTA_READSCREEN = 0x00000200,
 
             WINSTA_ALL_ACCESS = 0x0000037F
+        }
+
+        [Flags]
+        public enum DW_INFO_LEVEL : uint
+        {
+            SERVICE_CONFIG_DESCRIPTION = 0x00000001,
+            SERVICE_CONFIG_FAILURE_ACTIONS = 0x00000002,
+            SERVICE_CONFIG_DELAYED_AUTO_START_INFO = 0x00000003,
+            SERVICE_CONFIG_FAILURE_ACTIONS_FLAG = 0x00000004,
+            SERVICE_CONFIG_SERVICE_SID_INFO = 0x00000005,
+            SERVICE_CONFIG_REQUIRED_PRIVILEGES_INFO = 0x00000006,
+            SERVICE_CONFIG_PRESHUTDOWN_INFO = 0x00000007
         }
     }
 }

@@ -53,13 +53,12 @@ namespace DaemonMasterService
             {
                 //Load config from registry
                 daemon = RegistryManagement.LoadDaemonFromRegistry(DaemonMasterUtils.GetServiceName());
+                StartProcess();
             }
             catch (Exception)
             {
                 Stop();
             }
-
-            StartProcess();
         }
 
         protected override void OnStop()
@@ -71,7 +70,6 @@ namespace DaemonMasterService
 
         protected override void OnPause()
         {
-
             ProcessManagement.PauseProcess((uint)process.Id);
 
             base.OnPause();
@@ -131,11 +129,6 @@ namespace DaemonMasterService
 
                 ProcessStartInfo startInfo = new ProcessStartInfo(daemon.FullPath, daemon.Parameter);
 
-                //if (userName != String.Empty && password != String.Empty)
-                //{
-                //    startInfo.UserName = userName;
-                //    startInfo.Password = password;
-                //}
 
                 process = new Process();
                 process.StartInfo = startInfo;

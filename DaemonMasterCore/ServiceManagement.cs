@@ -28,6 +28,7 @@ using System.Threading.Tasks;
 using DaemonMasterCore.Win32;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.Windows.Documents;
 using Microsoft.Win32;
 
 namespace DaemonMasterCore
@@ -36,7 +37,7 @@ namespace DaemonMasterCore
     public static class ServiceManagement
     {
         //Timeout Start/Stop Services (in ms)
-        private const int timeout = 10000;
+        private const int WaitForStatusTimeout = 10000;
 
         private static readonly string DaemonMasterServicePath = AppDomain.CurrentDomain.BaseDirectory;
         private const string DaemonMasterServiceFile = "DaemonMasterService.exe";
@@ -52,46 +53,48 @@ namespace DaemonMasterCore
         public static void CreateInteractiveService(Daemon daemon)
         {
             if (!Directory.Exists(DaemonMasterServicePath) || !File.Exists(DaemonMasterServicePath + DaemonMasterServiceFile))
-                throw new Exception("Can't find the DaemonMasterService file!");
+                throw new IOException("Can't find the DaemonMasterService file!");
 
             IntPtr scManager = ADVAPI.OpenSCManager(null, null, (uint)ADVAPI.SCM_ACCESS.SC_MANAGER_CREATE_SERVICE);
 
-            if (scManager != IntPtr.Zero)
-            {
-                try
-                {
-                    IntPtr svManager = ADVAPI.CreateService(
-                                                            scManager,
-                                                            daemon.ServiceName,
-                                                            daemon.DisplayName,
-                                                            (uint)ADVAPI.SERVICE_ACCESS.SERVICE_ALL_ACCESS,
-                                                            (uint)ADVAPI.SERVICE_TYPE.SERVICE_INTERACTIVE_PROCESS | (uint)ADVAPI.SERVICE_TYPE.SERVICE_WIN32_OWN_PROCESS,
-                                                            (uint)ADVAPI.SERVICE_START.SERVICE_AUTO_START,
-                                                            (uint)ADVAPI.SERVICE_ERROR_CONTROLE.SERVICE_ERROR_IGNORE,
-                                                            DaemonMasterServicePath + DaemonMasterServiceFile + DaemonMasterServiceParameter,
-                                                            null,
-                                                            null,
-                                                            "UI0Detect",
-                                                            null,
-                                                            null);
+            if (scManager == IntPtr.Zero)
+                throw new Win32Exception("Cannot open the service manager!, error:\n" + Marshal.GetLastWin32Error());
 
-                    if (svManager == IntPtr.Zero)
-                    {
-                        throw new Win32Exception(Marshal.GetLastWin32Error());
-                    }
-                    else
-                    {
-                        ADVAPI.CloseServiceHandle(svManager);
-                    }
-                }
-                finally
-                {
-                    ADVAPI.CloseServiceHandle(scManager);
-                }
-            }
-            else
+            IntPtr svManager = ADVAPI.CreateService(
+                                                        scManager,
+                                                        daemon.ServiceName,
+                                                        daemon.DisplayName,
+                                                        (uint)ADVAPI.SERVICE_ACCESS.SERVICE_ALL_ACCESS,
+                                                        (uint)ADVAPI.SERVICE_TYPE.SERVICE_INTERACTIVE_PROCESS | (uint)ADVAPI.SERVICE_TYPE.SERVICE_WIN32_OWN_PROCESS,
+                                                        (uint)ADVAPI.SERVICE_START.SERVICE_AUTO_START,
+                                                        (uint)ADVAPI.SERVICE_ERROR_CONTROLE.SERVICE_ERROR_IGNORE,
+                                                        DaemonMasterServicePath + DaemonMasterServiceFile + DaemonMasterServiceParameter,
+                                                        null,
+                                                        null,
+                                                        "UI0Detect",
+                                                        null,
+                                                        null);
+            if (svManager == IntPtr.Zero)
             {
-                throw new Win32Exception(Marshal.GetLastWin32Error());
+                ADVAPI.CloseServiceHandle(scManager);
+                throw new Win32Exception("Cannot create the service!, error:\n" + Marshal.GetLastWin32Error());
+            }
+
+
+            try
+            {
+                //Create an struct with the description of the service
+                ADVAPI.SERVICE_DESCRIPTION serviceDescription;
+                serviceDescription.lpDescription = daemon.Description;
+
+                //Set the description of the service
+                if (!ADVAPI.ChangeServiceConfig2(svManager, (uint)ADVAPI.DW_INFO_LEVEL.SERVICE_CONFIG_DESCRIPTION, ref serviceDescription))
+                    throw new Win32Exception("Cannot set the description of the service!, error:\n" + Marshal.GetLastWin32Error());
+            }
+            finally
+            {
+                ADVAPI.CloseServiceHandle(svManager);
+                ADVAPI.CloseServiceHandle(scManager);
             }
         }
 
@@ -112,7 +115,7 @@ namespace DaemonMasterCore
                         scManager.Start();
 
                     //Prüft ob der Service gestartet ist oder einen Timeout gemacht hat
-                    scManager.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromMilliseconds(timeout));
+                    scManager.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromMilliseconds(WaitForStatusTimeout));
 
                     return 1;
                 }
@@ -138,7 +141,7 @@ namespace DaemonMasterCore
                         scManager.Stop();
 
                     //Prüft ob der Service gestoppt ist oder einen Timeout gemacht hat
-                    scManager.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromMilliseconds(timeout));
+                    scManager.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromMilliseconds(WaitForStatusTimeout));
                     return 1;
                 }
             }
@@ -150,75 +153,88 @@ namespace DaemonMasterCore
 
         public static void DeleteService(string serviceName)
         {
-
+            //Open the service manager
             IntPtr scManager = ADVAPI.OpenSCManager(null, null, (uint)ADVAPI.SCM_ACCESS.SC_MANAGER_CONNECT);
 
+            //Check if scManager is a valid pointer
             if (scManager == IntPtr.Zero)
+                throw new Win32Exception("Cannot open the service manager!, error:\n" + Marshal.GetLastWin32Error());
+
+            //Open the service
+            IntPtr svManager = ADVAPI.OpenService(scManager, serviceName, (uint)ADVAPI.SERVICE_ACCESS.DELETE | (uint)ADVAPI.SERVICE_ACCESS.SERVICE_QUERY_STATUS | (uint)ADVAPI.SERVICE_ACCESS.SERVICE_ENUMERATE_DEPENDENTS);
+
+            //Check if svManager is a valid pointer
+            if (svManager == IntPtr.Zero)
             {
-                throw new Win32Exception(Marshal.GetLastWin32Error());
+                ADVAPI.CloseServiceHandle(scManager);
+                throw new Win32Exception("Cannot create the service!, error:\n" + Marshal.GetLastWin32Error());
             }
 
-            IntPtr svManager = ADVAPI.OpenService(scManager, serviceName, (uint)ADVAPI.SERVICE_ACCESS.DELETE | (uint)ADVAPI.SERVICE_ACCESS.SERVICE_QUERY_STATUS | (uint)ADVAPI.SERVICE_ACCESS.SERVICE_ENUMERATE_DEPENDENTS);
+            try
+            {
+                //Check if the service has been stopped
+                if (DaemonMasterUtils.QueryServiceStatusEx(svManager).currentState != (int)ADVAPI.SERVICE_STATE.SERVICE_STOPPED)
+                {
+                    if (StopService(serviceName) < 0)
+                        throw new Win32Exception("Cannot stop the service!, error:\n" + Marshal.GetLastWin32Error());
+                }
+
+                //Delete the service
+                if (!ADVAPI.DeleteService(svManager))
+                    throw new Win32Exception("Cannot delete the service!, error:\n" + Marshal.GetLastWin32Error());
+            }
+            finally
+            {
+                ADVAPI.CloseServiceHandle(svManager);
+                ADVAPI.CloseServiceHandle(scManager);
+            }
+        }
+
+        public static bool ChangeServiceConfig2(string serviceName, string description)
+        {
+            //Open Sc Manager
+            IntPtr scManager = ADVAPI.OpenSCManager(null, null, (uint)ADVAPI.SCM_ACCESS.SC_MANAGER_CREATE_SERVICE);
+
+            //Check if the scManager is not zero
+            if (scManager == IntPtr.Zero)
+                throw new Win32Exception("Cannot open the service Manager!, error:\n" + Marshal.GetLastWin32Error());
+
+            //Open the service manager
+            IntPtr svManager = ADVAPI.OpenService(scManager, serviceName,
+                (uint)ADVAPI.SERVICE_ACCESS.SERVICE_QUERY_STATUS |
+                (uint)ADVAPI.SERVICE_ACCESS.SERVICE_CHANGE_CONFIG |
+                (uint)ADVAPI.SERVICE_ACCESS.SERVICE_QUERY_CONFIG);
 
             if (svManager == IntPtr.Zero)
             {
                 ADVAPI.CloseServiceHandle(scManager);
-                throw new Win32Exception(Marshal.GetLastWin32Error());
+                throw new Win32Exception("Cannot open the service!, error:\n" + Marshal.GetLastWin32Error());
             }
-
-            //Prüft ob der Service gestoppt ist
-            if (QueryServiceStatusEx(svManager).currentState != (int)ADVAPI.SERVICE_STATE.SERVICE_STOPPED)
-            {
-                if (StopService(serviceName) < 0)
-                {
-                    ADVAPI.CloseServiceHandle(scManager);
-                    ADVAPI.CloseServiceHandle(svManager);
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
-                }
-            }
-
-            //Löscht den Service
-            if (!ADVAPI.DeleteService(svManager))
-            {
-                throw new Win32Exception(Marshal.GetLastWin32Error());
-            }
-
-            ADVAPI.CloseServiceHandle(scManager);
-            ADVAPI.CloseServiceHandle(svManager);
-        }
-
-        //http://www.pinvoke.net/default.aspx/advapi32.QueryServiceStatusEx
-        public static ADVAPI.SERVICE_STATUS_PROCESS QueryServiceStatusEx(IntPtr svManager)
-        {
-            IntPtr buffer = IntPtr.Zero;
-            int size = 0;
 
             try
             {
-                ADVAPI.QueryServiceStatusEx(svManager, 0, buffer, size, out size);
-                //Reserviere Speicher in der größe von size
-                buffer = Marshal.AllocHGlobal(size);
-
-                if (!ADVAPI.QueryServiceStatusEx(svManager, 0, buffer, size, out size))
+                //Query status of the service
+                if (DaemonMasterUtils.QueryServiceStatusEx(svManager).currentState != (int)ADVAPI.SERVICE_STATE.SERVICE_STOPPED)
                 {
-
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                    return false;
                 }
 
-                return (ADVAPI.SERVICE_STATUS_PROCESS)Marshal.PtrToStructure(buffer, typeof(ADVAPI.SERVICE_STATUS_PROCESS));
-            }
-            catch (Exception)
-            {
-                throw new NotImplementedException();
+                //create an struct with description of the service
+                ADVAPI.SERVICE_DESCRIPTION serviceDescription;
+                serviceDescription.lpDescription = description;
+
+                //Set the description of the service
+                if (!ADVAPI.ChangeServiceConfig2(svManager, (uint)ADVAPI.DW_INFO_LEVEL.SERVICE_CONFIG_DESCRIPTION, ref serviceDescription))
+                    throw new Win32Exception("Cannot set the description of the service!, error:\n" + Marshal.GetLastWin32Error());
+
+                return true;
             }
             finally
             {
-                //Gebe Speicher, wenn genutzt, wieder frei
-                if (!buffer.Equals(IntPtr.Zero))
-                    Marshal.FreeHGlobal(buffer);
+                ADVAPI.CloseServiceHandle(svManager);
+                ADVAPI.CloseServiceHandle(scManager);
             }
         }
-
 
 
 
@@ -234,66 +250,10 @@ namespace DaemonMasterCore
                     if (scManager.Status != ServiceControllerStatus.StartPending)
                         scManager.Start();
 
-                    scManager.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromMilliseconds(timeout));
+                    scManager.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromMilliseconds(WaitForStatusTimeout));
 
-                    if (scManager.Status == ServiceControllerStatus.Running)
-                        return true;
-
-                    return false;
+                    return scManager.Status == ServiceControllerStatus.Running;
                 }
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        //Ändert den Regkey so das Interactive Services erlaubt werden (Set NoInteractiveServices to 0)
-        public static bool ActivateInteractiveServices()
-        {
-            try
-            {
-                using (RegistryKey regKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Windows", true))
-                {
-                    if (regKey != null)
-                    {
-                        if (regKey.GetValue("NoInteractiveServices").ToString() != "0")
-                            regKey.SetValue("NoInteractiveServices", "0", RegistryValueKind.DWord);
-
-                        regKey.Close();
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        //Ändert den Regkey so das Interactive Services erlaubt werden (Set NoInteractiveServices to 0)
-        public static bool CheckNoInteractiveServicesRegKey()
-        {
-            try
-            {
-                using (RegistryKey regKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Windows", true))
-                {
-                    if (regKey != null)
-                    {
-                        if (regKey.GetValue("NoInteractiveServices").ToString() == "0")
-                        {
-
-                            regKey.Close();
-                            return true;
-                        }
-
-                        return false;
-                    }
-                }
-
-                return false;
             }
             catch (Exception)
             {
@@ -302,6 +262,5 @@ namespace DaemonMasterCore
         }
 
         #endregion
-
     }
 }

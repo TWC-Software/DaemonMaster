@@ -232,12 +232,12 @@ namespace DaemonMaster
         private bool AskToEnableInteractiveServices()
         {
             //Wenn der RegKey nicht gestetzt ist, soll der Nutzer gefragt werden
-            if (!ServiceManagement.CheckNoInteractiveServicesRegKey())
+            if (!RegistryManagement.CheckNoInteractiveServicesRegKey())
             {
                 MessageBoxResult result = MessageBox.Show(resManager.GetString("interactive_service_regkey_not_set"), resManager.GetString("question"), MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
                 {
-                    if (ServiceManagement.ActivateInteractiveServices())
+                    if (RegistryManagement.ActivateInteractiveServices())
                     {
                         return true;
                     }

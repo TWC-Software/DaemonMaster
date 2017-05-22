@@ -55,7 +55,7 @@
     <Compile Include="DaemonMasterUtils.cs" />
     <Compile Include="JsonManagement.cs" />
     <Compile Include="DaemonInfo.cs" />
-    <Compile Include="PlaceholderTextBox.cs" />
+    <Compile Include="WPF\PlaceholderTextBox.cs" />
     <Compile Include="ProcessManagement.cs" />
     <Compile Include="RegistryManagement.cs" />
     <Compile Include="SecurityManagement.cs" />
