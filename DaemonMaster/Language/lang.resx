@@ -259,6 +259,6 @@
     <value>Switch to Session 0</value>
   </data>
   <data name="you_must_stop_the_service_first" xml:space="preserve">
-    <value>You must stop the service first</value>
+    <value>You must stop the service first. Do you want stop the service now ?</value>
   </data>
 </root>

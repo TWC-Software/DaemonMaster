@@ -258,4 +258,7 @@
   <data name="cannot_load_data_from_registry" xml:space="preserve">
     <value>Ne peut pas charger les données du Registre !!</value>
   </data>
+  <data name="you_must_stop_the_service_first" xml:space="preserve">
+    <value>Vous devez arrêter le service tout d’abord. Voulez-vous arrêter le service maintenant ? !</value>
+  </data>
 </root>

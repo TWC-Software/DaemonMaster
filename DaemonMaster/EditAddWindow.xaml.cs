@@ -20,6 +20,7 @@
 
 using System;
 using System.CodeDom;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -60,7 +61,7 @@ namespace DaemonMaster
         public EditAddWindow(DaemonInfo daemonInfo) : this() // This = Konstruktor davor wird auch ausgeführt (=> Ableitung vom Oberen)
         {
             textBoxServiceName.IsReadOnly = true;
-            textBoxDescription.IsReadOnly = true;
+
 
             try
             {
@@ -197,6 +198,7 @@ namespace DaemonMaster
                         try
                         {
                             RegistryManagement.SaveInRegistry(daemon);
+                            ServiceManagement.ChangeServiceConfig2(daemon.ServiceName, daemon.Description);
 
                             this.Close();
                         }

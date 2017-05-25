@@ -50,7 +50,10 @@ namespace DaemonMasterCore
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         #region Service
-
+        /// <summary>
+        /// Create an interactiv service under the "Local System" account with UI0Detect as dependencie
+        /// </summary>
+        /// <param name="daemon"></param>
         public static void CreateInteractiveService(Daemon daemon)
         {
             if (!Directory.Exists(DaemonMasterServicePath) || !File.Exists(DaemonMasterServicePath + DaemonMasterServiceFile))
@@ -84,13 +87,7 @@ namespace DaemonMasterCore
 
             try
             {
-                //Create an struct with the description of the service
-                ADVAPI.SERVICE_DESCRIPTION serviceDescription;
-                serviceDescription.lpDescription = daemon.Description;
-
-                //Set the description of the service
-                if (!ADVAPI.ChangeServiceConfig2(svManager, (uint)ADVAPI.DW_INFO_LEVEL.SERVICE_CONFIG_DESCRIPTION, ref serviceDescription))
-                    throw new Win32Exception("Cannot set the description of the service!, error:\n" + Marshal.GetLastWin32Error());
+                ChangeServiceConfig2(svManager, daemon.Description);
             }
             finally
             {
@@ -99,17 +96,21 @@ namespace DaemonMasterCore
             }
         }
 
-        public static int StartService(string serviceName)
+        /// <summary>
+        /// Start the service. Possible return values are AlreadyStarted, Successful and Error
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <returns></returns>
+        public static State StartService(string serviceName)
         {
             try
             {
-                if (!CheckUI0DetectService())
-                    return -1;
-
+                //if (!CheckUI0DetectService())
+                //    return State.Unsuccessful;
                 using (ServiceController scManager = new ServiceController(serviceName))
                 {
                     if (scManager.Status == ServiceControllerStatus.Running)
-                        return 0;
+                        return State.AlreadyStarted;
 
                     //Startet den Service
                     if (scManager.Status != ServiceControllerStatus.StartPending)
@@ -118,16 +119,21 @@ namespace DaemonMasterCore
                     //Prüft ob der Service gestartet ist oder einen Timeout gemacht hat
                     scManager.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromMilliseconds(WaitForStatusTimeout));
 
-                    return 1;
+                    return State.Successful;
                 }
             }
             catch (Exception)
             {
-                return -1;
+                return State.Error;
             }
         }
 
-        public static int StopService(string serviceName)
+        /// <summary>
+        /// Stop the service. Possible return values are AlreadyStopped, Successful and Error
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <returns></returns>
+        public static State StopService(string serviceName)
         {
             try
             {
@@ -135,7 +141,7 @@ namespace DaemonMasterCore
                 {
 
                     if (scManager.Status == ServiceControllerStatus.Stopped)
-                        return 0;
+                        return State.AlreadyStopped;
 
                     //Stoppt den Service
                     if (scManager.Status != ServiceControllerStatus.StopPending)
@@ -143,16 +149,21 @@ namespace DaemonMasterCore
 
                     //Prüft ob der Service gestoppt ist oder einen Timeout gemacht hat
                     scManager.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromMilliseconds(WaitForStatusTimeout));
-                    return 1;
+                    return State.Successful;
                 }
             }
             catch (Exception)
             {
-                return -1;
+                return State.Error;
             }
         }
 
-        public static void DeleteService(string serviceName)
+        /// <summary>
+        /// Delete the service. Possible return values are NotStopped and Successful
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <returns></returns>
+        public static State DeleteService(string serviceName)
         {
             //Open the service manager
             IntPtr scManager = ADVAPI.OpenSCManager(null, null, (uint)ADVAPI.SCM_ACCESS.SC_MANAGER_CONNECT);
@@ -168,7 +179,7 @@ namespace DaemonMasterCore
             if (svManager == IntPtr.Zero)
             {
                 ADVAPI.CloseServiceHandle(scManager);
-                throw new Win32Exception("Cannot create the service!, error:\n" + Marshal.GetLastWin32Error());
+                throw new Win32Exception("Cannot open the service!, error:\n" + Marshal.GetLastWin32Error());
             }
 
             try
@@ -178,12 +189,14 @@ namespace DaemonMasterCore
                 {
                     //if (StopService(serviceName) < 0)
                     //    throw new Win32Exception("Cannot stop the service!, error:\n" + Marshal.GetLastWin32Error());
-                    throw new ServiceNotStoppedException();
+                    return State.NotStopped;
                 }
 
                 //Delete the service
                 if (!ADVAPI.DeleteService(svManager))
                     throw new Win32Exception("Cannot delete the service!, error:\n" + Marshal.GetLastWin32Error());
+
+                return State.Successful;
             }
             finally
             {
@@ -192,8 +205,17 @@ namespace DaemonMasterCore
             }
         }
 
-        public static bool ChangeServiceConfig2(string serviceName, string description)
+        /// <summary>
+        /// Change the service config (description). Possible return values are NotStopped and Successful
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <param name="description"></param>
+        /// <returns></returns>
+        public static State ChangeServiceConfig2(string serviceName, string description)
         {
+            if (String.IsNullOrWhiteSpace(description) || String.IsNullOrWhiteSpace(serviceName))
+                throw new Exception("Description is empty!");
+
             //Open Sc Manager
             IntPtr scManager = ADVAPI.OpenSCManager(null, null, (uint)ADVAPI.SCM_ACCESS.SC_MANAGER_CREATE_SERVICE);
 
@@ -215,24 +237,7 @@ namespace DaemonMasterCore
 
             try
             {
-
-                //Query status of the service
-                if (DaemonMasterUtils.QueryServiceStatusEx(svManager).currentState != (int)ADVAPI.SERVICE_STATE.SERVICE_STOPPED)
-                    throw new ServiceNotStoppedException();
-
-
-                if (description != null)
-                {
-                    //create an struct with description of the service
-                    ADVAPI.SERVICE_DESCRIPTION serviceDescription;
-                    serviceDescription.lpDescription = description;
-
-                    //Set the description of the service
-                    if (!ADVAPI.ChangeServiceConfig2(svManager, (uint)ADVAPI.DW_INFO_LEVEL.SERVICE_CONFIG_DESCRIPTION, ref serviceDescription))
-                        throw new Win32Exception("Cannot set the description of the service!, error:\n" + Marshal.GetLastWin32Error());
-                }
-
-                return true;
+                return ChangeServiceConfig2(svManager, description);
             }
             finally
             {
@@ -241,7 +246,28 @@ namespace DaemonMasterCore
             }
         }
 
+        /// <summary>
+        /// Change the service config with the handle (description). Possible return values are NotStopped and Successful
+        /// </summary>
+        /// <param name="svManager"></param>
+        /// <param name="description"></param>
+        /// <returns></returns>
+        private static State ChangeServiceConfig2(IntPtr svManager, string description)
+        {
+            //Query status of the service
+            if (DaemonMasterUtils.QueryServiceStatusEx(svManager).currentState != (int)ADVAPI.SERVICE_STATE.SERVICE_STOPPED)
+                return State.NotStopped;
 
+            //Create an struct with description of the service
+            ADVAPI.SERVICE_DESCRIPTION serviceDescription;
+            serviceDescription.lpDescription = description;
+
+            //Set the description of the service
+            if (!ADVAPI.ChangeServiceConfig2(svManager, (uint)ADVAPI.DW_INFO_LEVEL.SERVICE_CONFIG_DESCRIPTION, ref serviceDescription))
+                throw new Win32Exception("Cannot set the description of the service!, error:\n" + Marshal.GetLastWin32Error());
+
+            return State.Successful;
+        }
 
         public static bool CheckUI0DetectService()
         {
@@ -267,5 +293,22 @@ namespace DaemonMasterCore
         }
 
         #endregion
+
+        [Flags]
+        public enum State
+        {
+            NotStopped,
+            NotStarted,
+            AlreadyStopped,
+            AlreadyStarted,
+            Stopped,
+            Running,
+            Paused,
+            Deleted,
+            Successful,
+            Unsuccessful,
+            Error,
+            ParametersArNotValid
+        }
     }
 }

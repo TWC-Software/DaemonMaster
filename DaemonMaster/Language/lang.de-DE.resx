@@ -258,4 +258,7 @@
   <data name="cannot_load_data_from_registry" xml:space="preserve">
     <value>Daten konnten nicht von der Registry geladen werden!</value>
   </data>
+  <data name="you_must_stop_the_service_first" xml:space="preserve">
+    <value>Der Dienst muss zuerst gestoppt werden. Soll dieser jetzt gestoppt werden?</value>
+  </data>
 </root>

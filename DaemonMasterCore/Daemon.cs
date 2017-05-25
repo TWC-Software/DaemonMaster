@@ -50,6 +50,7 @@ namespace DaemonMasterCore
         public string DisplayName { get; set; }
         public string ServiceName { get; set; }
         public string Description { get; set; }
+        public string[] DependOnService { get; set; }
 
         public string FileDir { get; set; }
         public string FileName { get; set; }

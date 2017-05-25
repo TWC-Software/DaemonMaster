@@ -270,19 +270,30 @@ namespace DaemonMaster
         {
             try
             {
-                ServiceManagement.DeleteService(daemonInfo.ServiceName);
-                processCollection.RemoveAt(listBoxDaemons.SelectedIndex);
+                switch (ServiceManagement.DeleteService(daemonInfo.ServiceName))
+                {
+                    case ServiceManagement.State.NotStopped:
 
-                MessageBox.Show(resManager.GetString("the_service_deletion_was_successful"),
-                    resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBoxResult result = MessageBox.Show(resManager.GetString("you_must_stop_the_service_first"), resManager.GetString("information"), MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            StopDaemon(daemonInfo);
+                        }
+                        break;
+
+                    case ServiceManagement.State.Successful:
+
+                        processCollection.RemoveAt(listBoxDaemons.SelectedIndex);
+
+                        MessageBox.Show(resManager.GetString("the_service_deletion_was_successful"),
+                            resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
+                        break;
+                }
             }
-            catch (ServiceNotStoppedException)
+            catch (Exception ex)
             {
-                MessageBox.Show(resManager.GetString("you_must_stop_the_service_first"), resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception)
-            {
-                MessageBox.Show(resManager.GetString("the_service_deletion_was_unsuccessful"), resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(resManager.GetString("the_service_deletion_was_unsuccessful") + "\n" + ex.Message, resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -298,15 +309,15 @@ namespace DaemonMaster
         {
             switch (ServiceManagement.StartService(daemonInfo.ServiceName))
             {
-                case -1:
+                case ServiceManagement.State.Error | ServiceManagement.State.Unsuccessful:
                     MessageBox.Show(resManager.GetString("cannot_start_the_service"), resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
 
-                case 0:
+                case ServiceManagement.State.AlreadyStarted:
                     MessageBox.Show(resManager.GetString("cannot_start_the_service_already_running"), resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
 
-                case 1:
+                case ServiceManagement.State.Successful:
                     MessageBox.Show(resManager.GetString("service_start_was_successful"), resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
             }
@@ -316,15 +327,15 @@ namespace DaemonMaster
         {
             switch (ServiceManagement.StopService(daemonInfo.ServiceName))
             {
-                case -1:
+                case ServiceManagement.State.Error | ServiceManagement.State.Unsuccessful:
                     MessageBox.Show(resManager.GetString("cannot_stop_the_service"), resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
 
-                case 0:
+                case ServiceManagement.State.AlreadyStopped:
                     MessageBox.Show(resManager.GetString("cannot_stop_the_service_already_stopped"), resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
 
-                case 1:
+                case ServiceManagement.State.Successful:
                     MessageBox.Show(resManager.GetString("service_stop_was_successful"), resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
             }

@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Security.AccessControl;
 using System.ServiceProcess;
 
 namespace DaemonMasterCore
@@ -63,29 +64,39 @@ namespace DaemonMasterCore
         public static Daemon LoadDaemonFromRegistry(string serviceName)
         {
             //Open Regkey folder
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\" + serviceName + @"\Parameters", false))
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\" + serviceName, false))
             {
                 if (key == null)
                     throw new Exception("Can't open registry key!");
 
-                Daemon daemon = new Daemon
-                {
-                    DisplayName = (string)key.GetValue("DisplayName"),
-                    ServiceName = (string)key.GetValue("ServiceName"),
-                    FileDir = (string)key.GetValue("FileDir"),
-                    FileName = (string)key.GetValue("FileName"),
-                    Parameter = (string)key.GetValue("Parameter"),
-                    UserName = (string)key.GetValue("UserName"),
-                    UserPassword = (string)key.GetValue("UserPassword"),
-                    MaxRestarts = (int)key.GetValue("MaxRestarts"),
-                    ProcessKillTime = (int)key.GetValue("ProcessKillTime"),
-                    ProcessRestartDelay = (int)key.GetValue("ProcessRestartDelay"),
-                    CounterResetTime = (int)key.GetValue("CounterResetTime"),
-                    ConsoleApplication = Convert.ToBoolean(key.GetValue("ConsoleApplication")),
-                    UseCtrlC = Convert.ToBoolean(key.GetValue("UseCtrlC"))
-                };
+                Daemon daemon = new Daemon();
 
-                return daemon;
+                daemon.DisplayName = Convert.ToString(key.GetValue("DisplayName"));
+                daemon.Description = Convert.ToString(key.GetValue("Description"));
+                daemon.DependOnService = (string[])key.GetValue("DependOnService", String.Empty);
+
+                //Open Parameters SubKey
+                using (RegistryKey parameters = key.OpenSubKey(@"Parameters"))
+                {
+                    if (parameters == null)
+                        throw new Exception("Can't open registry key!");
+
+                    //daemon.DisplayName = (string)key.GetValue("DisplayName");
+                    daemon.ServiceName = Convert.ToString(parameters.GetValue("ServiceName"));
+                    daemon.FileDir = Convert.ToString(parameters.GetValue("FileDir"));
+                    daemon.FileName = Convert.ToString(parameters.GetValue("FileName"));
+                    daemon.Parameter = Convert.ToString(parameters.GetValue("Parameter"));
+                    daemon.UserName = Convert.ToString(parameters.GetValue("UserName"));
+                    daemon.UserPassword = Convert.ToString(parameters.GetValue("UserPassword"));
+                    daemon.MaxRestarts = Convert.ToInt32(parameters.GetValue("MaxRestarts"));
+                    daemon.ProcessKillTime = Convert.ToInt32(parameters.GetValue("ProcessKillTime"));
+                    daemon.ProcessRestartDelay = Convert.ToInt32(parameters.GetValue("ProcessRestartDelay"));
+                    daemon.CounterResetTime = Convert.ToInt32(parameters.GetValue("CounterResetTime"));
+                    daemon.ConsoleApplication = Convert.ToBoolean(parameters.GetValue("ConsoleApplication"));
+                    daemon.UseCtrlC = Convert.ToBoolean(parameters.GetValue("UseCtrlC"));
+
+                    return daemon;
+                }
             }
         }
 

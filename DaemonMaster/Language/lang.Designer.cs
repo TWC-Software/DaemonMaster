@@ -484,7 +484,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die You must stop the service first ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die You must stop the service first. Do you want stop the service now ? ähnelt.
         /// </summary>
         public static string you_must_stop_the_service_first {
             get {
