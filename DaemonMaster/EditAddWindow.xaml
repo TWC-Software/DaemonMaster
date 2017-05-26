@@ -39,7 +39,7 @@
                     <ComboBoxItem Content="Manual"/>
                     <ComboBoxItem Content="Disabled"/>
                 </ComboBox>
-                <Label x:Name="labelStarttyp" Content="Starttyp:" HorizontalAlignment="Left" Margin="22,119,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="labelStarttyp" Content="Start Type:" HorizontalAlignment="Left" Margin="11,119,0,0" VerticalAlignment="Top"/>
             </Grid>
         </TabItem>
         <TabItem Header="Security" />

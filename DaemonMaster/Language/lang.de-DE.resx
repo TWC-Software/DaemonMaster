@@ -202,7 +202,7 @@
     <value>WARNUNG</value>
   </data>
   <data name="windows10_mouse_keyboard" xml:space="preserve">
-    <value>WARNUNG: In Windows 10 können sie ihre Maus und ihre tastatur nicht benutzen!</value>
+    <value>WARNUNG: In Windows 10 können sie ihre Maus und ihre Tastatur nicht benutzen!</value>
   </data>
   <data name="title" xml:space="preserve">
     <value>DaemonMaster Version 1</value>
