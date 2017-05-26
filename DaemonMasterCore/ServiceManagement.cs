@@ -85,15 +85,8 @@ namespace DaemonMasterCore
             }
 
 
-            try
-            {
-                ChangeServiceConfig2(svManager, daemon.Description);
-            }
-            finally
-            {
-                ADVAPI.CloseServiceHandle(svManager);
-                ADVAPI.CloseServiceHandle(scManager);
-            }
+            ADVAPI.CloseServiceHandle(svManager);
+            ADVAPI.CloseServiceHandle(scManager);
         }
 
         /// <summary>
@@ -206,16 +199,48 @@ namespace DaemonMasterCore
         }
 
         /// <summary>
-        /// Change the service config (description). Possible return values are NotStopped and Successful
+        /// Change the service config with the handle (description). Possible return values are NotStopped and Successful
         /// </summary>
-        /// <param name="serviceName"></param>
+        /// <param name="svManager"></param>
         /// <param name="description"></param>
         /// <returns></returns>
-        public static State ChangeServiceConfig2(string serviceName, string description)
+        private static void ChangeServiceConfig2(IntPtr svManager, string description)
         {
-            if (String.IsNullOrWhiteSpace(description) || String.IsNullOrWhiteSpace(serviceName))
-                throw new Exception("Description is empty!");
+            //Create an struct with description of the service
+            ADVAPI.SERVICE_DESCRIPTION serviceDescription;
+            serviceDescription.lpDescription = description;
 
+            //Set the description of the service
+            if (!ADVAPI.ChangeServiceConfig2(svManager, (uint)ADVAPI.DW_INFO_LEVEL.SERVICE_CONFIG_DESCRIPTION, ref serviceDescription))
+                throw new Win32Exception("Cannot set the description of the service!, error:\n" + Marshal.GetLastWin32Error());
+        }
+
+        /// <summary>
+        /// Change the service config with the handle (delayed start). Possible return values are NotStopped and Successful
+        /// </summary>
+        /// <param name="svManager"></param>
+        /// <param name="delayedStart"></param>
+        /// <returns></returns>
+        private static void ChangeServiceConfig2(IntPtr svManager, bool delayedStart)
+        {
+            // //Create an struct with description of the service
+            ADVAPI.SERVICE_CONFIG_DELAYED_AUTO_START_INFO serviceDelayedStart;
+            serviceDelayedStart.delayedStart = delayedStart;
+
+            //Set the description of the service
+            if (!ADVAPI.ChangeServiceConfig2(svManager, (uint)ADVAPI.DW_INFO_LEVEL.SERVICE_CONFIG_DELAYED_AUTO_START_INFO,
+                ref serviceDelayedStart))
+                throw new Win32Exception("Cannot set the description of the service!, error:\n" +
+                                         Marshal.GetLastWin32Error());
+        }
+
+        /// <summary>
+        /// Change the service config. Possible return values are NotStopped and Successful
+        /// </summary>
+        /// <param name="daemon"></param>
+        /// <returns></returns>
+        public static State ChangeCompleteServiceConfig(Daemon daemon)
+        {
             //Open Sc Manager
             IntPtr scManager = ADVAPI.OpenSCManager(null, null, (uint)ADVAPI.SCM_ACCESS.SC_MANAGER_CREATE_SERVICE);
 
@@ -224,7 +249,7 @@ namespace DaemonMasterCore
                 throw new Win32Exception("Cannot open the service Manager!, error:\n" + Marshal.GetLastWin32Error());
 
             //Open the service manager
-            IntPtr svManager = ADVAPI.OpenService(scManager, serviceName,
+            IntPtr svManager = ADVAPI.OpenService(scManager, daemon.ServiceName,
                 (uint)ADVAPI.SERVICE_ACCESS.SERVICE_QUERY_STATUS |
                 (uint)ADVAPI.SERVICE_ACCESS.SERVICE_CHANGE_CONFIG |
                 (uint)ADVAPI.SERVICE_ACCESS.SERVICE_QUERY_CONFIG);
@@ -235,9 +260,20 @@ namespace DaemonMasterCore
                 throw new Win32Exception("Cannot open the service!, error:\n" + Marshal.GetLastWin32Error());
             }
 
+            //Query status of the service
+            if (DaemonMasterUtils.QueryServiceStatusEx(svManager).currentState != (int)ADVAPI.SERVICE_STATE.SERVICE_STOPPED)
+                return State.NotStopped;
+
             try
             {
-                return ChangeServiceConfig2(svManager, description);
+                ChangeServiceConfig2(svManager, daemon.Description);
+                ChangeServiceConfig2(svManager, daemon.DelayedStart);
+
+                if (!ADVAPI.ChangeServiceConfig(svManager, ADVAPI.SERVICE_NO_CHANGE, (uint)daemon.Starttype,
+                    ADVAPI.SERVICE_NO_CHANGE, null, null, null, String.Concat(daemon.DependOnService), null, null, daemon.DisplayName))
+                    throw new Win32Exception("Cannot set the config of the service!, error:\n" + Marshal.GetLastWin32Error());
+
+                return State.Successful;
             }
             finally
             {
@@ -247,28 +283,9 @@ namespace DaemonMasterCore
         }
 
         /// <summary>
-        /// Change the service config with the handle (description). Possible return values are NotStopped and Successful
+        /// Check if the service UI0Detect running
         /// </summary>
-        /// <param name="svManager"></param>
-        /// <param name="description"></param>
         /// <returns></returns>
-        private static State ChangeServiceConfig2(IntPtr svManager, string description)
-        {
-            //Query status of the service
-            if (DaemonMasterUtils.QueryServiceStatusEx(svManager).currentState != (int)ADVAPI.SERVICE_STATE.SERVICE_STOPPED)
-                return State.NotStopped;
-
-            //Create an struct with description of the service
-            ADVAPI.SERVICE_DESCRIPTION serviceDescription;
-            serviceDescription.lpDescription = description;
-
-            //Set the description of the service
-            if (!ADVAPI.ChangeServiceConfig2(svManager, (uint)ADVAPI.DW_INFO_LEVEL.SERVICE_CONFIG_DESCRIPTION, ref serviceDescription))
-                throw new Win32Exception("Cannot set the description of the service!, error:\n" + Marshal.GetLastWin32Error());
-
-            return State.Successful;
-        }
-
         public static bool CheckUI0DetectService()
         {
             try
@@ -291,6 +308,8 @@ namespace DaemonMasterCore
                 return false;
             }
         }
+
+
 
         #endregion
 

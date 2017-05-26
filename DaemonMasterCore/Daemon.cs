@@ -21,6 +21,7 @@
 using System;
 using Newtonsoft.Json;
 using System.Windows.Media;
+using DaemonMasterCore.Win32;
 
 namespace DaemonMasterCore
 {
@@ -51,9 +52,12 @@ namespace DaemonMasterCore
         public string ServiceName { get; set; }
         public string Description { get; set; }
         public string[] DependOnService { get; set; }
+        public ADVAPI.SERVICE_START Starttype { get; set; }
+        public bool DelayedStart { get; set; }
 
         public string FileDir { get; set; }
         public string FileName { get; set; }
+        public string FileExtension { get; set; }
         public string FullPath => FileDir + @"\" + FileName;
 
         public string Parameter { get; set; }

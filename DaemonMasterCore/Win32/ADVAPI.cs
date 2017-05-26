@@ -53,9 +53,18 @@ namespace DaemonMasterCore.Win32
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ChangeServiceConfig2(IntPtr hService, uint dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_DESCRIPTION lpInfo);
 
+        [DllImport("advapi32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ChangeServiceConfig2(IntPtr hService, uint dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_CONFIG_DELAYED_AUTO_START_INFO lpInfo);
+
+        [DllImport("advapi32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ChangeServiceConfig(IntPtr hService, UInt32 dwServiceType, UInt32 dwStartType, UInt32 dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, string lpdwTagId, string lpDependencies, string lpServiceStartName, string lpPassword, string lpDisplayName);
 
 
         //---------------------//
+
+        public const UInt32 SERVICE_NO_CHANGE = 0xffffffff;
 
         [StructLayout(LayoutKind.Sequential)]
         public struct SERVICE_STATUS_PROCESS
@@ -75,6 +84,12 @@ namespace DaemonMasterCore.Win32
         public struct SERVICE_DESCRIPTION
         {
             public string lpDescription;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SERVICE_CONFIG_DELAYED_AUTO_START_INFO
+        {
+            public bool delayedStart;
         }
 
         //---------------------//

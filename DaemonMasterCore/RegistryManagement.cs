@@ -24,6 +24,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security.AccessControl;
 using System.ServiceProcess;
+using DaemonMasterCore.Win32;
 
 namespace DaemonMasterCore
 {
@@ -39,9 +40,6 @@ namespace DaemonMasterCore
         {
             using (RegistryKey serviceKey = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Services\" + daemon.ServiceName + @"\Parameters"))
             {
-                serviceKey.SetValue("DisplayName", daemon.DisplayName, RegistryValueKind.String);
-                serviceKey.SetValue("ServiceName", daemon.ServiceName, RegistryValueKind.String);
-
                 serviceKey.SetValue("FileDir", daemon.FileDir, RegistryValueKind.String);
                 serviceKey.SetValue("FileName", daemon.FileName, RegistryValueKind.String);
 
@@ -69,31 +67,34 @@ namespace DaemonMasterCore
                 if (key == null)
                     throw new Exception("Can't open registry key!");
 
-                Daemon daemon = new Daemon();
+                Daemon daemon = new Daemon
+                {
+                    ServiceName = Convert.ToString(serviceName),
+                    DisplayName = Convert.ToString(key.GetValue("DisplayName")),
+                    Description = Convert.ToString(key.GetValue("Description")),
+                    DependOnService = (string[])key.GetValue("DependOnService", String.Empty),
+                    DelayedStart = Convert.ToBoolean(key.GetValue("DelayedAutostart", false)),
+                    Starttype = (ADVAPI.SERVICE_START)Convert.ToUInt32(key.GetValue("Start", 2))
+                };
 
-                daemon.DisplayName = Convert.ToString(key.GetValue("DisplayName"));
-                daemon.Description = Convert.ToString(key.GetValue("Description"));
-                daemon.DependOnService = (string[])key.GetValue("DependOnService", String.Empty);
 
                 //Open Parameters SubKey
-                using (RegistryKey parameters = key.OpenSubKey(@"Parameters"))
+                using (RegistryKey parameters = key.OpenSubKey(@"Parameters", false))
                 {
                     if (parameters == null)
                         throw new Exception("Can't open registry key!");
 
-                    //daemon.DisplayName = (string)key.GetValue("DisplayName");
-                    daemon.ServiceName = Convert.ToString(parameters.GetValue("ServiceName"));
                     daemon.FileDir = Convert.ToString(parameters.GetValue("FileDir"));
                     daemon.FileName = Convert.ToString(parameters.GetValue("FileName"));
                     daemon.Parameter = Convert.ToString(parameters.GetValue("Parameter"));
                     daemon.UserName = Convert.ToString(parameters.GetValue("UserName"));
                     daemon.UserPassword = Convert.ToString(parameters.GetValue("UserPassword"));
-                    daemon.MaxRestarts = Convert.ToInt32(parameters.GetValue("MaxRestarts"));
-                    daemon.ProcessKillTime = Convert.ToInt32(parameters.GetValue("ProcessKillTime"));
-                    daemon.ProcessRestartDelay = Convert.ToInt32(parameters.GetValue("ProcessRestartDelay"));
-                    daemon.CounterResetTime = Convert.ToInt32(parameters.GetValue("CounterResetTime"));
-                    daemon.ConsoleApplication = Convert.ToBoolean(parameters.GetValue("ConsoleApplication"));
-                    daemon.UseCtrlC = Convert.ToBoolean(parameters.GetValue("UseCtrlC"));
+                    daemon.MaxRestarts = Convert.ToInt32(parameters.GetValue("MaxRestarts", 3));
+                    daemon.ProcessKillTime = Convert.ToInt32(parameters.GetValue("ProcessKillTime", 9500));
+                    daemon.ProcessRestartDelay = Convert.ToInt32(parameters.GetValue("ProcessRestartDelay", 2000));
+                    daemon.CounterResetTime = Convert.ToInt32(parameters.GetValue("CounterResetTime", 2000));
+                    daemon.ConsoleApplication = Convert.ToBoolean(parameters.GetValue("ConsoleApplication", false));
+                    daemon.UseCtrlC = Convert.ToBoolean(parameters.GetValue("UseCtrlC", false));
 
                     return daemon;
                 }

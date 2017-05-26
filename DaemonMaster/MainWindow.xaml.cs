@@ -54,24 +54,10 @@ namespace DaemonMaster
 
             //Add events
             EditAddWindow.DaemonSavedEvent += EditAddWindow_DaemonSavedEvent;
-            //EditAddWindow.DaemonEditEvent += EditAddWindow_DaemonEditEvent;
-
-
 
             //Fragt, wenn der RegKey nicht gesetzt ist, ob dieser gesetzt werden soll
             if (!AskToEnableInteractiveServices())
                 this.Close();
-
-            ////Bei einem Problem bei laden aus der Registry wird eine leere Liste geladen und eine Fehlermeldung angezeigt
-            //try
-            //{
-            //    processCollection = RegistryManagement.LoadFromRegistry();
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show(resManager.GetString("cannot_load_deamonfile", CultureInfo.CurrentUICulture) + ex.Message);
-            //    processCollection = new ObservableCollection<Daemon>();
-            //}
 
             processCollection = RegistryManagement.LoadDaemonInfosFromRegistry();
 
@@ -368,10 +354,6 @@ namespace DaemonMaster
         private void EditAddWindow_DaemonSavedEvent(DaemonInfo daemonInfo) // Fügt Deamon Objekt der Liste hinzu
         {
             processCollection.Add(daemonInfo);
-        }
-
-        private void EditAddWindow_DaemonEditEvent() // Fügt Deamon Objekt der Liste hinzu
-        {
         }
 
         #endregion
