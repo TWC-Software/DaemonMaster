@@ -32,7 +32,7 @@ namespace DaemonMasterService
         private Daemon daemon = null;
 
         private uint restartCounter = 0;
-        private Timer resetTimer;
+        private Timer resetTimer = null;
 
 
         public Service1(bool enablePause)

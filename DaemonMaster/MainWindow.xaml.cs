@@ -25,7 +25,7 @@ using System.Resources;
 using System.Windows;
 using System.Windows.Input;
 using DaemonMasterCore;
-using DaemonMasterCore.Exceptions;
+using AutoUpdaterDotNET;
 
 
 
@@ -71,6 +71,11 @@ namespace DaemonMaster
             {
                 MessageBox.Show(resManager.GetString("error_ui0service", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
+            AutoUpdater.CurrentCulture = CultureInfo.CurrentCulture;
+            AutoUpdater.ShowSkipButton = true;
+            AutoUpdater.OpenDownloadPage = true;
+            AutoUpdater.Start();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
