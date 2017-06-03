@@ -261,4 +261,10 @@
   <data name="you_must_stop_the_service_first" xml:space="preserve">
     <value>You must stop the service first. Do you want stop the service now ?</value>
   </data>
+  <data name="button_help" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="button_check_for_updates" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
 </root>

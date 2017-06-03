@@ -21,6 +21,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Reflection;
 using System.Resources;
 using System.Windows;
 using System.Windows.Input;
@@ -71,11 +72,6 @@ namespace DaemonMaster
             {
                 MessageBox.Show(resManager.GetString("error_ui0service", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
-            AutoUpdater.CurrentCulture = CultureInfo.CurrentCulture;
-            AutoUpdater.ShowSkipButton = true;
-            AutoUpdater.OpenDownloadPage = true;
-            AutoUpdater.Start("https://github.com/TWC-Software/DaemonMaster/blob/master/AutoUpdater.xml");
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -175,6 +171,11 @@ namespace DaemonMaster
                 return;
 
             EditDaemon();
+        }
+
+        private void MenuItem_Click_CheckForUpdates(object sender, RoutedEventArgs e)
+        {
+            CheckForUpdates();
         }
 
         private void MenuItem_Click_Credits(object sender, RoutedEventArgs e)
@@ -348,6 +349,15 @@ namespace DaemonMaster
             }
         }
 
+
+        private void CheckForUpdates()
+        {
+            AutoUpdater.CurrentCulture = CultureInfo.CurrentCulture;
+            AutoUpdater.ShowSkipButton = true;
+            AutoUpdater.OpenDownloadPage = true;
+            AutoUpdater.Start("https://raw.githubusercontent.com/TWC-Software/DaemonMaster/master/AutoUpdater.xml", typeof(MainWindow).Assembly);
+        }
+
         #endregion
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -366,6 +376,11 @@ namespace DaemonMaster
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+        }
+
+        private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            CheckForUpdates();
         }
     }
 }

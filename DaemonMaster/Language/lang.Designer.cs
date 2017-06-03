@@ -79,6 +79,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Check for updates ähnelt.
+        /// </summary>
+        public static string button_check_for_updates {
+            get {
+                return ResourceManager.GetString("button_check_for_updates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Credits ähnelt.
         /// </summary>
         public static string button_credits {
@@ -120,6 +129,15 @@ namespace DaemonMaster.Language {
         public static string button_file {
             get {
                 return ResourceManager.GetString("button_file", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Help ähnelt.
+        /// </summary>
+        public static string button_help {
+            get {
+                return ResourceManager.GetString("button_help", resourceCulture);
             }
         }
         
