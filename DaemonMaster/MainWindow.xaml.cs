@@ -75,7 +75,7 @@ namespace DaemonMaster
             AutoUpdater.CurrentCulture = CultureInfo.CurrentCulture;
             AutoUpdater.ShowSkipButton = true;
             AutoUpdater.OpenDownloadPage = true;
-            AutoUpdater.Start();
+            AutoUpdater.Start("https://github.com/TWC-Software/DaemonMaster/blob/master/AutoUpdater.xml");
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
