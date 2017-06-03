@@ -90,7 +90,7 @@ namespace DaemonMaster
             textBoxUsername.Text = daemon.UserName;
             textBoxDescription.Text = daemon.Description;
 
-            switch (daemon.Starttype)
+            switch (daemon.StartType)
             {
                 case ADVAPI.SERVICE_START.SERVICE_AUTO_START:
                     comboBoxStarttyp.SelectedIndex = daemon.DelayedStart ? 1 : 0;
@@ -187,26 +187,26 @@ namespace DaemonMaster
                     //Automatic
                     case 0:
                         daemon.DelayedStart = false;
-                        daemon.Starttype = ADVAPI.SERVICE_START.SERVICE_AUTO_START;
+                        daemon.StartType = ADVAPI.SERVICE_START.SERVICE_AUTO_START;
                         break;
 
 
                     //Automatic with delay
                     case 1:
                         daemon.DelayedStart = true;
-                        daemon.Starttype = ADVAPI.SERVICE_START.SERVICE_AUTO_START;
+                        daemon.StartType = ADVAPI.SERVICE_START.SERVICE_AUTO_START;
                         break;
 
                     //Manual
                     case 2:
                         daemon.DelayedStart = false;
-                        daemon.Starttype = ADVAPI.SERVICE_START.SERVICE_DEMAND_START;
+                        daemon.StartType = ADVAPI.SERVICE_START.SERVICE_DEMAND_START;
                         break;
 
                     //Disabled
                     case 3:
                         daemon.DelayedStart = false;
-                        daemon.Starttype = ADVAPI.SERVICE_START.SERVICE_DISABLED;
+                        daemon.StartType = ADVAPI.SERVICE_START.SERVICE_DISABLED;
                         break;
                 }
 

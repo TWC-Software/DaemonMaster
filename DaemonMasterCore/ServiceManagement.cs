@@ -269,7 +269,7 @@ namespace DaemonMasterCore
                 ChangeServiceConfig2(svManager, daemon.Description);
                 ChangeServiceConfig2(svManager, daemon.DelayedStart);
 
-                if (!ADVAPI.ChangeServiceConfig(svManager, ADVAPI.SERVICE_NO_CHANGE, (uint)daemon.Starttype,
+                if (!ADVAPI.ChangeServiceConfig(svManager, ADVAPI.SERVICE_NO_CHANGE, (uint)daemon.StartType,
                     ADVAPI.SERVICE_NO_CHANGE, null, null, null, String.Concat(daemon.DependOnService), null, null, daemon.DisplayName))
                     throw new Win32Exception("Cannot set the config of the service!, error:\n" + Marshal.GetLastWin32Error());
 

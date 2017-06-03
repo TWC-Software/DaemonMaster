@@ -18,23 +18,21 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
-using Microsoft.Win32;
+using DaemonMasterCore;
 using System;
 using System.Diagnostics;
 using System.ServiceProcess;
 using System.Threading;
-using DaemonMasterCore;
-using DaemonMasterCore.Win32;
-using System.Runtime.InteropServices;
 
 namespace DaemonMasterService
 {
     public partial class Service1 : ServiceBase
     {
-        Process process = null;
-        Daemon daemon = null;
+        private Process process = null;
+        private Daemon daemon = null;
 
-        private uint restarts = 0;
+        private uint restartCounter = 0;
+        private Timer resetTimer;
 
 
         public Service1(bool enablePause)
@@ -63,6 +61,9 @@ namespace DaemonMasterService
 
         protected override void OnStop()
         {
+            //Disable Process_Exited event
+            process.EnableRaisingEvents = false;
+            //Stop the process
             StopProcess();
 
             base.OnStop();
@@ -83,41 +84,39 @@ namespace DaemonMasterService
         }
 
 
+
+
         private void StopProcess()
         {
-            try
+            if (process == null || process.HasExited)
+                return;
+
+            //IntPtr handle = process.MainWindowHandle;
+
+            //if (handle != IntPtr.Zero)
+            //{
+            //    USER32.PostMessage(handle, USER32._SYSCOMMAND, (IntPtr)USER32.wParam.SC_CLOSE, IntPtr.Zero);
+            //}
+            //else
+            //{
+            if (!process.CloseMainWindow())
             {
-                if (process != null)
+                //Schließt, wenn es eine Consolen Anwendung ist, das fenster mit einem Ctrl-C / Ctrl-Break Befehl
+                if (daemon.ConsoleApplication)
                 {
-                    IntPtr handle = process.MainWindowHandle;
-
-                    if (handle != IntPtr.Zero)
-                    {
-                        USER32.PostMessage(handle, USER32._SYSCOMMAND, (IntPtr)USER32.wParam.SC_CLOSE, IntPtr.Zero);
-                    }
-                    else
-                    {
-                        if (!process.CloseMainWindow())
-                        {
-                            //Schließt, wenn es eine Consolen Anwendung ist, das fenster mit einem Ctrl-C / Ctrl-Break Befehl
-                            if (daemon.ConsoleApplication)
-                            {
-                                ProcessManagement.CloseConsoleApplication(daemon.UseCtrlC, (uint)process.Id);
-                            }
-                        }
-                    }
-
-                    process.WaitForExit(daemon.ProcessKillTime);
-                    process.Kill();
-
-                    process.Close();
-                    process.Dispose();
-                    process = null;
+                    ProcessManagement.CloseConsoleApplication(daemon.UseCtrlC, (uint)process.Id);
                 }
             }
-            catch (Exception)
+            //}
+
+            if (!process.WaitForExit(daemon.ProcessKillTime))
             {
+                process.Kill();
             }
+
+            process.Close();
+            process.Dispose();
+            process = null;
         }
 
         private void StartProcess()
@@ -127,18 +126,20 @@ namespace DaemonMasterService
                 if (daemon.FullPath == String.Empty)
                     throw new Exception("Invalid filepath!");
 
-                ProcessStartInfo startInfo = new ProcessStartInfo(daemon.FullPath, daemon.Parameter);
-
+                ProcessStartInfo startInfo =
+                    new ProcessStartInfo(daemon.FullPath, daemon.Parameter)
+                    {
+                        UseShellExecute = false,
+                        ErrorDialog = false
+                    };
 
                 process = new Process();
                 process.StartInfo = startInfo;
-                process.Start();
                 //Abboniert das Event
                 process.Exited += Process_Exited;
                 //Benötigt damit Exited funktioniert
                 process.EnableRaisingEvents = true;
-
-
+                process.Start();
             }
             catch (Exception)
             {
@@ -150,11 +151,26 @@ namespace DaemonMasterService
         {
             try
             {
-                if (daemon.MaxRestarts == 0 || restarts < daemon.MaxRestarts)
+                if (daemon.MaxRestarts == 0 || restartCounter < daemon.MaxRestarts)
                 {
-                    Thread.Sleep(daemon.ProcessRestartDelay);
-                    process.Start();
-                    restarts++;
+
+                    Timer restartDelayTimer = new Timer(o =>
+                    {
+                        process.Start();
+                        restartCounter++;
+
+                        if (resetTimer == null)
+                        {
+                            resetTimer = new Timer(ResetTimerCallback, null, daemon.CounterResetTime, Timeout.Infinite);
+                        }
+                        else
+                        {
+                            resetTimer.Change(daemon.CounterResetTime, Timeout.Infinite);
+                        }
+
+                        ((Timer)o).Dispose();
+
+                    }, null, daemon.ProcessRestartDelay, Timeout.Infinite);
                 }
                 else
                 {
@@ -165,6 +181,14 @@ namespace DaemonMasterService
             {
                 Stop();
             }
+        }
+
+        private void ResetTimerCallback(object state)
+        {
+            restartCounter = 0;
+
+            resetTimer.Dispose();
+            resetTimer = null;
         }
     }
 }
