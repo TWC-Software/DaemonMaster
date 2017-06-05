@@ -33,7 +33,7 @@
                 <CoreWPF:PlaceholderTextBox x:Name="textBoxDisplayName" Height="23" Margin="81,41,0,0" TextWrapping="Wrap" Placeholder="&lt;Please enter a display name&gt;" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
                 <CoreWPF:PlaceholderTextBox x:Name="textBoxDescription" Height="23" Margin="81,68,0,0" TextWrapping="Wrap" Placeholder="&lt;Please enter a description&gt;" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
                 <Label x:Name="labelDescription" Content="Description:" HorizontalAlignment="Left" Margin="3,67,0,0" VerticalAlignment="Top"/>
-                <ComboBox x:Name="comboBoxStarttyp" HorizontalAlignment="Left" Margin="81,123,0,0" VerticalAlignment="Top" Width="321" RenderTransformOrigin="1.217,1.045" SelectedIndex="0">
+                <ComboBox x:Name="comboBoxStartType" HorizontalAlignment="Left" Margin="81,123,0,0" VerticalAlignment="Top" Width="321" RenderTransformOrigin="1.217,1.045" SelectedIndex="0">
                     <ComboBoxItem Content="Automatic"/>
                     <ComboBoxItem Content="Automatic with delay"/>
                     <ComboBoxItem Content="Manual"/>

@@ -93,15 +93,15 @@ namespace DaemonMaster
             switch (daemon.StartType)
             {
                 case ADVAPI.SERVICE_START.SERVICE_AUTO_START:
-                    comboBoxStarttyp.SelectedIndex = daemon.DelayedStart ? 1 : 0;
+                    comboBoxStartType.SelectedIndex = daemon.DelayedStart ? 1 : 0;
                     break;
 
                 case ADVAPI.SERVICE_START.SERVICE_DEMAND_START:
-                    comboBoxStarttyp.SelectedIndex = 2;
+                    comboBoxStartType.SelectedIndex = 2;
                     break;
 
                 case ADVAPI.SERVICE_START.SERVICE_DISABLED:
-                    comboBoxStarttyp.SelectedIndex = 3;
+                    comboBoxStartType.SelectedIndex = 3;
                     break;
             }
         }
@@ -186,7 +186,7 @@ namespace DaemonMaster
                 daemon.Parameter = textBoxParam.Text;
                 daemon.Description = textBoxDescription.Text;
 
-                switch (comboBoxStarttyp.SelectedIndex)
+                switch (comboBoxStartType.SelectedIndex)
                 {
 
                     //Automatic
