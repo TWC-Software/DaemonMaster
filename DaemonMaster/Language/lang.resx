@@ -267,4 +267,7 @@
   <data name="button_check_for_updates" xml:space="preserve">
     <value>Check for updates</value>
   </data>
+  <data name="do_you_to_use_the_data_of_the_shortcut" xml:space="preserve">
+    <value>Do you want to use the data of the shortcut? All existing data will be overwritten!</value>
+  </data>
 </root>

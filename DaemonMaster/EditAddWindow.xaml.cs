@@ -122,8 +122,13 @@ namespace DaemonMaster
             OpenFileDialog openFileDialog =
                 new OpenFileDialog
                 {
+                    //Show the path of the shortcuts
+                    DereferenceLinks = false,
+                    CheckFileExists = true,
+                    CheckPathExists = true,
+                    AddExtension = true,
                     InitialDirectory = Environment.GetFolderPath(System.Environment.SpecialFolder.MyComputer),
-                    Filter = "Exe files (*.exe)|*.exe|" +
+                    Filter = "Exe files (*.exe)|*.exe|" + "Shortcut (*.lnk)|*.lnk|" +
                              "All files (*.*)|*.*"
                 };
 
@@ -153,7 +158,7 @@ namespace DaemonMaster
         {
             try
             {
-                if (!Directory.Exists(Path.GetDirectoryName(textBoxFilePath.Text)) || !File.Exists(textBoxFilePath.Text))
+                if (!Directory.Exists(Path.GetDirectoryName(textBoxFilePath.Text)) || !System.IO.File.Exists(textBoxFilePath.Text))
                 {
                     MessageBox.Show(resManager.GetString("invalid_path", CultureInfo.CurrentUICulture));
                     return;

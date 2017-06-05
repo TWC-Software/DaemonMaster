@@ -267,4 +267,7 @@
   <data name="button_check_for_updates" xml:space="preserve">
     <value>Nach Aktualisierungen suchen</value>
   </data>
+  <data name="do_you_to_use_the_data_of_the_shortcut" xml:space="preserve">
+    <value>Wollen Sie die Daten der Verknüpfung nutzen? Alle vorhandenen Daten werden dabei überschrieben!</value>
+  </data>
 </root>

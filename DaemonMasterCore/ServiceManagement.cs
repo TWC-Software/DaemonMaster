@@ -242,7 +242,7 @@ namespace DaemonMasterCore
         public static State ChangeCompleteServiceConfig(Daemon daemon)
         {
             //Open Sc Manager
-            IntPtr scManager = ADVAPI.OpenSCManager(null, null, (uint)ADVAPI.SCM_ACCESS.SC_MANAGER_CREATE_SERVICE);
+            IntPtr scManager = ADVAPI.OpenSCManager(null, null, (uint)ADVAPI.SCM_ACCESS.SC_MANAGER_CONNECT);
 
             //Check if the scManager is not zero
             if (scManager == IntPtr.Zero)
@@ -251,8 +251,7 @@ namespace DaemonMasterCore
             //Open the service manager
             IntPtr svManager = ADVAPI.OpenService(scManager, daemon.ServiceName,
                 (uint)ADVAPI.SERVICE_ACCESS.SERVICE_QUERY_STATUS |
-                (uint)ADVAPI.SERVICE_ACCESS.SERVICE_CHANGE_CONFIG |
-                (uint)ADVAPI.SERVICE_ACCESS.SERVICE_QUERY_CONFIG);
+                (uint)ADVAPI.SERVICE_ACCESS.SERVICE_CHANGE_CONFIG);
 
             if (svManager == IntPtr.Zero)
             {
@@ -270,7 +269,7 @@ namespace DaemonMasterCore
                 ChangeServiceConfig2(svManager, daemon.DelayedStart);
 
                 if (!ADVAPI.ChangeServiceConfig(svManager, ADVAPI.SERVICE_NO_CHANGE, (uint)daemon.StartType,
-                    ADVAPI.SERVICE_NO_CHANGE, null, null, null, String.Concat(daemon.DependOnService), null, null, daemon.DisplayName))
+                    ADVAPI.SERVICE_NO_CHANGE, null, null, null, null/*String.Concat(daemon.DependOnService)*/, null, null, daemon.DisplayName))
                     throw new Win32Exception("Cannot set the config of the service!, error:\n" + Marshal.GetLastWin32Error());
 
                 return State.Successful;

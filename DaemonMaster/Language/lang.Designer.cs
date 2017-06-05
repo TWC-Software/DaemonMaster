@@ -295,6 +295,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Do you want to use the data of the shortcut? All existing data will be overwritten! ähnelt.
+        /// </summary>
+        public static string do_you_to_use_the_data_of_the_shortcut {
+            get {
+                return ResourceManager.GetString("do_you_to_use_the_data_of_the_shortcut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Error ähnelt.
         /// </summary>
         public static string error {

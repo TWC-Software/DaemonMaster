@@ -21,6 +21,7 @@
 using DaemonMasterCore;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.ServiceProcess;
 using System.Threading;
 
@@ -126,12 +127,20 @@ namespace DaemonMasterService
                 if (daemon.FullPath == String.Empty)
                     throw new Exception("Invalid filepath!");
 
-                ProcessStartInfo startInfo =
-                    new ProcessStartInfo(daemon.FullPath, daemon.Parameter)
-                    {
-                        UseShellExecute = false,
-                        ErrorDialog = false
-                    };
+                ProcessStartInfo startInfo = new ProcessStartInfo(daemon.FullPath, daemon.Parameter);
+
+                string extension = Path.GetExtension(daemon.FullPath);
+
+                if (String.Equals(extension, ".lnk", StringComparison.OrdinalIgnoreCase))
+                {
+                    startInfo.UseShellExecute = true;
+                }
+                else
+                {
+                    startInfo.UseShellExecute = false;
+                }
+
+                startInfo.ErrorDialog = false;
 
                 process = new Process();
                 process.StartInfo = startInfo;
