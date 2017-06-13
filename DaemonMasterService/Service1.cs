@@ -20,21 +20,13 @@
 
 using DaemonMasterCore;
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.ServiceProcess;
-using System.Threading;
 
 namespace DaemonMasterService
 {
     public partial class Service1 : ServiceBase
     {
-        private Process process = null;
-        private Daemon daemon = null;
-
-        private uint restartCounter = 0;
-        private Timer resetTimer = null;
-
+        private ProcessManagement _processManagement = null;
 
         public Service1(bool enablePause)
         {
@@ -51,8 +43,9 @@ namespace DaemonMasterService
             try
             {
                 //Load config from registry
-                daemon = RegistryManagement.LoadDaemonFromRegistry(DaemonMasterUtils.GetServiceName());
-                StartProcess();
+                Daemon daemon = RegistryManagement.LoadDaemonFromRegistry(DaemonMasterUtils.GetServiceName());
+                _processManagement = new ProcessManagement(daemon);
+                _processManagement.StartProcess();
             }
             catch (Exception)
             {
@@ -62,17 +55,14 @@ namespace DaemonMasterService
 
         protected override void OnStop()
         {
-            //Disable Process_Exited event
-            process.EnableRaisingEvents = false;
             //Stop the process
-            StopProcess();
-
+            _processManagement.StopProcess();
             base.OnStop();
         }
 
         protected override void OnPause()
         {
-            ProcessManagement.PauseProcess((uint)process.Id);
+            _processManagement.PauseProcess();
 
             base.OnPause();
         }
@@ -81,123 +71,7 @@ namespace DaemonMasterService
         {
             base.OnContinue();
 
-            ProcessManagement.ResumeProcess((uint)process.Id);
-        }
-
-
-
-
-        private void StopProcess()
-        {
-            if (process == null || process.HasExited)
-                return;
-
-            //IntPtr handle = process.MainWindowHandle;
-
-            //if (handle != IntPtr.Zero)
-            //{
-            //    USER32.PostMessage(handle, USER32._SYSCOMMAND, (IntPtr)USER32.wParam.SC_CLOSE, IntPtr.Zero);
-            //}
-            //else
-            //{
-            if (!process.CloseMainWindow())
-            {
-                //Schließt, wenn es eine Consolen Anwendung ist, das fenster mit einem Ctrl-C / Ctrl-Break Befehl
-                if (daemon.ConsoleApplication)
-                {
-                    ProcessManagement.CloseConsoleApplication(daemon.UseCtrlC, (uint)process.Id);
-                }
-            }
-            //}
-
-            if (!process.WaitForExit(daemon.ProcessKillTime))
-            {
-                process.Kill();
-            }
-
-            process.Close();
-            process.Dispose();
-            process = null;
-        }
-
-        private void StartProcess()
-        {
-            try
-            {
-                if (daemon.FullPath == String.Empty)
-                    throw new Exception("Invalid filepath!");
-
-                ProcessStartInfo startInfo = new ProcessStartInfo(daemon.FullPath, daemon.Parameter);
-
-                string extension = Path.GetExtension(daemon.FullPath);
-
-                if (String.Equals(extension, ".lnk", StringComparison.OrdinalIgnoreCase))
-                {
-                    startInfo.UseShellExecute = true;
-                }
-                else
-                {
-                    startInfo.UseShellExecute = false;
-                }
-
-                startInfo.ErrorDialog = false;
-
-                process = new Process();
-                process.StartInfo = startInfo;
-                //Abboniert das Event
-                process.Exited += Process_Exited;
-                //Benötigt damit Exited funktioniert
-                process.EnableRaisingEvents = true;
-                process.Start();
-            }
-            catch (Exception)
-            {
-                Stop();
-            }
-        }
-
-        private void Process_Exited(object sender, EventArgs e)
-        {
-            try
-            {
-                if (daemon.MaxRestarts == 0 || restartCounter < daemon.MaxRestarts)
-                {
-
-                    Timer restartDelayTimer = new Timer(o =>
-                    {
-                        process.Start();
-                        restartCounter++;
-
-                        if (resetTimer == null)
-                        {
-                            resetTimer = new Timer(ResetTimerCallback, null, daemon.CounterResetTime, Timeout.Infinite);
-                        }
-                        else
-                        {
-                            resetTimer.Change(daemon.CounterResetTime, Timeout.Infinite);
-                        }
-
-                        ((Timer)o).Dispose();
-
-                    }, null, daemon.ProcessRestartDelay, Timeout.Infinite);
-                }
-                else
-                {
-                    Stop();
-                }
-            }
-            catch (Exception)
-            {
-                Stop();
-            }
-        }
-
-        private void ResetTimerCallback(object state)
-        {
-            restartCounter = 0;
-
-            resetTimer.Dispose();
-            resetTimer = null;
+            _processManagement.ResumeProcess();
         }
     }
 }

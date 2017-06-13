@@ -28,6 +28,7 @@ using System.Threading.Tasks;
 using DaemonMasterCore.Win32;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.ComponentModel.Design;
 using System.Windows.Documents;
 using Microsoft.Win32;
 using DaemonMasterCore.Exceptions;
@@ -59,19 +60,19 @@ namespace DaemonMasterCore
             if (!Directory.Exists(DaemonMasterServicePath) || !File.Exists(DaemonMasterServicePath + DaemonMasterServiceFile))
                 throw new IOException("Can't find the DaemonMasterService file!");
 
-            IntPtr scManager = ADVAPI.OpenSCManager(null, null, (uint)ADVAPI.SCM_ACCESS.SC_MANAGER_CREATE_SERVICE);
+            IntPtr scManager = NativeMethods.OpenSCManager(null, null, (uint)NativeMethods.SCM_ACCESS.SC_MANAGER_CREATE_SERVICE);
 
             if (scManager == IntPtr.Zero)
                 throw new Win32Exception("Cannot open the service manager!, error:\n" + Marshal.GetLastWin32Error());
 
-            IntPtr svManager = ADVAPI.CreateService(
+            IntPtr svManager = NativeMethods.CreateService(
                                                         scManager,
                                                         daemon.ServiceName,
                                                         daemon.DisplayName,
-                                                        (uint)ADVAPI.SERVICE_ACCESS.SERVICE_ALL_ACCESS,
-                                                        (uint)ADVAPI.SERVICE_TYPE.SERVICE_INTERACTIVE_PROCESS | (uint)ADVAPI.SERVICE_TYPE.SERVICE_WIN32_OWN_PROCESS,
-                                                        (uint)ADVAPI.SERVICE_START.SERVICE_AUTO_START,
-                                                        (uint)ADVAPI.SERVICE_ERROR_CONTROLE.SERVICE_ERROR_IGNORE,
+                                                        (uint)NativeMethods.SERVICE_ACCESS.SERVICE_ALL_ACCESS,
+                                                        (uint)NativeMethods.SERVICE_TYPE.SERVICE_INTERACTIVE_PROCESS | (uint)NativeMethods.SERVICE_TYPE.SERVICE_WIN32_OWN_PROCESS,
+                                                        (uint)NativeMethods.SERVICE_START.SERVICE_AUTO_START,
+                                                        (uint)NativeMethods.SERVICE_ERROR_CONTROLE.SERVICE_ERROR_IGNORE,
                                                         DaemonMasterServicePath + DaemonMasterServiceFile + DaemonMasterServiceParameter,
                                                         null,
                                                         null,
@@ -80,13 +81,13 @@ namespace DaemonMasterCore
                                                         null);
             if (svManager == IntPtr.Zero)
             {
-                ADVAPI.CloseServiceHandle(scManager);
+                NativeMethods.CloseServiceHandle(scManager);
                 throw new Win32Exception("Cannot create the service!, error:\n" + Marshal.GetLastWin32Error());
             }
 
 
-            ADVAPI.CloseServiceHandle(svManager);
-            ADVAPI.CloseServiceHandle(scManager);
+            NativeMethods.CloseServiceHandle(svManager);
+            NativeMethods.CloseServiceHandle(scManager);
         }
 
         /// <summary>
@@ -159,26 +160,26 @@ namespace DaemonMasterCore
         public static State DeleteService(string serviceName)
         {
             //Open the service manager
-            IntPtr scManager = ADVAPI.OpenSCManager(null, null, (uint)ADVAPI.SCM_ACCESS.SC_MANAGER_CONNECT);
+            IntPtr scManager = NativeMethods.OpenSCManager(null, null, (uint)NativeMethods.SCM_ACCESS.SC_MANAGER_CONNECT);
 
             //Check if scManager is a valid pointer
             if (scManager == IntPtr.Zero)
                 throw new Win32Exception("Cannot open the service manager!, error:\n" + Marshal.GetLastWin32Error());
 
             //Open the service
-            IntPtr svManager = ADVAPI.OpenService(scManager, serviceName, (uint)ADVAPI.SERVICE_ACCESS.DELETE | (uint)ADVAPI.SERVICE_ACCESS.SERVICE_QUERY_STATUS | (uint)ADVAPI.SERVICE_ACCESS.SERVICE_ENUMERATE_DEPENDENTS);
+            IntPtr svManager = NativeMethods.OpenService(scManager, serviceName, (uint)NativeMethods.SERVICE_ACCESS.DELETE | (uint)NativeMethods.SERVICE_ACCESS.SERVICE_QUERY_STATUS | (uint)NativeMethods.SERVICE_ACCESS.SERVICE_ENUMERATE_DEPENDENTS);
 
             //Check if svManager is a valid pointer
             if (svManager == IntPtr.Zero)
             {
-                ADVAPI.CloseServiceHandle(scManager);
+                NativeMethods.CloseServiceHandle(scManager);
                 throw new Win32Exception("Cannot open the service!, error:\n" + Marshal.GetLastWin32Error());
             }
 
             try
             {
                 //Check if the service has been stopped
-                if (DaemonMasterUtils.QueryServiceStatusEx(svManager).currentState != (int)ADVAPI.SERVICE_STATE.SERVICE_STOPPED)
+                if (DaemonMasterUtils.QueryServiceStatusEx(svManager).currentState != (int)NativeMethods.SERVICE_STATE.SERVICE_STOPPED)
                 {
                     //if (StopService(serviceName) < 0)
                     //    throw new Win32Exception("Cannot stop the service!, error:\n" + Marshal.GetLastWin32Error());
@@ -186,15 +187,15 @@ namespace DaemonMasterCore
                 }
 
                 //Delete the service
-                if (!ADVAPI.DeleteService(svManager))
+                if (!NativeMethods.DeleteService(svManager))
                     throw new Win32Exception("Cannot delete the service!, error:\n" + Marshal.GetLastWin32Error());
 
                 return State.Successful;
             }
             finally
             {
-                ADVAPI.CloseServiceHandle(svManager);
-                ADVAPI.CloseServiceHandle(scManager);
+                NativeMethods.CloseServiceHandle(svManager);
+                NativeMethods.CloseServiceHandle(scManager);
             }
         }
 
@@ -207,11 +208,11 @@ namespace DaemonMasterCore
         private static void ChangeServiceConfig2(IntPtr svManager, string description)
         {
             //Create an struct with description of the service
-            ADVAPI.SERVICE_DESCRIPTION serviceDescription;
+            NativeMethods.SERVICE_DESCRIPTION serviceDescription;
             serviceDescription.lpDescription = description;
 
             //Set the description of the service
-            if (!ADVAPI.ChangeServiceConfig2(svManager, (uint)ADVAPI.DW_INFO_LEVEL.SERVICE_CONFIG_DESCRIPTION, ref serviceDescription))
+            if (!NativeMethods.ChangeServiceConfig2(svManager, (uint)NativeMethods.DW_INFO_LEVEL.SERVICE_CONFIG_DESCRIPTION, ref serviceDescription))
                 throw new Win32Exception("Cannot set the description of the service!, error:\n" + Marshal.GetLastWin32Error());
         }
 
@@ -224,11 +225,11 @@ namespace DaemonMasterCore
         private static void ChangeServiceConfig2(IntPtr svManager, bool delayedStart)
         {
             // //Create an struct with description of the service
-            ADVAPI.SERVICE_CONFIG_DELAYED_AUTO_START_INFO serviceDelayedStart;
+            NativeMethods.SERVICE_CONFIG_DELAYED_AUTO_START_INFO serviceDelayedStart;
             serviceDelayedStart.delayedStart = delayedStart;
 
             //Set the description of the service
-            if (!ADVAPI.ChangeServiceConfig2(svManager, (uint)ADVAPI.DW_INFO_LEVEL.SERVICE_CONFIG_DELAYED_AUTO_START_INFO,
+            if (!NativeMethods.ChangeServiceConfig2(svManager, (uint)NativeMethods.DW_INFO_LEVEL.SERVICE_CONFIG_DELAYED_AUTO_START_INFO,
                 ref serviceDelayedStart))
                 throw new Win32Exception("Cannot set the description of the service!, error:\n" +
                                          Marshal.GetLastWin32Error());
@@ -242,25 +243,25 @@ namespace DaemonMasterCore
         public static State ChangeCompleteServiceConfig(Daemon daemon)
         {
             //Open Sc Manager
-            IntPtr scManager = ADVAPI.OpenSCManager(null, null, (uint)ADVAPI.SCM_ACCESS.SC_MANAGER_CONNECT);
+            IntPtr scManager = NativeMethods.OpenSCManager(null, null, (uint)NativeMethods.SCM_ACCESS.SC_MANAGER_CONNECT);
 
             //Check if the scManager is not zero
             if (scManager == IntPtr.Zero)
                 throw new Win32Exception("Cannot open the service Manager!, error:\n" + Marshal.GetLastWin32Error());
 
             //Open the service manager
-            IntPtr svManager = ADVAPI.OpenService(scManager, daemon.ServiceName,
-                (uint)ADVAPI.SERVICE_ACCESS.SERVICE_QUERY_STATUS |
-                (uint)ADVAPI.SERVICE_ACCESS.SERVICE_CHANGE_CONFIG);
+            IntPtr svManager = NativeMethods.OpenService(scManager, daemon.ServiceName,
+                (uint)NativeMethods.SERVICE_ACCESS.SERVICE_QUERY_STATUS |
+                (uint)NativeMethods.SERVICE_ACCESS.SERVICE_CHANGE_CONFIG);
 
             if (svManager == IntPtr.Zero)
             {
-                ADVAPI.CloseServiceHandle(scManager);
+                NativeMethods.CloseServiceHandle(scManager);
                 throw new Win32Exception("Cannot open the service!, error:\n" + Marshal.GetLastWin32Error());
             }
 
             //Query status of the service
-            if (DaemonMasterUtils.QueryServiceStatusEx(svManager).currentState != (int)ADVAPI.SERVICE_STATE.SERVICE_STOPPED)
+            if (DaemonMasterUtils.QueryServiceStatusEx(svManager).currentState != (int)NativeMethods.SERVICE_STATE.SERVICE_STOPPED)
                 return State.NotStopped;
 
             try
@@ -268,16 +269,16 @@ namespace DaemonMasterCore
                 ChangeServiceConfig2(svManager, daemon.Description);
                 ChangeServiceConfig2(svManager, daemon.DelayedStart);
 
-                if (!ADVAPI.ChangeServiceConfig(svManager, ADVAPI.SERVICE_NO_CHANGE, (uint)daemon.StartType,
-                    ADVAPI.SERVICE_NO_CHANGE, null, null, null, null/*String.Concat(daemon.DependOnService)*/, null, null, daemon.DisplayName))
+                if (!NativeMethods.ChangeServiceConfig(svManager, NativeMethods.SERVICE_NO_CHANGE, (uint)daemon.StartType,
+                    NativeMethods.SERVICE_NO_CHANGE, null, null, null, null/*String.Concat(daemon.DependOnService)*/, null, null, daemon.DisplayName))
                     throw new Win32Exception("Cannot set the config of the service!, error:\n" + Marshal.GetLastWin32Error());
 
                 return State.Successful;
             }
             finally
             {
-                ADVAPI.CloseServiceHandle(svManager);
-                ADVAPI.CloseServiceHandle(scManager);
+                NativeMethods.CloseServiceHandle(svManager);
+                NativeMethods.CloseServiceHandle(scManager);
             }
         }
 
@@ -300,6 +301,29 @@ namespace DaemonMasterCore
                     scManager.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromMilliseconds(WaitForStatusTimeout));
 
                     return scManager.Status == ServiceControllerStatus.Running;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Check if the service running
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <returns></returns>
+        public static bool IsServiceRunning(string serviceName)
+        {
+            try
+            {
+                using (ServiceController scManager = new ServiceController(serviceName))
+                {
+                    if (scManager.Status == ServiceControllerStatus.Running)
+                        return true;
+
+                    return false;
                 }
             }
             catch (Exception)

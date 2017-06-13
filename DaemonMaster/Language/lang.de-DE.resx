@@ -270,4 +270,10 @@
   <data name="do_you_to_use_the_data_of_the_shortcut" xml:space="preserve">
     <value>Wollen Sie die Daten der Verknüpfung nutzen? Alle vorhandenen Daten werden dabei überschrieben!</value>
   </data>
+  <data name="button_start" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="button_stop" xml:space="preserve">
+    <value>Stop</value>
+  </data>
 </root>

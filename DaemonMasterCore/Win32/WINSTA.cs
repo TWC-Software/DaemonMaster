@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: WIN32 WINSTA
+//  DaemonMaster: WIN32 NativeMethods
 //  
 //  This file is part of DeamonMaster.
 // 
@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 
 namespace DaemonMasterCore.Win32
 {
-    public static class WINSTA
+    public static partial class NativeMethods
     {
         [DllImport("winsta.dll", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern void WinStationSwitchToServicesSession();

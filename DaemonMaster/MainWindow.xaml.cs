@@ -24,10 +24,11 @@ using System.Globalization;
 using System.Reflection;
 using System.Resources;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using DaemonMasterCore;
 using AutoUpdaterDotNET;
-
+using DaemonMasterCore.Win32;
 
 
 namespace DaemonMaster
@@ -195,6 +196,27 @@ namespace DaemonMaster
             MessageBox.Show(resManager.GetString("currently_unavailable"), resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
+        private void MenuItemStartWS_OnClick(object sender, RoutedEventArgs e)
+        {
+            //if (listBoxDaemons.SelectedItem == null)
+            //    return;
+
+            //if (((MenuItem)sender).Header.ToString() == resManager.GetString("button_start"))
+            //{
+            //    if (StartDaemonWS((DaemonInfo)listBoxDaemons.SelectedItem))
+            //    {
+            //        ((MenuItem)sender).Header = resManager.GetString("button_stop");
+            //    }
+            //}
+            //else
+            //{
+            //    if (StopDaemonWS((DaemonInfo)listBoxDaemons.SelectedItem))
+            //    {
+            //        ((MenuItem)sender).Header = resManager.GetString("button_start");
+            //    }
+            //}
+        }
+
         #endregion
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -333,6 +355,42 @@ namespace DaemonMaster
             }
         }
 
+        //[Obsolete]
+        //private bool StartDaemonWS(DaemonInfo daemonInfo)
+        //{
+        //    //if (ServiceManagement.IsServiceRunning(daemonInfo.ServiceName))
+        //    //{
+        //    //    //PLACEHOLDER
+        //    //    MessageBox.Show(resManager.GetString("cannot_start_the_service"), resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+        //    //    return false;
+        //    //}
+
+
+        //    //try
+        //    //{
+        //    //    //Daemon daemon = RegistryManagement.LoadDaemonFromRegistry(daemonInfo.ServiceName);
+        //    //    //processManagement = new ProcessManagement(daemon);
+        //    //    //return processManagement.StartProcess();
+        //    //}
+        //    //catch (Exception)
+        //    //{
+        //    //    return false;
+        //    //}
+        //}
+
+        //[Obsolete]
+        //private bool StopDaemonWS(DaemonInfo daemonInfo)
+        //{
+        //    try
+        //    {
+        //        //return processStopProcess();
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return false;
+        //    }
+        //}
+
         private void SwitchToSession0()
         {
             if (ServiceManagement.CheckUI0DetectService())
@@ -340,7 +398,7 @@ namespace DaemonMaster
                 MessageBoxResult result = MessageBox.Show(resManager.GetString("windows10_mouse_keyboard", CultureInfo.CurrentUICulture), resManager.GetString("warning", CultureInfo.CurrentUICulture), MessageBoxButton.OKCancel, MessageBoxImage.Warning);
                 if (result == MessageBoxResult.OK)
                 {
-                    DaemonMasterCore.Win32.WINSTA.WinStationSwitchToServicesSession();
+                    NativeMethods.WinStationSwitchToServicesSession();
                 }
             }
             else

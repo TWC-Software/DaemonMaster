@@ -92,15 +92,15 @@ namespace DaemonMaster
 
             switch (daemon.StartType)
             {
-                case ADVAPI.SERVICE_START.SERVICE_AUTO_START:
+                case NativeMethods.SERVICE_START.SERVICE_AUTO_START:
                     comboBoxStartType.SelectedIndex = daemon.DelayedStart ? 1 : 0;
                     break;
 
-                case ADVAPI.SERVICE_START.SERVICE_DEMAND_START:
+                case NativeMethods.SERVICE_START.SERVICE_DEMAND_START:
                     comboBoxStartType.SelectedIndex = 2;
                     break;
 
-                case ADVAPI.SERVICE_START.SERVICE_DISABLED:
+                case NativeMethods.SERVICE_START.SERVICE_DISABLED:
                     comboBoxStartType.SelectedIndex = 3;
                     break;
             }
@@ -192,26 +192,26 @@ namespace DaemonMaster
                     //Automatic
                     case 0:
                         daemon.DelayedStart = false;
-                        daemon.StartType = ADVAPI.SERVICE_START.SERVICE_AUTO_START;
+                        daemon.StartType = NativeMethods.SERVICE_START.SERVICE_AUTO_START;
                         break;
 
 
                     //Automatic with delay
                     case 1:
                         daemon.DelayedStart = true;
-                        daemon.StartType = ADVAPI.SERVICE_START.SERVICE_AUTO_START;
+                        daemon.StartType = NativeMethods.SERVICE_START.SERVICE_AUTO_START;
                         break;
 
                     //Manual
                     case 2:
                         daemon.DelayedStart = false;
-                        daemon.StartType = ADVAPI.SERVICE_START.SERVICE_DEMAND_START;
+                        daemon.StartType = NativeMethods.SERVICE_START.SERVICE_DEMAND_START;
                         break;
 
                     //Disabled
                     case 3:
                         daemon.DelayedStart = false;
-                        daemon.StartType = ADVAPI.SERVICE_START.SERVICE_DISABLED;
+                        daemon.StartType = NativeMethods.SERVICE_START.SERVICE_DISABLED;
                         break;
                 }
 

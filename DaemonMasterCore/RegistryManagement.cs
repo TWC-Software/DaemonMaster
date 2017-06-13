@@ -74,7 +74,7 @@ namespace DaemonMasterCore
                     Description = Convert.ToString(key.GetValue("Description")),
                     DependOnService = (string[])key.GetValue("DependOnService", String.Empty),
                     DelayedStart = Convert.ToBoolean(key.GetValue("DelayedAutostart", false)),
-                    StartType = (ADVAPI.SERVICE_START)Convert.ToUInt32(key.GetValue("Start", 2))
+                    StartType = (NativeMethods.SERVICE_START)Convert.ToUInt32(key.GetValue("Start", 2))
                 };
 
 

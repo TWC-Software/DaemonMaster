@@ -169,11 +169,29 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Start ähnelt.
+        /// </summary>
+        public static string button_start {
+            get {
+                return ResourceManager.GetString("button_start", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Start Service ähnelt.
         /// </summary>
         public static string button_start_service {
             get {
                 return ResourceManager.GetString("button_start_service", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Stop ähnelt.
+        /// </summary>
+        public static string button_stop {
+            get {
+                return ResourceManager.GetString("button_stop", resourceCulture);
             }
         }
         

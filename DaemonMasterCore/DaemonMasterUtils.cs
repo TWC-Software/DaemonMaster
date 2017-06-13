@@ -53,24 +53,24 @@ namespace DaemonMasterCore
         }
 
         //http://www.pinvoke.net/default.aspx/advapi32.QueryServiceStatusEx
-        public static ADVAPI.SERVICE_STATUS_PROCESS QueryServiceStatusEx(IntPtr svManager)
+        public static NativeMethods.SERVICE_STATUS_PROCESS QueryServiceStatusEx(IntPtr svManager)
         {
             IntPtr buffer = IntPtr.Zero;
             int size = 0;
 
             try
             {
-                ADVAPI.QueryServiceStatusEx(svManager, 0, buffer, size, out size);
+                NativeMethods.QueryServiceStatusEx(svManager, 0, buffer, size, out size);
                 //Reserviere Speicher in der größe von size
                 buffer = Marshal.AllocHGlobal(size);
 
-                if (!ADVAPI.QueryServiceStatusEx(svManager, 0, buffer, size, out size))
+                if (!NativeMethods.QueryServiceStatusEx(svManager, 0, buffer, size, out size))
                 {
 
                     throw new Win32Exception(Marshal.GetLastWin32Error());
                 }
 
-                return (ADVAPI.SERVICE_STATUS_PROCESS)Marshal.PtrToStructure(buffer, typeof(ADVAPI.SERVICE_STATUS_PROCESS));
+                return (NativeMethods.SERVICE_STATUS_PROCESS)Marshal.PtrToStructure(buffer, typeof(NativeMethods.SERVICE_STATUS_PROCESS));
             }
             catch (Exception)
             {
