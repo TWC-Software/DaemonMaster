@@ -26,7 +26,7 @@ namespace DaemonMasterService
 {
     public partial class Service1 : ServiceBase
     {
-        private ProcessManagement _processManagement = null;
+        private Process _processManagement = null;
 
         public Service1(bool enablePause)
         {
@@ -44,7 +44,7 @@ namespace DaemonMasterService
             {
                 //Load config from registry
                 Daemon daemon = RegistryManagement.LoadDaemonFromRegistry(DaemonMasterUtils.GetServiceName());
-                _processManagement = new ProcessManagement(daemon);
+                _processManagement = new Process(daemon);
                 _processManagement.StartProcess();
             }
             catch (Exception)

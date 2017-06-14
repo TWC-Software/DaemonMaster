@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: PROCESS MANAGEMENT CONFIG FILE
+//  DaemonMaster: PROCESS MANAGEMENT FILE
 //  
 //  This file is part of DeamonMaster.
 // 
@@ -17,197 +17,58 @@
 //   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using System;
+
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DaemonMasterCore.Win32;
-using System.Threading;
 
 namespace DaemonMasterCore
 {
-    public class ProcessManagement
+    public static class ProcessManagement
     {
-        private readonly Daemon _daemon = null;
+        private static List<KeyValuePair<string, Process>> processes = new List<KeyValuePair<string, Process>>();
 
-        private Process _process = null;
-        private Timer _resetTimer = null;
-        private uint _restartCounter = 0;
-
-        public ProcessManagement(Daemon daemon)
+        /// <summary>
+        /// Get the Process object of the given service name, if no process exists to the given service name the function return null
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <returns></returns>
+        public static Process GetProcessByName(string serviceName)
         {
-            _daemon = daemon;
+            if (IsProcessAlreadyThere(serviceName))
+            {
+                return processes.FirstOrDefault(x => x.Key == serviceName).Value;
+            }
+
+            return null;
         }
 
-        public Daemon GetDaemon => _daemon;
-
-        public bool CloseConsoleApplication(bool useCtrlC)
+        /// <summary>
+        /// Check if the Process with the given service name already exists
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <returns></returns>
+        public static bool IsProcessAlreadyThere(string serviceName)
         {
-            if (_process == null)
-                throw new NullReferenceException();
-
-
-            if (useCtrlC)
+            if (processes.FirstOrDefault(x => x.Key == serviceName).Equals(default(KeyValuePair<string, Process>)))
             {
-                return NativeMethods.GenerateConsoleCtrlEvent((uint)NativeMethods.CtrlEvent.CTRL_C_EVENT, (uint)_process.Id);
-            }
-            else
-            {
-                return NativeMethods.GenerateConsoleCtrlEvent((uint)NativeMethods.CtrlEvent.CTRL_BREAK_EVENT, (uint)_process.Id);
-            }
-        }
-
-        public bool PauseProcess()
-        {
-            if (_process == null)
-                throw new NullReferenceException();
-
-            IntPtr processHandle = NativeMethods.OpenThread(NativeMethods.ThreadAccess.SUSPEND_RESUME, true, (uint)_process.Id);
-
-            if (processHandle == IntPtr.Zero)
                 return false;
-
-            try
-            {
-                return NativeMethods.SuspendThread(processHandle);
             }
-            finally
-            {
-                NativeMethods.CloseHandle(processHandle);
-            }
-        }
-
-        public bool ResumeProcess()
-        {
-            if (_process == null)
-                throw new NullReferenceException();
-
-            IntPtr processHandle = NativeMethods.OpenThread(NativeMethods.ThreadAccess.SUSPEND_RESUME, true, (uint)_process.Id);
-
-            if (processHandle == IntPtr.Zero)
-                return false;
-
-            try
-            {
-                return NativeMethods.ResumeThread(processHandle);
-            }
-            finally
-            {
-                NativeMethods.CloseHandle(processHandle);
-            }
-        }
-
-        public bool StartProcess()
-        {
-            if (_daemon.FullPath == String.Empty)
-                throw new Exception("Invalid filepath!");
-
-            ProcessStartInfo startInfo = new ProcessStartInfo(_daemon.FullPath, _daemon.Parameter);
-            startInfo.ErrorDialog = false;
-
-            //UseShellExecute if the application is a shortcut
-            string extension = Path.GetExtension(_daemon.FullPath);
-
-            if (String.Equals(extension, ".lnk", StringComparison.OrdinalIgnoreCase))
-            {
-                startInfo.UseShellExecute = true;
-            }
-            else
-            {
-                startInfo.UseShellExecute = false;
-            }
-
-            //Create an _process object
-            _process = new Process();
-            _process.StartInfo = startInfo;
-            //Subscribe to the event
-            _process.Exited += Process_Exited;
-            //Required for that Exited event work
-            _process.EnableRaisingEvents = true;
-            _process.Start();
             return true;
         }
 
-        public bool StopProcess()
+        /// <summary>
+        /// Create a new process with the service name (return the process object), if a process exists with the same service name, the function return null
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <returns></returns>
+        public static Process CreateNewProcces(string serviceName)
         {
-            if (_process == null || _process.HasExited)
-                throw new NullReferenceException();
+            if (IsProcessAlreadyThere(serviceName))
+                return null;
 
-            //Disable Process_Exited event
-            _process.EnableRaisingEvents = false;
-
-            //IntPtr handle = _process.MainWindowHandle;
-            //NativeMethods.PostMessage(handle, NativeMethods._SYSCOMMAND, (IntPtr)NativeMethods.wParam.SC_CLOSE, IntPtr.Zero);
-
-            //Send Ctrl-C / Ctrl-Break command if the application is a console
-            if (_daemon.ConsoleApplication)
-            {
-                CloseConsoleApplication(_daemon.UseCtrlC);
-            }
-
-            //Close the MainWindow of the application 
-            _process.CloseMainWindow();
-
-            //Waiting for the _process to close, after a ProcessKillTime the _process will be killed
-            if (!_process.WaitForExit(_daemon.ProcessKillTime))
-            {
-                _process.Kill();
-            }
-
-            _process.Close();
-            _process.Dispose();
-            _process = null;
-            return true;
-        }
-
-
-
-
-        private void Process_Exited(object sender, EventArgs args)
-        {
-            try
-            {
-                if (_daemon.MaxRestarts == 0 || _restartCounter < _daemon.MaxRestarts)
-                {
-
-                    Timer restartDelayTimer = new Timer(o =>
-                    {
-                        _process.Start();
-                        _restartCounter++;
-
-                        if (_resetTimer == null)
-                        {
-                            _resetTimer = new Timer(ResetTimerCallback, null, _daemon.CounterResetTime, Timeout.Infinite);
-                        }
-                        else
-                        {
-                            _resetTimer.Change(_daemon.CounterResetTime, Timeout.Infinite);
-                        }
-
-                        ((Timer)o).Dispose();
-
-                    }, null, _daemon.ProcessRestartDelay, Timeout.Infinite);
-                }
-                else
-                {
-                    //Stop();
-                }
-            }
-            catch (Exception)
-            {
-                //Stop();
-            }
-        }
-
-        private void ResetTimerCallback(object state)
-        {
-            _restartCounter = 0;
-
-            _resetTimer.Dispose();
-            _resetTimer = null;
+            Process process = new Process(serviceName);
+            processes.Add(new KeyValuePair<string, Process>(serviceName, process));
+            return processes.FirstOrDefault(x => x.Key == serviceName).Value;
         }
     }
 }

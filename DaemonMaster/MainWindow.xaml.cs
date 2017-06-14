@@ -127,7 +127,7 @@ namespace DaemonMaster
             if (listBoxDaemons.SelectedItem == null)
                 return;
 
-            StartDaemon((DaemonInfo)listBoxDaemons.SelectedItem);
+            StartService((DaemonInfo)listBoxDaemons.SelectedItem);
         }
 
         private void MenuItemStop_Click(object sender, RoutedEventArgs e)
@@ -135,7 +135,7 @@ namespace DaemonMaster
             if (listBoxDaemons.SelectedItem == null)
                 return;
 
-            StopDaemon((DaemonInfo)listBoxDaemons.SelectedItem);
+            StopService((DaemonInfo)listBoxDaemons.SelectedItem);
         }
 
         private void MenuItemDelete_Click(object sender, RoutedEventArgs e)
@@ -198,23 +198,22 @@ namespace DaemonMaster
 
         private void MenuItemStartWS_OnClick(object sender, RoutedEventArgs e)
         {
-            //if (listBoxDaemons.SelectedItem == null)
-            //    return;
+            if (listBoxDaemons.SelectedItem == null)
+                return;
 
-            //if (((MenuItem)sender).Header.ToString() == resManager.GetString("button_start"))
-            //{
-            //    if (StartDaemonWS((DaemonInfo)listBoxDaemons.SelectedItem))
-            //    {
-            //        ((MenuItem)sender).Header = resManager.GetString("button_stop");
-            //    }
-            //}
-            //else
-            //{
-            //    if (StopDaemonWS((DaemonInfo)listBoxDaemons.SelectedItem))
-            //    {
-            //        ((MenuItem)sender).Header = resManager.GetString("button_start");
-            //    }
-            //}
+            DaemonInfo daemonInfo = (DaemonInfo)listBoxDaemons.SelectedItem;
+            Process process = ProcessManagement.CreateNewProcces(daemonInfo.ServiceName);
+            process?.StartProcess();
+        }
+
+        private void MenuItemStopWS_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (listBoxDaemons.SelectedItem == null)
+                return;
+
+            DaemonInfo daemonInfo = (DaemonInfo)listBoxDaemons.SelectedItem;
+            Process process = ProcessManagement.GetProcessByName(daemonInfo.ServiceName);
+            process?.StopProcess();
         }
 
         #endregion
@@ -292,7 +291,7 @@ namespace DaemonMaster
 
                         if (result == MessageBoxResult.Yes)
                         {
-                            StopDaemon(daemonInfo);
+                            StopService(daemonInfo);
                         }
                         break;
 
@@ -319,7 +318,7 @@ namespace DaemonMaster
             OpenEditDaemonWindow((DaemonInfo)listBoxDaemons.SelectedItem);
         }
 
-        private void StartDaemon(DaemonInfo daemonInfo)
+        private void StartService(DaemonInfo daemonInfo)
         {
             switch (ServiceManagement.StartService(daemonInfo.ServiceName))
             {
@@ -337,7 +336,7 @@ namespace DaemonMaster
             }
         }
 
-        private void StopDaemon(DaemonInfo daemonInfo)
+        private void StopService(DaemonInfo daemonInfo)
         {
             switch (ServiceManagement.StopService(daemonInfo.ServiceName))
             {
@@ -355,41 +354,15 @@ namespace DaemonMaster
             }
         }
 
-        //[Obsolete]
-        //private bool StartDaemonWS(DaemonInfo daemonInfo)
-        //{
-        //    //if (ServiceManagement.IsServiceRunning(daemonInfo.ServiceName))
-        //    //{
-        //    //    //PLACEHOLDER
-        //    //    MessageBox.Show(resManager.GetString("cannot_start_the_service"), resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-        //    //    return false;
-        //    //}
+        private void StartProcess(DaemonInfo daemonInfo)
+        {
 
+        }
 
-        //    //try
-        //    //{
-        //    //    //Daemon daemon = RegistryManagement.LoadDaemonFromRegistry(daemonInfo.ServiceName);
-        //    //    //processManagement = new ProcessManagement(daemon);
-        //    //    //return processManagement.StartProcess();
-        //    //}
-        //    //catch (Exception)
-        //    //{
-        //    //    return false;
-        //    //}
-        //}
+        private void StopProcess(DaemonInfo daemonInfo)
+        {
 
-        //[Obsolete]
-        //private bool StopDaemonWS(DaemonInfo daemonInfo)
-        //{
-        //    try
-        //    {
-        //        //return processStopProcess();
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return false;
-        //    }
-        //}
+        }
 
         private void SwitchToSession0()
         {

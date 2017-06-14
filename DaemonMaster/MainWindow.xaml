@@ -38,6 +38,7 @@
                     <MenuItem Header="{x:Static resx:lang.button_stop_service}" Click="MenuItemStop_Click"/>
                     <MenuItem Header="{x:Static resx:lang.button_delete_service}" Click="MenuItemDelete_Click"/>
                     <MenuItem Header="{x:Static resx:lang.button_start}" Click="MenuItemStartWS_OnClick"/>
+                    <MenuItem Header="{x:Static resx:lang.button_stop}" Click="MenuItemStopWS_OnClick"/>
                 </ContextMenu>
 
                 <!--Sets a context menu for each ListBoxItem in the current ListBox-->
