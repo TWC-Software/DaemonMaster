@@ -22,7 +22,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Security.AccessControl;
 using System.ServiceProcess;
+using DaemonMasterCore.Win32;
 
 namespace DaemonMasterCore
 {
@@ -38,9 +40,6 @@ namespace DaemonMasterCore
         {
             using (RegistryKey serviceKey = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Services\" + daemon.ServiceName + @"\Parameters"))
             {
-                serviceKey.SetValue("DisplayName", daemon.DisplayName, RegistryValueKind.String);
-                serviceKey.SetValue("ServiceName", daemon.ServiceName, RegistryValueKind.String);
-
                 serviceKey.SetValue("FileDir", daemon.FileDir, RegistryValueKind.String);
                 serviceKey.SetValue("FileName", daemon.FileName, RegistryValueKind.String);
 
@@ -55,12 +54,56 @@ namespace DaemonMasterCore
 
                 serviceKey.SetValue("ConsoleApplication", daemon.ConsoleApplication, RegistryValueKind.DWord);
                 serviceKey.SetValue("UseCtrlC", daemon.UseCtrlC, RegistryValueKind.DWord);
+
+                serviceKey.Close();
             }
         }
 
-        public static ObservableCollection<Daemon> LoadFromRegistry()
+        public static Daemon LoadDaemonFromRegistry(string serviceName)
         {
-            ObservableCollection<Daemon> daemons = new ObservableCollection<Daemon>();
+            //Open Regkey folder
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\" + serviceName, false))
+            {
+                if (key == null)
+                    throw new Exception("Can't open registry key!");
+
+                Daemon daemon = new Daemon
+                {
+                    ServiceName = Convert.ToString(serviceName),
+                    DisplayName = Convert.ToString(key.GetValue("DisplayName")),
+                    Description = Convert.ToString(key.GetValue("Description")),
+                    DependOnService = (string[])key.GetValue("DependOnService", String.Empty),
+                    DelayedStart = Convert.ToBoolean(key.GetValue("DelayedAutostart", false)),
+                    StartType = (NativeMethods.SERVICE_START)Convert.ToUInt32(key.GetValue("Start", 2))
+                };
+
+
+                //Open Parameters SubKey
+                using (RegistryKey parameters = key.OpenSubKey(@"Parameters", false))
+                {
+                    if (parameters == null)
+                        throw new Exception("Can't open registry key!");
+
+                    daemon.FileDir = Convert.ToString(parameters.GetValue("FileDir"));
+                    daemon.FileName = Convert.ToString(parameters.GetValue("FileName"));
+                    daemon.Parameter = Convert.ToString(parameters.GetValue("Parameter"));
+                    daemon.UserName = Convert.ToString(parameters.GetValue("UserName"));
+                    daemon.UserPassword = Convert.ToString(parameters.GetValue("UserPassword"));
+                    daemon.MaxRestarts = Convert.ToInt32(parameters.GetValue("MaxRestarts", 3));
+                    daemon.ProcessKillTime = Convert.ToInt32(parameters.GetValue("ProcessKillTime", 9500));
+                    daemon.ProcessRestartDelay = Convert.ToInt32(parameters.GetValue("ProcessRestartDelay", 2000));
+                    daemon.CounterResetTime = Convert.ToInt32(parameters.GetValue("CounterResetTime", 2000));
+                    daemon.ConsoleApplication = Convert.ToBoolean(parameters.GetValue("ConsoleApplication", false));
+                    daemon.UseCtrlC = Convert.ToBoolean(parameters.GetValue("UseCtrlC", false));
+
+                    return daemon;
+                }
+            }
+        }
+
+        public static ObservableCollection<DaemonInfo> LoadDaemonInfosFromRegistry()
+        {
+            ObservableCollection<DaemonInfo> daemons = new ObservableCollection<DaemonInfo>();
 
             ServiceController[] sc = ServiceController.GetServices();
 
@@ -70,7 +113,20 @@ namespace DaemonMasterCore
                 {
                     if (service.ServiceName.Contains("DaemonMaster_"))
                     {
-                        daemons.Add(LoadDaemonFromRegistry(service.ServiceName));
+                        using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\" + service.ServiceName + @"\Parameters", false))
+                        {
+                            if (key == null)
+                                throw new Exception("Can't open registry key!");
+
+                            DaemonInfo daemonInfo = new DaemonInfo
+                            {
+                                DisplayName = service.DisplayName,
+                                ServiceName = service.ServiceName,
+                                FullPath = (string)key.GetValue("FileDir") + @"/" + (string)key.GetValue("FileName")
+                            };
+
+                            daemons.Add(daemonInfo);
+                        }
                     }
                 }
                 catch (Exception)
@@ -81,54 +137,48 @@ namespace DaemonMasterCore
             return daemons;
         }
 
-        public static Daemon LoadDaemonFromRegistry(string serviceName)
+
+
+
+
+
+
+
+        //�ndert den Regkey so das Interactive Services erlaubt werden (Set NoInteractiveServices to 0)
+        public static bool ActivateInteractiveServices()
         {
-            //Open Regkey folder
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\" + serviceName + @"\Parameters", false))
+            try
             {
-                if (key == null)
-                    throw new Exception("Can't open registry key!");
-
-                Daemon daemon = new Daemon
+                using (RegistryKey regKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Windows", true))
                 {
-                    DisplayName = (string)key.GetValue("DisplayName"),
-                    ServiceName = (string)key.GetValue("ServiceName"),
-                    FileDir = (string)key.GetValue("FileDir"),
-                    FileName = (string)key.GetValue("FileName"),
-                    Parameter = (string)(key.GetValue("Parameter") ?? String.Empty),
-                    UserName = (string)(key.GetValue("UserName") ?? String.Empty),
-                    UserPassword = (string)(key.GetValue("UserPassword") ?? String.Empty),
-                    MaxRestarts = (int)(key.GetValue("MaxRestarts") ?? 3),
-                    ProcessKillTime = (int)(key.GetValue("ProcessKillTime") ?? 5000),
-                    ProcessRestartDelay = (int)(key.GetValue("ProcessRestartDelay") ?? 0),
-                    CounterResetTime = (int)(key.GetValue("CounterResetTime") ?? 2000),
-                    ConsoleApplication = Convert.ToBoolean((key.GetValue("ConsoleApplication") ?? false)),
-                    UseCtrlC = Convert.ToBoolean((key.GetValue("UseCtrlC") ?? false))
-                };
+                    if (regKey == null)
+                        return false;
 
-                return daemon;
+                    regKey.SetValue("NoInteractiveServices", "0", RegistryValueKind.DWord);
+                    regKey.Close();
+                    return true;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
 
-        public static List<string> LoadDaemonsFromRegistry()
+        //�ndert den Regkey so das Interactive Services erlaubt werden (Set NoInteractiveServices to 0)
+        public static bool CheckNoInteractiveServicesRegKey()
         {
-            List<string> daemons = null;
-
-            ServiceController[] sc = ServiceController.GetServices();
-
-            foreach (ServiceController service in sc)
+            try
             {
-                try
+                using (RegistryKey regKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Windows", false))
                 {
-                    if (service.ServiceName.Contains("DaemonMaster_"))
-                        daemons.Add(service.DisplayName);
-                }
-                catch (Exception)
-                {
-                    continue;
+                    return regKey != null && !Convert.ToBoolean(regKey.GetValue("NoInteractiveServices"));
                 }
             }
-            return daemons;
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         #endregion

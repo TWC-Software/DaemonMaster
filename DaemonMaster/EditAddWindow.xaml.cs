@@ -19,11 +19,15 @@
 
 
 using System;
+using System.CodeDom;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Resources;
 using System.Windows;
 using DaemonMasterCore;
+using DaemonMasterCore.Win32;
 using Microsoft.Win32;
 
 namespace DaemonMaster
@@ -36,17 +40,12 @@ namespace DaemonMaster
         private readonly ResourceManager resManager = new ResourceManager("DaemonMaster.Language.lang", typeof(EditAddWindow).Assembly);
 
         //Erstellt ein Event 
-        internal delegate void DaemonSavedDelegate(Daemon daemon);
-        internal delegate void DaemonEditDelegate(Daemon daemon, int index);
+        internal delegate void DaemonSavedDelegate(DaemonInfo daemon);
         internal static event DaemonSavedDelegate DaemonSavedEvent;
-        internal static event DaemonEditDelegate DaemonEditEvent;
 
-        private string fileName = String.Empty;
-        private string fileDir = String.Empty;
-
+        private Daemon daemon = null;
 
         private readonly bool onEdit = false;
-        private readonly int index = 0;
 
 
         public EditAddWindow()
@@ -54,26 +53,56 @@ namespace DaemonMaster
             InitializeComponent();
 
             textBoxFilePath.IsReadOnly = true;
+            daemon = new Daemon();
         }
 
-        public EditAddWindow(Daemon daemon, int index) : this() // This = Konstruktor davor wird auch ausgeführt (=> Ableitung vom Oberen)
+        public EditAddWindow(DaemonInfo daemonInfo) : this() // This = Konstruktor davor wird auch ausgeführt (=> Ableitung vom Oberen)
         {
-            onEdit = true;
-            this.index = index;
             textBoxServiceName.IsReadOnly = true;
 
-            fileName = daemon.FileName;
 
-            textBoxFilePath.Text = daemon.FullPath; // Holt sich Parameter aus dem Deamon und schreibt sie in das Fenster rein
-            textBoxDisplayName.Text = daemon.DisplayName;
-            textBoxParam.Text = daemon.Parameter;
-            textBoxServiceName.Text = daemon.ServiceName.Substring(13);
-
-            if (daemon.UserName != String.Empty && daemon.UserPassword != String.Empty)
+            try
             {
-                checkBoxUseLocalSystem.IsChecked = false;
-                textBoxUsername.Text = daemon.UserName;
-                textBoxPassword.Text = daemon.UserPassword;
+                if (ServiceManagement.StopService(daemonInfo.ServiceName) < 0)
+                    throw new Exception("Service must be stopped");
+
+                daemon = RegistryManagement.LoadDaemonFromRegistry(daemonInfo.ServiceName);
+                LoadDataIntoUI(daemon);
+
+                onEdit = true;
+            }
+            catch (Exception)
+            {
+                MessageBox.Show(resManager.GetString("cannot_load_data_from_registry"), resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+
+                this.Close();
+            }
+        }
+
+        private void LoadDataIntoUI(Daemon daemon)
+        {
+            textBoxDisplayName.Text = daemon.DisplayName;
+            textBoxServiceName.Text = daemon.ServiceName.Substring(13);
+            textBoxFilePath.Text = daemon.FullPath;
+            textBoxParam.Text = daemon.Parameter;
+            textBoxDescription.Text = "";
+            textBoxPassword.Text = daemon.UserPassword;
+            textBoxUsername.Text = daemon.UserName;
+            textBoxDescription.Text = daemon.Description;
+
+            switch (daemon.StartType)
+            {
+                case NativeMethods.SERVICE_START.SERVICE_AUTO_START:
+                    comboBoxStartType.SelectedIndex = daemon.DelayedStart ? 1 : 0;
+                    break;
+
+                case NativeMethods.SERVICE_START.SERVICE_DEMAND_START:
+                    comboBoxStartType.SelectedIndex = 2;
+                    break;
+
+                case NativeMethods.SERVICE_START.SERVICE_DISABLED:
+                    comboBoxStartType.SelectedIndex = 3;
+                    break;
             }
         }
 
@@ -90,22 +119,28 @@ namespace DaemonMaster
 
         private void buttonSearchPath_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.InitialDirectory = Environment.GetFolderPath(System.Environment.SpecialFolder.MyComputer); // @"c:\";
-            openFileDialog.Filter = "Exe files (*.exe)|*.exe|" +
-                                    "All files (*.*)|*.*";
+            OpenFileDialog openFileDialog =
+                new OpenFileDialog
+                {
+                    //Show the path of the shortcuts
+                    DereferenceLinks = false,
+                    CheckFileExists = true,
+                    CheckPathExists = true,
+                    AddExtension = true,
+                    InitialDirectory = Environment.GetFolderPath(System.Environment.SpecialFolder.MyComputer),
+                    Filter = "Exe files (*.exe)|*.exe|" + "Shortcut (*.lnk)|*.lnk|" +
+                             "All files (*.*)|*.*"
+                };
 
             //Wenn eine Datei gewählt worden ist
             if (openFileDialog.ShowDialog() == true)
             {
                 textBoxFilePath.Text = openFileDialog.FileName;
-                fileDir = Path.GetDirectoryName(openFileDialog.FileName);
-                fileName = openFileDialog.SafeFileName;
 
                 //Wenn der Name noch leer oder der Standart Name geladen ist, soll er ihn mit dem Datei namen befüllen
-                if (textBoxDisplayName.Text == String.Empty || textBoxDisplayName.Text == "<Please enter a Name> (default = filename)")
+                if (String.IsNullOrWhiteSpace(textBoxDisplayName.Text))
                 {
-                    textBoxDisplayName.Text = fileName;
+                    textBoxDisplayName.Text = openFileDialog.SafeFileName;
                 }
             }
         }
@@ -123,49 +158,111 @@ namespace DaemonMaster
         {
             try
             {
-
-                if (Directory.Exists(fileDir) && File.Exists(fileDir + @"\" + fileName))
+                if (!Directory.Exists(Path.GetDirectoryName(textBoxFilePath.Text)) || !System.IO.File.Exists(textBoxFilePath.Text))
                 {
-                    if (!String.IsNullOrWhiteSpace(textBoxDisplayName.Text) && !String.IsNullOrWhiteSpace(textBoxFilePath.Text) && !String.IsNullOrWhiteSpace(textBoxServiceName.Text))
+                    MessageBox.Show(resManager.GetString("invalid_path", CultureInfo.CurrentUICulture));
+                    return;
+                }
+
+                if (String.IsNullOrWhiteSpace(textBoxDisplayName.Text) ||
+                    String.IsNullOrWhiteSpace(textBoxServiceName.Text))
+                {
+                    MessageBox.Show(resManager.GetString("invalid_values", CultureInfo.CurrentUICulture));
+                    return;
+                }
+
+                string fileDir = Path.GetDirectoryName(textBoxFilePath.Text);
+                string fileName = Path.GetFileName(textBoxFilePath.Text);
+                string fileExtension = Path.GetExtension(textBoxFilePath.Text);
+
+
+                daemon.DisplayName = textBoxDisplayName.Text;
+                daemon.ServiceName = "DaemonMaster_" + textBoxServiceName.Text;
+
+                daemon.FileDir = fileDir;
+                daemon.FileName = fileName;
+                daemon.FileExtension = fileExtension;
+
+                daemon.Parameter = textBoxParam.Text;
+                daemon.Description = textBoxDescription.Text;
+
+                switch (comboBoxStartType.SelectedIndex)
+                {
+
+                    //Automatic
+                    case 0:
+                        daemon.DelayedStart = false;
+                        daemon.StartType = NativeMethods.SERVICE_START.SERVICE_AUTO_START;
+                        break;
+
+
+                    //Automatic with delay
+                    case 1:
+                        daemon.DelayedStart = true;
+                        daemon.StartType = NativeMethods.SERVICE_START.SERVICE_AUTO_START;
+                        break;
+
+                    //Manual
+                    case 2:
+                        daemon.DelayedStart = false;
+                        daemon.StartType = NativeMethods.SERVICE_START.SERVICE_DEMAND_START;
+                        break;
+
+                    //Disabled
+                    case 3:
+                        daemon.DelayedStart = false;
+                        daemon.StartType = NativeMethods.SERVICE_START.SERVICE_DISABLED;
+                        break;
+                }
+
+
+
+
+                if (!onEdit)
+                {
+                    try
                     {
-                        //Erstellt einen neunen "Daemon"
-                        Daemon daemon = new Daemon();
-                        daemon.DisplayName = textBoxDisplayName.Text;
-                        daemon.ServiceName = "DaemonMaster_" + textBoxServiceName.Text;
-                        daemon.FileDir = fileDir;
-                        daemon.FileName = fileName;
-                        daemon.Parameter = textBoxParam.Text;
+                        ServiceManagement.CreateInteractiveService(daemon);
+                        SaveAllData(daemon);
 
-                        if (!checkBoxUseLocalSystem.IsChecked ?? true && textBoxUsername.Text != String.Empty && textBoxPassword.Text != String.Empty && textBoxUsername.Text != "<Enter Service Username>" && textBoxPassword.Text != "<Enter Service Password>")
+                        DaemonInfo daemonInfo = new DaemonInfo
                         {
-                            daemon.UserName = textBoxUsername.Text;
-                            daemon.UserPassword = textBoxPassword.Text;
-                        }
-                        else
-                        {
-                            daemon.UserName = String.Empty;
-                            daemon.UserPassword = String.Empty;
-                        }
+                            DisplayName = daemon.DisplayName,
+                            ServiceName = daemon.ServiceName,
+                            FullPath = daemon.FullPath
+                        };
 
-                        if (onEdit)
-                        {
-                            DaemonEditEvent(daemon, index);
-                        }
-                        else
-                        {
-                            DaemonSaved(daemon);
-                        }
+                        OnDaemonSavedEvent(daemonInfo);
+
+                        MessageBox.Show(
+                            resManager.GetString("the_service_installation_was_successful",
+                                CultureInfo.CurrentUICulture), resManager.GetString("success"), MessageBoxButton.OK,
+                            MessageBoxImage.Information);
 
                         this.Close();
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        MessageBox.Show(resManager.GetString("invalid_values", CultureInfo.CurrentUICulture));
+                        MessageBox.Show(
+                            resManager.GetString("the_service_installation_was_unsuccessful",
+                                CultureInfo.CurrentUICulture) + ex.Message, "Error", MessageBoxButton.OK,
+                            MessageBoxImage.Error);
                     }
                 }
                 else
                 {
-                    MessageBox.Show(resManager.GetString("invalid_path", CultureInfo.CurrentUICulture));
+                    try
+                    {
+                        SaveAllData(daemon);
+                        this.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(
+                            resManager.GetString("data_cannot_be_saved", CultureInfo.CurrentUICulture) + ex.Message,
+                            resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+                    }
                 }
             }
             catch (Exception ex)
@@ -173,15 +270,25 @@ namespace DaemonMaster
                 MessageBox.Show(ex.Message, resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        #endregion
 
-
-        //Event Invoke (Invoke = aufrufen)
-        private void DaemonSaved(Daemon daemon)
+        private static void SaveAllData(Daemon daemon)
         {
-            DaemonSavedEvent?.Invoke(daemon); // ? = Wenn nicht 0
+            RegistryManagement.SaveInRegistry(daemon);
+            ServiceManagement.ChangeCompleteServiceConfig(daemon);
         }
 
-        #endregion
+
+
+
+
+
+
+
+
+
+
+
 
         private void checkBoxUseLocalSystem_Checked(object sender, RoutedEventArgs e)
         {
@@ -193,6 +300,11 @@ namespace DaemonMaster
         {
             textBoxUsername.IsEnabled = true;
             textBoxPassword.IsEnabled = true;
+        }
+
+        private static void OnDaemonSavedEvent(DaemonInfo daemonInfo)
+        {
+            DaemonSavedEvent?.Invoke(daemonInfo);
         }
     }
 }

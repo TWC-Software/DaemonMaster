@@ -18,15 +18,29 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
+using System;
 using Newtonsoft.Json;
 using System.Windows.Media;
+using DaemonMasterCore.Win32;
 
 namespace DaemonMasterCore
 {
     public class Daemon
     {
+        //Default parameter
         public Daemon()
         {
+            Parameter = String.Empty;
+            UserName = String.Empty;
+            UserPassword = String.Empty;
+
+            MaxRestarts = 3;
+            ProcessKillTime = 9500;
+            ProcessRestartDelay = 2500;
+            CounterResetTime = 10000;
+
+            ConsoleApplication = false;
+            UseCtrlC = false;
         }
 
         public override string ToString()
@@ -36,30 +50,26 @@ namespace DaemonMasterCore
 
         public string DisplayName { get; set; }
         public string ServiceName { get; set; }
+        public string Description { get; set; }
+        public string[] DependOnService { get; set; }
+        public NativeMethods.SERVICE_START StartType { get; set; }
+        public bool DelayedStart { get; set; }
 
         public string FileDir { get; set; }
         public string FileName { get; set; }
-        public string FullPath
-        {
-            get { return FileDir + @"\" + FileName; }
-        }
+        public string FileExtension { get; set; }
+        public string FullPath => FileDir + @"\" + FileName;
 
         public string Parameter { get; set; }
         public string UserName { get; set; }
         public string UserPassword { get; set; }
-        public int MaxRestarts { get; set; }
 
+        public int MaxRestarts { get; set; }
         public int ProcessKillTime { get; set; }
         public int ProcessRestartDelay { get; set; }
         public int CounterResetTime { get; set; }
 
         public bool ConsoleApplication { get; set; }
         public bool UseCtrlC { get; set; }
-
-        [JsonIgnore]
-        public ImageSource Icon
-        {
-            get { return DaemonMasterUtils.GetIcon(FullPath); }
-        }
     }
 }

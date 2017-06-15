@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: PROCESS MANAGEMENT CONFIG FILE
+//  DaemonMaster: PROCESS MANAGEMENT FILE
 //  
 //  This file is part of DeamonMaster.
 // 
@@ -17,61 +17,58 @@
 //   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using System;
+
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DaemonMasterCore.Win32;
 
 namespace DaemonMasterCore
 {
     public static class ProcessManagement
     {
-        public static bool CloseConsoleApplication(bool useCtrlC, uint Id)
+        private static List<KeyValuePair<string, Process>> processes = new List<KeyValuePair<string, Process>>();
+
+        /// <summary>
+        /// Get the Process object of the given service name, if no process exists to the given service name the function return null
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <returns></returns>
+        public static Process GetProcessByName(string serviceName)
         {
-            if (useCtrlC)
+            if (IsProcessAlreadyThere(serviceName))
             {
-                return KERNEL32.GenerateConsoleCtrlEvent((uint)KERNEL32.CtrlEvent.CTRL_C_EVENT, Id);
+                return processes.FirstOrDefault(x => x.Key == serviceName).Value;
             }
-            else
-            {
-                return KERNEL32.GenerateConsoleCtrlEvent((uint)KERNEL32.CtrlEvent.CTRL_BREAK_EVENT, Id);
-            }
+
+            return null;
         }
 
-        public static bool PauseProcess(uint Id)
+        /// <summary>
+        /// Check if the Process with the given service name already exists
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <returns></returns>
+        public static bool IsProcessAlreadyThere(string serviceName)
         {
-            IntPtr processHandle = KERNEL32.OpenThread(KERNEL32.ThreadAccess.SUSPEND_RESUME, true, Id);
-
-            if (processHandle == IntPtr.Zero)
+            if (processes.FirstOrDefault(x => x.Key == serviceName).Equals(default(KeyValuePair<string, Process>)))
+            {
                 return false;
-
-            try
-            {
-                return KERNEL32.SuspendThread(processHandle);
             }
-            finally
-            {
-                KERNEL32.CloseHandle(processHandle);
-            }
+            return true;
         }
 
-        public static bool ResumeProcess(uint Id)
+        /// <summary>
+        /// Create a new process with the service name (return the process object), if a process exists with the same service name, the function return null
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <returns></returns>
+        public static Process CreateNewProcces(string serviceName)
         {
-            IntPtr processHandle = KERNEL32.OpenThread(KERNEL32.ThreadAccess.SUSPEND_RESUME, true, (uint)Id);
+            if (IsProcessAlreadyThere(serviceName))
+                return null;
 
-            if (processHandle == IntPtr.Zero)
-                return false;
-
-            try
-            {
-                return KERNEL32.ResumeThread(processHandle);
-            }
-            finally
-            {
-                KERNEL32.CloseHandle(processHandle);
-            }
+            Process process = new Process(serviceName);
+            processes.Add(new KeyValuePair<string, Process>(serviceName, process));
+            return processes.FirstOrDefault(x => x.Key == serviceName).Value;
         }
     }
 }

@@ -63,9 +63,27 @@ namespace DaemonMaster.Language {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Add ähnelt.
         /// </summary>
+        public static string add {
+            get {
+                return ResourceManager.GetString("add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Add ähnelt.
+        /// </summary>
         public static string button_add_service {
             get {
                 return ResourceManager.GetString("button_add_service", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Check for updates ähnelt.
+        /// </summary>
+        public static string button_check_for_updates {
+            get {
+                return ResourceManager.GetString("button_check_for_updates", resourceCulture);
             }
         }
         
@@ -115,6 +133,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Help ähnelt.
+        /// </summary>
+        public static string button_help {
+            get {
+                return ResourceManager.GetString("button_help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Import list ähnelt.
         /// </summary>
         public static string button_import {
@@ -142,11 +169,29 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Start ähnelt.
+        /// </summary>
+        public static string button_start {
+            get {
+                return ResourceManager.GetString("button_start", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Start Service ähnelt.
         /// </summary>
         public static string button_start_service {
             get {
                 return ResourceManager.GetString("button_start_service", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Stop ähnelt.
+        /// </summary>
+        public static string button_stop {
+            get {
+                return ResourceManager.GetString("button_stop", resourceCulture);
             }
         }
         
@@ -187,6 +232,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Cannot load data from registry! ähnelt.
+        /// </summary>
+        public static string cannot_load_data_from_registry {
+            get {
+                return ResourceManager.GetString("cannot_load_data_from_registry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Cannot load Daemon file!\n ähnelt.
         /// </summary>
         public static string cannot_load_deamonfile {
@@ -223,7 +277,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Cannit stop the service! ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Cannot stop the service! ähnelt.
         /// </summary>
         public static string cannot_stop_the_service {
             get {
@@ -255,6 +309,15 @@ namespace DaemonMaster.Language {
         public static string data_cannot_be_saved {
             get {
                 return ResourceManager.GetString("data_cannot_be_saved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Do you want to use the data of the shortcut? All existing data will be overwritten! ähnelt.
+        /// </summary>
+        public static string do_you_to_use_the_data_of_the_shortcut {
+            get {
+                return ResourceManager.GetString("do_you_to_use_the_data_of_the_shortcut", resourceCulture);
             }
         }
         
@@ -385,6 +448,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Switch to Session 0 ähnelt.
+        /// </summary>
+        public static string switch_to_session_0 {
+            get {
+                return ResourceManager.GetString("switch_to_session_0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die TEST ENG ähnelt.
         /// </summary>
         public static string test {
@@ -453,6 +525,15 @@ namespace DaemonMaster.Language {
         public static string windows10_mouse_keyboard {
             get {
                 return ResourceManager.GetString("windows10_mouse_keyboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die You must stop the service first. Do you want stop the service now ? ähnelt.
+        /// </summary>
+        public static string you_must_stop_the_service_first {
+            get {
+                return ResourceManager.GetString("you_must_stop_the_service_first", resourceCulture);
             }
         }
     }

@@ -18,24 +18,15 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
-using Microsoft.Win32;
-using System;
-using System.Diagnostics;
-using System.ServiceProcess;
-using System.Threading;
 using DaemonMasterCore;
-using DaemonMasterCore.Win32;
-using System.Runtime.InteropServices;
+using System;
+using System.ServiceProcess;
 
 namespace DaemonMasterService
 {
     public partial class Service1 : ServiceBase
     {
-        Process process = null;
-        Daemon daemon = null;
-
-        private uint restarts = 0;
-
+        private Process _processManagement = null;
 
         public Service1(bool enablePause)
         {
@@ -52,27 +43,26 @@ namespace DaemonMasterService
             try
             {
                 //Load config from registry
-                daemon = RegistryManagement.LoadDaemonFromRegistry(DaemonMasterUtils.GetServiceName());
+                Daemon daemon = RegistryManagement.LoadDaemonFromRegistry(DaemonMasterUtils.GetServiceName());
+                _processManagement = new Process(daemon);
+                _processManagement.StartProcess();
             }
             catch (Exception)
             {
                 Stop();
             }
-
-            StartProcess();
         }
 
         protected override void OnStop()
         {
-            StopProcess();
-
+            //Stop the process
+            _processManagement.StopProcess();
             base.OnStop();
         }
 
         protected override void OnPause()
         {
-
-            ProcessManagement.PauseProcess((uint)process.Id);
+            _processManagement.PauseProcess();
 
             base.OnPause();
         }
@@ -81,97 +71,7 @@ namespace DaemonMasterService
         {
             base.OnContinue();
 
-            ProcessManagement.ResumeProcess((uint)process.Id);
-        }
-
-
-        private void StopProcess()
-        {
-            try
-            {
-                if (process != null)
-                {
-                    IntPtr handle = process.MainWindowHandle;
-
-                    if (handle != IntPtr.Zero)
-                    {
-                        USER32.PostMessage(handle, USER32._SYSCOMMAND, (IntPtr)USER32.wParam.SC_CLOSE, IntPtr.Zero);
-                    }
-                    else
-                    {
-                        if (!process.CloseMainWindow())
-                        {
-                            //Schließt, wenn es eine Consolen Anwendung ist, das fenster mit einem Ctrl-C / Ctrl-Break Befehl
-                            if (daemon.ConsoleApplication)
-                            {
-                                ProcessManagement.CloseConsoleApplication(daemon.UseCtrlC, (uint)process.Id);
-                            }
-                        }
-                    }
-
-                    process.WaitForExit(daemon.ProcessKillTime);
-                    process.Kill();
-
-                    process.Close();
-                    process.Dispose();
-                    process = null;
-                }
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        private void StartProcess()
-        {
-            try
-            {
-                if (daemon.FullPath == String.Empty)
-                    throw new Exception("Invalid filepath!");
-
-                ProcessStartInfo startInfo = new ProcessStartInfo(daemon.FullPath, daemon.Parameter);
-
-                //if (userName != String.Empty && password != String.Empty)
-                //{
-                //    startInfo.UserName = userName;
-                //    startInfo.Password = password;
-                //}
-
-                process = new Process();
-                process.StartInfo = startInfo;
-                process.Start();
-                //Abboniert das Event
-                process.Exited += Process_Exited;
-                //Benötigt damit Exited funktioniert
-                process.EnableRaisingEvents = true;
-
-
-            }
-            catch (Exception)
-            {
-                Stop();
-            }
-        }
-
-        private void Process_Exited(object sender, EventArgs e)
-        {
-            try
-            {
-                if (daemon.MaxRestarts == 0 || restarts < daemon.MaxRestarts)
-                {
-                    Thread.Sleep(daemon.ProcessRestartDelay);
-                    process.Start();
-                    restarts++;
-                }
-                else
-                {
-                    Stop();
-                }
-            }
-            catch (Exception)
-            {
-                Stop();
-            }
+            _processManagement.ResumeProcess();
         }
     }
 }

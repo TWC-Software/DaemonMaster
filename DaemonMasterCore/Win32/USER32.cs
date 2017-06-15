@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace DaemonMasterCore.Win32
 {
     //FROM PINVOKE
-    public static class USER32
+    public static partial class NativeMethods
     {
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern IntPtr PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);

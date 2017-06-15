@@ -118,105 +118,153 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="cannot_delete_deamonfile" xml:space="preserve">
-    <value />
+    <value>Impossible de supprimer le fichier Deamon ! \n !</value>
   </data>
   <data name="cannot_delete_regkeys" xml:space="preserve">
-    <value />
+    <value>Impossible de supprimer les clés de la base de Registre ! \n !</value>
   </data>
   <data name="cannot_load_deamonfile" xml:space="preserve">
-    <value />
+    <value>Impossible de charger le fichier Daemon ! \n !</value>
   </data>
   <data name="cannot_save_deamonfile" xml:space="preserve">
-    <value />
+    <value>Impossible d’enregistrer le fichier Daemon ! \n !</value>
   </data>
   <data name="cannot_start_the_service" xml:space="preserve">
-    <value />
+    <value>Impossible de démarrer le service!</value>
   </data>
   <data name="cannot_start_the_service_already_running" xml:space="preserve">
-    <value />
+    <value>Le service est déjà en cours d’exécution !</value>
   </data>
   <data name="cannot_stop_the_service" xml:space="preserve">
-    <value />
+    <value>Impossible d'arrêter le service !!</value>
   </data>
   <data name="cannot_stop_the_service_already_stopped" xml:space="preserve">
-    <value />
+    <value>Le service était déjà arrêté !!</value>
   </data>
   <data name="data_cannot_be_saved" xml:space="preserve">
-    <value />
+    <value>Impossible d’enregistrer les données ! \n !</value>
   </data>
   <data name="error" xml:space="preserve">
-    <value />
+    <value>Erreur!</value>
   </data>
   <data name="error_ui0service" xml:space="preserve">
-    <value />
+    <value>Impossible de démarrer le Service de UI0Detect !!</value>
   </data>
   <data name="failed_start_UI0detect_service" xml:space="preserve">
-    <value />
+    <value>Impossible de démarrer le service de UI0Detect !!</value>
   </data>
   <data name="information" xml:space="preserve">
-    <value />
+    <value>Informations !</value>
   </data>
   <data name="interactive_service_regkey_not_set" xml:space="preserve">
-    <value />
+    <value>Processus interactifs sont bloqués par une clé de registre. Vous souhaitez le désactiver ? (L’Application ne peut pas fonctionner sans processus interactifs !) !</value>
   </data>
   <data name="invalid_path" xml:space="preserve">
-    <value />
+    <value>Chemin d’accès au fichier n’est pas valide ou le fichier a été supprimé !!</value>
   </data>
   <data name="invalid_values" xml:space="preserve">
-    <value />
+    <value>Valeurs invalides</value>
   </data>
   <data name="max_limit_reached" xml:space="preserve">
-    <value />
+    <value>Limite atteinte</value>
   </data>
   <data name="problem_occurred" xml:space="preserve">
-    <value />
+    <value>Un problème est survenu lors de l'execution de l'action.</value>
   </data>
   <data name="question" xml:space="preserve">
-    <value />
+    <value>Question</value>
   </data>
   <data name="service_start_was_successful" xml:space="preserve">
-    <value />
+    <value>Service démarré avec succès !!</value>
   </data>
   <data name="service_stop_was_successful" xml:space="preserve">
-    <value />
-  </data>
-  <data name="String1" xml:space="preserve">
-    <value />
-  </data>
-  <data name="String2" xml:space="preserve">
-    <value />
+    <value>Service arrêté avec succès !!</value>
   </data>
   <data name="success" xml:space="preserve">
-    <value />
+    <value>Réussi!</value>
   </data>
   <data name="test" xml:space="preserve">
     <value>TEST FR</value>
   </data>
   <data name="the_service_deletion_was_successful" xml:space="preserve">
-    <value />
+    <value>Suppression de service a réussi !!</value>
   </data>
   <data name="the_service_deletion_was_unsuccessful" xml:space="preserve">
-    <value />
+    <value>Suppression de service n’a pas réussi !!</value>
   </data>
   <data name="the_service_installation_was_successful" xml:space="preserve">
-    <value />
+    <value>Installation du service a réussi !!</value>
   </data>
   <data name="the_service_installation_was_unsuccessful" xml:space="preserve">
-    <value />
+    <value>Installation du service n’a pas réussi !!</value>
   </data>
   <data name="warning" xml:space="preserve">
-    <value />
+    <value>ATTENTION!</value>
   </data>
   <data name="windows10_mouse_keyboard" xml:space="preserve">
-    <value />
+    <value>ATTENTION! : Dans Windows 10 vous ne pouvez pas utiliser votre souris ou votre clavier !!</value>
   </data>
   <data name="currently_unavailable" xml:space="preserve">
-    <value />
+    <value>Actuellement indisponible :)</value>
   </data>
   <data name="switch_to_session_0" xml:space="preserve">
-    <value />
+    <value>Passer à la Session 0</value>
   </data>
   <data name="add" xml:space="preserve">
-    <value />
+    <value>Ajouter</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>DeamonMaster, Version 1 !</value>
+  </data>
+  <data name="button_switch_to_session_0" xml:space="preserve">
+    <value>Passer à la Session 0</value>
+  </data>
+  <data name="button_add_service" xml:space="preserve">
+    <value>Ajouter</value>
+  </data>
+  <data name="button_delete_service" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="button_edit_service" xml:space="preserve">
+    <value>Modifier</value>
+  </data>
+  <data name="button_credits" xml:space="preserve">
+    <value>Générique</value>
+  </data>
+  <data name="button_export" xml:space="preserve">
+    <value>Exporter une liste</value>
+  </data>
+  <data name="button_file" xml:space="preserve">
+    <value>Fichier</value>
+  </data>
+  <data name="button_import" xml:space="preserve">
+    <value>Importer une liste</value>
+  </data>
+  <data name="button_save" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="button_search" xml:space="preserve">
+    <value>Chercher</value>
+  </data>
+  <data name="button_start_service" xml:space="preserve">
+    <value>Commencer le service</value>
+  </data>
+  <data name="button_stop_service" xml:space="preserve">
+    <value>Arrêter le service</value>
+  </data>
+  <data name="label_filter" xml:space="preserve">
+    <value>Mode de filtrage</value>
+  </data>
+  <data name="cannot_load_data_from_registry" xml:space="preserve">
+    <value>Ne peut pas charger les données du Registre !!</value>
+  </data>
+  <data name="you_must_stop_the_service_first" xml:space="preserve">
+    <value>Vous devez arrêter le service tout d’abord. Voulez-vous arrêter le service maintenant ? !</value>
+  </data>
+  <data name="button_help" xml:space="preserve">
+    <value>Aider</value>
+  </data>
+  <data name="button_check_for_updates" xml:space="preserve">
+    <value>Vérifier l'existence de mises à jour </value>
   </data>
 </root>

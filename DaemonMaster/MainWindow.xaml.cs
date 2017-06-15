@@ -21,11 +21,14 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Reflection;
 using System.Resources;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using DaemonMasterCore;
-
+using AutoUpdaterDotNET;
+using DaemonMasterCore.Win32;
 
 
 namespace DaemonMaster
@@ -35,7 +38,7 @@ namespace DaemonMaster
     /// </summary>
     public partial class MainWindow : Window
     {
-        private ObservableCollection<Daemon> processCollection = null;
+        private ObservableCollection<DaemonInfo> processCollection = null;
         private readonly ResourceManager resManager = new ResourceManager("DaemonMaster.Language.lang", typeof(MainWindow).Assembly);
 
         public MainWindow()
@@ -53,24 +56,12 @@ namespace DaemonMaster
 
             //Add events
             EditAddWindow.DaemonSavedEvent += EditAddWindow_DaemonSavedEvent;
-            EditAddWindow.DaemonEditEvent += EditAddWindow_DaemonEditEvent;
-
-
 
             //Fragt, wenn der RegKey nicht gesetzt ist, ob dieser gesetzt werden soll
             if (!AskToEnableInteractiveServices())
                 this.Close();
 
-            //Bei einem Problem bei laden aus der Registry wird eine leere Liste geladen und eine Fehlermeldung angezeigt
-            try
-            {
-                processCollection = RegistryManagement.LoadFromRegistry();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(resManager.GetString("cannot_load_deamonfile", CultureInfo.CurrentUICulture) + ex.Message);
-                processCollection = new ObservableCollection<Daemon>();
-            }
+            processCollection = RegistryManagement.LoadDaemonInfosFromRegistry();
 
             //Add Event
             processCollection.CollectionChanged += ProcessList_CollectionChanged;
@@ -101,9 +92,6 @@ namespace DaemonMaster
 
         private void buttonEdit_Click(object sender, RoutedEventArgs e)
         {
-            if (listBoxDaemons.SelectedItem == null)
-                return;
-
             EditDaemon();
         }
 
@@ -112,13 +100,13 @@ namespace DaemonMaster
             if (listBoxDaemons.SelectedItem == null)
                 return;
 
-            RemoveDaemon(listBoxDaemons.SelectedItem as Daemon);
+            RemoveDaemon((DaemonInfo)listBoxDaemons.SelectedItem);
         }
 
         private void buttonFilter_Click(object sender, RoutedEventArgs e)
         {
 
-            foreach (Daemon d in processCollection)
+            foreach (DaemonInfo d in processCollection)
             {
                 if (d.DisplayName.Contains(textBoxFilter.Text))
                 {
@@ -139,7 +127,7 @@ namespace DaemonMaster
             if (listBoxDaemons.SelectedItem == null)
                 return;
 
-            StartDaemon(listBoxDaemons.SelectedItem as Daemon);
+            StartService((DaemonInfo)listBoxDaemons.SelectedItem);
         }
 
         private void MenuItemStop_Click(object sender, RoutedEventArgs e)
@@ -147,7 +135,7 @@ namespace DaemonMaster
             if (listBoxDaemons.SelectedItem == null)
                 return;
 
-            StopDaemon(listBoxDaemons.SelectedItem as Daemon);
+            StopService((DaemonInfo)listBoxDaemons.SelectedItem);
         }
 
         private void MenuItemDelete_Click(object sender, RoutedEventArgs e)
@@ -155,14 +143,11 @@ namespace DaemonMaster
             if (listBoxDaemons.SelectedItem == null)
                 return;
 
-            RemoveDaemon(listBoxDaemons.SelectedItem as Daemon);
+            RemoveDaemon((DaemonInfo)listBoxDaemons.SelectedItem);
         }
 
         private void listBoxDaemons_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (listBoxDaemons.SelectedItem == null)
-                return;
-
             EditDaemon();
         }
 
@@ -178,7 +163,7 @@ namespace DaemonMaster
             if (listBoxDaemons.SelectedItem == null)
                 return;
 
-            RemoveDaemon(listBoxDaemons.SelectedItem as Daemon);
+            RemoveDaemon((DaemonInfo)listBoxDaemons.SelectedItem);
         }
 
         private void MenuItem_Click_EditDaemon(object sender, RoutedEventArgs e)
@@ -187,6 +172,11 @@ namespace DaemonMaster
                 return;
 
             EditDaemon();
+        }
+
+        private void MenuItem_Click_CheckForUpdates(object sender, RoutedEventArgs e)
+        {
+            CheckForUpdates();
         }
 
         private void MenuItem_Click_Credits(object sender, RoutedEventArgs e)
@@ -204,6 +194,26 @@ namespace DaemonMaster
         private void MenuItem_Click_Import(object sender, RoutedEventArgs e)
         {
             MessageBox.Show(resManager.GetString("currently_unavailable"), resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void MenuItemStartWS_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (listBoxDaemons.SelectedItem == null)
+                return;
+
+            DaemonInfo daemonInfo = (DaemonInfo)listBoxDaemons.SelectedItem;
+            Process process = ProcessManagement.CreateNewProcces(daemonInfo.ServiceName);
+            process?.StartProcess();
+        }
+
+        private void MenuItemStopWS_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (listBoxDaemons.SelectedItem == null)
+                return;
+
+            DaemonInfo daemonInfo = (DaemonInfo)listBoxDaemons.SelectedItem;
+            Process process = ProcessManagement.GetProcessByName(daemonInfo.ServiceName);
+            process?.StopProcess();
         }
 
         #endregion
@@ -226,9 +236,9 @@ namespace DaemonMaster
             addProcessWindow.ShowDialog(); // Fenster geht auf, Code geht erst weiter wenn Fesnter geschlossen ist
         }
 
-        private void OpenEditDaemonWindow(int index)
+        private void OpenEditDaemonWindow(DaemonInfo daemonInfo)
         {
-            EditAddWindow addProcessWindow = new EditAddWindow(processCollection[index] as Daemon, index);
+            EditAddWindow addProcessWindow = new EditAddWindow(daemonInfo);
             addProcessWindow.ShowDialog();
         }
 
@@ -236,12 +246,12 @@ namespace DaemonMaster
         private bool AskToEnableInteractiveServices()
         {
             //Wenn der RegKey nicht gestetzt ist, soll der Nutzer gefragt werden
-            if (!ServiceManagement.CheckNoInteractiveServicesRegKey())
+            if (!RegistryManagement.CheckNoInteractiveServicesRegKey())
             {
                 MessageBoxResult result = MessageBox.Show(resManager.GetString("interactive_service_regkey_not_set"), resManager.GetString("question"), MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
                 {
-                    if (ServiceManagement.ActivateInteractiveServices())
+                    if (RegistryManagement.ActivateInteractiveServices())
                     {
                         return true;
                     }
@@ -269,69 +279,89 @@ namespace DaemonMaster
             }
         }
 
-        private void RemoveDaemon(Daemon daemon)
+        private void RemoveDaemon(DaemonInfo daemonInfo)
         {
-            if (daemon == null)
-                return;
-
             try
             {
-                ServiceManagement.DeleteService(daemon);
-                processCollection.RemoveAt(listBoxDaemons.SelectedIndex);
+                switch (ServiceManagement.DeleteService(daemonInfo.ServiceName))
+                {
+                    case ServiceManagement.State.NotStopped:
 
-                MessageBox.Show(resManager.GetString("the_service_deletion_was_successful"), resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBoxResult result = MessageBox.Show(resManager.GetString("you_must_stop_the_service_first"), resManager.GetString("information"), MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            StopService(daemonInfo);
+                        }
+                        break;
+
+                    case ServiceManagement.State.Successful:
+
+                        processCollection.RemoveAt(listBoxDaemons.SelectedIndex);
+
+                        MessageBox.Show(resManager.GetString("the_service_deletion_was_successful"),
+                            resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
+                        break;
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(resManager.GetString("the_service_deletion_was_unsuccessful"), resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(resManager.GetString("the_service_deletion_was_unsuccessful") + "\n" + ex.Message, resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void EditDaemon()
         {
-            OpenEditDaemonWindow(listBoxDaemons.SelectedIndex);
-        }
-
-        private void StartDaemon(Daemon daemon)
-        {
-            if (daemon == null)
+            if (listBoxDaemons.SelectedItem == null)
                 return;
 
-            switch (ServiceManagement.StartService(daemon))
+            OpenEditDaemonWindow((DaemonInfo)listBoxDaemons.SelectedItem);
+        }
+
+        private void StartService(DaemonInfo daemonInfo)
+        {
+            switch (ServiceManagement.StartService(daemonInfo.ServiceName))
             {
-                case -1:
+                case ServiceManagement.State.Error | ServiceManagement.State.Unsuccessful:
                     MessageBox.Show(resManager.GetString("cannot_start_the_service"), resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
 
-                case 0:
+                case ServiceManagement.State.AlreadyStarted:
                     MessageBox.Show(resManager.GetString("cannot_start_the_service_already_running"), resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
 
-                case 1:
+                case ServiceManagement.State.Successful:
                     MessageBox.Show(resManager.GetString("service_start_was_successful"), resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
             }
         }
 
-        private void StopDaemon(Daemon daemon)
+        private void StopService(DaemonInfo daemonInfo)
         {
-            if (daemon == null)
-                return;
-
-            switch (ServiceManagement.StopService(daemon))
+            switch (ServiceManagement.StopService(daemonInfo.ServiceName))
             {
-                case -1:
+                case ServiceManagement.State.Error | ServiceManagement.State.Unsuccessful:
                     MessageBox.Show(resManager.GetString("cannot_stop_the_service"), resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
 
-                case 0:
+                case ServiceManagement.State.AlreadyStopped:
                     MessageBox.Show(resManager.GetString("cannot_stop_the_service_already_stopped"), resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
 
-                case 1:
+                case ServiceManagement.State.Successful:
                     MessageBox.Show(resManager.GetString("service_stop_was_successful"), resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
             }
+        }
+
+        private void StartProcess(DaemonInfo daemonInfo)
+        {
+
+        }
+
+        private void StopProcess(DaemonInfo daemonInfo)
+        {
+
         }
 
         private void SwitchToSession0()
@@ -341,13 +371,22 @@ namespace DaemonMaster
                 MessageBoxResult result = MessageBox.Show(resManager.GetString("windows10_mouse_keyboard", CultureInfo.CurrentUICulture), resManager.GetString("warning", CultureInfo.CurrentUICulture), MessageBoxButton.OKCancel, MessageBoxImage.Warning);
                 if (result == MessageBoxResult.OK)
                 {
-                    DaemonMasterCore.Win32.WINSTA.WinStationSwitchToServicesSession();
+                    NativeMethods.WinStationSwitchToServicesSession();
                 }
             }
             else
             {
                 MessageBox.Show(resManager.GetString("failed_start_UI0detect_service", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+
+        private void CheckForUpdates()
+        {
+            AutoUpdater.CurrentCulture = CultureInfo.CurrentCulture;
+            AutoUpdater.ShowSkipButton = true;
+            AutoUpdater.OpenDownloadPage = true;
+            AutoUpdater.Start("https://raw.githubusercontent.com/TWC-Software/DaemonMaster/master/AutoUpdater.xml", typeof(MainWindow).Assembly);
         }
 
         #endregion
@@ -358,33 +397,9 @@ namespace DaemonMaster
 
         #region EventHandler
 
-        private void EditAddWindow_DaemonSavedEvent(Daemon daemon) // Fügt Deamon Objekt der Liste hinzu
+        private void EditAddWindow_DaemonSavedEvent(DaemonInfo daemonInfo) // Fügt Deamon Objekt der Liste hinzu
         {
-            try
-            {
-                ServiceManagement.CreateInteractiveService(daemon);
-                RegistryManagement.SaveInRegistry(daemon);
-                processCollection.Add(daemon);
-
-                MessageBox.Show(resManager.GetString("the_service_installation_was_successful", CultureInfo.CurrentUICulture), resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(resManager.GetString("the_service_installation_was_unsuccessful", CultureInfo.CurrentUICulture) + "\n\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void EditAddWindow_DaemonEditEvent(Daemon daemon, int index) // Fügt Deamon Objekt der Liste hinzu
-        {
-            try
-            {
-                RegistryManagement.SaveInRegistry(daemon);
-                processCollection[index] = daemon;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(resManager.GetString("data_cannot_be_saved", CultureInfo.CurrentUICulture) + ex.Message, resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            processCollection.Add(daemonInfo);
         }
 
         #endregion
@@ -392,6 +407,11 @@ namespace DaemonMaster
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+        }
+
+        private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            CheckForUpdates();
         }
     }
 }

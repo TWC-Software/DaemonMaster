@@ -1,12 +1,14 @@
 
 # DaemonMaster Alpha
 Daemon Master is a software which makes it possible to create and manage a Windows-service from any program.
+WARNING SOFTWARE IS IN EARLY ALPHA !
 
 ## Features
-- Easy and fast creation / deletion of services
+- Easy and fast creation, deletion and editing of services
 - Creating / Editing new services in realtime
 - Using any .exe program as a service
-- Automatic service-startup with Windows itself
+- Works with shortcuts (The parameter(s) of the shortcut and the parameter(s) of the field in the programm will be used!)
+- Automatic service-startup with Windows itself (Manual, Automatic with delay and Disabled works also)
 
 ## Planned Features
 - Custom username and password for a service
