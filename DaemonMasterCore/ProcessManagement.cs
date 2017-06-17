@@ -24,7 +24,7 @@ namespace DaemonMasterCore
 {
     public static class ProcessManagement
     {
-        private static readonly Dictionary<string, DaemonProcess> processes = new Dictionary<string, DaemonProcess>();
+        private static readonly Dictionary<string, DaemonProcess> Processes = new Dictionary<string, DaemonProcess>();
 
         /// <summary>
         /// Get the Process object of the given service name, if no process exists to the given service name the function return null
@@ -35,7 +35,7 @@ namespace DaemonMasterCore
         {
             if (IsProcessAlreadyThere(serviceName))
             {
-                return processes[serviceName];
+                return Processes[serviceName];
             }
 
             return null;
@@ -48,7 +48,7 @@ namespace DaemonMasterCore
         /// <returns></returns>
         public static bool IsProcessAlreadyThere(string serviceName)
         {
-            return processes.ContainsKey(serviceName);
+            return Processes.ContainsKey(serviceName);
         }
 
         /// <summary>
@@ -62,8 +62,8 @@ namespace DaemonMasterCore
                 return null;
 
             DaemonProcess process = new DaemonProcess(serviceName);
-            processes.Add(serviceName, process);
-            return processes[serviceName];
+            Processes.Add(serviceName, process);
+            return Processes[serviceName];
         }
 
         /// <summary>
@@ -75,10 +75,10 @@ namespace DaemonMasterCore
             if (!IsProcessAlreadyThere(serviceName))
                 return -1;
 
-            if (processes[serviceName].StopProcess() != 1)
+            if (Processes[serviceName].StopProcess() != 1)
             {
-                processes[serviceName].Dispose();
-                processes.Remove(serviceName);
+                Processes[serviceName].Dispose();
+                Processes.Remove(serviceName);
                 return 1;
             }
             return 0;
@@ -94,9 +94,9 @@ namespace DaemonMasterCore
             if (!IsProcessAlreadyThere(serviceName))
                 return false;
 
-            processes[serviceName].KillProcess();
-            processes[serviceName].Dispose();
-            processes.Remove(serviceName);
+            Processes[serviceName].KillProcess();
+            Processes[serviceName].Dispose();
+            Processes.Remove(serviceName);
             return true;
         }
     }

@@ -37,6 +37,7 @@
                     <MenuItem Header="{x:Static resx:lang.button_start_service}" Click="MenuItemStart_Click"/>
                     <MenuItem Header="{x:Static resx:lang.button_stop_service}" Click="MenuItemStop_Click"/>
                     <MenuItem Header="{x:Static resx:lang.button_delete_service}" Click="MenuItemDelete_Click"/>
+                    <Separator/>
                     <MenuItem Header="{x:Static resx:lang.button_start}" Click="MenuItemStartWS_OnClick"/>
                     <MenuItem Header="{x:Static resx:lang.button_stop}" Click="MenuItemStopWS_OnClick"/>
                 </ContextMenu>
@@ -60,6 +61,7 @@
             </MenuItem>
             <MenuItem Header="{x:Static resx:lang.button_help}">
                 <MenuItem Header="{x:Static resx:lang.button_check_for_updates}" Click="MenuItem_Click_CheckForUpdates"/>
+                <Separator/>
                 <MenuItem Header="{x:Static resx:lang.button_credits}" Click="MenuItem_Click_Credits"/>
             </MenuItem>
         </Menu>
