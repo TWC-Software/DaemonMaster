@@ -29,26 +29,86 @@ using System.Threading;
 
 namespace DaemonMasterCore
 {
-    public class Process
+    [Obsolete("The class is very buggy!", false)]
+    public class DaemonProcess : IDisposable
     {
+        private bool _disposed = false;
         private readonly Daemon _daemon = null;
+        private bool _stopped = true;
 
-        private System.Diagnostics.Process _process = null;
+        private Process _process = null;
         private Timer _resetTimer = null;
         private uint _restartCounter = 0;
 
-        public Process(Daemon daemon)
+
+        public DaemonProcess(Daemon daemon)
         {
             _daemon = daemon;
+            Init();
         }
 
-        public Process(string serviceName)
+        public DaemonProcess(string serviceName)
         {
             _daemon = RegistryManagement.LoadDaemonFromRegistry(serviceName);
+            Init();
+        }
+
+        public void Init()
+        {
+            if (_daemon.FullPath == String.Empty)
+                throw new Exception("Invalid filepath!");
+
+            //Create instance of Process
+            _process = new Process();
+
+            ProcessStartInfo startInfo = new ProcessStartInfo(_daemon.FullPath, _daemon.Parameter);
+            startInfo.ErrorDialog = false;
+
+            //UseShellExecute if the application is a shortcut
+            string extension = Path.GetExtension(_daemon.FullPath);
+
+            if (String.Equals(extension, ".lnk", StringComparison.OrdinalIgnoreCase))
+            {
+                startInfo.UseShellExecute = true;
+            }
+            else
+            {
+                startInfo.UseShellExecute = false;
+            }
+
+            _process.StartInfo = startInfo;
+            //Subscribe to the event
+            _process.Exited += Process_Exited;
+            //Required for that Exited event work
+            _process.EnableRaisingEvents = true;
+
+            _process.Start();
+            //_process.WaitForInputIdle();
         }
 
 
         public Daemon GetDaemon => _daemon;
+
+        public bool IsRunning()
+        {
+            if (_process == null)
+                throw new ArgumentNullException("_process");
+
+            try
+            {
+                foreach (Process proc in Process.GetProcesses())
+                {
+                    if (proc.Id == _process.Id)
+                        return true;
+                }
+                return false;
+            }
+            catch (InvalidOperationException)
+            {
+                return true;
+            }
+        }
+
 
         public bool CloseConsoleApplication(bool useCtrlC)
         {
@@ -108,39 +168,24 @@ namespace DaemonMasterCore
 
         public bool StartProcess()
         {
-            if (_daemon.FullPath == String.Empty)
-                throw new Exception("Invalid filepath!");
+            if (_process == null)
+                throw new NullReferenceException();
 
-            ProcessStartInfo startInfo = new ProcessStartInfo(_daemon.FullPath, _daemon.Parameter);
-            startInfo.ErrorDialog = false;
+            if (IsRunning())
+                throw new InvalidOperationException();
 
-            //UseShellExecute if the application is a shortcut
-            string extension = Path.GetExtension(_daemon.FullPath);
 
-            if (String.Equals(extension, ".lnk", StringComparison.OrdinalIgnoreCase))
-            {
-                startInfo.UseShellExecute = true;
-            }
-            else
-            {
-                startInfo.UseShellExecute = false;
-            }
-
-            //Create an _process object
-            _process = new System.Diagnostics.Process();
-            _process.StartInfo = startInfo;
-            //Subscribe to the event
-            _process.Exited += Process_Exited;
-            //Required for that Exited event work
-            _process.EnableRaisingEvents = true;
             _process.Start();
             return true;
         }
 
-        public bool StopProcess()
+        public int StopProcess()
         {
-            if (_process == null || _process.HasExited)
+            if (_process == null)
                 throw new NullReferenceException();
+
+            if (!IsRunning())
+                throw new Exception("is not running");
 
             //Disable Process_Exited event
             _process.EnableRaisingEvents = false;
@@ -154,19 +199,34 @@ namespace DaemonMasterCore
                 CloseConsoleApplication(_daemon.UseCtrlC);
             }
 
-            //Close the MainWindow of the application 
-            _process.CloseMainWindow();
+            if (_process.MainWindowHandle != IntPtr.Zero)
+                //Close the MainWindow of the application 
+                _process.CloseMainWindow();
 
             //Waiting for the _process to close, after a ProcessKillTime the _process will be killed
             if (!_process.WaitForExit(_daemon.ProcessKillTime))
-            {
-                _process.Kill();
-            }
+                return 0;
 
             _process.Close();
-            _process.Dispose();
-            _process = null;
-            return true;
+            return 1;
+        }
+
+        public bool KillProcess()
+        {
+            if (_process == null)
+                throw new NullReferenceException();
+
+            try
+            {
+                //Disable Process_Exited event
+                _process.EnableRaisingEvents = false;
+                _process.Kill();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
 
@@ -179,23 +239,23 @@ namespace DaemonMasterCore
                 if (_daemon.MaxRestarts == 0 || _restartCounter < _daemon.MaxRestarts)
                 {
 
-                    Timer restartDelayTimer = new Timer(o =>
-                    {
-                        _process.Start();
-                        _restartCounter++;
+                    //Timer restartDelayTimer = new Timer(o =>
+                    //{
+                    _process.Start();
+                    _restartCounter++;
 
-                        if (_resetTimer == null)
-                        {
-                            _resetTimer = new Timer(ResetTimerCallback, null, _daemon.CounterResetTime, Timeout.Infinite);
-                        }
-                        else
-                        {
-                            _resetTimer.Change(_daemon.CounterResetTime, Timeout.Infinite);
-                        }
+                    //    if (_resetTimer == null)
+                    //    {
+                    //        _resetTimer = new Timer(ResetTimerCallback, null, _daemon.CounterResetTime, Timeout.Infinite);
+                    //    }
+                    //    else
+                    //    {
+                    //        _resetTimer.Change(_daemon.CounterResetTime, Timeout.Infinite);
+                    //    }
 
-                        ((Timer)o).Dispose();
+                    //    ((Timer)o).Dispose();
 
-                    }, null, _daemon.ProcessRestartDelay, Timeout.Infinite);
+                    //}, null, _daemon.ProcessRestartDelay, Timeout.Infinite);
                 }
                 else
                 {
@@ -211,9 +271,43 @@ namespace DaemonMasterCore
         private void ResetTimerCallback(object state)
         {
             _restartCounter = 0;
+        }
 
-            _resetTimer.Dispose();
-            _resetTimer = null;
+
+
+        //Public implementation of Dispose pattern.
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        //Protected implementation of Dispose pattern.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if (disposing)
+            {
+                if (_process != null)
+                {
+                    if (IsRunning())
+                        _process.Kill();
+
+                    _process.Dispose();
+                    _process = null;
+                }
+
+                if (_resetTimer != null)
+                {
+                    _resetTimer.Dispose();
+                    _resetTimer = null;
+                }
+            }
+
+            // Free any unmanaged objects here.
+            _disposed = true;
         }
     }
 }

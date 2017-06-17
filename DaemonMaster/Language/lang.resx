@@ -276,4 +276,13 @@
   <data name="button_stop" xml:space="preserve">
     <value>Stop</value>
   </data>
+  <data name="stop_was_successful" xml:space="preserve">
+    <value>Stop was successful!</value>
+  </data>
+  <data name="stop_was_unsuccessful" xml:space="preserve">
+    <value>Stop was unsuccessful! Do you want kill the process?</value>
+  </data>
+  <data name="the_selected_process_does_not_exist" xml:space="preserve">
+    <value>The selected process does not exist!</value>
+  </data>
 </root>

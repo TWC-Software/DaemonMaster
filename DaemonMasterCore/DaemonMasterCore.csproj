@@ -58,7 +58,7 @@
     <Compile Include="DaemonInfo.cs" />
     <Compile Include="ProcessManagement.cs" />
     <Compile Include="WPF\PlaceholderTextBox.cs" />
-    <Compile Include="Process.cs" />
+    <Compile Include="DaemonProcess.cs" />
     <Compile Include="RegistryManagement.cs" />
     <Compile Include="SecurityManagement.cs" />
     <Compile Include="ServiceManagement.cs" />

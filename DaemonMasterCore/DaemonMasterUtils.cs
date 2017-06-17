@@ -65,10 +65,8 @@ namespace DaemonMasterCore
                 buffer = Marshal.AllocHGlobal(size);
 
                 if (!NativeMethods.QueryServiceStatusEx(svManager, 0, buffer, size, out size))
-                {
-
                     throw new Win32Exception(Marshal.GetLastWin32Error());
-                }
+
 
                 return (NativeMethods.SERVICE_STATUS_PROCESS)Marshal.PtrToStructure(buffer, typeof(NativeMethods.SERVICE_STATUS_PROCESS));
             }

@@ -202,8 +202,7 @@ namespace DaemonMaster
                 return;
 
             DaemonInfo daemonInfo = (DaemonInfo)listBoxDaemons.SelectedItem;
-            Process process = ProcessManagement.CreateNewProcces(daemonInfo.ServiceName);
-            process?.StartProcess();
+            ProcessManagement.CreateNewProcess(daemonInfo.ServiceName);
         }
 
         private void MenuItemStopWS_OnClick(object sender, RoutedEventArgs e)
@@ -212,8 +211,25 @@ namespace DaemonMaster
                 return;
 
             DaemonInfo daemonInfo = (DaemonInfo)listBoxDaemons.SelectedItem;
-            Process process = ProcessManagement.GetProcessByName(daemonInfo.ServiceName);
-            process?.StopProcess();
+
+            switch (ProcessManagement.DeleteProcess(daemonInfo.ServiceName))
+            {
+                case 0:
+                    MessageBoxResult result = MessageBox.Show(resManager.GetString("stop_was_unsuccessful"),
+                        resManager.GetString("error"), MessageBoxButton.YesNo, MessageBoxImage.Error);
+
+                    if (result == MessageBoxResult.Yes)
+                        ProcessManagement.KillAndDeleteProcess(daemonInfo.ServiceName);
+                    break;
+                case 1:
+                    MessageBox.Show(resManager.GetString("stop_was_successful"),
+                        resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                    break;
+                case -1:
+                    MessageBox.Show(resManager.GetString("the_selected_process_does_not_exist"),
+                        resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                    break;
+            }
         }
 
         #endregion

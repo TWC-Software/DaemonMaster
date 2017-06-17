@@ -439,6 +439,24 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Stop was successful! ähnelt.
+        /// </summary>
+        public static string stop_was_successful {
+            get {
+                return ResourceManager.GetString("stop_was_successful", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Stop was unsuccessful! Do you want kill the process? ähnelt.
+        /// </summary>
+        public static string stop_was_unsuccessful {
+            get {
+                return ResourceManager.GetString("stop_was_unsuccessful", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Success ähnelt.
         /// </summary>
         public static string success {
@@ -462,6 +480,15 @@ namespace DaemonMaster.Language {
         public static string test {
             get {
                 return ResourceManager.GetString("test", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die The selected process does not exist! ähnelt.
+        /// </summary>
+        public static string the_selected_process_does_not_exist {
+            get {
+                return ResourceManager.GetString("the_selected_process_does_not_exist", resourceCulture);
             }
         }
         

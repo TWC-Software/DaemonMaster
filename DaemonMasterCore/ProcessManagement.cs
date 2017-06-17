@@ -19,24 +19,23 @@
 
 
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DaemonMasterCore
 {
     public static class ProcessManagement
     {
-        private static List<KeyValuePair<string, Process>> processes = new List<KeyValuePair<string, Process>>();
+        private static readonly Dictionary<string, DaemonProcess> processes = new Dictionary<string, DaemonProcess>();
 
         /// <summary>
         /// Get the Process object of the given service name, if no process exists to the given service name the function return null
         /// </summary>
         /// <param name="serviceName"></param>
         /// <returns></returns>
-        public static Process GetProcessByName(string serviceName)
+        public static DaemonProcess GetProcessByName(string serviceName)
         {
             if (IsProcessAlreadyThere(serviceName))
             {
-                return processes.FirstOrDefault(x => x.Key == serviceName).Value;
+                return processes[serviceName];
             }
 
             return null;
@@ -49,11 +48,7 @@ namespace DaemonMasterCore
         /// <returns></returns>
         public static bool IsProcessAlreadyThere(string serviceName)
         {
-            if (processes.FirstOrDefault(x => x.Key == serviceName).Equals(default(KeyValuePair<string, Process>)))
-            {
-                return false;
-            }
-            return true;
+            return processes.ContainsKey(serviceName);
         }
 
         /// <summary>
@@ -61,14 +56,48 @@ namespace DaemonMasterCore
         /// </summary>
         /// <param name="serviceName"></param>
         /// <returns></returns>
-        public static Process CreateNewProcces(string serviceName)
+        public static DaemonProcess CreateNewProcess(string serviceName)
         {
             if (IsProcessAlreadyThere(serviceName))
                 return null;
 
-            Process process = new Process(serviceName);
-            processes.Add(new KeyValuePair<string, Process>(serviceName, process));
-            return processes.FirstOrDefault(x => x.Key == serviceName).Value;
+            DaemonProcess process = new DaemonProcess(serviceName);
+            processes.Add(serviceName, process);
+            return processes[serviceName];
+        }
+
+        /// <summary>
+        /// Dispose the process with the given service name
+        /// </summary>
+        /// <param name="serviceName"></param>
+        public static int DeleteProcess(string serviceName)
+        {
+            if (!IsProcessAlreadyThere(serviceName))
+                return -1;
+
+            if (processes[serviceName].StopProcess() != 1)
+            {
+                processes[serviceName].Dispose();
+                processes.Remove(serviceName);
+                return 1;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Kill and Dispose the process with the given service name
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <returns></returns>
+        public static bool KillAndDeleteProcess(string serviceName)
+        {
+            if (!IsProcessAlreadyThere(serviceName))
+                return false;
+
+            processes[serviceName].KillProcess();
+            processes[serviceName].Dispose();
+            processes.Remove(serviceName);
+            return true;
         }
     }
 }
