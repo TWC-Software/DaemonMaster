@@ -20,6 +20,7 @@
 using DaemonMasterCore.Win32;
 using System;
 using System.Diagnostics;
+using System.Threading;
 
 namespace DaemonMasterCore
 {
@@ -30,7 +31,8 @@ namespace DaemonMasterCore
         private readonly Daemon _daemon = null;
         private readonly Process _process = new Process();
 
-        public Daemon GetDaemon => _daemon;
+        private int _restarts = 0;
+
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                        Constructor + Init                                            //
@@ -60,6 +62,7 @@ namespace DaemonMasterCore
             _process.Exited += ProcessOnExited;
         }
         #endregion
+
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                  Start, Stop, Pause, Resume, etc                                     //
@@ -176,6 +179,22 @@ namespace DaemonMasterCore
         }
         #endregion
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                     ProcessOnExited event                                            //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void ProcessOnExited(object sender, EventArgs eventArgs)
+        {
+            //restart the process if _restarts < MaxRestarts or MaxRestarts = -1
+            if (_restarts < _daemon.MaxRestarts || _daemon.MaxRestarts == -1)
+            {
+                Thread.Sleep(_daemon.ProcessRestartDelay);
+                StartProcess();
+                _restarts++;
+            }
+        }
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                         Other functions                                              //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -216,10 +235,8 @@ namespace DaemonMasterCore
             }
         }
 
-        private void ProcessOnExited(object sender, EventArgs eventArgs)
-        {
-            StartProcess();
-        }
+        public Daemon GetDaemon => _daemon;
+
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                             Dispose                                                  //
@@ -251,6 +268,10 @@ namespace DaemonMasterCore
 
         #endregion
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                              Other                                                   //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public enum DaemonProcessState
         {

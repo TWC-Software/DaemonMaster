@@ -156,7 +156,7 @@ namespace DaemonMasterCore
         /// <returns></returns>
         public static bool IsDictionaryEmpty()
         {
-            return Processes.Count > 0;
+            return Processes.Count > 1;
         }
     }
 }
