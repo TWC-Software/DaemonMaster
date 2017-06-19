@@ -26,7 +26,7 @@ namespace DaemonMasterService
 {
     public partial class Service1 : ServiceBase
     {
-        private DaemonProcess _processManagement = null;
+        private DaemonProcess _daemonProcess = null;
 
         public Service1(bool enablePause)
         {
@@ -43,9 +43,8 @@ namespace DaemonMasterService
             try
             {
                 //Load config from registry
-                Daemon daemon = RegistryManagement.LoadDaemonFromRegistry(DaemonMasterUtils.GetServiceName());
-                _processManagement = new DaemonProcess(daemon);
-                _processManagement.StartProcess();
+                _daemonProcess = new DaemonProcess(DaemonMasterUtils.GetServiceName());
+                _daemonProcess.StartProcess();
             }
             catch (Exception)
             {
@@ -56,13 +55,14 @@ namespace DaemonMasterService
         protected override void OnStop()
         {
             //Stop the process
-            _processManagement.StopProcess();
+            _daemonProcess.StopProcess();
+            _daemonProcess.Dispose();
             base.OnStop();
         }
 
         protected override void OnPause()
         {
-            _processManagement.PauseProcess();
+            _daemonProcess.PauseProcess();
 
             base.OnPause();
         }
@@ -71,7 +71,7 @@ namespace DaemonMasterService
         {
             base.OnContinue();
 
-            _processManagement.ResumeProcess();
+            _daemonProcess.ResumeProcess();
         }
     }
 }

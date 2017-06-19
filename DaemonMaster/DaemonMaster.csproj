@@ -8,11 +8,13 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>DaemonMaster</RootNamespace>
     <AssemblyName>DaemonMaster</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -25,7 +27,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -92,20 +93,20 @@
     <Compile Include="CreditsWindow.xaml.cs">
       <DependentUpon>CreditsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Language\lang.de-DE.Designer.cs">
+    <Compile Include="Language\lang.de.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>lang.de-DE.resx</DependentUpon>
+      <DependentUpon>lang.de.resx</DependentUpon>
     </Compile>
     <Compile Include="Language\lang.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>lang.resx</DependentUpon>
     </Compile>
-    <Compile Include="Language\lang.fr-FR.Designer.cs">
+    <Compile Include="Language\lang.fr.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>lang.fr-FR.resx</DependentUpon>
+      <DependentUpon>lang.fr.resx</DependentUpon>
     </Compile>
     <Page Include="CreditsWindow.xaml">
       <SubType>Designer</SubType>
@@ -145,13 +146,13 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Language\lang.de-DE.resx">
+    <EmbeddedResource Include="Language\lang.de.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>lang.de-DE.Designer.cs</LastGenOutput>
+      <LastGenOutput>lang.de.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Language\lang.fr-FR.resx">
+    <EmbeddedResource Include="Language\lang.fr.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>lang.fr-FR.Designer.cs</LastGenOutput>
+      <LastGenOutput>lang.fr.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Language\lang.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

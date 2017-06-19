@@ -202,7 +202,22 @@ namespace DaemonMaster
                 return;
 
             DaemonInfo daemonInfo = (DaemonInfo)listBoxDaemons.SelectedItem;
-            ProcessManagement.CreateNewProcess(daemonInfo.ServiceName);
+
+            switch (ProcessManagement.CreateNewProcess(daemonInfo.ServiceName))
+            {
+                case DaemonProcess.DaemonProcessState.Unsuccessful:
+                    MessageBox.Show(_resManager.GetString("start_was_unsuccessful"),
+                         _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                    break;
+                case DaemonProcess.DaemonProcessState.Successful:
+                    MessageBox.Show(_resManager.GetString("start_was_successful"),
+                        _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                    break;
+                case DaemonProcess.DaemonProcessState.AlreadyStopped:
+                    MessageBox.Show(_resManager.GetString("the_selected_process_is_already_started"),
+                        _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                    break;
+            }
         }
 
         private void MenuItemStopWS_OnClick(object sender, RoutedEventArgs e)
@@ -214,21 +229,39 @@ namespace DaemonMaster
 
             switch (ProcessManagement.DeleteProcess(daemonInfo.ServiceName))
             {
-                case 0:
+                case DaemonProcess.DaemonProcessState.Unsuccessful:
                     MessageBoxResult result = MessageBox.Show(_resManager.GetString("stop_was_unsuccessful"),
                         _resManager.GetString("error"), MessageBoxButton.YesNo, MessageBoxImage.Error);
 
                     if (result == MessageBoxResult.Yes)
                         ProcessManagement.KillAndDeleteProcess(daemonInfo.ServiceName);
                     break;
-                case 1:
+                case DaemonProcess.DaemonProcessState.Successful:
                     MessageBox.Show(_resManager.GetString("stop_was_successful"),
                         _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
-                case -1:
+                case DaemonProcess.DaemonProcessState.AlreadyStopped:
                     MessageBox.Show(_resManager.GetString("the_selected_process_does_not_exist"),
                         _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
+            }
+        }
+
+        private void MenuItemKillWS_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (listBoxDaemons.SelectedItem == null)
+                return;
+            DaemonInfo daemonInfo = (DaemonInfo)listBoxDaemons.SelectedItem;
+
+            if (ProcessManagement.KillAndDeleteProcess(daemonInfo.ServiceName))
+            {
+                MessageBox.Show(_resManager.GetString("the_process_killing_was_successful"),
+                    _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show(_resManager.GetString("the_process_killing_was_unsuccessful"),
+                    _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -370,16 +403,6 @@ namespace DaemonMaster
             }
         }
 
-        private void StartProcess(DaemonInfo daemonInfo)
-        {
-
-        }
-
-        private void StopProcess(DaemonInfo daemonInfo)
-        {
-
-        }
-
         private void SwitchToSession0()
         {
             if (ServiceManagement.CheckUI0DetectService())
@@ -423,6 +446,22 @@ namespace DaemonMaster
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            //Kill all running processes
+            if (ProcessManagement.IsDictionaryEmpty())
+            {
+                MessageBoxResult result = MessageBox.Show(_resManager.GetString("all_processes_will_be_killed"), _resManager.GetString("warning"), MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+
+                //Cancel the shutdown, else kill all processes
+                if (result == MessageBoxResult.Cancel)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+                else
+                {
+                    ProcessManagement.KillAndDeleteAllProcesses();
+                }
+            }
         }
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)

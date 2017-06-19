@@ -18,6 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
+using System;
 using System.Collections.Generic;
 
 namespace DaemonMasterCore
@@ -46,42 +47,67 @@ namespace DaemonMasterCore
         /// </summary>
         /// <param name="serviceName"></param>
         /// <returns></returns>
-        public static bool IsProcessAlreadyThere(string serviceName)
+        private static bool IsProcessAlreadyThere(string serviceName)
         {
             return Processes.ContainsKey(serviceName);
         }
 
         /// <summary>
-        /// Create a new process with the service name (return the process object), if a process exists with the same service name, the function return null
+        /// Create a new process with the service name (return the process object)
         /// </summary>
         /// <param name="serviceName"></param>
         /// <returns></returns>
-        public static DaemonProcess CreateNewProcess(string serviceName)
+        public static DaemonProcess.DaemonProcessState CreateNewProcess(string serviceName)
         {
             if (IsProcessAlreadyThere(serviceName))
-                return null;
+                return DaemonProcess.DaemonProcessState.AlreadyStarted;
 
             DaemonProcess process = new DaemonProcess(serviceName);
-            Processes.Add(serviceName, process);
-            return Processes[serviceName];
+            DaemonProcess.DaemonProcessState result = process.StartProcess();
+
+            switch (result)
+            {
+                case DaemonProcess.DaemonProcessState.AlreadyStarted:
+                    break;
+
+                case DaemonProcess.DaemonProcessState.Successful:
+                    Processes.Add(serviceName, process);
+                    break;
+
+                case DaemonProcess.DaemonProcessState.Unsuccessful:
+                    break;
+            }
+
+            return result;
         }
 
         /// <summary>
         /// Dispose the process with the given service name
         /// </summary>
         /// <param name="serviceName"></param>
-        public static int DeleteProcess(string serviceName)
+        public static DaemonProcess.DaemonProcessState DeleteProcess(string serviceName)
         {
             if (!IsProcessAlreadyThere(serviceName))
-                return -1;
+                return DaemonProcess.DaemonProcessState.AlreadyStopped;
 
-            if (Processes[serviceName].StopProcess() != 1)
+            DaemonProcess process = new DaemonProcess(serviceName);
+            DaemonProcess.DaemonProcessState result = process.StopProcess();
+
+            switch (result)
             {
-                Processes[serviceName].Dispose();
-                Processes.Remove(serviceName);
-                return 1;
+                case DaemonProcess.DaemonProcessState.AlreadyStopped:
+                    break;
+
+                case DaemonProcess.DaemonProcessState.Successful:
+                    process.Dispose();
+                    Processes.Remove(serviceName);
+                    break;
+
+                case DaemonProcess.DaemonProcessState.Unsuccessful:
+                    break;
             }
-            return 0;
+
+            return result;
         }
 
         /// <summary>
@@ -98,6 +124,39 @@ namespace DaemonMasterCore
             Processes[serviceName].Dispose();
             Processes.Remove(serviceName);
             return true;
+        }
+
+        /// <summary>
+        /// Kill all processes in the list
+        /// </summary>
+        public static void KillAndDeleteAllProcesses()
+        {
+            foreach (var process in Processes)
+            {
+                try
+                {
+                    DaemonProcess daemonProcess = process.Value;
+
+                    daemonProcess.KillProcess();
+                    daemonProcess.Dispose();
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+            }
+
+            //Clear process list
+            Processes.Clear();
+        }
+
+        /// <summary>
+        /// If dictionary/list empty
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsDictionaryEmpty()
+        {
+            return Processes.Count > 0;
         }
     }
 }

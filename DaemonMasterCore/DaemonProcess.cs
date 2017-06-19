@@ -17,35 +17,26 @@
 //   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DaemonMasterCore.Win32;
-using System.Threading;
+using System;
+using System.Diagnostics;
 
 namespace DaemonMasterCore
 {
-    [Obsolete("The class is very buggy!", false)]
     public class DaemonProcess : IDisposable
     {
         private bool _disposed = false;
+
         private readonly Daemon _daemon = null;
-        private bool _stopped = true;
+        private readonly Process _process = new Process();
 
-        private Process _process = null;
-        private Timer _resetTimer = null;
-        private uint _restartCounter = 0;
+        public Daemon GetDaemon => _daemon;
 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                        Constructor + Init                                            //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public DaemonProcess(Daemon daemon)
-        {
-            _daemon = daemon;
-            Init();
-        }
+        #region Constructor/Init
 
         public DaemonProcess(string serviceName)
         {
@@ -55,76 +46,94 @@ namespace DaemonMasterCore
 
         public void Init()
         {
-            if (_daemon.FullPath == String.Empty)
-                throw new Exception("Invalid filepath!");
-
-            //Create instance of Process
-            _process = new Process();
-
-            ProcessStartInfo startInfo = new ProcessStartInfo(_daemon.FullPath, _daemon.Parameter);
-            startInfo.ErrorDialog = false;
-
-            //UseShellExecute if the application is a shortcut
-            string extension = Path.GetExtension(_daemon.FullPath);
-
-            if (String.Equals(extension, ".lnk", StringComparison.OrdinalIgnoreCase))
+            //Create the start info for the process
+            ProcessStartInfo startInfo = new ProcessStartInfo()
             {
-                startInfo.UseShellExecute = true;
-            }
-            else
-            {
-                startInfo.UseShellExecute = false;
-            }
+                FileName = _daemon.FullPath,
+                Arguments = _daemon.Parameter,
+                UseShellExecute = true //For .ink
+            };
 
             _process.StartInfo = startInfo;
-            //Subscribe to the event
-            _process.Exited += Process_Exited;
-            //Required for that Exited event work
+            //Enable raising events for auto restart
             _process.EnableRaisingEvents = true;
+            _process.Exited += ProcessOnExited;
+        }
+        #endregion
 
-            _process.Start();
-            //_process.WaitForInputIdle();
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                  Start, Stop, Pause, Resume, etc                                     //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        #region Start/Stop/Pause/Resume/etc
+
+        public DaemonProcessState StartProcess()
+        {
+            if (_process.Start())
+            {
+                return DaemonProcessState.Successful;
+            }
+
+            return DaemonProcessState.Unsuccessful;
         }
 
-
-        public Daemon GetDaemon => _daemon;
-
-        public bool IsRunning()
+        public DaemonProcessState StopProcess()
         {
-            if (_process == null)
-                throw new ArgumentNullException("_process");
+            //If process already stoppend return
+            if (!IsRunning())
+                return DaemonProcessState.AlreadyStopped;
+
+            //Disable raising events (disable auto restart)
+            _process.EnableRaisingEvents = false;
 
             try
             {
-                foreach (Process proc in Process.GetProcesses())
+                //If console app then send Ctrl-C or Ctrl-Break command
+                if (_daemon.ConsoleApplication)
                 {
-                    if (proc.Id == _process.Id)
-                        return true;
+                    CloseConsoleApplication(_daemon.UseCtrlC);
                 }
-                return false;
+
+                //Send close main window command
+                _process.CloseMainWindow();
+
+                //Wait for a defined time
+                if (_process.WaitForExit(_daemon.ProcessKillTime))
+                {
+                    _process.Close();
+                    return DaemonProcessState.Successful;
+                }
+
+                return DaemonProcessState.Unsuccessful;
             }
-            catch (InvalidOperationException)
+            catch (Exception)
             {
-                return true;
+                return DaemonProcessState.Unsuccessful;
             }
         }
 
-
-        public bool CloseConsoleApplication(bool useCtrlC)
+        public DaemonProcessState KillProcess()
         {
-            if (_process == null)
-                throw new NullReferenceException();
+            //If process already stoppend return
+            if (!IsRunning())
+                return DaemonProcessState.AlreadyStopped;
 
+            //Disable raising events (disable auto restart)
+            _process.EnableRaisingEvents = false;
 
-            if (useCtrlC)
+            //Kill the process
+            try
             {
-                return NativeMethods.GenerateConsoleCtrlEvent((uint)NativeMethods.CtrlEvent.CTRL_C_EVENT, (uint)_process.Id);
+                _process.Kill();
+                _process.Close();
+                return DaemonProcessState.Successful;
             }
-            else
+            catch (Exception)
             {
-                return NativeMethods.GenerateConsoleCtrlEvent((uint)NativeMethods.CtrlEvent.CTRL_BREAK_EVENT, (uint)_process.Id);
+                return DaemonProcessState.Unsuccessful;
             }
         }
+
 
         public bool PauseProcess()
         {
@@ -165,115 +174,58 @@ namespace DaemonMasterCore
                 NativeMethods.CloseHandle(processHandle);
             }
         }
+        #endregion
 
-        public bool StartProcess()
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                         Other functions                                              //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public bool CloseConsoleApplication(bool useCtrlC)
         {
             if (_process == null)
                 throw new NullReferenceException();
 
-            if (IsRunning())
-                throw new InvalidOperationException();
 
-
-            _process.Start();
-            return true;
-        }
-
-        public int StopProcess()
-        {
-            if (_process == null)
-                throw new NullReferenceException();
-
-            if (!IsRunning())
-                throw new Exception("is not running");
-
-            //Disable Process_Exited event
-            _process.EnableRaisingEvents = false;
-
-            //IntPtr handle = _process.MainWindowHandle;
-            //NativeMethods.PostMessage(handle, NativeMethods._SYSCOMMAND, (IntPtr)NativeMethods.wParam.SC_CLOSE, IntPtr.Zero);
-
-            //Send Ctrl-C / Ctrl-Break command if the application is a console
-            if (_daemon.ConsoleApplication)
+            if (useCtrlC)
             {
-                CloseConsoleApplication(_daemon.UseCtrlC);
+                return NativeMethods.GenerateConsoleCtrlEvent((uint)NativeMethods.CtrlEvent.CTRL_C_EVENT, (uint)_process.Id);
             }
-
-            if (_process.MainWindowHandle != IntPtr.Zero)
-                //Close the MainWindow of the application 
-                _process.CloseMainWindow();
-
-            //Waiting for the _process to close, after a ProcessKillTime the _process will be killed
-            if (!_process.WaitForExit(_daemon.ProcessKillTime))
-                return 0;
-
-            _process.Close();
-            return 1;
+            else
+            {
+                return NativeMethods.GenerateConsoleCtrlEvent((uint)NativeMethods.CtrlEvent.CTRL_BREAK_EVENT, (uint)_process.Id);
+            }
         }
 
-        public bool KillProcess()
+        public bool IsRunning()
         {
             if (_process == null)
-                throw new NullReferenceException();
+                throw new ArgumentNullException("_process");
 
             try
             {
-                //Disable Process_Exited event
-                _process.EnableRaisingEvents = false;
-                _process.Kill();
-                return true;
-            }
-            catch (Exception)
-            {
+                foreach (Process proc in Process.GetProcesses())
+                {
+                    if (proc.Id == _process.Id)
+                        return true;
+                }
                 return false;
             }
-        }
-
-
-
-
-        private void Process_Exited(object sender, EventArgs args)
-        {
-            try
+            catch (InvalidOperationException)
             {
-                if (_daemon.MaxRestarts == 0 || _restartCounter < _daemon.MaxRestarts)
-                {
-
-                    //Timer restartDelayTimer = new Timer(o =>
-                    //{
-                    _process.Start();
-                    _restartCounter++;
-
-                    //    if (_resetTimer == null)
-                    //    {
-                    //        _resetTimer = new Timer(ResetTimerCallback, null, _daemon.CounterResetTime, Timeout.Infinite);
-                    //    }
-                    //    else
-                    //    {
-                    //        _resetTimer.Change(_daemon.CounterResetTime, Timeout.Infinite);
-                    //    }
-
-                    //    ((Timer)o).Dispose();
-
-                    //}, null, _daemon.ProcessRestartDelay, Timeout.Infinite);
-                }
-                else
-                {
-                    //Stop();
-                }
-            }
-            catch (Exception)
-            {
-                //Stop();
+                return true;
             }
         }
 
-        private void ResetTimerCallback(object state)
+        private void ProcessOnExited(object sender, EventArgs eventArgs)
         {
-            _restartCounter = 0;
+            StartProcess();
         }
 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                             Dispose                                                  //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        #region Dispose
 
         //Public implementation of Dispose pattern.
         public void Dispose()
@@ -290,24 +242,22 @@ namespace DaemonMasterCore
 
             if (disposing)
             {
-                if (_process != null)
-                {
-                    if (IsRunning())
-                        _process.Kill();
-
-                    _process.Dispose();
-                    _process = null;
-                }
-
-                if (_resetTimer != null)
-                {
-                    _resetTimer.Dispose();
-                    _resetTimer = null;
-                }
+                _process?.Dispose();
             }
 
             // Free any unmanaged objects here.
             _disposed = true;
+        }
+
+        #endregion
+
+
+        public enum DaemonProcessState
+        {
+            AlreadyStopped,
+            AlreadyStarted,
+            Successful,
+            Unsuccessful,
         }
     }
 }

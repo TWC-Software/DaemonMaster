@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -8,9 +8,9 @@ using System.Windows;
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
 [assembly: AssemblyTitle("DaemonMaster GUI")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Daemon Master is a software which makes it possible to create and manage a Windows-service from any program.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("TWCSoftware")]
+[assembly: AssemblyCompany("TWC Software")]
 [assembly: AssemblyProduct("DaemonMaster")]
 [assembly: AssemblyCopyright("Copyright ©  2017 Mike Cremer / Stephan André")]
 [assembly: AssemblyTrademark("")]

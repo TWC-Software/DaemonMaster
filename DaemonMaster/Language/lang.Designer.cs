@@ -70,6 +70,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die All processes will be killed on shutdown (except services)! Are you sure? ähnelt.
+        /// </summary>
+        public static string all_processes_will_be_killed {
+            get {
+                return ResourceManager.GetString("all_processes_will_be_killed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Add ähnelt.
         /// </summary>
         public static string button_add_service {
@@ -147,6 +156,15 @@ namespace DaemonMaster.Language {
         public static string button_import {
             get {
                 return ResourceManager.GetString("button_import", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kill process ähnelt.
+        /// </summary>
+        public static string button_kill {
+            get {
+                return ResourceManager.GetString("button_kill", resourceCulture);
             }
         }
         
@@ -439,6 +457,24 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Start was successful! ähnelt.
+        /// </summary>
+        public static string start_was_successful {
+            get {
+                return ResourceManager.GetString("start_was_successful", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Start was unsuccessful! ähnelt.
+        /// </summary>
+        public static string start_was_unsuccessful {
+            get {
+                return ResourceManager.GetString("start_was_unsuccessful", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Stop was successful! ähnelt.
         /// </summary>
         public static string stop_was_successful {
@@ -484,11 +520,38 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die The process killing was successful! ähnelt.
+        /// </summary>
+        public static string the_process_killing_was_successful {
+            get {
+                return ResourceManager.GetString("the_process_killing_was_successful", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die The process killing was unsuccessful! ähnelt.
+        /// </summary>
+        public static string the_process_killing_was_unsuccessful {
+            get {
+                return ResourceManager.GetString("the_process_killing_was_unsuccessful", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The selected process does not exist! ähnelt.
         /// </summary>
         public static string the_selected_process_does_not_exist {
             get {
                 return ResourceManager.GetString("the_selected_process_does_not_exist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die The selected process is already started! ähnelt.
+        /// </summary>
+        public static string the_selected_process_is_already_started {
+            get {
+                return ResourceManager.GetString("the_selected_process_is_already_started", resourceCulture);
             }
         }
         

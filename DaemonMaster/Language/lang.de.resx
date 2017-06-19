@@ -285,4 +285,25 @@
   <data name="the_selected_process_does_not_exist" xml:space="preserve">
     <value>Der gewählte Prozess existiert nicht!</value>
   </data>
+  <data name="button_kill" xml:space="preserve">
+    <value>Prozess "killen"</value>
+  </data>
+  <data name="the_process_killing_was_successful" xml:space="preserve">
+    <value>Der Prozess wurde erfolgreich "gekillt"!</value>
+  </data>
+  <data name="the_process_killing_was_unsuccessful" xml:space="preserve">
+    <value>Der Prozess konnte nicht "gekillt" werden!</value>
+  </data>
+  <data name="start_was_successful" xml:space="preserve">
+    <value>Start war erfolgreich!</value>
+  </data>
+  <data name="start_was_unsuccessful" xml:space="preserve">
+    <value>Start war nicht erfolgreich!</value>
+  </data>
+  <data name="the_selected_process_is_already_started" xml:space="preserve">
+    <value>Der gewählte Prozess läuft bereits!</value>
+  </data>
+  <data name="all_processes_will_be_killed" xml:space="preserve">
+    <value>Bei herunterfahren der Anwendung werden alle Prozesse "gekillt"! Sind Sie sich sicher?</value>
+  </data>
 </root>

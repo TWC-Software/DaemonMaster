@@ -285,4 +285,25 @@
   <data name="the_selected_process_does_not_exist" xml:space="preserve">
     <value>The selected process does not exist!</value>
   </data>
+  <data name="button_kill" xml:space="preserve">
+    <value>Kill process</value>
+  </data>
+  <data name="the_process_killing_was_successful" xml:space="preserve">
+    <value>The process killing was successful!</value>
+  </data>
+  <data name="the_process_killing_was_unsuccessful" xml:space="preserve">
+    <value>The process killing was unsuccessful!</value>
+  </data>
+  <data name="start_was_successful" xml:space="preserve">
+    <value>Start was successful!</value>
+  </data>
+  <data name="start_was_unsuccessful" xml:space="preserve">
+    <value>Start was unsuccessful!</value>
+  </data>
+  <data name="the_selected_process_is_already_started" xml:space="preserve">
+    <value>The selected process is already started!</value>
+  </data>
+  <data name="all_processes_will_be_killed" xml:space="preserve">
+    <value>All processes will be killed on shutdown (except services)! Are you sure?</value>
+  </data>
 </root>
