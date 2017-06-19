@@ -54,9 +54,12 @@ namespace DaemonMasterService
 
         protected override void OnStop()
         {
-            //Stop the process
-            _daemonProcess.StopProcess();
+            //Stop/Kill the process
+            if (_daemonProcess.StopProcess() == DaemonProcess.DaemonProcessState.Unsuccessful)
+                _daemonProcess.KillProcess();
+
             _daemonProcess.Dispose();
+
             base.OnStop();
         }
 

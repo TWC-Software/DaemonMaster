@@ -26,11 +26,10 @@ namespace DaemonMasterCore
 {
     public class DaemonProcess : IDisposable
     {
-        private bool _disposed = false;
-
         private readonly Daemon _daemon = null;
         private readonly Process _process = new Process();
 
+        //Don't change!!
         private int _restarts = 0;
 
 
@@ -243,6 +242,8 @@ namespace DaemonMasterCore
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         #region Dispose
+
+        private bool _disposed = false;
 
         //Public implementation of Dispose pattern.
         public void Dispose()
