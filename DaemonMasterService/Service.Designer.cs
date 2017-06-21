@@ -1,6 +1,6 @@
 namespace DaemonMasterService
 {
-    partial class Service1
+    partial class Service
     {
         /// <summary> 
         /// Erforderliche Designervariable.
@@ -29,9 +29,9 @@ namespace DaemonMasterService
         private void InitializeComponent()
         {
             // 
-            // Service1
+            // Service
             // 
-            this.ServiceName = "Service1";
+            this.ServiceName = "Service";
 
         }
 

@@ -90,7 +90,7 @@ namespace DaemonMasterCore
             if (!IsProcessAlreadyThere(serviceName))
                 return DaemonProcess.DaemonProcessState.AlreadyStopped;
 
-            DaemonProcess process = new DaemonProcess(serviceName);
+            DaemonProcess process = Processes[serviceName];
             DaemonProcess.DaemonProcessState result = process.StopProcess();
 
             switch (result)

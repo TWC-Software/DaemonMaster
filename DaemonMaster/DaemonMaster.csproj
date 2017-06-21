@@ -196,6 +196,10 @@
       <Project>{fa9d9d3d-af33-4ff0-acb3-3d7278e5a90b}</Project>
       <Name>DaemonMasterCore</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DaemonMasterService\DaemonMasterService.csproj">
+      <Project>{227ba4d7-56ac-40ba-a73c-0b28ac8c99f8}</Project>
+      <Name>DaemonMasterService</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

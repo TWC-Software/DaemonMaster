@@ -21,11 +21,14 @@ using DaemonMasterCore.Win32;
 using System;
 using System.Diagnostics;
 using System.Threading;
+using NLog;
 
 namespace DaemonMasterCore
 {
     public class DaemonProcess : IDisposable
     {
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         private readonly Daemon _daemon = null;
         private readonly Process _process = new Process();
 
@@ -191,6 +194,11 @@ namespace DaemonMasterCore
                 Thread.Sleep(_daemon.ProcessRestartDelay);
                 StartProcess();
                 _restarts++;
+                _logger.Warn("Restart process... (restart: {0})", _restarts);
+            }
+            else
+            {
+                _logger.Warn("The maximum number of restarts has been reached!");
             }
         }
 

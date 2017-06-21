@@ -7,19 +7,8 @@
         mc:Ignorable="d"
         Title="CreditsWindow" Height="434.275" Width="336.384">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        <ScrollViewer Grid.ColumnSpan="2">
-            <Grid>
-                <TextBlock x:Name="label" 
-                   Margin="10,184,10,10" 
-                   ScrollViewer.VerticalScrollBarVisibility="Visible"
-                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                   ScrollViewer.CanContentScroll="True" HorizontalAlignment="Center"><Run Text="The program &quot;DeamonMaster&quot; was originally &#xA;created by MCPC10"/><Run Text=" (Main Developer) "/><Run Text="and "/><Run Text="Stuffi3000"/><Run Text="&#xA;&#xA;GUI: Stuffi3000, MCPC10&#xA;Code: MCPC10 &#xA;Icon: Stuffi3000&#xA;&#xA;Used Librarys:&#xA;Newtonsoft.Json&#xA;&#xA;Thanks to :&#xA;Pinvoke.net&#xA;stackoverflow.com (for help from the user"/><Run Text="s"/><Run Text=")"/></TextBlock>
-                <Image x:Name="image" Height="159" Margin="64,13,64,0" VerticalAlignment="Top" Source="DeamonMaster Icon.bmp"/>
-            </Grid>
-        </ScrollViewer>
+        <Image x:Name="image" Height="159" Margin="64,13,64,0" VerticalAlignment="Top" Source="DeamonMaster Icon.bmp"/>
+        <TextBox x:Name="textBoxCredits" TextWrapping="Wrap" Margin="10,194,0,10" RenderTransformOrigin="0.5,0.5" Height="Auto" VerticalAlignment="Stretch" AcceptsReturn="True" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
+        Text="" HorizontalAlignment="Left" Width="308"/>
     </Grid>
 </Window>
