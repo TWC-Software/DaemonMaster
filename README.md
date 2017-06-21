@@ -14,9 +14,9 @@ WARNING SOFTWARE IS IN PRE-ALPHA !
 - Custom username and password for a service
 
 ## Thanks to 
-pinvoke.net (and its users)
-stackoverflow.com (for help from the users)
-entwickler-ecke.de (for help from the users)
+- pinvoke.net (and its users)
+- stackoverflow.com (for help from the users)
+- entwickler-ecke.de (for help from the users)
 
 ## Used Librarys
 - Newtonsoft.Json - James Newton - King - MIT License
