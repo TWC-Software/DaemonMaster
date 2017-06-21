@@ -21,6 +21,7 @@ WARNING SOFTWARE IS IN PRE-ALPHA !
 ## Used Librarys
 - Newtonsoft.Json - James Newton - King - MIT License
 - NLog - Jaroslaw Kowalski, Kim Christensen, Julian Verdurmen - BSD 3 - clause "New" or "Revised" License
+- AutoUpdater.NET - RBSoft - MIT License
 
 ## Copyright 
 MCPC10,
