@@ -18,7 +18,7 @@ pinvoke.net (and its users)
 stackoverflow.com (for help from the users)
 entwickler-ecke.de (for help from the users)
 
-## Used Librarys:
+## Used Librarys
 - Newtonsoft.Json - James Newton - King - MIT License
 - NLog - Jaroslaw Kowalski, Kim Christensen, Julian Verdurmen - BSD 3 - clause "New" or "Revised" License
 
