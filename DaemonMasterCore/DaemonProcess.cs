@@ -145,18 +145,18 @@ namespace DaemonMasterCore
             if (_process == null)
                 throw new NullReferenceException();
 
-            IntPtr processHandle = NativeMethods.OpenThread(NativeMethods.ThreadAccess.SUSPEND_RESUME, true, (uint)_process.Id);
-
-            if (processHandle == IntPtr.Zero)
-                return false;
-
             try
             {
-                return NativeMethods.SuspendThread(processHandle);
+                using (ThreadHandle threadHandle =
+                    ThreadHandle.OpenThread(NativeMethods.ThreadAccess.SUSPEND_RESUME, true, _process.Id))
+                {
+                    threadHandle.PauseThread();
+                }
+                return true;
             }
-            finally
+            catch (Exception)
             {
-                NativeMethods.CloseHandle(processHandle);
+                return false;
             }
         }
 
@@ -164,19 +164,18 @@ namespace DaemonMasterCore
         {
             if (_process == null)
                 throw new NullReferenceException();
-
-            IntPtr processHandle = NativeMethods.OpenThread(NativeMethods.ThreadAccess.SUSPEND_RESUME, true, (uint)_process.Id);
-
-            if (processHandle == IntPtr.Zero)
-                return false;
-
             try
             {
-                return NativeMethods.ResumeThread(processHandle);
+                using (ThreadHandle threadHandle =
+                    ThreadHandle.OpenThread(NativeMethods.ThreadAccess.SUSPEND_RESUME, true, _process.Id))
+                {
+                    threadHandle.ResumeThread();
+                }
+                return true;
             }
-            finally
+            catch (Exception)
             {
-                NativeMethods.CloseHandle(processHandle);
+                return false;
             }
         }
         #endregion

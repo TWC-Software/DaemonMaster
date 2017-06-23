@@ -62,6 +62,7 @@
     <Compile Include="ProcessManagement.cs" />
     <Compile Include="Win32\ServiceControlManager.cs" />
     <Compile Include="Win32\ServiceHandle.cs" />
+    <Compile Include="Win32\ThreadHandle.cs" />
     <Compile Include="WPF\PlaceholderTextBox.cs" />
     <Compile Include="DaemonProcess.cs" />
     <Compile Include="RegistryManagement.cs" />
