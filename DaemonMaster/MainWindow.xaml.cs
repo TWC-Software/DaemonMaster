@@ -28,6 +28,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using DaemonMasterCore;
 using AutoUpdaterDotNET;
+using DaemonMasterCore.Exceptions;
 using DaemonMasterCore.Win32;
 
 
@@ -56,6 +57,7 @@ namespace DaemonMaster
 
             //Add events
             EditAddWindow.DaemonSavedEvent += EditAddWindow_DaemonSavedEvent;
+            EditAddWindow.DaemonEditEvent += EditAddWindowOnDaemonEditEvent;
 
             //Fragt, wenn der RegKey nicht gesetzt ist, ob dieser gesetzt werden soll
             if (!AskToEnableInteractiveServices())
@@ -205,15 +207,15 @@ namespace DaemonMaster
 
             switch (ProcessManagement.CreateNewProcess(daemonInfo.ServiceName))
             {
-                case DaemonProcess.DaemonProcessState.Unsuccessful:
+                case ProcessManagement.DaemonProcessState.Unsuccessful:
                     MessageBox.Show(_resManager.GetString("start_was_unsuccessful"),
                          _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
-                case DaemonProcess.DaemonProcessState.Successful:
+                case ProcessManagement.DaemonProcessState.Successful:
                     MessageBox.Show(_resManager.GetString("start_was_successful"),
                         _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
-                case DaemonProcess.DaemonProcessState.AlreadyStopped:
+                case ProcessManagement.DaemonProcessState.AlreadyStopped:
                     MessageBox.Show(_resManager.GetString("the_selected_process_is_already_started"),
                         _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
@@ -229,18 +231,18 @@ namespace DaemonMaster
 
             switch (ProcessManagement.DeleteProcess(daemonInfo.ServiceName))
             {
-                case DaemonProcess.DaemonProcessState.Unsuccessful:
+                case ProcessManagement.DaemonProcessState.Unsuccessful:
                     MessageBoxResult result = MessageBox.Show(_resManager.GetString("stop_was_unsuccessful"),
                         _resManager.GetString("error"), MessageBoxButton.YesNo, MessageBoxImage.Error);
 
                     if (result == MessageBoxResult.Yes)
                         ProcessManagement.KillAndDeleteProcess(daemonInfo.ServiceName);
                     break;
-                case DaemonProcess.DaemonProcessState.Successful:
+                case ProcessManagement.DaemonProcessState.Successful:
                     MessageBox.Show(_resManager.GetString("stop_was_successful"),
                         _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
-                case DaemonProcess.DaemonProcessState.AlreadyStopped:
+                case ProcessManagement.DaemonProcessState.AlreadyStopped:
                     MessageBox.Show(_resManager.GetString("the_selected_process_does_not_exist"),
                         _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
@@ -287,8 +289,25 @@ namespace DaemonMaster
 
         private void OpenEditDaemonWindow(DaemonInfo daemonInfo)
         {
+            if (ServiceManagement.IsServiceRunning(daemonInfo.ServiceName))
+            {
+                MessageBoxResult result = MessageBox.Show(_resManager.GetString("you_must_stop_the_service_first"),
+                    _resManager.GetString("information"), MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    StopService(daemonInfo);
+                }
+                else
+                {
+                    return;
+                }
+            }
+
             EditAddWindow addProcessWindow = new EditAddWindow(daemonInfo);
             addProcessWindow.ShowDialog();
+
+
         }
 
 
@@ -332,25 +351,20 @@ namespace DaemonMaster
         {
             try
             {
-                switch (ServiceManagement.DeleteService(daemonInfo.ServiceName))
+                ServiceManagement.DeleteService(daemonInfo.ServiceName);
+                _processCollection.RemoveAt(listBoxDaemons.SelectedIndex);
+
+                MessageBox.Show(_resManager.GetString("the_service_deletion_was_successful"),
+                    _resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (ServiceNotStoppedException)
+            {
+                MessageBoxResult result = MessageBox.Show(_resManager.GetString("you_must_stop_the_service_first"),
+                    _resManager.GetString("information"), MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+                if (result == MessageBoxResult.Yes)
                 {
-                    case ServiceManagement.State.NotStopped:
-
-                        MessageBoxResult result = MessageBox.Show(_resManager.GetString("you_must_stop_the_service_first"), _resManager.GetString("information"), MessageBoxButton.YesNo, MessageBoxImage.Information);
-
-                        if (result == MessageBoxResult.Yes)
-                        {
-                            StopService(daemonInfo);
-                        }
-                        break;
-
-                    case ServiceManagement.State.Successful:
-
-                        _processCollection.RemoveAt(listBoxDaemons.SelectedIndex);
-
-                        MessageBox.Show(_resManager.GetString("the_service_deletion_was_successful"),
-                            _resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
-                        break;
+                    StopService(daemonInfo);
                 }
             }
             catch (Exception ex)
@@ -407,18 +421,28 @@ namespace DaemonMaster
         {
             if (ServiceManagement.CheckUI0DetectService())
             {
-                MessageBoxResult result = MessageBox.Show(_resManager.GetString("windows10_mouse_keyboard", CultureInfo.CurrentUICulture), _resManager.GetString("warning", CultureInfo.CurrentUICulture), MessageBoxButton.OKCancel, MessageBoxImage.Warning);
-                if (result == MessageBoxResult.OK)
+                //if its Windows 10 then showing a warning message
+                if (Environment.OSVersion.Version.Major == 10)
                 {
-                    NativeMethods.WinStationSwitchToServicesSession();
+                    MessageBoxResult result =
+                        MessageBox.Show(_resManager.GetString("windows10_mouse_keyboard", CultureInfo.CurrentUICulture),
+                            _resManager.GetString("warning", CultureInfo.CurrentUICulture), MessageBoxButton.OKCancel,
+                            MessageBoxImage.Warning);
+
+                    if (result == MessageBoxResult.Cancel)
+                        return;
                 }
+                //Switch to session 0
+                NativeMethods.WinStationSwitchToServicesSession();
             }
             else
             {
-                MessageBox.Show(_resManager.GetString("failed_start_UI0detect_service", CultureInfo.CurrentUICulture), _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    _resManager.GetString("failed_start_UI0detect_service", CultureInfo.CurrentUICulture),
+                    _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
-
 
         private void CheckForUpdates()
         {
@@ -439,6 +463,12 @@ namespace DaemonMaster
         private void EditAddWindow_DaemonSavedEvent(DaemonInfo daemonInfo) // Fügt Deamon Objekt der Liste hinzu
         {
             _processCollection.Add(daemonInfo);
+        }
+
+        //Replace the old info with the new
+        private void EditAddWindowOnDaemonEditEvent(DaemonInfo oldDaemonInfo, DaemonInfo newDaemonInfo)
+        {
+            _processCollection[_processCollection.IndexOf(oldDaemonInfo)] = newDaemonInfo;
         }
 
         #endregion

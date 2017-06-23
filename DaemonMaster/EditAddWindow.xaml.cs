@@ -42,11 +42,13 @@ namespace DaemonMaster
         //Erstellt ein Event 
         internal delegate void DaemonSavedDelegate(DaemonInfo daemon);
         internal static event DaemonSavedDelegate DaemonSavedEvent;
+        internal delegate void DaemonEditDelegate(DaemonInfo oldDaemonInfo, DaemonInfo newDaemonInfo);
+        internal static event DaemonEditDelegate DaemonEditEvent;
 
         private Daemon daemon = null;
+        private DaemonInfo _oldDaemonInfo = null;
 
         private readonly bool onEdit = false;
-
 
         public EditAddWindow()
         {
@@ -59,7 +61,7 @@ namespace DaemonMaster
         public EditAddWindow(DaemonInfo daemonInfo) : this() // This = Konstruktor davor wird auch ausgeführt (=> Ableitung vom Oberen)
         {
             textBoxServiceName.IsReadOnly = true;
-
+            _oldDaemonInfo = daemonInfo;
 
             try
             {
@@ -223,7 +225,7 @@ namespace DaemonMaster
                     try
                     {
                         ServiceManagement.CreateInteractiveService(daemon);
-                        SaveAllData(daemon);
+                        RegistryManagement.SaveInRegistry(daemon);
 
                         DaemonInfo daemonInfo = new DaemonInfo
                         {
@@ -253,7 +255,18 @@ namespace DaemonMaster
                 {
                     try
                     {
-                        SaveAllData(daemon);
+                        ServiceManagement.ChangeServiceConfig(daemon);
+                        RegistryManagement.SaveInRegistry(daemon);
+
+                        DaemonInfo newDaemonInfo = new DaemonInfo
+                        {
+                            ServiceName = daemon.ServiceName,
+                            DisplayName = daemon.DisplayName,
+                            FullPath = daemon.FullPath
+                        };
+
+                        //Replace the GUI Item with the new infos
+                        OnDaemonEditEvent(_oldDaemonInfo, newDaemonInfo);
                         this.Close();
                     }
                     catch (Exception ex)
@@ -271,12 +284,6 @@ namespace DaemonMaster
             }
         }
         #endregion
-
-        private static void SaveAllData(Daemon daemon)
-        {
-            RegistryManagement.SaveInRegistry(daemon);
-            ServiceManagement.ChangeCompleteServiceConfig(daemon);
-        }
 
 
 
@@ -305,6 +312,11 @@ namespace DaemonMaster
         private static void OnDaemonSavedEvent(DaemonInfo daemonInfo)
         {
             DaemonSavedEvent?.Invoke(daemonInfo);
+        }
+
+        private static void OnDaemonEditEvent(DaemonInfo oldDaemonInfo, DaemonInfo newDaemonInfo)
+        {
+            DaemonEditEvent?.Invoke(oldDaemonInfo, newDaemonInfo);
         }
     }
 }

@@ -10,10 +10,10 @@ namespace DaemonMasterCore.Win32
     //FROM PINVOKE.NET
     public static partial class NativeMethods
     {
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        public static extern IntPtr CreateService
+        [DllImport("advapi32.dll", EntryPoint = "CreateServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern ServiceHandle CreateService
         (
-            IntPtr hSCManager,
+            ServiceControlManager hSCManager,
             string lpServiceName,
             string lpDisplayName,
             uint dwDesiredAccess,
@@ -29,48 +29,51 @@ namespace DaemonMasterCore.Win32
         );
 
         [DllImport("advapi32.dll", EntryPoint = "OpenSCManagerW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
-        public static extern IntPtr OpenSCManager(string machineName, string databaseName, uint dwAccess);
+        public static extern ServiceControlManager OpenSCManager(string machineName, string databaseName, uint dwAccess);
 
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CloseServiceHandle(IntPtr hSCManager);
 
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport("advapi32.dll", EntryPoint = "StartServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool StartService(IntPtr hService, uint dwNumServiceArgs, string[] lpServiceArgVectors);
+        public static extern bool StartService(ServiceHandle hService, uint dwNumServiceArgs, string[] lpServiceArgVectors);
 
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        public static extern IntPtr OpenService(IntPtr hSCManager, string lpServiceName, uint dwDesiredAccess);
-
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool DeleteService(IntPtr hService);
+        [DllImport("advapi32.dll", EntryPoint = "OpenServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern ServiceHandle OpenService(ServiceControlManager hSCManager, string lpServiceName, uint dwDesiredAccess);
 
         [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern bool QueryServiceStatusEx(IntPtr serviceHandle, int infoLevel, IntPtr buffer, int bufferSize, out int bytesNeeded);
-
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool ChangeServiceConfig2(IntPtr hService, uint dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_DESCRIPTION lpInfo);
+        public static extern bool DeleteService(ServiceHandle hService);
 
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern bool QueryServiceStatusEx(ServiceHandle hService, int infoLevel, IntPtr buffer, int bufferSize, out int bytesNeeded);
+
+        [DllImport("advapi32.dll", EntryPoint = "ChangeServiceConfig2W", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool ChangeServiceConfig2(IntPtr hService, uint dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_CONFIG_DELAYED_AUTO_START_INFO lpInfo);
+        public static extern bool ChangeServiceConfig2(ServiceHandle hService, uint dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_DESCRIPTION lpInfo);
 
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport("advapi32.dll", EntryPoint = "ChangeServiceConfig2W", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool ChangeServiceConfig(IntPtr hService, UInt32 dwServiceType, UInt32 dwStartType, UInt32 dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, string lpdwTagId, string lpDependencies, string lpServiceStartName, string lpPassword, string lpDisplayName);
+        public static extern bool ChangeServiceConfig2(ServiceHandle hService, uint dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_CONFIG_DELAYED_AUTO_START_INFO lpInfo);
 
+        [DllImport("advapi32.dll", EntryPoint = "ChangeServiceConfigW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ChangeServiceConfig(ServiceHandle hService, UInt32 dwServiceType, UInt32 dwStartType, UInt32 dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, string lpdwTagId, string lpDependencies, string lpServiceStartName, string lpPassword, string lpDisplayName);
+
+        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ControlService(ServiceHandle hService, SERVICE_CONTROL dwControl, ref SERVICE_STATUS lpServiceStatus);
 
         //---------------------//
 
         public const UInt32 SERVICE_NO_CHANGE = 0xffffffff;
 
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct SERVICE_STATUS_PROCESS
         {
             public int serviceType;
-            public int currentState;
+            public SERVICE_STATE currentState;
             public int controlsAccepted;
             public int win32ExitCode;
             public int serviceSpecificExitCode;
@@ -80,13 +83,13 @@ namespace DaemonMasterCore.Win32
             public int serviceFlags;
         }
 
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct SERVICE_DESCRIPTION
         {
             public string lpDescription;
         }
 
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct SERVICE_CONFIG_DELAYED_AUTO_START_INFO
         {
             public bool delayedStart;
@@ -371,6 +374,50 @@ namespace DaemonMasterCore.Win32
             SERVICE_START_PENDING = 0x00000002,
             SERVICE_STOP_PENDING = 0x00000003,
             SERVICE_STOPPED = 0x00000001
+        }
+
+        [Flags]
+        public enum SERVICE_CONTROL : uint
+        {
+            STOP = 0x00000001,
+            PAUSE = 0x00000002,
+            CONTINUE = 0x00000003,
+            INTERROGATE = 0x00000004,
+            SHUTDOWN = 0x00000005,
+            PARAMCHANGE = 0x00000006,
+            NETBINDADD = 0x00000007,
+            NETBINDREMOVE = 0x00000008,
+            NETBINDENABLE = 0x00000009,
+            NETBINDDISABLE = 0x0000000A,
+            DEVICEEVENT = 0x0000000B,
+            HARDWAREPROFILECHANGE = 0x0000000C,
+            POWEREVENT = 0x0000000D,
+            SESSIONCHANGE = 0x0000000E
+        }
+
+        [Flags]
+        public enum SERVICE_ACCEPT : uint
+        {
+            STOP = 0x00000001,
+            PAUSE_CONTINUE = 0x00000002,
+            SHUTDOWN = 0x00000004,
+            PARAMCHANGE = 0x00000008,
+            NETBINDCHANGE = 0x00000010,
+            HARDWAREPROFILECHANGE = 0x00000020,
+            POWEREVENT = 0x00000040,
+            SESSIONCHANGE = 0x00000080,
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        public struct SERVICE_STATUS
+        {
+            public int serviceType;
+            public int currentState;
+            public int controlsAccepted;
+            public int win32ExitCode;
+            public int serviceSpecificExitCode;
+            public int checkPoint;
+            public int waitHint;
         }
 
         [Flags]

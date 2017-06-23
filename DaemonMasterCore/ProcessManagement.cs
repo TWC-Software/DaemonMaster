@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: PROCESS MANAGEMENT FILE
+//  DaemonMaster: ProcessManagement
 //  
 //  This file is part of DeamonMaster.
 // 
@@ -32,15 +32,14 @@ namespace DaemonMasterCore
         /// </summary>
         /// <param name="serviceName"></param>
         /// <returns></returns>
-        public static DaemonProcess GetProcessByName(string serviceName)
-        {
-            if (IsProcessAlreadyThere(serviceName))
-            {
-                return Processes[serviceName];
-            }
-
-            return null;
-        }
+        //public static DaemonProcess GetProcessByName(string serviceName)
+        //{
+        //    if (IsProcessAlreadyThere(serviceName))
+        //    {
+        //        return Processes[serviceName];
+        //    }
+        //    return null;
+        //}
 
         /// <summary>
         /// Check if the Process with the given service name already exists
@@ -57,24 +56,24 @@ namespace DaemonMasterCore
         /// </summary>
         /// <param name="serviceName"></param>
         /// <returns></returns>
-        public static DaemonProcess.DaemonProcessState CreateNewProcess(string serviceName)
+        public static DaemonProcessState CreateNewProcess(string serviceName)
         {
             if (IsProcessAlreadyThere(serviceName))
-                return DaemonProcess.DaemonProcessState.AlreadyStarted;
+                return DaemonProcessState.AlreadyStarted;
 
             DaemonProcess process = new DaemonProcess(serviceName);
-            DaemonProcess.DaemonProcessState result = process.StartProcess();
+            DaemonProcessState result = process.StartProcess();
 
             switch (result)
             {
-                case DaemonProcess.DaemonProcessState.AlreadyStarted:
+                case DaemonProcessState.AlreadyStarted:
                     break;
 
-                case DaemonProcess.DaemonProcessState.Successful:
+                case DaemonProcessState.Successful:
                     Processes.Add(serviceName, process);
                     break;
 
-                case DaemonProcess.DaemonProcessState.Unsuccessful:
+                case DaemonProcessState.Unsuccessful:
                     break;
             }
 
@@ -85,25 +84,25 @@ namespace DaemonMasterCore
         /// Dispose the process with the given service name
         /// </summary>
         /// <param name="serviceName"></param>
-        public static DaemonProcess.DaemonProcessState DeleteProcess(string serviceName)
+        public static DaemonProcessState DeleteProcess(string serviceName)
         {
             if (!IsProcessAlreadyThere(serviceName))
-                return DaemonProcess.DaemonProcessState.AlreadyStopped;
+                return DaemonProcessState.AlreadyStopped;
 
             DaemonProcess process = Processes[serviceName];
-            DaemonProcess.DaemonProcessState result = process.StopProcess();
+            DaemonProcessState result = process.StopProcess();
 
             switch (result)
             {
-                case DaemonProcess.DaemonProcessState.AlreadyStopped:
+                case DaemonProcessState.AlreadyStopped:
                     break;
 
-                case DaemonProcess.DaemonProcessState.Successful:
+                case DaemonProcessState.Successful:
                     process.Dispose();
                     Processes.Remove(serviceName);
                     break;
 
-                case DaemonProcess.DaemonProcessState.Unsuccessful:
+                case DaemonProcessState.Unsuccessful:
                     break;
             }
 
@@ -124,6 +123,32 @@ namespace DaemonMasterCore
             Processes[serviceName].Dispose();
             Processes.Remove(serviceName);
             return true;
+        }
+
+        /// <summary>
+        /// Pause the process
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <returns></returns>
+        public static bool PauseProcess(string serviceName)
+        {
+            if (!IsProcessAlreadyThere(serviceName))
+                return false;
+
+            return Processes[serviceName].PauseProcess();
+        }
+
+        /// <summary>
+        /// Resume the process
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <returns></returns>
+        public static bool ResumeProcess(string serviceName)
+        {
+            if (!IsProcessAlreadyThere(serviceName))
+                return false;
+
+            return Processes[serviceName].ResumeProcess();
         }
 
         /// <summary>
@@ -157,6 +182,18 @@ namespace DaemonMasterCore
         public static bool IsDictionaryEmpty()
         {
             return Processes.Count > 1;
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                              Other                                                   //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public enum DaemonProcessState
+        {
+            AlreadyStopped,
+            AlreadyStarted,
+            Successful,
+            Unsuccessful,
         }
     }
 }

@@ -51,35 +51,5 @@ namespace DaemonMasterCore
 
             throw new Exception("Can not get the ServiceName");
         }
-
-        //http://www.pinvoke.net/default.aspx/advapi32.QueryServiceStatusEx
-        public static NativeMethods.SERVICE_STATUS_PROCESS QueryServiceStatusEx(IntPtr svManager)
-        {
-            IntPtr buffer = IntPtr.Zero;
-            int size = 0;
-
-            try
-            {
-                NativeMethods.QueryServiceStatusEx(svManager, 0, buffer, size, out size);
-                //Reserviere Speicher in der größe von size
-                buffer = Marshal.AllocHGlobal(size);
-
-                if (!NativeMethods.QueryServiceStatusEx(svManager, 0, buffer, size, out size))
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
-
-
-                return (NativeMethods.SERVICE_STATUS_PROCESS)Marshal.PtrToStructure(buffer, typeof(NativeMethods.SERVICE_STATUS_PROCESS));
-            }
-            catch (Exception)
-            {
-                throw new NotImplementedException();
-            }
-            finally
-            {
-                //Gebe Speicher, wenn genutzt, wieder frei
-                if (!buffer.Equals(IntPtr.Zero))
-                    Marshal.FreeHGlobal(buffer);
-            }
-        }
     }
 }
