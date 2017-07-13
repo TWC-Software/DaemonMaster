@@ -20,7 +20,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace DaemonMasterCore.Win32
+namespace DaemonMasterCore.Win32.PInvoke
 {
     public static partial class NativeMethods
     {

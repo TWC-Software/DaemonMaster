@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DaemonMasterCore.Win32
+namespace DaemonMasterCore.Win32.PInvoke
 {
     //FROM PINVOKE.NET
     public static partial class NativeMethods
@@ -19,7 +19,7 @@ namespace DaemonMasterCore.Win32
             SERVICE_ACCESS dwDesiredAccess,
             SERVICE_TYPE dwServiceType,
             SERVICE_START dwStartType,
-            SERVICE_ERROR_CONTROLE dwErrorControl,
+            SERVICE_ERROR_CONTROL dwErrorControl,
             string lpBinaryPathName,
             string lpLoadOrderGroup,
             string lpdwTagId,
@@ -31,6 +31,9 @@ namespace DaemonMasterCore.Win32
         [DllImport(DLLFiles.ADVAPI32, EntryPoint = "OpenSCManagerW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern ServiceControlManager OpenSCManager(string machineName, string databaseName, SCM_ACCESS dwAccess);
 
+        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "OpenServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        internal static extern ServiceHandle OpenService(ServiceControlManager hSCManager, string lpServiceName, SERVICE_ACCESS dwDesiredAccess);
+
         [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool CloseServiceHandle(IntPtr hSCManager);
@@ -39,33 +42,49 @@ namespace DaemonMasterCore.Win32
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool StartService(ServiceHandle hService, uint dwNumServiceArgs, string[] lpServiceArgVectors);
 
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "OpenServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern ServiceHandle OpenService(ServiceControlManager hSCManager, string lpServiceName, SERVICE_ACCESS dwDesiredAccess);
+        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool ControlService(ServiceHandle hService, SERVICE_CONTROL dwControl, ref SERVICE_STATUS lpServiceStatus);
 
         [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool DeleteService(ServiceHandle hService);
 
         [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern bool QueryServiceStatusEx(ServiceHandle hService, DW_INFO_LEVEL infoLevel, IntPtr buffer, int bufferSize, out int bytesNeeded);
-
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "ChangeServiceConfig2W", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool ChangeServiceConfig2(ServiceHandle hService, DW_INFO_LEVEL dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_DESCRIPTION lpInfo);
-
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "ChangeServiceConfig2W", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool ChangeServiceConfig2(ServiceHandle hService, DW_INFO_LEVEL dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_CONFIG_DELAYED_AUTO_START_INFO lpInfo);
+        internal static extern bool QueryServiceStatusEx(ServiceHandle hService, int infoLevel, IntPtr buffer, int bufferSize, out int bytesNeeded);
 
         [DllImport(DLLFiles.ADVAPI32, EntryPoint = "ChangeServiceConfigW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool ChangeServiceConfig(ServiceHandle hService, SERVICE_TYPE dwServiceType, SERVICE_START dwStartType, SERVICE_ERROR_CONTROLE dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, string lpdwTagId, string lpDependencies, string lpServiceStartName, string lpPassword, string lpDisplayName);
+        internal static extern bool ChangeServiceConfig(ServiceHandle hService, SERVICE_TYPE dwServiceType, SERVICE_START dwStartType, SERVICE_ERROR_CONTROL dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, string lpdwTagId, string lpDependencies, string lpServiceStartName, string lpPassword, string lpDisplayName);
 
-        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "ChangeServiceConfig2W", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool ControlService(ServiceHandle hService, SERVICE_CONTROL dwControl, ref SERVICE_STATUS lpServiceStatus);
+        internal static extern bool ChangeServiceConfig2(ServiceHandle hService, INFO_LEVEL dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_DESCRIPTION lpInfo);
+
+        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "ChangeServiceConfig2W", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool ChangeServiceConfig2(ServiceHandle hService, INFO_LEVEL dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_CONFIG_DELAYED_AUTO_START_INFO lpInfo);
 
         //---------------------//
+
+        /// <summary>
+        /// Needed for QueryServiceStatusEx as infoLevel
+        /// </summary>
+        public const int SC_STATUS_PROCESS_INFO = 0x0;
+
+        //---------------------//
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        public struct SERVICE_STATUS
+        {
+            public int serviceType;
+            public int currentState;
+            public int controlsAccepted;
+            public int win32ExitCode;
+            public int serviceSpecificExitCode;
+            public int checkPoint;
+            public int waitHint;
+        }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct SERVICE_STATUS_PROCESS
@@ -95,7 +114,63 @@ namespace DaemonMasterCore.Win32
 
         //---------------------//
 
+        /// <summary>
+        /// Access mask 
+        /// </summary>
+        [Flags]
+        public enum ACCESS_MASK : uint
+        {
+            DELETE = 0x00010000,
+            READ_CONTROL = 0x00020000,
+            WRITE_DAC = 0x00040000,
+            WRITE_OWNER = 0x00080000,
+            SYNCHRONIZE = 0x00100000,
 
+            STANDARD_RIGHTS_REQUIRED = 0x000F0000,
+
+            STANDARD_RIGHTS_READ = 0x00020000,
+            STANDARD_RIGHTS_WRITE = 0x00020000,
+            STANDARD_RIGHTS_EXECUTE = 0x00020000,
+
+            STANDARD_RIGHTS_ALL = 0x001F0000,
+
+            SPECIFIC_RIGHTS_ALL = 0x0000FFFF,
+
+            ACCESS_SYSTEM_SECURITY = 0x01000000,
+
+            MAXIMUM_ALLOWED = 0x02000000,
+
+            GENERIC_READ = 0x80000000,
+            GENERIC_WRITE = 0x40000000,
+            GENERIC_EXECUTE = 0x20000000,
+            GENERIC_ALL = 0x10000000,
+
+            DESKTOP_READOBJECTS = 0x00000001,
+            DESKTOP_CREATEWINDOW = 0x00000002,
+            DESKTOP_CREATEMENU = 0x00000004,
+            DESKTOP_HOOKCONTROL = 0x00000008,
+            DESKTOP_JOURNALRECORD = 0x00000010,
+            DESKTOP_JOURNALPLAYBACK = 0x00000020,
+            DESKTOP_ENUMERATE = 0x00000040,
+            DESKTOP_WRITEOBJECTS = 0x00000080,
+            DESKTOP_SWITCHDESKTOP = 0x00000100,
+
+            WINSTA_ENUMDESKTOPS = 0x00000001,
+            WINSTA_READATTRIBUTES = 0x00000002,
+            WINSTA_ACCESSCLIPBOARD = 0x00000004,
+            WINSTA_CREATEDESKTOP = 0x00000008,
+            WINSTA_WRITEATTRIBUTES = 0x00000010,
+            WINSTA_ACCESSGLOBALATOMS = 0x00000020,
+            WINSTA_EXITWINDOWS = 0x00000040,
+            WINSTA_ENUMERATE = 0x00000100,
+            WINSTA_READSCREEN = 0x00000200,
+
+            WINSTA_ALL_ACCESS = 0x0000037F
+        }
+
+        /// <summary>
+        /// Access to the SCManager
+        /// </summary>
         [Flags]
         public enum SCM_ACCESS : uint
         {
@@ -160,8 +235,7 @@ namespace DaemonMasterCore.Win32
         }
 
         /// <summary>
-        /// Access to the service. Before granting the requested access, the
-        /// system checks the access token of the calling process. 
+        /// Access to the service
         /// </summary>
         [Flags]
         public enum SERVICE_ACCESS : uint
@@ -284,7 +358,44 @@ namespace DaemonMasterCore.Win32
         }
 
         /// <summary>
-        /// Service types.
+        /// Service control (like stop, pause, etc)
+        /// </summary>
+        [Flags]
+        public enum SERVICE_CONTROL : uint
+        {
+            STOP = 0x00000001,
+            PAUSE = 0x00000002,
+            CONTINUE = 0x00000003,
+            INTERROGATE = 0x00000004,
+            SHUTDOWN = 0x00000005,
+            PARAMCHANGE = 0x00000006,
+            NETBINDADD = 0x00000007,
+            NETBINDREMOVE = 0x00000008,
+            NETBINDENABLE = 0x00000009,
+            NETBINDDISABLE = 0x0000000A,
+            DEVICEEVENT = 0x0000000B,
+            HARDWAREPROFILECHANGE = 0x0000000C,
+            POWEREVENT = 0x0000000D,
+            SESSIONCHANGE = 0x0000000E
+        }
+
+        /// <summary>
+        /// Info level for ChangeServiceConfig2
+        /// </summary>
+        [Flags]
+        public enum INFO_LEVEL : uint
+        {
+            SERVICE_CONFIG_DESCRIPTION = 0x00000001,
+            SERVICE_CONFIG_FAILURE_ACTIONS = 0x00000002,
+            SERVICE_CONFIG_DELAYED_AUTO_START_INFO = 0x00000003,
+            SERVICE_CONFIG_FAILURE_ACTIONS_FLAG = 0x00000004,
+            SERVICE_CONFIG_SERVICE_SID_INFO = 0x00000005,
+            SERVICE_CONFIG_REQUIRED_PRIVILEGES_INFO = 0x00000006,
+            SERVICE_CONFIG_PRESHUTDOWN_INFO = 0x00000007
+        }
+
+        /// <summary>
+        /// Service types
         /// </summary>
         [Flags]
         public enum SERVICE_TYPE : uint
@@ -320,6 +431,7 @@ namespace DaemonMasterCore.Win32
         /// <summary>
         /// Service start options
         /// </summary>
+        [Flags]
         public enum SERVICE_START : uint
         {
             /// <summary>
@@ -355,8 +467,11 @@ namespace DaemonMasterCore.Win32
             SERVICE_DISABLED = 0x00000004,
         }
 
+        /// <summary>
+        /// Service error control
+        /// </summary>
         [Flags]
-        public enum SERVICE_ERROR_CONTROLE : uint
+        public enum SERVICE_ERROR_CONTROL : uint
         {
             SERVICE_NO_CHANGE = 0xffffffff,
 
@@ -366,6 +481,9 @@ namespace DaemonMasterCore.Win32
             SERVICE_ERROR_SEVERE = 0x00000002
         }
 
+        /// <summary>
+        /// Service states
+        /// </summary>
         [Flags]
         public enum SERVICE_STATE : uint
         {
@@ -376,113 +494,6 @@ namespace DaemonMasterCore.Win32
             SERVICE_START_PENDING = 0x00000002,
             SERVICE_STOP_PENDING = 0x00000003,
             SERVICE_STOPPED = 0x00000001
-        }
-
-        [Flags]
-        public enum SERVICE_CONTROL : uint
-        {
-            STOP = 0x00000001,
-            PAUSE = 0x00000002,
-            CONTINUE = 0x00000003,
-            INTERROGATE = 0x00000004,
-            SHUTDOWN = 0x00000005,
-            PARAMCHANGE = 0x00000006,
-            NETBINDADD = 0x00000007,
-            NETBINDREMOVE = 0x00000008,
-            NETBINDENABLE = 0x00000009,
-            NETBINDDISABLE = 0x0000000A,
-            DEVICEEVENT = 0x0000000B,
-            HARDWAREPROFILECHANGE = 0x0000000C,
-            POWEREVENT = 0x0000000D,
-            SESSIONCHANGE = 0x0000000E
-        }
-
-        [Flags]
-        public enum SERVICE_ACCEPT : uint
-        {
-            STOP = 0x00000001,
-            PAUSE_CONTINUE = 0x00000002,
-            SHUTDOWN = 0x00000004,
-            PARAMCHANGE = 0x00000008,
-            NETBINDCHANGE = 0x00000010,
-            HARDWAREPROFILECHANGE = 0x00000020,
-            POWEREVENT = 0x00000040,
-            SESSIONCHANGE = 0x00000080,
-        }
-
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct SERVICE_STATUS
-        {
-            public int serviceType;
-            public int currentState;
-            public int controlsAccepted;
-            public int win32ExitCode;
-            public int serviceSpecificExitCode;
-            public int checkPoint;
-            public int waitHint;
-        }
-
-        [Flags]
-        public enum ACCESS_MASK : uint
-        {
-            DELETE = 0x00010000,
-            READ_CONTROL = 0x00020000,
-            WRITE_DAC = 0x00040000,
-            WRITE_OWNER = 0x00080000,
-            SYNCHRONIZE = 0x00100000,
-
-            STANDARD_RIGHTS_REQUIRED = 0x000F0000,
-
-            STANDARD_RIGHTS_READ = 0x00020000,
-            STANDARD_RIGHTS_WRITE = 0x00020000,
-            STANDARD_RIGHTS_EXECUTE = 0x00020000,
-
-            STANDARD_RIGHTS_ALL = 0x001F0000,
-
-            SPECIFIC_RIGHTS_ALL = 0x0000FFFF,
-
-            ACCESS_SYSTEM_SECURITY = 0x01000000,
-
-            MAXIMUM_ALLOWED = 0x02000000,
-
-            GENERIC_READ = 0x80000000,
-            GENERIC_WRITE = 0x40000000,
-            GENERIC_EXECUTE = 0x20000000,
-            GENERIC_ALL = 0x10000000,
-
-            DESKTOP_READOBJECTS = 0x00000001,
-            DESKTOP_CREATEWINDOW = 0x00000002,
-            DESKTOP_CREATEMENU = 0x00000004,
-            DESKTOP_HOOKCONTROL = 0x00000008,
-            DESKTOP_JOURNALRECORD = 0x00000010,
-            DESKTOP_JOURNALPLAYBACK = 0x00000020,
-            DESKTOP_ENUMERATE = 0x00000040,
-            DESKTOP_WRITEOBJECTS = 0x00000080,
-            DESKTOP_SWITCHDESKTOP = 0x00000100,
-
-            WINSTA_ENUMDESKTOPS = 0x00000001,
-            WINSTA_READATTRIBUTES = 0x00000002,
-            WINSTA_ACCESSCLIPBOARD = 0x00000004,
-            WINSTA_CREATEDESKTOP = 0x00000008,
-            WINSTA_WRITEATTRIBUTES = 0x00000010,
-            WINSTA_ACCESSGLOBALATOMS = 0x00000020,
-            WINSTA_EXITWINDOWS = 0x00000040,
-            WINSTA_ENUMERATE = 0x00000100,
-            WINSTA_READSCREEN = 0x00000200,
-
-            WINSTA_ALL_ACCESS = 0x0000037F
-        }
-
-        [Flags]
-        public enum DW_INFO_LEVEL : uint
-        {
-            SERVICE_CONFIG_DESCRIPTION = 0x00000001,
-            SERVICE_CONFIG_FAILURE_ACTIONS = 0x00000002,
-            SERVICE_CONFIG_DELAYED_AUTO_START_INFO = 0x00000003,
-            SERVICE_CONFIG_FAILURE_ACTIONS_FLAG = 0x00000004,
-            SERVICE_CONFIG_SERVICE_SID_INFO = 0x00000005,
-            SERVICE_CONFIG_REQUIRED_PRIVILEGES_INFO = 0x00000006,
-            SERVICE_CONFIG_PRESHUTDOWN_INFO = 0x00000007
         }
     }
 }

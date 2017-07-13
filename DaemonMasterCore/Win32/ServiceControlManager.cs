@@ -17,6 +17,7 @@
 //   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
+using DaemonMasterCore.Win32.PInvoke;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -54,7 +55,7 @@ namespace DaemonMasterCore.Win32
             NativeMethods.SERVICE_ACCESS desiredAccess,
             NativeMethods.SERVICE_TYPE serviceType,
             NativeMethods.SERVICE_START startType,
-            NativeMethods.SERVICE_ERROR_CONTROLE errorControl,
+            NativeMethods.SERVICE_ERROR_CONTROL errorControl,
             string binaryPathName,
             string loadOrderGroup,
             string tagId,

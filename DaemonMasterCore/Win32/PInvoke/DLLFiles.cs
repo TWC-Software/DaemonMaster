@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DaemonMasterCore.Win32
+namespace DaemonMasterCore.Win32.PInvoke
 {
     public class DLLFiles
     {

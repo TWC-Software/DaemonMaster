@@ -16,6 +16,7 @@
 //   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
+using DaemonMasterCore.Win32.PInvoke;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -61,7 +62,7 @@ namespace DaemonMasterCore.Win32
             serviceDescription.lpDescription = description;
 
             //Set the description of the service
-            if (!NativeMethods.ChangeServiceConfig2(this, NativeMethods.DW_INFO_LEVEL.SERVICE_CONFIG_DESCRIPTION, ref serviceDescription))
+            if (!NativeMethods.ChangeServiceConfig2(this, NativeMethods.INFO_LEVEL.SERVICE_CONFIG_DESCRIPTION, ref serviceDescription))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
@@ -72,7 +73,7 @@ namespace DaemonMasterCore.Win32
             serviceDelayedStart.delayedStart = enable;
 
             //Set the description of the service
-            if (!NativeMethods.ChangeServiceConfig2(this, NativeMethods.DW_INFO_LEVEL.SERVICE_CONFIG_DELAYED_AUTO_START_INFO,
+            if (!NativeMethods.ChangeServiceConfig2(this, NativeMethods.INFO_LEVEL.SERVICE_CONFIG_DELAYED_AUTO_START_INFO,
                 ref serviceDelayedStart))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
@@ -80,7 +81,7 @@ namespace DaemonMasterCore.Win32
         public void ChangeConfig(NativeMethods.SERVICE_START startType, string displayName)
         {
             if (!NativeMethods.ChangeServiceConfig(this, NativeMethods.SERVICE_TYPE.SERVICE_NO_CHANGE, startType,
-                NativeMethods.SERVICE_ERROR_CONTROLE.SERVICE_NO_CHANGE, null, null, null, null/*String.Concat(daemon.DependOnService)*/, null, null, displayName))
+                NativeMethods.SERVICE_ERROR_CONTROL.SERVICE_NO_CHANGE, null, null, null, null/*String.Concat(daemon.DependOnService)*/, null, null, displayName))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
@@ -92,11 +93,11 @@ namespace DaemonMasterCore.Win32
 
             try
             {
-                NativeMethods.QueryServiceStatusEx(this, 0, buffer, size, out size);
+                NativeMethods.QueryServiceStatusEx(this, NativeMethods.SC_STATUS_PROCESS_INFO, buffer, size, out size);
                 //Reserviere Speicher in der gr��e von size
                 buffer = Marshal.AllocHGlobal(size);
 
-                if (!NativeMethods.QueryServiceStatusEx(this, 0, buffer, size, out size))
+                if (!NativeMethods.QueryServiceStatusEx(this, NativeMethods.SC_STATUS_PROCESS_INFO, buffer, size, out size))
                     throw new Win32Exception(Marshal.GetLastWin32Error());
 
 

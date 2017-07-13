@@ -21,6 +21,7 @@ using DaemonMasterCore.Win32;
 using System;
 using System.Diagnostics;
 using System.Threading;
+using DaemonMasterCore.Win32.PInvoke;
 using NLog;
 
 namespace DaemonMasterCore
@@ -213,11 +214,11 @@ namespace DaemonMasterCore
 
             if (useCtrlC)
             {
-                return NativeMethods.GenerateConsoleCtrlEvent((uint)NativeMethods.CtrlEvent.CTRL_C_EVENT, (uint)_process.Id);
+                return NativeMethods.GenerateConsoleCtrlEvent(NativeMethods.CtrlEvent.CTRL_C_EVENT, (uint)_process.Id);
             }
             else
             {
-                return NativeMethods.GenerateConsoleCtrlEvent((uint)NativeMethods.CtrlEvent.CTRL_BREAK_EVENT, (uint)_process.Id);
+                return NativeMethods.GenerateConsoleCtrlEvent(NativeMethods.CtrlEvent.CTRL_BREAK_EVENT, (uint)_process.Id);
             }
         }
 

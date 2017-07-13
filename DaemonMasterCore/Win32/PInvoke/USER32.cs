@@ -1,13 +1,14 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace DaemonMasterCore.Win32
+namespace DaemonMasterCore.Win32.PInvoke
 {
     //FROM PINVOKE
     public static partial class NativeMethods
     {
+        [Obsolete("Not needed anymore!")]
         [DllImport(DLLFiles.USER32, SetLastError = true, CharSet = CharSet.Auto)]
-        public static extern IntPtr PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+        public static extern IntPtr PostMessage(IntPtr hWnd, uint Msg, wParam wParam, IntPtr lParam);
 
         public const Int32 _SYSCOMMAND = 0x0112;
 

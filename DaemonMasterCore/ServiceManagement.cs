@@ -19,6 +19,7 @@
 
 using DaemonMasterCore.Exceptions;
 using DaemonMasterCore.Win32;
+using DaemonMasterCore.Win32.PInvoke;
 using System;
 using System.IO;
 using System.ServiceProcess;
@@ -61,7 +62,7 @@ namespace DaemonMasterCore
                     NativeMethods.SERVICE_TYPE.SERVICE_INTERACTIVE_PROCESS |
                     NativeMethods.SERVICE_TYPE.SERVICE_WIN32_OWN_PROCESS,
                     daemon.StartType,
-                    NativeMethods.SERVICE_ERROR_CONTROLE.SERVICE_ERROR_NORMAL,
+                    NativeMethods.SERVICE_ERROR_CONTROL.SERVICE_ERROR_NORMAL,
                     DaemonMasterServicePath + DaemonMasterServiceFile + DaemonMasterServiceParameter,
                     null,
                     null,

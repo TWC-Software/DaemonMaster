@@ -16,6 +16,7 @@
 //   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
+using DaemonMasterCore.Win32.PInvoke;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;

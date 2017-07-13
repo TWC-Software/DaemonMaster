@@ -17,14 +17,11 @@
 //   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
+using DaemonMasterCore.Win32.PInvoke;
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Security.AccessControl;
 using System.ServiceProcess;
-using DaemonMasterCore.Win32;
 
 namespace DaemonMasterCore
 {

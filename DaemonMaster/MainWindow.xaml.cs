@@ -18,18 +18,16 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
+using AutoUpdaterDotNET;
+using DaemonMasterCore;
+using DaemonMasterCore.Exceptions;
+using DaemonMasterCore.Win32.PInvoke;
 using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Reflection;
 using System.Resources;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using DaemonMasterCore;
-using AutoUpdaterDotNET;
-using DaemonMasterCore.Exceptions;
-using DaemonMasterCore.Win32;
 
 
 namespace DaemonMaster

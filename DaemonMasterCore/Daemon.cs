@@ -18,10 +18,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
+using DaemonMasterCore.Win32.PInvoke;
 using System;
-using Newtonsoft.Json;
-using System.Windows.Media;
-using DaemonMasterCore.Win32;
 
 namespace DaemonMasterCore
 {

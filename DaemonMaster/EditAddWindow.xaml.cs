@@ -29,6 +29,7 @@ using System.Windows;
 using DaemonMasterCore;
 using DaemonMasterCore.Win32;
 using Microsoft.Win32;
+using DaemonMasterCore.Win32.PInvoke;
 
 namespace DaemonMaster
 {
