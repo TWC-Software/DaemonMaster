@@ -61,7 +61,7 @@ namespace DaemonMasterCore.Win32
             serviceDescription.lpDescription = description;
 
             //Set the description of the service
-            if (!NativeMethods.ChangeServiceConfig2(this, (uint)NativeMethods.DW_INFO_LEVEL.SERVICE_CONFIG_DESCRIPTION, ref serviceDescription))
+            if (!NativeMethods.ChangeServiceConfig2(this, NativeMethods.DW_INFO_LEVEL.SERVICE_CONFIG_DESCRIPTION, ref serviceDescription))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
@@ -72,15 +72,15 @@ namespace DaemonMasterCore.Win32
             serviceDelayedStart.delayedStart = enable;
 
             //Set the description of the service
-            if (!NativeMethods.ChangeServiceConfig2(this, (uint)NativeMethods.DW_INFO_LEVEL.SERVICE_CONFIG_DELAYED_AUTO_START_INFO,
+            if (!NativeMethods.ChangeServiceConfig2(this, NativeMethods.DW_INFO_LEVEL.SERVICE_CONFIG_DELAYED_AUTO_START_INFO,
                 ref serviceDelayedStart))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
         public void ChangeConfig(NativeMethods.SERVICE_START startType, string displayName)
         {
-            if (!NativeMethods.ChangeServiceConfig(this, NativeMethods.SERVICE_NO_CHANGE, (uint)startType,
-                NativeMethods.SERVICE_NO_CHANGE, null, null, null, null/*String.Concat(daemon.DependOnService)*/, null, null, displayName))
+            if (!NativeMethods.ChangeServiceConfig(this, NativeMethods.SERVICE_TYPE.SERVICE_NO_CHANGE, startType,
+                NativeMethods.SERVICE_ERROR_CONTROLE.SERVICE_NO_CHANGE, null, null, null, null/*String.Concat(daemon.DependOnService)*/, null, null, displayName))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 

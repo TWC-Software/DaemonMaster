@@ -60,6 +60,7 @@
     <Compile Include="JsonManagement.cs" />
     <Compile Include="DaemonInfo.cs" />
     <Compile Include="ProcessManagement.cs" />
+    <Compile Include="Win32\DLLFiles.cs" />
     <Compile Include="Win32\ServiceControlManager.cs" />
     <Compile Include="Win32\ServiceHandle.cs" />
     <Compile Include="Win32\ThreadHandle.cs" />

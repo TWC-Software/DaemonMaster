@@ -24,7 +24,7 @@ namespace DaemonMasterCore.Win32
 {
     public static partial class NativeMethods
     {
-        [DllImport("winsta.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport(DLLFiles.WINSTA, SetLastError = true, CharSet = CharSet.Auto)]
         public static extern void WinStationSwitchToServicesSession();
     }
 }

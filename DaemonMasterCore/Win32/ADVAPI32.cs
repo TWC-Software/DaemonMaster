@@ -10,16 +10,16 @@ namespace DaemonMasterCore.Win32
     //FROM PINVOKE.NET
     public static partial class NativeMethods
     {
-        [DllImport("advapi32.dll", EntryPoint = "CreateServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "CreateServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern ServiceHandle CreateService
         (
             ServiceControlManager hSCManager,
             string lpServiceName,
             string lpDisplayName,
-            uint dwDesiredAccess,
-            uint dwServiceType,
-            uint dwStartType,
-            uint dwErrorControl,
+            SERVICE_ACCESS dwDesiredAccess,
+            SERVICE_TYPE dwServiceType,
+            SERVICE_START dwStartType,
+            SERVICE_ERROR_CONTROLE dwErrorControl,
             string lpBinaryPathName,
             string lpLoadOrderGroup,
             string lpdwTagId,
@@ -28,46 +28,44 @@ namespace DaemonMasterCore.Win32
             string lpPassword
         );
 
-        [DllImport("advapi32.dll", EntryPoint = "OpenSCManagerW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern ServiceControlManager OpenSCManager(string machineName, string databaseName, uint dwAccess);
+        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "OpenSCManagerW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        internal static extern ServiceControlManager OpenSCManager(string machineName, string databaseName, SCM_ACCESS dwAccess);
 
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool CloseServiceHandle(IntPtr hSCManager);
 
-        [DllImport("advapi32.dll", EntryPoint = "StartServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "StartServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool StartService(ServiceHandle hService, uint dwNumServiceArgs, string[] lpServiceArgVectors);
 
-        [DllImport("advapi32.dll", EntryPoint = "OpenServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern ServiceHandle OpenService(ServiceControlManager hSCManager, string lpServiceName, uint dwDesiredAccess);
+        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "OpenServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        internal static extern ServiceHandle OpenService(ServiceControlManager hSCManager, string lpServiceName, SERVICE_ACCESS dwDesiredAccess);
 
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool DeleteService(ServiceHandle hService);
 
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern bool QueryServiceStatusEx(ServiceHandle hService, int infoLevel, IntPtr buffer, int bufferSize, out int bytesNeeded);
+        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
+        internal static extern bool QueryServiceStatusEx(ServiceHandle hService, DW_INFO_LEVEL infoLevel, IntPtr buffer, int bufferSize, out int bytesNeeded);
 
-        [DllImport("advapi32.dll", EntryPoint = "ChangeServiceConfig2W", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "ChangeServiceConfig2W", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool ChangeServiceConfig2(ServiceHandle hService, uint dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_DESCRIPTION lpInfo);
+        internal static extern bool ChangeServiceConfig2(ServiceHandle hService, DW_INFO_LEVEL dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_DESCRIPTION lpInfo);
 
-        [DllImport("advapi32.dll", EntryPoint = "ChangeServiceConfig2W", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "ChangeServiceConfig2W", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool ChangeServiceConfig2(ServiceHandle hService, uint dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_CONFIG_DELAYED_AUTO_START_INFO lpInfo);
+        internal static extern bool ChangeServiceConfig2(ServiceHandle hService, DW_INFO_LEVEL dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_CONFIG_DELAYED_AUTO_START_INFO lpInfo);
 
-        [DllImport("advapi32.dll", EntryPoint = "ChangeServiceConfigW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "ChangeServiceConfigW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool ChangeServiceConfig(ServiceHandle hService, UInt32 dwServiceType, UInt32 dwStartType, UInt32 dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, string lpdwTagId, string lpDependencies, string lpServiceStartName, string lpPassword, string lpDisplayName);
+        internal static extern bool ChangeServiceConfig(ServiceHandle hService, SERVICE_TYPE dwServiceType, SERVICE_START dwStartType, SERVICE_ERROR_CONTROLE dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, string lpdwTagId, string lpDependencies, string lpServiceStartName, string lpPassword, string lpDisplayName);
 
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool ControlService(ServiceHandle hService, SERVICE_CONTROL dwControl, ref SERVICE_STATUS lpServiceStatus);
 
         //---------------------//
-
-        public const UInt32 SERVICE_NO_CHANGE = 0xffffffff;
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct SERVICE_STATUS_PROCESS
@@ -291,6 +289,8 @@ namespace DaemonMasterCore.Win32
         [Flags]
         public enum SERVICE_TYPE : uint
         {
+            SERVICE_NO_CHANGE = 0xffffffff,
+
             /// <summary>
             /// Driver service.
             /// </summary>
@@ -358,6 +358,8 @@ namespace DaemonMasterCore.Win32
         [Flags]
         public enum SERVICE_ERROR_CONTROLE : uint
         {
+            SERVICE_NO_CHANGE = 0xffffffff,
+
             SERVICE_ERROR_CRITICAL = 0x00000003,
             SERVICE_ERROR_IGNORE = 0x00000000,
             SERVICE_ERROR_NORMAL = 0x00000001,

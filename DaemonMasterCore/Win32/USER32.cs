@@ -6,7 +6,7 @@ namespace DaemonMasterCore.Win32
     //FROM PINVOKE
     public static partial class NativeMethods
     {
-        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport(DLLFiles.USER32, SetLastError = true, CharSet = CharSet.Auto)]
         public static extern IntPtr PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
         public const Int32 _SYSCOMMAND = 0x0112;

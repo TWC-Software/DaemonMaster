@@ -39,7 +39,7 @@ namespace DaemonMasterCore.Win32
         //Give a ServiceControlManager object as return value 
         public static ServiceControlManager Connect(NativeMethods.SCM_ACCESS access)
         {
-            ServiceControlManager handle = NativeMethods.OpenSCManager(null, null, (uint)access);
+            ServiceControlManager handle = NativeMethods.OpenSCManager(null, null, access);
 
             if (handle.IsInvalid)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -62,8 +62,8 @@ namespace DaemonMasterCore.Win32
             string serviceStartName,
             string password)
         {
-            ServiceHandle serviceHandle = NativeMethods.CreateService(this, serviceName, displayName, (uint)desiredAccess,
-                (uint)serviceType, (uint)startType, (uint)errorControl, binaryPathName, loadOrderGroup, tagId, dependencies,
+            ServiceHandle serviceHandle = NativeMethods.CreateService(this, serviceName, displayName, desiredAccess,
+                serviceType, startType, errorControl, binaryPathName, loadOrderGroup, tagId, dependencies,
                 serviceStartName, password);
 
             if (serviceHandle.IsInvalid)
@@ -75,7 +75,7 @@ namespace DaemonMasterCore.Win32
         //Open a service and return the ServiceHandle
         public ServiceHandle OpenService(string serviceName, NativeMethods.SERVICE_ACCESS desiredAccess)
         {
-            ServiceHandle serviceHandle = NativeMethods.OpenService(this, serviceName, (uint)desiredAccess);
+            ServiceHandle serviceHandle = NativeMethods.OpenService(this, serviceName, desiredAccess);
 
             if (serviceHandle.IsInvalid)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
