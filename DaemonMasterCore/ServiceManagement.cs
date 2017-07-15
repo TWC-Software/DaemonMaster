@@ -25,12 +25,15 @@ using System.Diagnostics;
 using System.IO;
 using System.ServiceProcess;
 using System.Windows;
+using NLog;
 
 namespace DaemonMasterCore
 {
 
     public static class ServiceManagement
     {
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
+
         //Timeout Start/Stop Services (in ms)
         private const int WaitForStatusTimeout = 10000;
 
@@ -168,7 +171,16 @@ namespace DaemonMasterCore
         {
             foreach (var service in RegistryManagement.LoadDaemonInfosFromRegistry())
             {
-                DeleteService(service.ServiceName);
+                try
+                {
+                    _logger.Info("Delete '" + service.DisplayName + "'...");
+                    DeleteService(service.ServiceName);
+                    _logger.Info("Success");
+                }
+                catch (Exception e)
+                {
+                    _logger.Error("Failed to delete: " + service.DisplayName + "\n" + e.Message);
+                }
             }
         }
 

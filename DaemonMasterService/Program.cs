@@ -55,15 +55,8 @@ namespace DaemonMasterService
 
                 case "-deleteAllServices":
                     _logger.Info("Delete services...");
-                    try
-                    {
-                        ServiceManagement.DeleteAllServices();
-                        _logger.Info("Success!");
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e.Message);
-                    }
+                    ServiceManagement.DeleteAllServices();
+                    _logger.Info("Success!");
                     break;
 
                 case "-killAllServices":
