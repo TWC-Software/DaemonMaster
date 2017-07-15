@@ -20,11 +20,15 @@
 
 using System;
 using System.ServiceProcess;
+using DaemonMasterCore;
+using NLog;
 
 namespace DaemonMasterService
 {
     static class Program
     {
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Der Haupteinstiegspunkt für die Anwendung.
         /// </summary>
@@ -46,6 +50,32 @@ namespace DaemonMasterService
                     else
                     {
                         StartService(false);
+                    }
+                    break;
+
+                case "-deleteAllServices":
+                    _logger.Info("Delete services...");
+                    try
+                    {
+                        ServiceManagement.DeleteAllServices();
+                        _logger.Info("Success!");
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Error(e.Message);
+                    }
+                    break;
+
+                case "-killAllServices":
+                    _logger.Info("Killing services...");
+                    try
+                    {
+                        ServiceManagement.KillAllServices();
+                        _logger.Info("Success!");
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Error(e.Message);
                     }
                     break;
             }

@@ -21,8 +21,10 @@ using DaemonMasterCore.Exceptions;
 using DaemonMasterCore.Win32;
 using DaemonMasterCore.Win32.PInvoke;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.ServiceProcess;
+using System.Windows;
 
 namespace DaemonMasterCore
 {
@@ -119,7 +121,6 @@ namespace DaemonMasterCore
             {
                 using (ServiceController scManager = new ServiceController(serviceName))
                 {
-
                     if (scManager.Status == ServiceControllerStatus.Stopped)
                         return State.AlreadyStopped;
 
@@ -159,6 +160,33 @@ namespace DaemonMasterCore
                 }
             }
         }
+
+        /// <summary>
+        /// Delete all stopped services 
+        /// </summary>
+        public static void DeleteAllServices()
+        {
+            foreach (var service in RegistryManagement.LoadDaemonInfosFromRegistry())
+            {
+                DeleteService(service.ServiceName);
+            }
+        }
+
+        /// <summary>
+        /// Kill all services
+        /// </summary>
+        public static void KillAllServices()
+        {
+            foreach (var daemon in RegistryManagement.LoadDaemonInfosFromRegistry())
+            {
+                using (ServiceController serviceController = new ServiceController(daemon.ServiceName))
+                {
+                    if (serviceController.Status != ServiceControllerStatus.Stopped)
+                        serviceController.ExecuteCommand(128);
+                }
+            }
+        }
+
 
         /// <summary>
         /// Change the service config

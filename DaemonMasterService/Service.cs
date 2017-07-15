@@ -110,5 +110,19 @@ namespace DaemonMasterService
             _logger.Info("Resuming suspend process thread...");
             _logger.Info(ProcessManagement.ResumeProcess(_serviceName) ? "Successful!" : "Unsuccessful!");
         }
+
+        protected override void OnCustomCommand(int command)
+        {
+            if (command == (int)Commands.Kill)
+            {
+                ProcessManagement.KillAndDeleteProcess(_serviceName);
+                Stop();
+            }
+        }
+
+        public enum Commands : int
+        {
+            Kill = 128,
+        }
     }
 }

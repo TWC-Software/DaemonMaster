@@ -103,10 +103,6 @@ namespace DaemonMasterCore.Win32
 
                 return (NativeMethods.SERVICE_STATUS_PROCESS)Marshal.PtrToStructure(buffer, typeof(NativeMethods.SERVICE_STATUS_PROCESS));
             }
-            catch (Exception)
-            {
-                throw new NotImplementedException();
-            }
             finally
             {
                 //Gebe Speicher, wenn genutzt, wieder frei
