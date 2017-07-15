@@ -61,15 +61,8 @@ namespace DaemonMasterService
 
                 case "-killAllServices":
                     _logger.Info("Killing services...");
-                    try
-                    {
-                        ServiceManagement.KillAllServices();
-                        _logger.Info("Success!");
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e.Message);
-                    }
+                    ServiceManagement.KillAllServices();
+                    _logger.Info("Success!");
                     break;
             }
         }

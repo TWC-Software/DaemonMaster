@@ -169,17 +169,17 @@ namespace DaemonMasterCore
         /// </summary>
         public static void DeleteAllServices()
         {
-            foreach (var service in RegistryManagement.LoadDaemonInfosFromRegistry())
+            foreach (var daemon in RegistryManagement.LoadDaemonInfosFromRegistry())
             {
                 try
                 {
-                    _logger.Info("Delete '" + service.DisplayName + "'...");
-                    DeleteService(service.ServiceName);
+                    _logger.Info("Delete '" + daemon.DisplayName + "'...");
+                    DeleteService(daemon.ServiceName);
                     _logger.Info("Success");
                 }
                 catch (Exception e)
                 {
-                    _logger.Error("Failed to delete: " + service.DisplayName + "\n" + e.Message);
+                    _logger.Error("Failed to delete: " + daemon.DisplayName + "\n" + e.Message);
                 }
             }
         }
@@ -191,10 +191,26 @@ namespace DaemonMasterCore
         {
             foreach (var daemon in RegistryManagement.LoadDaemonInfosFromRegistry())
             {
-                using (ServiceController serviceController = new ServiceController(daemon.ServiceName))
+                try
                 {
-                    if (serviceController.Status != ServiceControllerStatus.Stopped)
-                        serviceController.ExecuteCommand(128);
+                    using (ServiceController serviceController = new ServiceController(daemon.ServiceName))
+                    {
+                        _logger.Info("Killing '" + daemon.DisplayName + "'...");
+                        if (serviceController.Status != ServiceControllerStatus.Stopped &&
+                            serviceController.Status != ServiceControllerStatus.StopPending)
+                        {
+                            serviceController.ExecuteCommand(128);
+                            _logger.Info("Success");
+                        }
+                        else if (serviceController.Status == ServiceControllerStatus.StopPending)
+                        {
+                            _logger.Warn("Can't kill the service, stop is already in progress '" + daemon.DisplayName + "'");
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    _logger.Error("Failed to kill: " + daemon.DisplayName + "\n" + e.Message);
                 }
             }
         }
