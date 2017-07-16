@@ -306,4 +306,7 @@
   <data name="all_processes_will_be_killed" xml:space="preserve">
     <value>All processes will be killed on shutdown (except services)! Are you sure?</value>
   </data>
+  <data name="invalid_user" xml:space="preserve">
+    <value>The given username or password was incorrect!</value>
+  </data>
 </root>

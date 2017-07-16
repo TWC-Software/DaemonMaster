@@ -18,18 +18,15 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
+using DaemonMasterCore;
+using DaemonMasterCore.Win32.PInvoke;
+using Microsoft.Win32;
 using System;
-using System.CodeDom;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Resources;
 using System.Windows;
-using DaemonMasterCore;
-using DaemonMasterCore.Win32;
-using Microsoft.Win32;
-using DaemonMasterCore.Win32.PInvoke;
+using Tulpep.ActiveDirectoryObjectPicker;
 
 namespace DaemonMaster
 {
@@ -56,6 +53,11 @@ namespace DaemonMaster
             InitializeComponent();
 
             textBoxFilePath.IsReadOnly = true;
+
+            buttonOpenADOP.IsEnabled = false;
+            textBoxPassword.IsEnabled = false;
+            textBoxUsername.IsEnabled = false;
+
             daemon = new Daemon();
         }
 
@@ -88,10 +90,21 @@ namespace DaemonMaster
             textBoxServiceName.Text = daemon.ServiceName.Substring(13);
             textBoxFilePath.Text = daemon.FullPath;
             textBoxParam.Text = daemon.Parameter;
-            textBoxDescription.Text = "";
-            textBoxPassword.Text = daemon.UserPassword;
-            textBoxUsername.Text = daemon.UserName;
             textBoxDescription.Text = daemon.Description;
+
+
+            if (String.IsNullOrWhiteSpace(daemon.UserName))
+            {
+                checkBoxUseLocalSystem.IsChecked = true;
+                textBoxPassword.Password = String.Empty;
+                textBoxUsername.Text = String.Empty;
+            }
+            else
+            {
+                textBoxPassword.Password = "***";
+                textBoxUsername.Text = daemon.UserName;
+            }
+
 
             switch (daemon.StartType)
             {
@@ -148,6 +161,25 @@ namespace DaemonMaster
             }
         }
 
+        private void buttonOpenADOP_Click(object sender, RoutedEventArgs e)
+        {
+            DirectoryObjectPickerDialog pickerDialog = new DirectoryObjectPickerDialog()
+            {
+
+                AllowedObjectTypes = ObjectTypes.Users,
+                DefaultObjectTypes = ObjectTypes.Users,
+                AllowedLocations = Locations.LocalComputer,
+                DefaultLocations = Locations.LocalComputer,
+                MultiSelect = false,
+                ShowAdvancedView = true
+            };
+
+            if (pickerDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                textBoxUsername.Text = pickerDialog.SelectedObject.Name;
+            }
+        }
+
         #endregion
 
 
@@ -163,15 +195,40 @@ namespace DaemonMaster
             {
                 if (!Directory.Exists(Path.GetDirectoryName(textBoxFilePath.Text)) || !System.IO.File.Exists(textBoxFilePath.Text))
                 {
-                    MessageBox.Show(resManager.GetString("invalid_path", CultureInfo.CurrentUICulture));
+                    MessageBox.Show(resManager.GetString("invalid_path", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
                 if (String.IsNullOrWhiteSpace(textBoxDisplayName.Text) ||
                     String.IsNullOrWhiteSpace(textBoxServiceName.Text))
                 {
-                    MessageBox.Show(resManager.GetString("invalid_values", CultureInfo.CurrentUICulture));
+                    MessageBox.Show(resManager.GetString("invalid_values", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
+                }
+
+                if (!(bool)checkBoxUseLocalSystem.IsChecked)
+                {
+                    if (String.IsNullOrWhiteSpace(textBoxUsername.Text) ||
+                        String.IsNullOrWhiteSpace(textBoxPassword.Password))
+                    {
+                        MessageBox.Show(resManager.GetString("invalid_user", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
+                    if (!SystemManagement.ValidateUser(textBoxUsername.Text,
+                        SecurityManagement.ConvertStringToSecureString(textBoxPassword.Password)))
+                    {
+                        MessageBox.Show(resManager.GetString("invalid_user", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
+                    daemon.UserName = textBoxUsername.Text;
+                    daemon.UserPassword = SecurityManagement.ConvertStringToSecureString(textBoxPassword.Password);
+                }
+                else
+                {
+                    daemon.UserName = String.Empty;
+                    daemon.UserPassword = null;
                 }
 
                 string fileDir = Path.GetDirectoryName(textBoxFilePath.Text);
@@ -284,6 +341,7 @@ namespace DaemonMaster
                 MessageBox.Show(ex.Message, resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
         #endregion
 
 
@@ -295,21 +353,6 @@ namespace DaemonMaster
 
 
 
-
-
-
-        private void checkBoxUseLocalSystem_Checked(object sender, RoutedEventArgs e)
-        {
-            textBoxUsername.IsEnabled = false;
-            textBoxPassword.IsEnabled = false;
-        }
-
-        private void checkBoxUseLocalSystem_Unchecked(object sender, RoutedEventArgs e)
-        {
-            textBoxUsername.IsEnabled = true;
-            textBoxPassword.IsEnabled = true;
-        }
-
         private static void OnDaemonSavedEvent(DaemonInfo daemonInfo)
         {
             DaemonSavedEvent?.Invoke(daemonInfo);
@@ -318,6 +361,25 @@ namespace DaemonMaster
         private static void OnDaemonEditEvent(DaemonInfo oldDaemonInfo, DaemonInfo newDaemonInfo)
         {
             DaemonEditEvent?.Invoke(oldDaemonInfo, newDaemonInfo);
+        }
+
+        private void CheckBoxUseLocalSystem_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (checkBoxUseLocalSystem.IsChecked == null)
+                return;
+
+            if ((bool)checkBoxUseLocalSystem.IsChecked)
+            {
+                buttonOpenADOP.IsEnabled = false;
+                textBoxPassword.IsEnabled = false;
+                textBoxUsername.IsEnabled = false;
+            }
+            else
+            {
+                buttonOpenADOP.IsEnabled = true;
+                textBoxPassword.IsEnabled = true;
+                textBoxUsername.IsEnabled = true;
+            }
         }
     }
 }

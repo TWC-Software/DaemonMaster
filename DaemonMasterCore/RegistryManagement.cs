@@ -43,7 +43,7 @@ namespace DaemonMasterCore
 
                 serviceKey.SetValue("Parameter", daemon.Parameter, RegistryValueKind.String);
                 serviceKey.SetValue("UserName", daemon.UserName, RegistryValueKind.String);
-                serviceKey.SetValue("UserPassword", daemon.UserPassword, RegistryValueKind.String);
+                serviceKey.SetValue("UserPassword", SecurityManagement.ConvertSecureStringToString(daemon.UserPassword), RegistryValueKind.String);
                 serviceKey.SetValue("MaxRestarts", daemon.MaxRestarts, RegistryValueKind.DWord);
 
                 serviceKey.SetValue("ProcessKillTime", daemon.ProcessKillTime, RegistryValueKind.DWord);
@@ -86,7 +86,7 @@ namespace DaemonMasterCore
                     daemon.FileName = Convert.ToString(parameters.GetValue("FileName"));
                     daemon.Parameter = Convert.ToString(parameters.GetValue("Parameter"));
                     daemon.UserName = Convert.ToString(parameters.GetValue("UserName"));
-                    daemon.UserPassword = Convert.ToString(parameters.GetValue("UserPassword"));
+                    daemon.UserPassword = SecurityManagement.ConvertStringToSecureString(Convert.ToString(parameters.GetValue("UserPassword")));
                     daemon.MaxRestarts = Convert.ToInt32(parameters.GetValue("MaxRestarts", 3));
                     daemon.ProcessKillTime = Convert.ToInt32(parameters.GetValue("ProcessKillTime", 9500));
                     daemon.ProcessRestartDelay = Convert.ToInt32(parameters.GetValue("ProcessRestartDelay", 2000));

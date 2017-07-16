@@ -203,20 +203,27 @@ namespace DaemonMaster
 
             DaemonInfo daemonInfo = (DaemonInfo)listBoxDaemons.SelectedItem;
 
-            switch (ProcessManagement.CreateNewProcess(daemonInfo.ServiceName))
+            try
             {
-                case ProcessManagement.DaemonProcessState.Unsuccessful:
-                    MessageBox.Show(_resManager.GetString("start_was_unsuccessful"),
-                         _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-                    break;
-                case ProcessManagement.DaemonProcessState.Successful:
-                    MessageBox.Show(_resManager.GetString("start_was_successful"),
-                        _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                    break;
-                case ProcessManagement.DaemonProcessState.AlreadyStopped:
-                    MessageBox.Show(_resManager.GetString("the_selected_process_is_already_started"),
-                        _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                    break;
+                switch (ProcessManagement.CreateNewProcess(daemonInfo.ServiceName))
+                {
+                    case ProcessManagement.DaemonProcessState.Unsuccessful:
+                        MessageBox.Show(_resManager.GetString("start_was_unsuccessful"),
+                            _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                        break;
+                    case ProcessManagement.DaemonProcessState.Successful:
+                        MessageBox.Show(_resManager.GetString("start_was_successful"),
+                            _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                        break;
+                    case ProcessManagement.DaemonProcessState.AlreadyStopped:
+                        MessageBox.Show(_resManager.GetString("the_selected_process_is_already_started"),
+                            _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                        break;
+                }
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -227,23 +234,30 @@ namespace DaemonMaster
 
             DaemonInfo daemonInfo = (DaemonInfo)listBoxDaemons.SelectedItem;
 
-            switch (ProcessManagement.DeleteProcess(daemonInfo.ServiceName))
+            try
             {
-                case ProcessManagement.DaemonProcessState.Unsuccessful:
-                    MessageBoxResult result = MessageBox.Show(_resManager.GetString("stop_was_unsuccessful"),
-                        _resManager.GetString("error"), MessageBoxButton.YesNo, MessageBoxImage.Error);
+                switch (ProcessManagement.DeleteProcess(daemonInfo.ServiceName))
+                {
+                    case ProcessManagement.DaemonProcessState.Unsuccessful:
+                        MessageBoxResult result = MessageBox.Show(_resManager.GetString("stop_was_unsuccessful"),
+                            _resManager.GetString("error"), MessageBoxButton.YesNo, MessageBoxImage.Error);
 
-                    if (result == MessageBoxResult.Yes)
-                        ProcessManagement.KillAndDeleteProcess(daemonInfo.ServiceName);
-                    break;
-                case ProcessManagement.DaemonProcessState.Successful:
-                    MessageBox.Show(_resManager.GetString("stop_was_successful"),
-                        _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                    break;
-                case ProcessManagement.DaemonProcessState.AlreadyStopped:
-                    MessageBox.Show(_resManager.GetString("the_selected_process_does_not_exist"),
-                        _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                    break;
+                        if (result == MessageBoxResult.Yes)
+                            ProcessManagement.KillAndDeleteProcess(daemonInfo.ServiceName);
+                        break;
+                    case ProcessManagement.DaemonProcessState.Successful:
+                        MessageBox.Show(_resManager.GetString("stop_was_successful"),
+                            _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                        break;
+                    case ProcessManagement.DaemonProcessState.AlreadyStopped:
+                        MessageBox.Show(_resManager.GetString("the_selected_process_does_not_exist"),
+                            _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                        break;
+                }
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -253,15 +267,22 @@ namespace DaemonMaster
                 return;
             DaemonInfo daemonInfo = (DaemonInfo)listBoxDaemons.SelectedItem;
 
-            if (ProcessManagement.KillAndDeleteProcess(daemonInfo.ServiceName))
+            try
             {
-                MessageBox.Show(_resManager.GetString("the_process_killing_was_successful"),
-                    _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                if (ProcessManagement.KillAndDeleteProcess(daemonInfo.ServiceName))
+                {
+                    MessageBox.Show(_resManager.GetString("the_process_killing_was_successful"),
+                        _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show(_resManager.GetString("the_process_killing_was_unsuccessful"),
+                        _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
-            else
+            catch (Exception exception)
             {
-                MessageBox.Show(_resManager.GetString("the_process_killing_was_unsuccessful"),
-                    _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(exception.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

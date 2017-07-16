@@ -40,6 +40,8 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
     <Reference Include="System.ServiceProcess" />
@@ -61,10 +63,12 @@
     <Compile Include="JsonManagement.cs" />
     <Compile Include="DaemonInfo.cs" />
     <Compile Include="ProcessManagement.cs" />
+    <Compile Include="SystemManagement.cs" />
     <Compile Include="Win32\PInvoke\DLLFiles.cs" />
     <Compile Include="Win32\ServiceControlManager.cs" />
     <Compile Include="Win32\ServiceHandle.cs" />
     <Compile Include="Win32\ThreadHandle.cs" />
+    <Compile Include="WPF\InvertBooleanConverter.cs" />
     <Compile Include="WPF\PlaceholderTextBox.cs" />
     <Compile Include="DaemonProcess.cs" />
     <Compile Include="RegistryManagement.cs" />

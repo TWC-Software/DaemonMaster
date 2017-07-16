@@ -7,11 +7,11 @@
         xmlns:resx="clr-namespace:DaemonMaster.Language"
         xmlns:CoreWPF="clr-namespace:DaemonMasterCore.WPF;assembly=DaemonMasterCore"
         mc:Ignorable="d"
-        Title="Edit / Add a Process" Height="343.496" Width="705.731" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
-    
+        Title="Edit / Add a Process" Height="343.496" Width="770.731" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
+
     <TabControl VerticalContentAlignment="Center">
         <TabItem Header="General">
-            <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,-1,-2" Height="282">
+            <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,9,-2" Height="282" Width="740">
                 <Label x:Name="labelServiceName" Content="Service:" HorizontalAlignment="Left" Margin="26,14,0,0" VerticalAlignment="Top"/>
                 <CoreWPF:PlaceholderTextBox x:Name="textBoxServiceName" Height="23" Margin="81,14,0,0" TextWrapping="Wrap" Placeholder="&lt;Please enter a Name&gt; (default = filename)" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" />
                 <Button x:Name="buttonSearchPath" Content="Search file" HorizontalAlignment="Left" Margin="81,179,0,0" VerticalAlignment="Top" Width="321" Click="buttonSearchPath_Click"/>
@@ -20,13 +20,14 @@
                 <Label x:Name="labelFilePath" Content="File path:" HorizontalAlignment="Left" Margin="18,146,0,0" VerticalAlignment="Top"/>
                 <TextBox x:Name="textBoxParam" Height="23" Width="321" Margin="81,95,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                 <Label x:Name="labelParam" Content="Parameter(s):" HorizontalAlignment="Left" Margin="-3,93,0,0" VerticalAlignment="Top"/>
-                <GroupBox x:Name="groupBoxCustomUsername" Header="Custom Username (Currently unavailable)" HorizontalAlignment="Left" Height="116" Margin="412,0,0,0" VerticalAlignment="Top" Width="277">
+                <GroupBox x:Name="groupBoxCustomUsername" Header="Custom Account (experimental)" HorizontalAlignment="Left" Height="116" Margin="412,0,0,0" VerticalAlignment="Top" Width="318">
                     <Grid HorizontalAlignment="Left" Height="100" Margin="0,0,-2,-6" VerticalAlignment="Top" Width="267">
+                        <CheckBox x:Name="checkBoxUseLocalSystem" Content="Use Local System account" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="CheckBoxUseLocalSystem_OnClick"/>
                         <Label x:Name="labelUsername" Content="Username:" HorizontalAlignment="Left" Margin="4,32,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.258,0.487"/>
                         <Label x:Name="labelPassword" Content="Password:" HorizontalAlignment="Left" Margin="8,63,0,0" VerticalAlignment="Top"/>
-                        <TextBox x:Name="textBoxUsername" HorizontalAlignment="Left" Height="23" Margin="75,32,0,0" TextWrapping="Wrap" Text="&lt;Enter Service Username&gt;" VerticalAlignment="Top" Width="182" IsEnabled="False"/>
-                        <TextBox x:Name="textBoxPassword" HorizontalAlignment="Left" Height="23" Margin="75,67,0,0" TextWrapping="Wrap" Text="&lt;Enter Service Password&gt;" VerticalAlignment="Top" Width="182" IsEnabled="False"/>
-                        <CheckBox x:Name="checkBoxUseLocalSystem" Content="Use Local System account" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Checked="checkBoxUseLocalSystem_Checked" Unchecked="checkBoxUseLocalSystem_Unchecked" IsChecked="True" IsEnabled="False"/>
+                        <CoreWPF:PlaceholderTextBox x:Name="textBoxUsername" HorizontalAlignment="Left" Height="23" Margin="75,32,0,0" TextWrapping="Wrap" Placeholder="&lt;Enter Service Username&gt;" VerticalAlignment="Top" Width="171" IsReadOnly="True"/>
+                        <PasswordBox x:Name="textBoxPassword" HorizontalAlignment="Left" Height="23" Margin="75,67,-38,0" VerticalAlignment="Top" Width="230"/>
+                        <Button x:Name="buttonOpenADOP" Content="Search" HorizontalAlignment="Left" Margin="251,32,-38,0" VerticalAlignment="Top" Width="54" Height="23" Click="buttonOpenADOP_Click"/>
                     </Grid>
                 </GroupBox>
                 <Label x:Name="labelDisplayName" Content="Display name:" HorizontalAlignment="Left" Margin="-8,40,0,0" VerticalAlignment="Top"/>
@@ -40,6 +41,7 @@
                     <ComboBoxItem Content="Disabled"/>
                 </ComboBox>
                 <Label x:Name="labelStarttyp" Content="Start Type:" HorizontalAlignment="Left" Margin="11,119,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="labelWarningPasswords" Content="WARNING: Passwords are stored as cleartext" HorizontalAlignment="Left" Margin="447,116,0,0" VerticalAlignment="Top"/>
             </Grid>
         </TabItem>
         <TabItem Header="Security" />

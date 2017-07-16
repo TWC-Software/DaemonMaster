@@ -394,6 +394,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die The given username or password was incorrect! ähnelt.
+        /// </summary>
+        public static string invalid_user {
+            get {
+                return ResourceManager.GetString("invalid_user", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Invalid values ähnelt.
         /// </summary>
         public static string invalid_values {

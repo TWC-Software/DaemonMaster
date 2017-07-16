@@ -306,4 +306,7 @@
   <data name="all_processes_will_be_killed" xml:space="preserve">
     <value>Bei herunterfahren der Anwendung werden alle Prozesse "gekillt"! Sind Sie sich sicher?</value>
   </data>
+  <data name="invalid_user" xml:space="preserve">
+    <value>Der angegebene Nutzername oder das angegebene Password waren falsch!</value>
+  </data>
 </root>

@@ -66,8 +66,9 @@ namespace DaemonMasterService
                         break;
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                _logger.Error(e.ToString);
                 Stop();
             }
         }

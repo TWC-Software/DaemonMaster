@@ -20,6 +20,8 @@
 using DaemonMasterCore.Win32;
 using System;
 using System.Diagnostics;
+using System.DirectoryServices.AccountManagement;
+using System.Security.Authentication;
 using System.Threading;
 using DaemonMasterCore.Win32.PInvoke;
 using NLog;
@@ -49,15 +51,28 @@ namespace DaemonMasterCore
             Init();
         }
 
-        internal void Init()
+        private void Init()
         {
             //Create the start info for the process
             ProcessStartInfo startInfo = new ProcessStartInfo()
             {
                 FileName = _daemon.FullPath,
                 Arguments = _daemon.Parameter,
-                UseShellExecute = true //For .ink
+                UseShellExecute = true //For .ink              
             };
+
+            if (!String.IsNullOrWhiteSpace(_daemon.UserName))
+            {
+                if (SystemManagement.ValidateUser(_daemon.UserName, _daemon.UserPassword))
+                {
+                    startInfo.UserName = _daemon.UserName;
+                    startInfo.Password = _daemon.UserPassword;
+                }
+                else
+                {
+                    throw new InvalidCredentialException();
+                }
+            }
 
             _process.StartInfo = startInfo;
             //Enable raising events for auto restart

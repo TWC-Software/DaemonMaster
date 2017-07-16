@@ -20,6 +20,7 @@
 
 using DaemonMasterCore.Win32.PInvoke;
 using System;
+using System.Security;
 
 namespace DaemonMasterCore
 {
@@ -30,7 +31,7 @@ namespace DaemonMasterCore
         {
             Parameter = String.Empty;
             UserName = String.Empty;
-            UserPassword = String.Empty;
+            UserPassword = null;
 
             MaxRestarts = 3;
             ProcessKillTime = 9500;
@@ -60,7 +61,7 @@ namespace DaemonMasterCore
 
         public string Parameter { get; set; }
         public string UserName { get; set; }
-        public string UserPassword { get; set; }
+        public SecureString UserPassword { get; set; }
 
         public int MaxRestarts { get; set; }
         public int ProcessKillTime { get; set; }

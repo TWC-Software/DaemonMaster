@@ -48,6 +48,9 @@ namespace DaemonMasterCore
 
         public static String ConvertSecureStringToString(SecureString value)
         {
+            if (value == null)
+                return String.Empty;
+
             IntPtr valuePtr = IntPtr.Zero;
             try
             {
