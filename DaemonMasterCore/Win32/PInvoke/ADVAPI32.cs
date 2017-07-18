@@ -65,6 +65,16 @@ namespace DaemonMasterCore.Win32.PInvoke
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool ChangeServiceConfig2(ServiceHandle hService, INFO_LEVEL dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_CONFIG_DELAYED_AUTO_START_INFO lpInfo);
 
+        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "LogonUserW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern bool LogonUser(
+            string lpszUsername,
+            string lpszDomain,
+            IntPtr lpszPassword,
+            LOGON_TYP dwLogonType,
+            LOGON_PROVIDER dwLogonProvider,
+            ref IntPtr phToken
+        );
+
         //---------------------//
 
         /// <summary>
@@ -494,6 +504,24 @@ namespace DaemonMasterCore.Win32.PInvoke
             SERVICE_START_PENDING = 0x00000002,
             SERVICE_STOP_PENDING = 0x00000003,
             SERVICE_STOPPED = 0x00000001
+        }
+
+        public enum LOGON_TYP
+        {
+            Interactive = 2,
+            Network = 3,
+            Batch = 4,
+            Service = 5,
+            Unlock = 7,
+            NetworkClearText = 8,
+            NewCredentials = 9
+        }
+
+        public enum LOGON_PROVIDER
+        {
+            Default = 0,
+            WinNT40 = 2,
+            WinNT50 = 3
         }
     }
 }

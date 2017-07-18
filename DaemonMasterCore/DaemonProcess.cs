@@ -58,15 +58,15 @@ namespace DaemonMasterCore
             {
                 FileName = _daemon.FullPath,
                 Arguments = _daemon.Parameter,
-                UseShellExecute = true //For .ink              
+                UseShellExecute = false //For .ink              
             };
 
-            if (!String.IsNullOrWhiteSpace(_daemon.UserName))
+            if (!String.IsNullOrWhiteSpace(_daemon.Username))
             {
-                if (SystemManagement.ValidateUser(_daemon.UserName, _daemon.UserPassword))
+                if (SystemManagement.CheckUser(_daemon.Username, _daemon.Password))
                 {
-                    startInfo.UserName = _daemon.UserName;
-                    startInfo.Password = _daemon.UserPassword;
+                    startInfo.UserName = _daemon.Username;
+                    startInfo.Password = _daemon.Password;
                 }
                 else
                 {

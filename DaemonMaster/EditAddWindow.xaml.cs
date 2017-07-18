@@ -93,7 +93,7 @@ namespace DaemonMaster
             textBoxDescription.Text = daemon.Description;
 
 
-            if (String.IsNullOrWhiteSpace(daemon.UserName))
+            if (String.IsNullOrWhiteSpace(daemon.Username) || daemon.UseLocalSystem || daemon.Password == null)
             {
                 checkBoxUseLocalSystem.IsChecked = true;
                 textBoxPassword.Password = String.Empty;
@@ -101,8 +101,8 @@ namespace DaemonMaster
             }
             else
             {
-                textBoxPassword.Password = "***";
-                textBoxUsername.Text = daemon.UserName;
+                textBoxPassword.Password = "***Super_sicheres_Password***";
+                textBoxUsername.Text = daemon.Username;
             }
 
 
@@ -211,25 +211,41 @@ namespace DaemonMaster
                     if (String.IsNullOrWhiteSpace(textBoxUsername.Text) ||
                         String.IsNullOrWhiteSpace(textBoxPassword.Password))
                     {
-                        MessageBox.Show(resManager.GetString("invalid_user", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(resManager.GetString("invalid_values", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
 
-                    if (!SystemManagement.ValidateUser(textBoxUsername.Text,
-                        SecurityManagement.ConvertStringToSecureString(textBoxPassword.Password)))
+                    if (textBoxPassword.Password != "***Super_sicheres_Password***")
                     {
-                        MessageBox.Show(resManager.GetString("invalid_user", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
+                        if (!SystemManagement.CheckUser(textBoxUsername.Text,
+                            SecurityManagement.ConvertStringToSecureString(textBoxPassword.Password)))
+                        {
+                            MessageBox.Show(resManager.GetString("invalid_user", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
 
-                    daemon.UserName = textBoxUsername.Text;
-                    daemon.UserPassword = SecurityManagement.ConvertStringToSecureString(textBoxPassword.Password);
+                        daemon.Username = textBoxUsername.Text;
+                        daemon.Password = textBoxPassword.SecurePassword;
+
+                        MessageBox.Show(SecurityManagement.ConvertSecureStringToString(daemon.Password) + " 1");
+                    }
+                    else
+                    {
+                        MessageBox.Show(SecurityManagement.ConvertSecureStringToString(daemon.Password) + " 1");
+
+                        if (!SystemManagement.CheckUser(textBoxUsername.Text, daemon.Password))
+                        {
+                            MessageBox.Show(resManager.GetString("invalid_user", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                    }
                 }
                 else
                 {
-                    daemon.UserName = String.Empty;
-                    daemon.UserPassword = null;
+                    daemon.Username = String.Empty;
+                    daemon.Password = null;
                 }
+                daemon.UseLocalSystem = (bool)checkBoxUseLocalSystem.IsChecked;
 
                 string fileDir = Path.GetDirectoryName(textBoxFilePath.Text);
                 string fileName = Path.GetFileName(textBoxFilePath.Text);

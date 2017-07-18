@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: REGISTRY MANAGEMENT FILE
+//  DaemonMaster: RegistryManagement
 //  
 //  This file is part of DeamonMaster.
 // 
@@ -20,7 +20,6 @@
 using DaemonMasterCore.Win32.PInvoke;
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ServiceProcess;
 
@@ -38,18 +37,26 @@ namespace DaemonMasterCore
         {
             using (RegistryKey serviceKey = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Services\" + daemon.ServiceName + @"\Parameters"))
             {
+                //Strings
                 serviceKey.SetValue("FileDir", daemon.FileDir, RegistryValueKind.String);
                 serviceKey.SetValue("FileName", daemon.FileName, RegistryValueKind.String);
 
                 serviceKey.SetValue("Parameter", daemon.Parameter, RegistryValueKind.String);
-                serviceKey.SetValue("UserName", daemon.UserName, RegistryValueKind.String);
-                serviceKey.SetValue("UserPassword", SecurityManagement.ConvertSecureStringToString(daemon.UserPassword), RegistryValueKind.String);
-                serviceKey.SetValue("MaxRestarts", daemon.MaxRestarts, RegistryValueKind.DWord);
+                serviceKey.SetValue("Username", daemon.Username, RegistryValueKind.String);
 
+                //Bytes
+                byte[] entropy = SecurityManagement.CreateRandomEntropy();
+                serviceKey.SetValue("Key", entropy, RegistryValueKind.Binary);
+                serviceKey.SetValue("Password", SecurityManagement.EncryptPassword(daemon.Password, entropy), RegistryValueKind.Binary);
+
+                //Ints
+                serviceKey.SetValue("MaxRestarts", daemon.MaxRestarts, RegistryValueKind.DWord);
                 serviceKey.SetValue("ProcessKillTime", daemon.ProcessKillTime, RegistryValueKind.DWord);
                 serviceKey.SetValue("ProcessRestartDelay", daemon.ProcessRestartDelay, RegistryValueKind.DWord);
                 serviceKey.SetValue("CounterResetTime", daemon.CounterResetTime, RegistryValueKind.DWord);
 
+                //Bools
+                serviceKey.SetValue("UseLocalSystem", daemon.UseLocalSystem, RegistryValueKind.DWord);
                 serviceKey.SetValue("ConsoleApplication", daemon.ConsoleApplication, RegistryValueKind.DWord);
                 serviceKey.SetValue("UseCtrlC", daemon.UseCtrlC, RegistryValueKind.DWord);
 
@@ -85,12 +92,14 @@ namespace DaemonMasterCore
                     daemon.FileDir = Convert.ToString(parameters.GetValue("FileDir"));
                     daemon.FileName = Convert.ToString(parameters.GetValue("FileName"));
                     daemon.Parameter = Convert.ToString(parameters.GetValue("Parameter"));
-                    daemon.UserName = Convert.ToString(parameters.GetValue("UserName"));
-                    daemon.UserPassword = SecurityManagement.ConvertStringToSecureString(Convert.ToString(parameters.GetValue("UserPassword")));
+                    daemon.Username = Convert.ToString(parameters.GetValue("Username"));
+                    byte[] entropy = (byte[])parameters.GetValue("Key");
+                    daemon.Password = SecurityManagement.DecryptPassword((byte[])parameters.GetValue("Password"), entropy);
                     daemon.MaxRestarts = Convert.ToInt32(parameters.GetValue("MaxRestarts", 3));
                     daemon.ProcessKillTime = Convert.ToInt32(parameters.GetValue("ProcessKillTime", 9500));
                     daemon.ProcessRestartDelay = Convert.ToInt32(parameters.GetValue("ProcessRestartDelay", 2000));
                     daemon.CounterResetTime = Convert.ToInt32(parameters.GetValue("CounterResetTime", 2000));
+                    daemon.UseLocalSystem = Convert.ToBoolean(parameters.GetValue("UseLocalSystem"));
                     daemon.ConsoleApplication = Convert.ToBoolean(parameters.GetValue("ConsoleApplication", false));
                     daemon.UseCtrlC = Convert.ToBoolean(parameters.GetValue("UseCtrlC", false));
 

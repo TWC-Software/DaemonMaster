@@ -41,7 +41,7 @@
                     <ComboBoxItem Content="Disabled"/>
                 </ComboBox>
                 <Label x:Name="labelStarttyp" Content="Start Type:" HorizontalAlignment="Left" Margin="11,119,0,0" VerticalAlignment="Top"/>
-                <Label x:Name="labelWarningPasswords" Content="WARNING: Passwords are stored as cleartext" HorizontalAlignment="Left" Margin="447,116,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="labelWarningPasswords" Content="WARNING: The user must have acces to the programm folder and the file path!" HorizontalAlignment="Left" Margin="10,215,0,0" VerticalAlignment="Top"/>
             </Grid>
         </TabItem>
         <TabItem Header="Security" />

@@ -30,8 +30,8 @@ namespace DaemonMasterCore
         public Daemon()
         {
             Parameter = String.Empty;
-            UserName = String.Empty;
-            UserPassword = null;
+            Username = String.Empty;
+            Password = null;
 
             MaxRestarts = 3;
             ProcessKillTime = 9500;
@@ -60,8 +60,9 @@ namespace DaemonMasterCore
         public string FullPath => FileDir + @"\" + FileName;
 
         public string Parameter { get; set; }
-        public string UserName { get; set; }
-        public SecureString UserPassword { get; set; }
+        public bool UseLocalSystem { get; set; }
+        public string Username { get; set; }
+        public SecureString Password { get; set; }
 
         public int MaxRestarts { get; set; }
         public int ProcessKillTime { get; set; }
