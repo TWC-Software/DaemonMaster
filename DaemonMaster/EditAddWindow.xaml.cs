@@ -53,11 +53,6 @@ namespace DaemonMaster
             InitializeComponent();
 
             textBoxFilePath.IsReadOnly = true;
-
-            buttonOpenADOP.IsEnabled = false;
-            textBoxPassword.IsEnabled = false;
-            textBoxUsername.IsEnabled = false;
-
             daemon = new Daemon();
         }
 
@@ -377,25 +372,6 @@ namespace DaemonMaster
         private static void OnDaemonEditEvent(DaemonInfo oldDaemonInfo, DaemonInfo newDaemonInfo)
         {
             DaemonEditEvent?.Invoke(oldDaemonInfo, newDaemonInfo);
-        }
-
-        private void CheckBoxUseLocalSystem_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (checkBoxUseLocalSystem.IsChecked == null)
-                return;
-
-            if ((bool)checkBoxUseLocalSystem.IsChecked)
-            {
-                buttonOpenADOP.IsEnabled = false;
-                textBoxPassword.IsEnabled = false;
-                textBoxUsername.IsEnabled = false;
-            }
-            else
-            {
-                buttonOpenADOP.IsEnabled = true;
-                textBoxPassword.IsEnabled = true;
-                textBoxUsername.IsEnabled = true;
-            }
         }
     }
 }
