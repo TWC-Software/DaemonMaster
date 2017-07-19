@@ -24,7 +24,7 @@
                 <Label x:Name="labelFilePath" Content="File path:" HorizontalAlignment="Left" Margin="18,146,0,0" VerticalAlignment="Top"/>
                 <TextBox x:Name="textBoxParam" Height="23" Width="321" Margin="81,95,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                 <Label x:Name="labelParam" Content="Parameter(s):" HorizontalAlignment="Left" Margin="-3,93,0,0" VerticalAlignment="Top"/>
-                <GroupBox x:Name="groupBoxCustomUsername" Header="Custom Account (experimental)" HorizontalAlignment="Left" Height="116" Margin="412,0,0,0" VerticalAlignment="Top" Width="318">
+                <GroupBox x:Name="groupBoxCustomUsername" Header="Custom User (experimental)" HorizontalAlignment="Left" Height="116" Margin="412,0,0,0" VerticalAlignment="Top" Width="318">
                     <Grid HorizontalAlignment="Left" Height="100" Margin="0,0,-2,-6" VerticalAlignment="Top" Width="267">
                         <Label x:Name="labelUsername" Content="Username:" HorizontalAlignment="Left" Margin="4,32,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.258,0.487"/>
                         <Label x:Name="labelPassword" Content="Password:" HorizontalAlignment="Left" Margin="8,63,0,0" VerticalAlignment="Top"/>

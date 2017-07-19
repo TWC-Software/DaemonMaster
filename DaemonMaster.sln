@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.14
+VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaemonMaster", "DaemonMaster\DaemonMaster.csproj", "{22341581-8624-4394-86C3-330956B03C03}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -12,6 +12,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaemonMasterService", "Daem
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{10A8BD2F-8374-464F-858A-0341027CBCB3}"
 	ProjectSection(SolutionItems) = preProject
+		ACTIVE_DIRECTORY_OBJECT_PICKER_LICENSE.txt = ACTIVE_DIRECTORY_OBJECT_PICKER_LICENSE.txt
 		AutoUpdater.xml = AutoUpdater.xml
 		NEWTONSOFT.JSON_LICENSE.txt = NEWTONSOFT.JSON_LICENSE.txt
 		NLOG_LICENSE.txt = NLOG_LICENSE.txt
