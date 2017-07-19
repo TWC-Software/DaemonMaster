@@ -1,7 +1,7 @@
 
 # DaemonMaster Alpha
 Daemon Master is a software which makes it possible to create and manage a Windows-service from any program.
-WARNING SOFTWARE IS IN PRE-ALPHA !
+WARNING SOFTWARE IS IN ALPHA !
 
 ## Features
 - Easy and fast creation, deletion and editing of services
@@ -9,9 +9,9 @@ WARNING SOFTWARE IS IN PRE-ALPHA !
 - Using any .exe program as a service
 - Works with shortcuts (The parameter(s) of the shortcut and the parameter(s) of the field in the programm will be used!)
 - Automatic service-startup with Windows itself (Manual, Automatic with delay and Disabled works also)
+- Custom username and password for a service (experimental)
 
 ## Planned Features
-- Custom username and password for a service
 
 ## Thanks to 
 - pinvoke.net (and its users)
@@ -20,8 +20,9 @@ WARNING SOFTWARE IS IN PRE-ALPHA !
 
 ## Used Librarys
 - Newtonsoft.Json - James Newton - King - MIT License
-- NLog - Jaroslaw Kowalski, Kim Christensen, Julian Verdurmen - BSD 3 - clause "New" or "Revised" License
+- NLog - Jaroslaw Kowalski, Kim Christensen, Julian Verdurmen - BSD 3 clause "New" or "Revised" License
 - AutoUpdater.NET - RBSoft - MIT License
+- Active Directory Object Picker - Tulpep - MS-PL License
 
 ## Copyright 
 MCPC10,
