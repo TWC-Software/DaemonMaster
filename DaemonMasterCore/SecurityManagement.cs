@@ -148,6 +148,12 @@ namespace DaemonMasterCore
         /// <returns></returns>
         public static SecureString DecryptPassword(byte[] encryptedPassword, byte[] entropy)
         {
+            if (encryptedPassword == null || entropy == null)
+                throw new ArgumentNullException();
+
+            if (encryptedPassword.Length <= 0 || entropy.Length <= 0)
+                return null;
+
             byte[] decryptedPassword = ProtectedData.Unprotect(encryptedPassword, entropy, DataProtectionScope.LocalMachine);
 
             if (decryptedPassword.Length > 0)

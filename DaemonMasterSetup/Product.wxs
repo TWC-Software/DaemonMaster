@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"><?define DaemonMaster_TargetDir=$(var.DaemonMaster.TargetDir)?>
+	<Product Id="78E506DD-DB6E-40C8-A721-FC944586503F" Name="DaemonMaster" Language="1033" Version="1.0.0" Manufacturer="TWC-Software" UpgradeCode="35f44a50-d9e4-480e-9171-45a6591150b8">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<!--Set install dir-->
+		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+		
+		<!--Use UI-->
+		<UIRef Id="WixUI_InstallDir"/>
+		
+		<!--Add icon-->
+		<Icon Id="DaemonMaster.ico" SourceFile="$(var.ProjectDir)DaemonMaster.ico" />
+		<Property Id="ARPPRODUCTICON" Value="DaemonMaster.ico" />
+		
+		<!--Add license-->
+		<WixVariable Id="WixUILicenseRtf" Value="$(var.ProjectDir)\gpl-3.0.rtf" />
+		<!--Add custom UI images-->
+		<!--<WixVariable Id="WixUIBannerBmp" Value="Images\installer_top-banner.bmp" />
+		<WixVariable Id="WixUIDialogBmp" Value="Images\installer_background.bmp" />-->
+		
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<!--Output only one file-->
+		<MediaTemplate EmbedCab="yes"/>
+		
+		<!--Add events-->
+		<InstallExecuteSequence>
+			<Custom Action='BeforeUninstall' After='InstallInitialize'>(REMOVE="ALL") AND (NOT UPGRADINGPRODUCTCODE)</Custom>
+		</InstallExecuteSequence>
+		
+		<!--Component refs-->
+		<Feature Id="ProductFeature" Title="DaemonMaster" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+			<ComponentGroupRef Id="de_files" />
+			<ComponentGroupRef Id="fr_files" />
+			<ComponentRef Id="AppShortcut" />
+			<ComponentRef Id="AppShortcutDesktop" />
+		</Feature>
+	</Product>
+
+	<!--Adding custom actions-->
+	<Fragment>
+		<Binary Id="DaemonMasterCustomActions.CA.dll" SourceFile="$(var.DaemonMasterCustomActions.TargetDir)$(var.DaemonMasterCustomActions.TargetName).CA.dll"/>
+		<CustomAction Id="BeforeUninstall" BinaryKey="DaemonMasterCustomActions.CA.dll" DllEntry="UninstallAllServices" Execute="deferred" Return="check" Impersonate="no"/>
+	</Fragment>
+
+	<!--Directories-->
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				 <Directory Id="INSTALLFOLDER" Name="DaemonMaster">
+					<Directory Id="de" Name="de" />
+					<Directory Id="fr" Name="fr" />
+				</Directory>
+			</Directory>
+			
+			<Directory Id="ProgramMenuFolder">
+				<Directory Id="AppProgramsFolder" Name="DaemonMaster" />
+			</Directory>
+			<Directory Id="DesktopFolder" Name="Desktop" />
+		</Directory>
+	</Fragment>
+
+	<!--Programm files-->
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+		<Component Id="DaemonMaster.exe" Guid="828e14ef-1775-4baf-babd-09c22a63dd59">
+			<File Id="DaemonMaster.exe" Name="DaemonMaster.exe" Source="$(var.DaemonMaster_TargetDir)DaemonMaster.exe" />
+		</Component>
+		<Component Id="DaemonMaster.exe.config" Guid="fe226363-b868-4b35-a8d4-9ee866c57d24">
+			<File Id="DaemonMaster.exe.config" Name="DaemonMaster.exe.config" Source="$(var.DaemonMaster_TargetDir)DaemonMaster.exe.config" />
+		</Component>
+		<Component Id="DaemonMasterCore.dll" Guid="19c2e184-2568-4aa4-84f8-ef95e699fdf0">
+			<File Id="DaemonMasterCore.dll" Name="DaemonMasterCore.dll" Source="$(var.DaemonMaster_TargetDir)DaemonMasterCore.dll" />
+		</Component>
+		<Component Id="NLog.config" Guid="df2cd224-b3ae-432e-ab27-65ce7a0ff866">
+			<File Id="NLog.config" Name="NLog.config" Source="$(var.DaemonMaster_TargetDir)NLog.config" />
+		</Component>
+		<Component Id="DaemonMasterService.exe" Guid="db575770-4ec4-4aa5-9ef3-efeb7edb18a8">
+			<File Id="DaemonMasterService.exe" Name="DaemonMasterService.exe" Source="$(var.DaemonMaster_TargetDir)DaemonMasterService.exe" />
+		</Component>
+		<Component Id="DaemonMasterService.exe.config" Guid="7dee1541-bdec-4ecb-b1a2-c13d92df4708">
+			<File Id="DaemonMasterService.exe.config" Name="DaemonMasterService.exe.config" Source="$(var.DaemonMaster_TargetDir)DaemonMasterService.exe.config" />
+		</Component>
+		<Component Id="ActiveDirectoryObjectPicker.dll" Guid="ddbf6da4-e90e-4400-a20c-13cd2bde5e39">
+			<File Id="ActiveDirectoryObjectPicker.dll" Name="ActiveDirectoryObjectPicker.dll" Source="$(var.DaemonMaster_TargetDir)ActiveDirectoryObjectPicker.dll" />
+		</Component>
+		<Component Id="AutoUpdater.NET.dll" Guid="e81dc281-b761-4760-8b75-2e7b3c0726bd">
+			<File Id="AutoUpdater.NET.dll" Name="AutoUpdater.NET.dll" Source="$(var.DaemonMaster_TargetDir)AutoUpdater.NET.dll" />
+		</Component>
+		<Component Id="Newtonsoft.Json.dll" Guid="a40b3034-ee00-4af1-a664-3cc1482f7857">
+			<File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.DaemonMaster_TargetDir)Newtonsoft.Json.dll" />
+		</Component>
+		<Component Id="NLog.dll" Guid="f46bf0f6-1d8c-451d-9cb1-838dc0e80822">
+			<File Id="NLog.dll" Name="NLog.dll" Source="$(var.DaemonMaster_TargetDir)NLog.dll" />
+		</Component>
+		</ComponentGroup>
+	</Fragment>
+	
+	<!--Shortcuts-->
+	<Fragment>
+		<DirectoryRef Id="AppProgramsFolder">
+			<Component Id="AppShortcut" Guid="21C07E8B-488A-46D8-B3D0-5F5508600CAC">
+				<Shortcut Id="AppStartMenuShortcut" Name="DaemonMaster" Description="Daemon Master is a software which makes it possible to create a service from any program." Target="[INSTALLFOLDER]DaemonMaster.exe" WorkingDirectory="INSTALLFOLDER" />
+				<RemoveFolder Id="RemoveApplicationProgramsFolder" Directory="AppProgramsFolder" On="uninstall" />
+				<RegistryValue Root="HKCU" Key="Software\DaemonMaster" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+			</Component>
+		</DirectoryRef>
+		<DirectoryRef Id="DesktopFolder">
+			<Component Id="AppShortcutDesktop" Guid="F821B36D-F1EE-4CFD-AE15-B4B6BE949036">
+				<Shortcut Id="AppDesktopShortcut" Name="DaemonMaster" Description="Daemon Master is a software which makes it possible to create a service from any program." Target="[INSTALLFOLDER]DaemonMaster.exe" WorkingDirectory="INSTALLFOLDER" />
+				<RemoveFolder Id="RemoveDesktopFolder" Directory="DesktopFolder" On="uninstall" />
+				<RegistryValue Root="HKCU" Key="Software\DaemonMaster" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+			</Component>
+		</DirectoryRef>
+	</Fragment>
+	
+	<!--German translations files-->
+	<Fragment>
+		<ComponentGroup Id="de_files" Directory="de">
+			<Component Id="de_DaemonMaster.resources.dll" Guid="e3f2eae4-3008-435a-8a54-5aa6d5f582a7">
+				<File Id="de_DaemonMaster.resources.dll" Name="DaemonMaster.resources.dll" Source="$(var.DaemonMaster_TargetDir)de\DaemonMaster.resources.dll" />
+			</Component>
+			<Component Id="de_AutoUpdater.NET.resources.dll" Guid="40AFBA91-2E6B-4F58-9230-D38E47DD7781">
+				<File Id="de_AutoUpdater.NET.resources.dll" Name="AutoUpdater.NET.resources.dll" Source="$(var.DaemonMaster_TargetDir)de\AutoUpdater.NET.resources.dll" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+
+	<!--French translations files-->
+	<Fragment>
+		<ComponentGroup Id="fr_files" Directory="fr">
+			<Component Id="fr_DaemonMaster.resources.dll" Guid="0c62d574-dfdf-450e-924d-c34b9f991557">
+				<File Id="fr_DaemonMaster.resources.dll" Name="DaemonMaster.resources.dll" Source="$(var.DaemonMaster_TargetDir)fr\DaemonMaster.resources.dll" />
+			</Component>
+			<Component Id="fr_AutoUpdater.NET.resources.dll" Guid="BA656F5C-4956-4921-866A-C51AA2605F84">
+				<File Id="fr_AutoUpdater.NET.resources.dll" Name="AutoUpdater.NET.resources.dll" Source="$(var.DaemonMaster_TargetDir)fr\AutoUpdater.NET.resources.dll" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+</Wix>

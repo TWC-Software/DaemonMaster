@@ -42,12 +42,21 @@ namespace DaemonMasterCore
                 serviceKey.SetValue("FileName", daemon.FileName, RegistryValueKind.String);
 
                 serviceKey.SetValue("Parameter", daemon.Parameter, RegistryValueKind.String);
-                serviceKey.SetValue("Username", daemon.Username, RegistryValueKind.String);
 
-                //Bytes
-                byte[] entropy = SecurityManagement.CreateRandomEntropy();
-                serviceKey.SetValue("Key", entropy, RegistryValueKind.Binary);
-                serviceKey.SetValue("Password", SecurityManagement.EncryptPassword(daemon.Password, entropy), RegistryValueKind.Binary);
+
+                if (!daemon.UseLocalSystem)
+                {
+                    byte[] entropy = SecurityManagement.CreateRandomEntropy();
+                    serviceKey.SetValue("Key", entropy, RegistryValueKind.Binary);
+                    serviceKey.SetValue("Password", SecurityManagement.EncryptPassword(daemon.Password, entropy), RegistryValueKind.Binary);
+                    serviceKey.SetValue("Username", daemon.Username, RegistryValueKind.String);
+                }
+                else
+                {
+                    serviceKey.DeleteValue("Key", false);
+                    serviceKey.DeleteValue("Password", false);
+                    serviceKey.DeleteValue("Username", false);
+                }
 
                 //Ints
                 serviceKey.SetValue("MaxRestarts", daemon.MaxRestarts, RegistryValueKind.DWord);
@@ -92,9 +101,9 @@ namespace DaemonMasterCore
                     daemon.FileDir = Convert.ToString(parameters.GetValue("FileDir"));
                     daemon.FileName = Convert.ToString(parameters.GetValue("FileName"));
                     daemon.Parameter = Convert.ToString(parameters.GetValue("Parameter"));
-                    daemon.Username = Convert.ToString(parameters.GetValue("Username"));
-                    byte[] entropy = (byte[])parameters.GetValue("Key");
-                    daemon.Password = SecurityManagement.DecryptPassword((byte[])parameters.GetValue("Password"), entropy);
+                    daemon.Username = Convert.ToString(parameters.GetValue("Username", String.Empty));
+                    byte[] entropy = (byte[])parameters.GetValue("Key", new byte[0]);
+                    daemon.Password = SecurityManagement.DecryptPassword((byte[])parameters.GetValue("Password", new byte[0]), entropy);
                     daemon.MaxRestarts = Convert.ToInt32(parameters.GetValue("MaxRestarts", 3));
                     daemon.ProcessKillTime = Convert.ToInt32(parameters.GetValue("ProcessKillTime", 9500));
                     daemon.ProcessRestartDelay = Convert.ToInt32(parameters.GetValue("ProcessRestartDelay", 2000));
@@ -143,7 +152,6 @@ namespace DaemonMasterCore
             }
             return daemons;
         }
-
 
 
 
