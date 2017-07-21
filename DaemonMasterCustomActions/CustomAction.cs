@@ -1,6 +1,7 @@
 using DaemonMasterCore;
 using Microsoft.Deployment.WindowsInstaller;
 using System;
+using System.Threading;
 
 namespace DaemonMasterCustomActions
 {
@@ -15,6 +16,9 @@ namespace DaemonMasterCustomActions
             {
                 session.Log("Killing all services...");
                 ServiceManagement.KillAllServices();
+
+                Thread.Sleep(2000);
+
                 session.Log("Deleting all services...");
                 ServiceManagement.DeleteAllServices();
             }

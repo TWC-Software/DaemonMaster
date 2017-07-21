@@ -309,4 +309,73 @@
   <data name="invalid_user" xml:space="preserve">
     <value>Der angegebene Nutzername oder das angegebene Password waren falsch!</value>
   </data>
+  <data name="label_display_name" xml:space="preserve">
+    <value>Anzeigename:</value>
+  </data>
+  <data name="label_service_name" xml:space="preserve">
+    <value>Dienstname:</value>
+  </data>
+  <data name="label_description" xml:space="preserve">
+    <value>Beschreibung:</value>
+  </data>
+  <data name="label_parameters" xml:space="preserve">
+    <value>Parameter:</value>
+  </data>
+  <data name="label_start_type" xml:space="preserve">
+    <value>Starteinstellung:</value>
+  </data>
+  <data name="starttype_automatic" xml:space="preserve">
+    <value>Automatisch</value>
+  </data>
+  <data name="starttype_automatic_with_delay" xml:space="preserve">
+    <value>Automatisch mit verzögertem Start</value>
+  </data>
+  <data name="starttype_manual" xml:space="preserve">
+    <value>Manuel</value>
+  </data>
+  <data name="starttype_disabled" xml:space="preserve">
+    <value>Deaktiviert</value>
+  </data>
+  <data name="label_file_path" xml:space="preserve">
+    <value>Pfad:</value>
+  </data>
+  <data name="button_search_file" xml:space="preserve">
+    <value>Suche Datei</value>
+  </data>
+  <data name="groupbox_custom_user" xml:space="preserve">
+    <value>Benutzerdefinierter Nutzer (experimentell)</value>
+  </data>
+  <data name="checkbox_use_local_system_account" xml:space="preserve">
+    <value>Nutze Lokales System</value>
+  </data>
+  <data name="label_username" xml:space="preserve">
+    <value>Nutzername:</value>
+  </data>
+  <data name="label_password" xml:space="preserve">
+    <value>Passwort:</value>
+  </data>
+  <data name="placeholder_username" xml:space="preserve">
+    <value>&lt;Benutzernamen eingeben&gt;</value>
+  </data>
+  <data name="placeholder_description" xml:space="preserve">
+    <value>&lt;Bitte geben Sie eine Beschreibung an&gt;</value>
+  </data>
+  <data name="placeholder_service_name" xml:space="preserve">
+    <value>&lt;Bitte geben Sie einen Namen an&gt;</value>
+  </data>
+  <data name="placeholder_display_name" xml:space="preserve">
+    <value>&lt;Bitte geben Sie einen Anzeigenamen an&gt;</value>
+  </data>
+  <data name="placeholder_file_path" xml:space="preserve">
+    <value>&lt;Klicken Sie auf "Suche Datei" zum suchen der .exe, etc&gt;</value>
+  </data>
+  <data name="tabitem_general" xml:space="preserve">
+    <value>Haupteinstellungen</value>
+  </data>
+  <data name="window_edit_add" xml:space="preserve">
+    <value>Bearbeiten oder hinzufügen eines Prozesses</value>
+  </data>
+  <data name="warning_file_access" xml:space="preserve">
+    <value>WARNUNG: Der Nutzer muss Zugriff auf die gewählte .exe oder ähnliches haben!</value>
+  </data>
 </root>

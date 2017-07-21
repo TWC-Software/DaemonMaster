@@ -187,6 +187,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Search file ähnelt.
+        /// </summary>
+        public static string button_search_file {
+            get {
+                return ResourceManager.GetString("button_search_file", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Start ähnelt.
         /// </summary>
         public static string button_start {
@@ -313,6 +322,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Use Local System account ähnelt.
+        /// </summary>
+        public static string checkbox_use_local_system_account {
+            get {
+                return ResourceManager.GetString("checkbox_use_local_system_account", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Currently unavailable :( ähnelt.
         /// </summary>
         public static string currently_unavailable {
@@ -367,6 +385,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Custom User (experimental) ähnelt.
+        /// </summary>
+        public static string groupbox_custom_user {
+            get {
+                return ResourceManager.GetString("groupbox_custom_user", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Information ähnelt.
         /// </summary>
         public static string information {
@@ -412,6 +439,33 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Description: ähnelt.
+        /// </summary>
+        public static string label_description {
+            get {
+                return ResourceManager.GetString("label_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Display name: ähnelt.
+        /// </summary>
+        public static string label_display_name {
+            get {
+                return ResourceManager.GetString("label_display_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die File path: ähnelt.
+        /// </summary>
+        public static string label_file_path {
+            get {
+                return ResourceManager.GetString("label_file_path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Filter ähnelt.
         /// </summary>
         public static string label_filter {
@@ -421,11 +475,101 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Parameter(s): ähnelt.
+        /// </summary>
+        public static string label_parameters {
+            get {
+                return ResourceManager.GetString("label_parameters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Password: ähnelt.
+        /// </summary>
+        public static string label_password {
+            get {
+                return ResourceManager.GetString("label_password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Service name: ähnelt.
+        /// </summary>
+        public static string label_service_name {
+            get {
+                return ResourceManager.GetString("label_service_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Start type: ähnelt.
+        /// </summary>
+        public static string label_start_type {
+            get {
+                return ResourceManager.GetString("label_start_type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Username: ähnelt.
+        /// </summary>
+        public static string label_username {
+            get {
+                return ResourceManager.GetString("label_username", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Max limit reached ähnelt.
         /// </summary>
         public static string max_limit_reached {
             get {
                 return ResourceManager.GetString("max_limit_reached", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die &lt;Please enter a description&gt; ähnelt.
+        /// </summary>
+        public static string placeholder_description {
+            get {
+                return ResourceManager.GetString("placeholder_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die &lt;Please enter a display name&gt; ähnelt.
+        /// </summary>
+        public static string placeholder_display_name {
+            get {
+                return ResourceManager.GetString("placeholder_display_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die &lt;Click on &quot;Search file&quot; to locate the .exe, etc&gt; ähnelt.
+        /// </summary>
+        public static string placeholder_file_path {
+            get {
+                return ResourceManager.GetString("placeholder_file_path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die &lt;Please enter a Name&gt; ähnelt.
+        /// </summary>
+        public static string placeholder_service_name {
+            get {
+                return ResourceManager.GetString("placeholder_service_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die &lt;Enter Service Username&gt; ähnelt.
+        /// </summary>
+        public static string placeholder_username {
+            get {
+                return ResourceManager.GetString("placeholder_username", resourceCulture);
             }
         }
         
@@ -484,6 +628,42 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Automatic ähnelt.
+        /// </summary>
+        public static string starttype_automatic {
+            get {
+                return ResourceManager.GetString("starttype_automatic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Automatic with delay ähnelt.
+        /// </summary>
+        public static string starttype_automatic_with_delay {
+            get {
+                return ResourceManager.GetString("starttype_automatic_with_delay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Disabled ähnelt.
+        /// </summary>
+        public static string starttype_disabled {
+            get {
+                return ResourceManager.GetString("starttype_disabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Manual ähnelt.
+        /// </summary>
+        public static string starttype_manual {
+            get {
+                return ResourceManager.GetString("starttype_manual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Stop was successful! ähnelt.
         /// </summary>
         public static string stop_was_successful {
@@ -516,6 +696,15 @@ namespace DaemonMaster.Language {
         public static string switch_to_session_0 {
             get {
                 return ResourceManager.GetString("switch_to_session_0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die General ähnelt.
+        /// </summary>
+        public static string tabitem_general {
+            get {
+                return ResourceManager.GetString("tabitem_general", resourceCulture);
             }
         }
         
@@ -615,6 +804,24 @@ namespace DaemonMaster.Language {
         public static string warning {
             get {
                 return ResourceManager.GetString("warning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die WARNING: The user must have acces to the programm folder and the file path! ähnelt.
+        /// </summary>
+        public static string warning_file_access {
+            get {
+                return ResourceManager.GetString("warning_file_access", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Edit / Add a Process ähnelt.
+        /// </summary>
+        public static string window_edit_add {
+            get {
+                return ResourceManager.GetString("window_edit_add", resourceCulture);
             }
         }
         

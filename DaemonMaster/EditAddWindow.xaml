@@ -7,48 +7,48 @@
         xmlns:resx="clr-namespace:DaemonMaster.Language"
         xmlns:CoreWPF="clr-namespace:DaemonMasterCore.WPF;assembly=DaemonMasterCore"
         mc:Ignorable="d"
-        Title="Edit / Add a Process" Height="343.496" Width="770.731" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
+        Title="{x:Static resx:lang.window_edit_add}" Height="343.496" Width="827.398" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
 
     <Window.Resources>
         <CoreWPF:InvertBooleanConverter x:Key="invertBoolConverter"/>
     </Window.Resources>
 
     <TabControl VerticalContentAlignment="Center">
-        <TabItem Header="General">
-            <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,9,-2" Height="282" Width="740">
-                <Label x:Name="labelServiceName" Content="Service:" HorizontalAlignment="Left" Margin="26,14,0,0" VerticalAlignment="Top"/>
-                <CoreWPF:PlaceholderTextBox x:Name="textBoxServiceName" Height="23" Margin="81,14,0,0" TextWrapping="Wrap" Placeholder="&lt;Please enter a Name&gt; (default = filename)" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" />
-                <Button x:Name="buttonSearchPath" Content="Search file" HorizontalAlignment="Left" Margin="81,179,0,0" VerticalAlignment="Top" Width="321" Click="buttonSearchPath_Click"/>
-                <Button x:Name="buttonSave" Content="{x:Static resx:lang.button_save}" Margin="275,246,0,0" Click="buttonSave_Click" Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139"/>
-                <CoreWPF:PlaceholderTextBox x:Name="textBoxFilePath" Height="23" Margin="81,150,0,0" TextWrapping="Wrap" Placeholder="&lt;Click on &quot;Search file&quot; to locate the .exe&gt;" VerticalAlignment="Top" IsReadOnly="True" HorizontalAlignment="Left" Width="321" UndoLimit="0"/>
-                <Label x:Name="labelFilePath" Content="File path:" HorizontalAlignment="Left" Margin="18,146,0,0" VerticalAlignment="Top"/>
+        <TabItem Header="{x:Static resx:lang.tabitem_general}">
+            <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,5,-2" Height="282" Width="800">
+                <Label x:Name="labelServiceName" Content="{x:Static resx:lang.label_service_name}" HorizontalAlignment="Left" Margin="-14,14,0,0" VerticalAlignment="Top"/>
+                <CoreWPF:PlaceholderTextBox x:Name="textBoxServiceName" Height="23" Margin="81,14,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_service_name}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" />
+                <Button x:Name="buttonSearchPath" Content="{x:Static resx:lang.button_search_file}" HorizontalAlignment="Left" Margin="81,179,0,0" VerticalAlignment="Top" Width="321" Click="buttonSearchPath_Click"/>
+                <Button x:Name="buttonSave" Content="{x:Static resx:lang.button_save}" Margin="329,250,0,0" Click="buttonSave_Click" Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139"/>
+                <CoreWPF:PlaceholderTextBox x:Name="textBoxFilePath" Height="23" Margin="81,150,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_file_path}" VerticalAlignment="Top" IsReadOnly="True" HorizontalAlignment="Left" Width="321" UndoLimit="0"/>
+                <Label x:Name="labelFilePath" Content="{x:Static resx:lang.label_file_path}" HorizontalAlignment="Left" Margin="-14,146,0,0" VerticalAlignment="Top"/>
                 <TextBox x:Name="textBoxParam" Height="23" Width="321" Margin="81,95,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                <Label x:Name="labelParam" Content="Parameter(s):" HorizontalAlignment="Left" Margin="-3,93,0,0" VerticalAlignment="Top"/>
-                <GroupBox x:Name="groupBoxCustomUsername" Header="Custom User (experimental)" HorizontalAlignment="Left" Height="116" Margin="412,0,0,0" VerticalAlignment="Top" Width="318">
+                <Label x:Name="labelParam" Content="{x:Static resx:lang.label_parameters}" HorizontalAlignment="Left" Margin="-14,92,0,0" VerticalAlignment="Top"/>
+                <GroupBox x:Name="groupBoxCustomUsername" Header="{x:Static resx:lang.groupbox_custom_user}" HorizontalAlignment="Left" Height="116" Margin="412,0,0,0" VerticalAlignment="Top" Width="378">
                     <Grid HorizontalAlignment="Left" Height="100" Margin="0,0,-2,-6" VerticalAlignment="Top" Width="267">
-                        <Label x:Name="labelUsername" Content="Username:" HorizontalAlignment="Left" Margin="4,32,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.258,0.487"/>
-                        <Label x:Name="labelPassword" Content="Password:" HorizontalAlignment="Left" Margin="8,63,0,0" VerticalAlignment="Top"/>
-                        <CoreWPF:PlaceholderTextBox x:Name="textBoxUsername" HorizontalAlignment="Left" Height="23" Margin="75,32,0,0" TextWrapping="Wrap" Placeholder="&lt;Enter Service Username&gt;" VerticalAlignment="Top" Width="171" IsReadOnly="False" IsEnabled="{Binding ElementName=checkBoxUseLocalSystem, Path=IsChecked, Converter={StaticResource invertBoolConverter}}"/>
-                        <PasswordBox x:Name="textBoxPassword" HorizontalAlignment="Left" Height="23" Margin="75,67,-38,0" VerticalAlignment="Top" Width="230" IsEnabled="{Binding ElementName=checkBoxUseLocalSystem, Path=IsChecked, Converter={StaticResource invertBoolConverter}}"/>
-                        <Button x:Name="buttonOpenADOP" Content="Search" HorizontalAlignment="Left" Margin="251,32,-38,0" VerticalAlignment="Top" Width="54" Height="23" Click="buttonOpenADOP_Click" IsEnabled="{Binding ElementName=checkBoxUseLocalSystem, Path=IsChecked, Converter={StaticResource invertBoolConverter}}"/>
-                        <CheckBox x:Name="checkBoxUseLocalSystem" Content="Use Local System account" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                        <Label x:Name="labelUsername" Content="{x:Static resx:lang.label_username}" HorizontalAlignment="Left" Margin="4,32,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.258,0.487"/>
+                        <Label x:Name="labelPassword" Content="{x:Static resx:lang.label_password}" HorizontalAlignment="Left" Margin="4,63,0,0" VerticalAlignment="Top"/>
+                        <CoreWPF:PlaceholderTextBox x:Name="textBoxUsername" HorizontalAlignment="Left" Height="23" Margin="93,32,-35,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_username}" VerticalAlignment="Top" Width="209" IsReadOnly="False" IsEnabled="{Binding ElementName=checkBoxUseLocalSystem, Path=IsChecked, Converter={StaticResource invertBoolConverter}}"/>
+                        <PasswordBox x:Name="textBoxPassword" HorizontalAlignment="Left" Height="23" Margin="93,67,-94,0" VerticalAlignment="Top" Width="268" IsEnabled="{Binding ElementName=checkBoxUseLocalSystem, Path=IsChecked, Converter={StaticResource invertBoolConverter}}"/>
+                        <Button x:Name="buttonOpenADOP" Content="{x:Static resx:lang.button_search}" HorizontalAlignment="Left" Margin="307,32,-94,0" VerticalAlignment="Top" Width="54" Height="23" Click="buttonOpenADOP_Click" IsEnabled="{Binding ElementName=checkBoxUseLocalSystem, Path=IsChecked, Converter={StaticResource invertBoolConverter}}"/>
+                        <CheckBox x:Name="checkBoxUseLocalSystem" Content="{x:Static resx:lang.checkbox_use_local_system_account}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                     </Grid>
                 </GroupBox>
-                <Label x:Name="labelDisplayName" Content="Display name:" HorizontalAlignment="Left" Margin="-8,40,0,0" VerticalAlignment="Top"/>
-                <CoreWPF:PlaceholderTextBox x:Name="textBoxDisplayName" Height="23" Margin="81,41,0,0" TextWrapping="Wrap" Placeholder="&lt;Please enter a display name&gt;" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
-                <CoreWPF:PlaceholderTextBox x:Name="textBoxDescription" Height="23" Margin="81,68,0,0" TextWrapping="Wrap" Placeholder="&lt;Please enter a description&gt;" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
-                <Label x:Name="labelDescription" Content="Description:" HorizontalAlignment="Left" Margin="3,67,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="labelDisplayName" Content="{x:Static resx:lang.label_display_name}" HorizontalAlignment="Left" Margin="-14,40,0,0" VerticalAlignment="Top"/>
+                <CoreWPF:PlaceholderTextBox x:Name="textBoxDisplayName" Height="23" Margin="81,41,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_display_name}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
+                <CoreWPF:PlaceholderTextBox x:Name="textBoxDescription" Height="23" Margin="81,68,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_description}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
+                <Label x:Name="labelDescription" Content="{x:Static resx:lang.label_description}" HorizontalAlignment="Left" Margin="-14,64,0,0" VerticalAlignment="Top"/>
                 <ComboBox x:Name="comboBoxStartType" HorizontalAlignment="Left" Margin="81,123,0,0" VerticalAlignment="Top" Width="321" RenderTransformOrigin="1.217,1.045" SelectedIndex="0">
-                    <ComboBoxItem Content="Automatic"/>
-                    <ComboBoxItem Content="Automatic with delay"/>
-                    <ComboBoxItem Content="Manual"/>
-                    <ComboBoxItem Content="Disabled"/>
+                    <ComboBoxItem Content="{x:Static resx:lang.starttype_automatic}"/>
+                    <ComboBoxItem Content="{x:Static resx:lang.starttype_automatic_with_delay}"/>
+                    <ComboBoxItem Content="{x:Static resx:lang.starttype_manual}"/>
+                    <ComboBoxItem Content="{x:Static resx:lang.starttype_disabled}"/>
                 </ComboBox>
-                <Label x:Name="labelStarttyp" Content="Start Type:" HorizontalAlignment="Left" Margin="11,119,0,0" VerticalAlignment="Top"/>
-                <Label x:Name="labelWarningPasswords" Content="WARNING: The user must have acces to the programm folder and the file path!" HorizontalAlignment="Left" Margin="10,215,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="labelStarttyp" Content="{x:Static resx:lang.label_start_type}" HorizontalAlignment="Left" Margin="-14,118,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="labelWarningPasswords" Content="{x:Static resx:lang.warning_file_access}" HorizontalAlignment="Left" Margin="188,219,0,0" VerticalAlignment="Top"/>
             </Grid>
         </TabItem>
-        <TabItem Header="Security" />
-        <TabItem Header="Details" />
+        <!--<TabItem Header="Security" />
+        <TabItem Header="Details" />-->
     </TabControl>
 </Window>

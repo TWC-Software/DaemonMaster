@@ -41,7 +41,7 @@
 	<!--Adding custom actions-->
 	<Fragment>
 		<Binary Id="DaemonMasterCustomActions.CA.dll" SourceFile="$(var.DaemonMasterCustomActions.TargetDir)$(var.DaemonMasterCustomActions.TargetName).CA.dll"/>
-		<CustomAction Id="BeforeUninstall" BinaryKey="DaemonMasterCustomActions.CA.dll" DllEntry="UninstallAllServices" Execute="deferred" Return="check" Impersonate="no"/>
+		<CustomAction Id="BeforeUninstall" BinaryKey="DaemonMasterCustomActions.CA.dll" DllEntry="UninstallAllServices" Execute="deferred" Return="asyncWait" Impersonate="no"/>
 	</Fragment>
 
 	<!--Directories-->
