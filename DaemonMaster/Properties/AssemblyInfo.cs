@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyTitle("DaemonMaster GUI")]
 [assembly: AssemblyDescription("Daemon Master is a software which makes it possible to create and manage a Windows-service from any program.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("TWC Software")]
+[assembly: AssemblyCompany("TWC-Software")]
 [assembly: AssemblyProduct("DaemonMaster")]
 [assembly: AssemblyCopyright("Copyright ©  2017 Mike Cremer / Stephan André")]
 [assembly: AssemblyTrademark("")]

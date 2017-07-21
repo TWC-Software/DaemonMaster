@@ -7,9 +7,9 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle("DaemonMasterCustomActions")]
 [assembly: AssemblyDescription("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("TWC-Software")]
 [assembly: AssemblyProduct("DaemonMasterCustomActions")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
+[assembly: AssemblyCopyright("Copyright ©  2017 Mike Cremer / Stephan André")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
