@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: EDIT/ADD GUI 
+//  DaemonMaster: EditAddWindow
 //  
 //  This file is part of DeamonMaster.
 // 
@@ -96,7 +96,7 @@ namespace DaemonMaster
             }
             else
             {
-                textBoxPassword.Password = "***Super_sicheres_Password***";
+                textBoxPassword.Password = "***Super_sicheres_Passwort***";
                 textBoxUsername.Text = daemon.Username;
             }
 
@@ -217,7 +217,7 @@ namespace DaemonMaster
 
                     if (textBoxPassword.Password != "***Super_sicheres_Password***")
                     {
-                        if (!SystemManagement.CheckUser(textBoxUsername.Text,
+                        if (!SystemManagement.ValidateUserWin32(textBoxUsername.Text,
                             SecurityManagement.ConvertStringToSecureString(textBoxPassword.Password)))
                         {
                             MessageBox.Show(resManager.GetString("invalid_user", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
@@ -226,14 +226,10 @@ namespace DaemonMaster
 
                         daemon.Username = textBoxUsername.Text;
                         daemon.Password = textBoxPassword.SecurePassword;
-
-                        MessageBox.Show(SecurityManagement.ConvertSecureStringToString(daemon.Password) + " 1");
                     }
                     else
                     {
-                        MessageBox.Show(SecurityManagement.ConvertSecureStringToString(daemon.Password) + " 1");
-
-                        if (!SystemManagement.CheckUser(textBoxUsername.Text, daemon.Password))
+                        if (!SystemManagement.ValidateUserWin32(textBoxUsername.Text, daemon.Password))
                         {
                             MessageBox.Show(resManager.GetString("invalid_user", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
                             return;

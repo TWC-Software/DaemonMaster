@@ -430,7 +430,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die The given username or password was incorrect! ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die The given username or/and password was incorrect! ähnelt.
         /// </summary>
         public static string invalid_user {
             get {

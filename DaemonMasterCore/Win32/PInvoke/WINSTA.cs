@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: WIN32 NativeMethods
+//  DaemonMaster: NativeMethods
 //  
 //  This file is part of DeamonMaster.
 // 
@@ -16,7 +16,6 @@
 //   You should have received a copy of the GNU General Public License
 //   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
-
 
 using System.Runtime.InteropServices;
 

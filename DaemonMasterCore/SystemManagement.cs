@@ -1,12 +1,27 @@
+/////////////////////////////////////////////////////////////////////////////////////////
+//  DaemonMaster: SystemManagement
+//  
+//  This file is part of DeamonMaster.
+// 
+//  DeamonMaster is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//   DeamonMaster is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//
+//   You should have received a copy of the GNU General Public License
+//   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+/////////////////////////////////////////////////////////////////////////////////////////
+
+using DaemonMasterCore.Win32.PInvoke;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using System.DirectoryServices.AccountManagement;
 using System.Runtime.InteropServices;
-using DaemonMasterCore.Win32.PInvoke;
+using System.Security;
 
 namespace DaemonMasterCore
 {
@@ -20,7 +35,7 @@ namespace DaemonMasterCore
             }
         }
 
-        public static bool CheckUser(string username, SecureString password)
+        public static bool ValidateUserWin32(string username, SecureString password)
         {
             if (String.IsNullOrWhiteSpace(username) || password == null)
                 throw new ArgumentNullException();
@@ -30,10 +45,8 @@ namespace DaemonMasterCore
 
             try
             {
-                string password1 = SecurityManagement.ConvertSecureStringToString(password);
-
                 passwordPtr = Marshal.SecureStringToGlobalAllocUnicode(password);
-                return NativeMethods.LogonUser(username, ".", passwordPtr, NativeMethods.LOGON_TYP.Interactive, NativeMethods.LOGON_PROVIDER.Default, ref tokenHandle);
+                return NativeMethods.LogonUser(username, ".", passwordPtr, NativeMethods.LOGON_TYP.Interactive, NativeMethods.LOGON_PROVIDER.Default, out tokenHandle);
             }
             finally
             {

@@ -61,9 +61,12 @@ namespace DaemonMasterCore
                 UseShellExecute = false //For .ink              
             };
 
-            if (!String.IsNullOrWhiteSpace(_daemon.Username))
+            if (!_daemon.UseLocalSystem)
             {
-                if (SystemManagement.CheckUser(_daemon.Username, _daemon.Password))
+                if (!String.IsNullOrWhiteSpace(_daemon.Username) && _daemon.Password != null)
+                    throw new InvalidCredentialException();
+
+                if (SystemManagement.ValidateUserWin32(_daemon.Username, _daemon.Password))
                 {
                     startInfo.UserName = _daemon.Username;
                     startInfo.Password = _daemon.Password;

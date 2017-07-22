@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: ServiceNotStoppedException
+//  DaemonMaster: ServiceStoppedException
 //  
 //  This file is part of DeamonMaster.
 // 

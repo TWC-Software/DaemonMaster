@@ -307,7 +307,7 @@
     <value>Bei herunterfahren der Anwendung werden alle Prozesse "gekillt"! Sind Sie sich sicher?</value>
   </data>
   <data name="invalid_user" xml:space="preserve">
-    <value>Der angegebene Nutzername oder das angegebene Password waren falsch!</value>
+    <value>Der angegebene Nutzername oder/und das angegebene Password ist/sind falsch!</value>
   </data>
   <data name="label_display_name" xml:space="preserve">
     <value>Anzeigename:</value>

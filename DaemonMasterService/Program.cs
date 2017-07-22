@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: MAIN SERVICE CLASS 
+//  DaemonMaster: Program
 //  
 //  This file is part of DeamonMaster.
 // 
@@ -17,11 +17,9 @@
 //   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-
-using System;
-using System.ServiceProcess;
 using DaemonMasterCore;
 using NLog;
+using System.ServiceProcess;
 
 namespace DaemonMasterService
 {
