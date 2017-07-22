@@ -378,4 +378,7 @@
   <data name="warning_file_access" xml:space="preserve">
     <value>WARNUNG: Der Nutzer muss Zugriff auf die gewählte .exe oder ähnliches haben!</value>
   </data>
+  <data name="button_cancel" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
 </root>

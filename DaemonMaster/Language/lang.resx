@@ -378,4 +378,7 @@
   <data name="warning_file_access" xml:space="preserve">
     <value>WARNING: The user must have acces to the programm folder and the file path!</value>
   </data>
+  <data name="button_cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
 </root>

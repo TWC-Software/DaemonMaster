@@ -123,12 +123,12 @@ namespace DaemonMaster
 
         #region GUI_Elements
 
-        private void buttonSave_Click(object sender, RoutedEventArgs e)
+        private void buttonSave_OnClick(object sender, RoutedEventArgs e)
         {
             Save();
         }
 
-        private void buttonSearchPath_Click(object sender, RoutedEventArgs e)
+        private void buttonSearchPath_OnClick(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog =
                 new OpenFileDialog
@@ -156,7 +156,7 @@ namespace DaemonMaster
             }
         }
 
-        private void buttonOpenADOP_Click(object sender, RoutedEventArgs e)
+        private void buttonOpenADOP_OnClick(object sender, RoutedEventArgs e)
         {
             DirectoryObjectPickerDialog pickerDialog = new DirectoryObjectPickerDialog()
             {
@@ -173,6 +173,11 @@ namespace DaemonMaster
             {
                 textBoxUsername.Text = pickerDialog.SelectedObject.Name;
             }
+        }
+
+        private void buttonCancel_OnClick(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
 
         #endregion
@@ -372,6 +377,11 @@ namespace DaemonMaster
         private static void OnDaemonEditEvent(DaemonInfo oldDaemonInfo, DaemonInfo newDaemonInfo)
         {
             DaemonEditEvent?.Invoke(oldDaemonInfo, newDaemonInfo);
+        }
+
+        private void textBoxDescription_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+
         }
     }
 }
