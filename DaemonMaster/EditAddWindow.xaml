@@ -14,8 +14,8 @@
     </Window.Resources>
 
     <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,0,0" Height="308" Width="890">
-        <Button x:Name="buttonSave" Content="{x:Static resx:lang.button_save}" Margin="725,282,0,0" Click="buttonSave_OnClick" Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139"/>
-        <Button x:Name="buttonCancel" Content="{x:Static resx:lang.button_cancel}" Margin="10,282,0,0"  Click="buttonCancel_OnClick"  Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139"/>
+        <Button x:Name="buttonSave" Content="{x:Static resx:lang.button_save}" Margin="10,276,0,0" Click="buttonSave_OnClick" Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139"/>
+        <Button x:Name="buttonCancel" Content="{x:Static resx:lang.button_cancel}" Margin="741,276,0,0"  Click="buttonCancel_OnClick"  Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139"/>
 
         <TabControl VerticalContentAlignment="Center" Margin="0,0,0,42" RenderTransformOrigin="0,0">
             <TabControl.RenderTransform>
