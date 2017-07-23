@@ -18,13 +18,12 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 using DaemonMasterCore.Win32;
-using System;
-using System.Diagnostics;
-using System.DirectoryServices.AccountManagement;
-using System.Security.Authentication;
-using System.Threading;
 using DaemonMasterCore.Win32.PInvoke;
 using NLog;
+using System;
+using System.Diagnostics;
+using System.Security.Authentication;
+using System.Threading;
 
 namespace DaemonMasterCore
 {
@@ -37,6 +36,7 @@ namespace DaemonMasterCore
 
         //Don't change!!
         private int _restarts = 0;
+        private DateTime? lastRestartTime = null;
 
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -206,6 +206,27 @@ namespace DaemonMasterCore
 
         internal void ProcessOnExited(object sender, EventArgs eventArgs)
         {
+            #region Counter reset system
+
+            if (_daemon.CounterResetTime != 0 && lastRestartTime.HasValue)
+            {
+                //Reset the counter if secondsBetweenCraches is greater than or equal to CounterResetTime 
+                try
+                {
+                    uint secondsBetweenCraches = Convert.ToUInt32(DateTime.UtcNow.Subtract(lastRestartTime.Value).TotalSeconds);
+                    if (secondsBetweenCraches >= _daemon.CounterResetTime)
+                    {
+                        _restarts = 0;
+                    }
+                }
+                //Reset the counter if an overflow happens because secondsBetweenCraches must be greater than CounterResetTime
+                catch (OverflowException)
+                {
+                    _restarts = 0;
+                }
+            }
+            #endregion
+
             //restart the process if _restarts < MaxRestarts or MaxRestarts = -1
             if (_restarts < _daemon.MaxRestarts || _daemon.MaxRestarts == -1)
             {
@@ -213,6 +234,8 @@ namespace DaemonMasterCore
                 StartProcess();
                 _restarts++;
                 _logger.Warn("Restart process... (restart: {0})", _restarts);
+
+                lastRestartTime = DateTime.UtcNow;
             }
             else
             {
