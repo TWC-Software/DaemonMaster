@@ -381,4 +381,13 @@
   <data name="button_cancel" xml:space="preserve">
     <value>Abbrechen</value>
   </data>
+  <data name="invalid_shortcut" xml:space="preserve">
+    <value>Ungültige Verknüpfung</value>
+  </data>
+  <data name="button_load_shortcut" xml:space="preserve">
+    <value>Lade Informationen aus einer Verknüpfung</value>
+  </data>
+  <data name="data_will_be_overwritten" xml:space="preserve">
+    <value>Vorhandene Daten werden beim Laden überschrieben!</value>
+  </data>
 </root>

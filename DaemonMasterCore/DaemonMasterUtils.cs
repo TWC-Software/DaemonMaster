@@ -17,8 +17,11 @@
 //   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
+using Shell32;
 using System;
+using System.IO;
 using System.Management;
+using System.Windows;
 using System.Windows.Media;
 
 namespace DaemonMasterCore
@@ -34,7 +37,7 @@ namespace DaemonMasterCore
                 {
                     return System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
                         icon.Handle,
-                        System.Windows.Int32Rect.Empty,
+                        Int32Rect.Empty,
                         System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
                 }
             }
@@ -67,5 +70,50 @@ namespace DaemonMasterCore
 
             throw new Exception("Can not get the ServiceName");
         }
+
+        public static ShortcutInfo GetShortcutInfos(string shortcutFullPath)
+        {
+            string directory = Path.GetDirectoryName(shortcutFullPath);
+            string file = Path.GetFileName(shortcutFullPath);
+
+            Shell shell = new Shell();
+            Folder folder = shell.NameSpace(directory);
+            FolderItem folderItem = folder.ParseName(file);
+
+            ShellLinkObject link = (ShellLinkObject)folderItem.GetLink;
+
+            ShortcutInfo shortcutInfo = new ShortcutInfo()
+            {
+                FilePath = link.Path,
+                Arguments = link.Arguments,
+                WorkingDir = link.WorkingDirectory,
+                Description = link.Description,
+            };
+
+            return shortcutInfo;
+        }
+
+        public static bool IsShortcut(string shortcutFullPath)
+        {
+            string directory = Path.GetDirectoryName(shortcutFullPath);
+            string file = Path.GetFileName(shortcutFullPath);
+
+            Shell shell = new Shell();
+            Folder folder = shell.NameSpace(directory);
+            FolderItem folderItem = folder.ParseName(file);
+
+            if (folderItem != null)
+                return folderItem.IsLink;
+
+            return false;
+        }
+    }
+
+    public class ShortcutInfo
+    {
+        public string FilePath { get; set; }
+        public string WorkingDir { get; set; }
+        public string Arguments { get; set; }
+        public string Description { get; set; }
     }
 }

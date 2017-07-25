@@ -20,6 +20,7 @@
 
 using DaemonMasterCore;
 using DaemonMasterCore.Win32.PInvoke;
+using DaemonMasterCore.Win32.PInvoke.COM;
 using Microsoft.Win32;
 using System;
 using System.Globalization;
@@ -133,13 +134,12 @@ namespace DaemonMaster
             OpenFileDialog openFileDialog =
                 new OpenFileDialog
                 {
-                    //Show the path of the shortcuts
-                    DereferenceLinks = false,
+                    DereferenceLinks = true,
                     CheckFileExists = true,
                     CheckPathExists = true,
                     AddExtension = true,
-                    InitialDirectory = Environment.GetFolderPath(System.Environment.SpecialFolder.MyComputer),
-                    Filter = "Exe files (*.exe)|*.exe|" + "Shortcut (*.lnk)|*.lnk|" +
+                    InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
+                    Filter = "Exe files (*.exe)|*.exe|" +
                              "All files (*.*)|*.*"
                 };
 
@@ -151,7 +151,7 @@ namespace DaemonMaster
                 //Wenn der Name noch leer oder der Standart Name geladen ist, soll er ihn mit dem Datei namen befüllen
                 if (String.IsNullOrWhiteSpace(textBoxDisplayName.Text))
                 {
-                    textBoxDisplayName.Text = openFileDialog.SafeFileName;
+                    textBoxDisplayName.Text = Path.GetFileNameWithoutExtension(openFileDialog.SafeFileName);
                 }
             }
         }
@@ -180,6 +180,52 @@ namespace DaemonMaster
             this.Close();
         }
 
+        private void buttonLoadShortcut_OnClick(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog =
+                new OpenFileDialog
+                {
+                    //Show the path of the shortcuts
+                    DereferenceLinks = false,
+                    CheckFileExists = true,
+                    CheckPathExists = true,
+                    AddExtension = true,
+                    InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
+                    Filter = "Shortcut (*.lnk)|*.lnk|" +
+                             "All files (*.*)|*.*"
+                };
+
+            //Wenn eine Datei gewählt worden ist
+            if (openFileDialog.ShowDialog() == true)
+            {
+                if (DaemonMasterUtils.IsShortcut(openFileDialog.FileName))
+                {
+                    MessageBoxResult result = MessageBox.Show(resManager.GetString("data_will_be_overwritten", CultureInfo.CurrentUICulture), resManager.GetString("warning", CultureInfo.CurrentUICulture), MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        ShortcutInfo shortcutInfo = DaemonMasterUtils.GetShortcutInfos(openFileDialog.FileName);
+                        textBoxParam.Text = shortcutInfo.Arguments;
+                        textBoxFilePath.Text = shortcutInfo.FilePath;
+
+                        if (String.IsNullOrWhiteSpace(textBoxDescription.Text))
+                        {
+                            textBoxDescription.Text = shortcutInfo.Description;
+                        }
+
+                        if (String.IsNullOrWhiteSpace(textBoxDisplayName.Text))
+                        {
+                            textBoxDisplayName.Text = Path.GetFileNameWithoutExtension(openFileDialog.SafeFileName);
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show(resManager.GetString("invalid_shortcut", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+            }
+        }
+
         #endregion
 
 
@@ -193,11 +239,12 @@ namespace DaemonMaster
         {
             try
             {
-                if (!Directory.Exists(Path.GetDirectoryName(textBoxFilePath.Text)) || !System.IO.File.Exists(textBoxFilePath.Text))
+                if (!Directory.Exists(Path.GetDirectoryName(textBoxFilePath.Text)) || !File.Exists(textBoxFilePath.Text))
                 {
                     MessageBox.Show(resManager.GetString("invalid_path", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
+
 
                 if (String.IsNullOrWhiteSpace(textBoxDisplayName.Text) ||
                     String.IsNullOrWhiteSpace(textBoxServiceName.Text))
@@ -241,12 +288,12 @@ namespace DaemonMaster
                     daemon.Username = String.Empty;
                     daemon.Password = null;
                 }
-                daemon.UseLocalSystem = (bool)checkBoxUseLocalSystem.IsChecked;
 
                 string fileDir = Path.GetDirectoryName(textBoxFilePath.Text);
                 string fileName = Path.GetFileName(textBoxFilePath.Text);
                 string fileExtension = Path.GetExtension(textBoxFilePath.Text);
 
+                daemon.UseLocalSystem = (bool)checkBoxUseLocalSystem.IsChecked;
 
                 daemon.DisplayName = textBoxDisplayName.Text;
                 daemon.ServiceName = "DaemonMaster_" + textBoxServiceName.Text;

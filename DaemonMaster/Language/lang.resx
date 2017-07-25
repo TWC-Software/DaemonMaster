@@ -381,4 +381,14 @@
   <data name="button_cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="invalid_shortcut" xml:space="preserve">
+    <value>Invalid shortcut</value>
+  </data>
+  <data name="button_load_shortcut" xml:space="preserve">
+    <value>Load data from shortcut</value>
+  </data>
+  <data name="data_will_be_overwritten" xml:space="preserve">
+    <value>Existing data will be overwritten on load!
+</value>
+  </data>
 </root>

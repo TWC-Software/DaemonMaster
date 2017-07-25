@@ -40,7 +40,7 @@ namespace DaemonMasterCore
                 //Strings
                 serviceKey.SetValue("FileDir", daemon.FileDir, RegistryValueKind.String);
                 serviceKey.SetValue("FileName", daemon.FileName, RegistryValueKind.String);
-
+                serviceKey.SetValue("FileExtension", daemon.FileExtension, RegistryValueKind.String);
                 serviceKey.SetValue("Parameter", daemon.Parameter, RegistryValueKind.String);
 
 
@@ -100,6 +100,7 @@ namespace DaemonMasterCore
 
                     daemon.FileDir = Convert.ToString(parameters.GetValue("FileDir"));
                     daemon.FileName = Convert.ToString(parameters.GetValue("FileName"));
+                    daemon.FileExtension = Convert.ToString(parameters.GetValue("FileExtension"));
                     daemon.Parameter = Convert.ToString(parameters.GetValue("Parameter"));
                     daemon.Username = Convert.ToString(parameters.GetValue("Username", String.Empty));
                     byte[] entropy = (byte[])parameters.GetValue("Key", new byte[0]);

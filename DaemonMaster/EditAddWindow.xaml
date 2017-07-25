@@ -30,7 +30,7 @@
                 <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,0,0" Height="282" Width="874">
                     <Label x:Name="labelServiceName" Content="{x:Static resx:lang.label_service_name}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                     <CoreWPF:PlaceholderTextBox x:Name="textBoxServiceName" Height="23" Margin="147,14,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_service_name}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" />
-                    <Button x:Name="buttonSearchPath" Content="{x:Static resx:lang.button_search_file}" HorizontalAlignment="Left" Margin="147,194,0,0" VerticalAlignment="Top" Width="717" Click="buttonSearchPath_OnClick"/>
+                    <Button x:Name="buttonSearchPath" Content="{x:Static resx:lang.button_search_file}" HorizontalAlignment="Left" Margin="147,194,0,0" VerticalAlignment="Top" Width="247" Click="buttonSearchPath_OnClick"/>
 
                     <CoreWPF:PlaceholderTextBox x:Name="textBoxFilePath" Height="23" Margin="147,166,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_file_path}" VerticalAlignment="Top" IsReadOnly="True" HorizontalAlignment="Left" Width="717" UndoLimit="0"/>
                     <Label x:Name="labelFilePath" Content="{x:Static resx:lang.label_file_path}" HorizontalAlignment="Left" Margin="10,162,0,0" VerticalAlignment="Top"/>
@@ -58,6 +58,7 @@
                     </ComboBox>
                     <Label x:Name="labelStarttyp" Content="{x:Static resx:lang.label_start_type}" HorizontalAlignment="Left" Margin="10,126,0,0" VerticalAlignment="Top"/>
                     <Label x:Name="labelWarningPasswords" Content="{x:Static resx:lang.warning_file_access}" HorizontalAlignment="Left" Margin="271,214,0,0" VerticalAlignment="Top"/>
+                    <Button x:Name="buttonLoadShortcut" Content="{x:Static resx:lang.button_load_shortcut}" Margin="399,194,0,0" Click="buttonLoadShortcut_OnClick"  Height="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="465"/>
                 </Grid>
             </TabItem>
             <!--<TabItem Header="Security" />

@@ -178,6 +178,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Load data from shortcut ähnelt.
+        /// </summary>
+        public static string button_load_shortcut {
+            get {
+                return ResourceManager.GetString("button_load_shortcut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Save ähnelt.
         /// </summary>
         public static string button_save {
@@ -358,6 +367,16 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Existing data will be overwritten on load!
+        /// ähnelt.
+        /// </summary>
+        public static string data_will_be_overwritten {
+            get {
+                return ResourceManager.GetString("data_will_be_overwritten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Do you want to use the data of the shortcut? All existing data will be overwritten! ähnelt.
         /// </summary>
         public static string do_you_to_use_the_data_of_the_shortcut {
@@ -426,6 +445,15 @@ namespace DaemonMaster.Language {
         public static string invalid_path {
             get {
                 return ResourceManager.GetString("invalid_path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Invalid shortcut ähnelt.
+        /// </summary>
+        public static string invalid_shortcut {
+            get {
+                return ResourceManager.GetString("invalid_shortcut", resourceCulture);
             }
         }
         
