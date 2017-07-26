@@ -151,13 +151,13 @@
     <value>Impossible de démarrer le Service de UI0Detect !!</value>
   </data>
   <data name="failed_start_UI0detect_service" xml:space="preserve">
-    <value>Impossible de démarrer le service de UI0Detect !!</value>
+    <value>Le démarrage du service de UI0Detect à échoué !!</value>
   </data>
   <data name="information" xml:space="preserve">
     <value>Informations !</value>
   </data>
   <data name="interactive_service_regkey_not_set" xml:space="preserve">
-    <value>Processus interactifs sont bloqués par une clé de registre. Vous souhaitez le désactiver ? (L’Application ne peut pas fonctionner sans processus interactifs !) !</value>
+    <value>Les processus interactifs sont bloqués par une clé de registre. Vous souhaitez la désactiver ? (L’Application ne peut pas fonctionner sans processus interactifs !) !</value>
   </data>
   <data name="invalid_path" xml:space="preserve">
     <value>Chemin d’accès au fichier n’est pas valide ou le fichier a été supprimé !!</value>
@@ -247,7 +247,7 @@
     <value>Chercher</value>
   </data>
   <data name="button_start_service" xml:space="preserve">
-    <value>Commencer le service</value>
+    <value>Enclencher le service</value>
   </data>
   <data name="button_stop_service" xml:space="preserve">
     <value>Arrêter le service</value>
@@ -256,7 +256,7 @@
     <value>Mode de filtrage</value>
   </data>
   <data name="cannot_load_data_from_registry" xml:space="preserve">
-    <value>Ne peut pas charger les données du Registre !!</value>
+    <value>Impossible de charger les données du Registre !!</value>
   </data>
   <data name="you_must_stop_the_service_first" xml:space="preserve">
     <value>Vous devez arrêter le service tout d’abord. Voulez-vous arrêter le service maintenant ? !</value>
