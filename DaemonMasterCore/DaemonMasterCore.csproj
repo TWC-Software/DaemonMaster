@@ -67,7 +67,6 @@
     <Compile Include="DaemonInfo.cs" />
     <Compile Include="ProcessManagement.cs" />
     <Compile Include="SystemManagement.cs" />
-    <Compile Include="Win32\PInvoke\COM\IShellLink.cs" />
     <Compile Include="Win32\PInvoke\DLLFiles.cs" />
     <Compile Include="Win32\ServiceControlManager.cs" />
     <Compile Include="Win32\ServiceHandle.cs" />
