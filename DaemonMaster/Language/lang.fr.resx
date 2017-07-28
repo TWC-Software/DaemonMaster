@@ -267,4 +267,127 @@
   <data name="button_check_for_updates" xml:space="preserve">
     <value>Vérifier l'existence de mises à jour </value>
   </data>
+  <data name="do_you_to_use_the_data_of_the_shortcut" xml:space="preserve">
+    <value>Voulez-vous utiliser les données du raccourci? Toutes les données existantes seront écrasées !!</value>
+  </data>
+  <data name="button_start" xml:space="preserve">
+    <value>Commencer !</value>
+  </data>
+  <data name="button_stop" xml:space="preserve">
+    <value>Arrêtez !</value>
+  </data>
+  <data name="stop_was_successful" xml:space="preserve">
+    <value>Arrêter avec succes!</value>
+  </data>
+  <data name="stop_was_unsuccessful" xml:space="preserve">
+    <value>Stop n'a pas réussi! Voulez-vous tuer le processus?</value>
+  </data>
+  <data name="the_selected_process_does_not_exist" xml:space="preserve">
+    <value>Le processus sélectionné n'existe pas !!</value>
+  </data>
+  <data name="button_kill" xml:space="preserve">
+    <value>Tuer le processus</value>
+  </data>
+  <data name="the_process_killing_was_successful" xml:space="preserve">
+    <value>L' arrêt du processus a été couronné de succès!</value>
+  </data>
+  <data name="the_process_killing_was_unsuccessful" xml:space="preserve">
+    <value>L' arrêt du processus a échoué !!</value>
+  </data>
+  <data name="start_was_successful" xml:space="preserve">
+    <value>Le début a été couronné de succès!</value>
+  </data>
+  <data name="start_was_unsuccessful" xml:space="preserve">
+    <value>Le début a échoué !!</value>
+  </data>
+  <data name="the_selected_process_is_already_started" xml:space="preserve">
+    <value>Le processus sélectionné est déjà lancé!</value>
+  </data>
+  <data name="all_processes_will_be_killed" xml:space="preserve">
+    <value>Tous les processus seront tués lors de l'arrêt (sauf les services)! Êtes-vous sûr?!</value>
+  </data>
+  <data name="invalid_user" xml:space="preserve">
+    <value>Le nom d'utilisateur et / ou le mot de passe donnés étaient incorrects !!</value>
+  </data>
+  <data name="label_display_name" xml:space="preserve">
+    <value>Nom d’affichage</value>
+  </data>
+  <data name="label_service_name" xml:space="preserve">
+    <value>Nom service</value>
+  </data>
+  <data name="label_description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="label_parameters" xml:space="preserve">
+    <value>Paramètre(s)</value>
+  </data>
+  <data name="label_start_type" xml:space="preserve">
+    <value>Début</value>
+  </data>
+  <data name="starttype_automatic" xml:space="preserve">
+    <value>Automatique</value>
+  </data>
+  <data name="starttype_automatic_with_delay" xml:space="preserve">
+    <value>Automatique avec retard!</value>
+  </data>
+  <data name="starttype_manual" xml:space="preserve">
+    <value>Manuelle</value>
+  </data>
+  <data name="starttype_disabled" xml:space="preserve">
+    <value>Désactivé</value>
+  </data>
+  <data name="label_file_path" xml:space="preserve">
+    <value>Chemin d'accès</value>
+  </data>
+  <data name="button_search_file" xml:space="preserve">
+    <value>Rechercher des Tags du fichier</value>
+  </data>
+  <data name="groupbox_custom_user" xml:space="preserve">
+    <value>Utilisateur personnalisé (expérimental)!</value>
+  </data>
+  <data name="checkbox_use_local_system_account" xml:space="preserve">
+    <value>Utilisez le compte Système local!</value>
+  </data>
+  <data name="label_username" xml:space="preserve">
+    <value>Nom d'utilisateur</value>
+  </data>
+  <data name="label_password" xml:space="preserve">
+    <value>Mot de passe</value>
+  </data>
+  <data name="placeholder_username" xml:space="preserve">
+    <value>&lt;Ajouter le nom du service&gt; !</value>
+  </data>
+  <data name="placeholder_description" xml:space="preserve">
+    <value>&lt;Ajouter une description&gt; !</value>
+  </data>
+  <data name="placeholder_service_name" xml:space="preserve">
+    <value>&lt;Ajouter un nom&gt; !</value>
+  </data>
+  <data name="placeholder_display_name" xml:space="preserve">
+    <value>&lt;Ajouter le nom d'affichage&gt; !</value>
+  </data>
+  <data name="placeholder_file_path" xml:space="preserve">
+    <value>&lt;Cliquez sur "Cherchez le fichier" pour localizer le .exe, etc&gt; !</value>
+  </data>
+  <data name="tabitem_general" xml:space="preserve">
+    <value>Données générales</value>
+  </data>
+  <data name="window_edit_add" xml:space="preserve">
+    <value>Modifier / Ajouter un processus!</value>
+  </data>
+  <data name="warning_file_access" xml:space="preserve">
+    <value>AVERTISSEMENT: L'utilisateur doit avoir accès au dossier programme et au chemin du fichier !!</value>
+  </data>
+  <data name="button_cancel" xml:space="preserve">
+    <value>Annuler !</value>
+  </data>
+  <data name="invalid_shortcut" xml:space="preserve">
+    <value>Raccourci invalide!</value>
+  </data>
+  <data name="button_load_shortcut" xml:space="preserve">
+    <value>Chargez les données à partir du raccourci!</value>
+  </data>
+  <data name="data_will_be_overwritten" xml:space="preserve">
+    <value>Les données existantes seront écrasées sur la charge! !</value>
+  </data>
 </root>
