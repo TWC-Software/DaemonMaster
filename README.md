@@ -4,7 +4,7 @@ Daemon Master is a software which makes it possible to create and manage a Windo
 WARNING SOFTWARE IS IN ALPHA !
 
 ## Pre-release is available!
-You can download the pre-release here: https://github.com/TWC-Software/DaemonMaster/releases
+You can download the pre-release here: [Click here](https://github.com/TWC-Software/DaemonMaster/releases/latest)
 
 ## Features
 - Easy and fast creation, deletion and editing of services
