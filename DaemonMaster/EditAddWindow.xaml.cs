@@ -20,7 +20,6 @@
 
 using DaemonMasterCore;
 using DaemonMasterCore.Win32.PInvoke;
-using DaemonMasterCore.Win32.PInvoke.COM;
 using Microsoft.Win32;
 using System;
 using System.Globalization;
