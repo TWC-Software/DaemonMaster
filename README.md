@@ -3,6 +3,9 @@
 Daemon Master is a software which makes it possible to create and manage a Windows-service from any program.
 WARNING SOFTWARE IS IN ALPHA !
 
+## Pre-release is available!
+You can download the pre-release here: https://github.com/TWC-Software/DaemonMaster/releases
+
 ## Features
 - Easy and fast creation, deletion and editing of services
 - Creating / Editing new services in realtime
@@ -12,6 +15,7 @@ WARNING SOFTWARE IS IN ALPHA !
 - Custom username and password for a service (experimental)
 
 ## Planned Features
+- Currently: None
 
 ## Thanks to 
 - pinvoke.net (and its users)
