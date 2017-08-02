@@ -29,7 +29,7 @@ namespace DaemonMasterCore
 {
     internal class DaemonProcess : IDisposable
     {
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly Daemon _daemon = null;
         private readonly Process _process = new Process();
@@ -233,13 +233,13 @@ namespace DaemonMasterCore
                 Thread.Sleep(_daemon.ProcessRestartDelay);
                 StartProcess();
                 _restarts++;
-                _logger.Warn("Restart process... (restart: {0})", _restarts);
+                Logger.Warn("Restart process... (restart: {0})", _restarts);
 
                 lastRestartTime = DateTime.UtcNow;
             }
             else
             {
-                _logger.Warn("The maximum number of restarts has been reached!");
+                Logger.Warn("The maximum number of restarts has been reached!");
             }
         }
 

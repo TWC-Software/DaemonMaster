@@ -390,4 +390,13 @@
   <data name="data_will_be_overwritten" xml:space="preserve">
     <value>Vorhandene Daten werden beim Laden überschrieben!</value>
   </data>
+  <data name="service" xml:space="preserve">
+    <value>Dienst</value>
+  </data>
+  <data name="status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="pid" xml:space="preserve">
+    <value>PID</value>
+  </data>
 </root>

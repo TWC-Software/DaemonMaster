@@ -391,4 +391,13 @@
     <value>Existing data will be overwritten on load!
 </value>
   </data>
+  <data name="service" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="pid" xml:space="preserve">
+    <value>PID</value>
+  </data>
 </root>

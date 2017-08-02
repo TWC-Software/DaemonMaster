@@ -566,6 +566,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die PID ähnelt.
+        /// </summary>
+        public static string pid {
+            get {
+                return ResourceManager.GetString("pid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die &lt;Please enter a description&gt; ähnelt.
         /// </summary>
         public static string placeholder_description {
@@ -625,6 +634,15 @@ namespace DaemonMaster.Language {
         public static string question {
             get {
                 return ResourceManager.GetString("question", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Service ähnelt.
+        /// </summary>
+        public static string service {
+            get {
+                return ResourceManager.GetString("service", resourceCulture);
             }
         }
         
@@ -697,6 +715,15 @@ namespace DaemonMaster.Language {
         public static string starttype_manual {
             get {
                 return ResourceManager.GetString("starttype_manual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Status ähnelt.
+        /// </summary>
+        public static string status {
+            get {
+                return ResourceManager.GetString("status", resourceCulture);
             }
         }
         

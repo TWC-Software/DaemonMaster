@@ -25,14 +25,14 @@ namespace DaemonMasterCore.WPF
 {
     public class PlaceholderTextBox : TextBox
     {
-        private string placeholder = "Placeholder";
+        private string _placeholder = "Placeholder";
 
         public string Placeholder
         {
-            get { return placeholder; }
+            get { return _placeholder; }
             set
             {
-                placeholder = value;
+                _placeholder = value;
                 SetPlaceholder();
             }
         }
@@ -42,7 +42,7 @@ namespace DaemonMasterCore.WPF
         {
             get
             {
-                if (base.Text == placeholder)
+                if (base.Text == _placeholder)
                     return String.Empty;
 
                 return base.Text;
@@ -80,14 +80,14 @@ namespace DaemonMasterCore.WPF
         {
             if (String.IsNullOrWhiteSpace(base.Text))
             {
-                base.Text = placeholder;
+                base.Text = _placeholder;
                 Foreground = System.Windows.Media.Brushes.Gray;
             }
         }
 
         private void RemovePlaceholder()
         {
-            if (base.Text == placeholder)
+            if (base.Text == _placeholder)
             {
                 base.Text = String.Empty;
                 Foreground = System.Windows.Media.Brushes.Black;

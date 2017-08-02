@@ -118,9 +118,9 @@ namespace DaemonMasterCore
             }
         }
 
-        public static ObservableCollection<DaemonInfo> LoadDaemonInfosFromRegistry()
+        public static ObservableCollection<DaemonItem> LoadDaemonItemsFromRegistry()
         {
-            ObservableCollection<DaemonInfo> daemons = new ObservableCollection<DaemonInfo>();
+            ObservableCollection<DaemonItem> daemons = new ObservableCollection<DaemonItem>();
 
             ServiceController[] sc = ServiceController.GetServices();
 
@@ -135,14 +135,14 @@ namespace DaemonMasterCore
                             if (key == null)
                                 throw new Exception("Can't open registry key!");
 
-                            DaemonInfo daemonInfo = new DaemonInfo
+                            DaemonItem daemonItem = new DaemonItem
                             {
                                 DisplayName = service.DisplayName,
                                 ServiceName = service.ServiceName,
                                 FullPath = (string)key.GetValue("FileDir") + @"/" + (string)key.GetValue("FileName")
                             };
 
-                            daemons.Add(daemonInfo);
+                            daemons.Add(daemonItem);
                         }
                     }
                 }

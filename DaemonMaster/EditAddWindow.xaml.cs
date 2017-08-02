@@ -35,16 +35,16 @@ namespace DaemonMaster
     /// </summary>
     public partial class EditAddWindow : Window
     {
-        private readonly ResourceManager resManager = new ResourceManager("DaemonMaster.Language.lang", typeof(EditAddWindow).Assembly);
+        private readonly ResourceManager _resManager = new ResourceManager("DaemonMaster.Language.lang", typeof(EditAddWindow).Assembly);
 
         //Erstellt ein Event 
-        internal delegate void DaemonSavedDelegate(DaemonInfo daemon);
+        internal delegate void DaemonSavedDelegate(DaemonItem daemon);
         internal static event DaemonSavedDelegate DaemonSavedEvent;
-        internal delegate void DaemonEditDelegate(DaemonInfo oldDaemonInfo, DaemonInfo newDaemonInfo);
+        internal delegate void DaemonEditDelegate(DaemonItem oldDaemonItem, DaemonItem newDaemonItem);
         internal static event DaemonEditDelegate DaemonEditEvent;
 
         private Daemon daemon = null;
-        private DaemonInfo _oldDaemonInfo = null;
+        private DaemonItem _oldDaemonItem = null;
 
         private readonly bool onEdit = false;
 
@@ -56,24 +56,24 @@ namespace DaemonMaster
             daemon = new Daemon();
         }
 
-        public EditAddWindow(DaemonInfo daemonInfo) : this() // This = Konstruktor davor wird auch ausgeführt (=> Ableitung vom Oberen)
+        public EditAddWindow(DaemonItem daemonItem) : this() // This = Konstruktor davor wird auch ausgeführt (=> Ableitung vom Oberen)
         {
             textBoxServiceName.IsReadOnly = true;
-            _oldDaemonInfo = daemonInfo;
+            _oldDaemonItem = daemonItem;
 
             try
             {
-                if (ServiceManagement.StopService(daemonInfo.ServiceName) < 0)
+                if (ServiceManagement.StopService(daemonItem.ServiceName) < 0)
                     throw new Exception("Service must be stopped");
 
-                daemon = RegistryManagement.LoadDaemonFromRegistry(daemonInfo.ServiceName);
+                daemon = RegistryManagement.LoadDaemonFromRegistry(daemonItem.ServiceName);
                 LoadDataIntoUI(daemon);
 
                 onEdit = true;
             }
             catch (Exception)
             {
-                MessageBox.Show(resManager.GetString("cannot_load_data_from_registry"), resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(_resManager.GetString("cannot_load_data_from_registry"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
 
                 this.Close();
             }
@@ -199,7 +199,7 @@ namespace DaemonMaster
             {
                 if (DaemonMasterUtils.IsShortcut(openFileDialog.FileName))
                 {
-                    MessageBoxResult result = MessageBox.Show(resManager.GetString("data_will_be_overwritten", CultureInfo.CurrentUICulture), resManager.GetString("warning", CultureInfo.CurrentUICulture), MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    MessageBoxResult result = MessageBox.Show(_resManager.GetString("data_will_be_overwritten", CultureInfo.CurrentUICulture), _resManager.GetString("warning", CultureInfo.CurrentUICulture), MessageBoxButton.YesNo, MessageBoxImage.Warning);
                     if (result == MessageBoxResult.Yes)
                     {
                         ShortcutInfo shortcutInfo = DaemonMasterUtils.GetShortcutInfos(openFileDialog.FileName);
@@ -219,7 +219,7 @@ namespace DaemonMaster
                 }
                 else
                 {
-                    MessageBox.Show(resManager.GetString("invalid_shortcut", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(_resManager.GetString("invalid_shortcut", CultureInfo.CurrentUICulture), _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
             }
@@ -240,7 +240,7 @@ namespace DaemonMaster
             {
                 if (!Directory.Exists(Path.GetDirectoryName(textBoxFilePath.Text)) || !File.Exists(textBoxFilePath.Text))
                 {
-                    MessageBox.Show(resManager.GetString("invalid_path", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(_resManager.GetString("invalid_path", CultureInfo.CurrentUICulture), _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
@@ -248,7 +248,7 @@ namespace DaemonMaster
                 if (String.IsNullOrWhiteSpace(textBoxDisplayName.Text) ||
                     String.IsNullOrWhiteSpace(textBoxServiceName.Text))
                 {
-                    MessageBox.Show(resManager.GetString("invalid_values", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(_resManager.GetString("invalid_values", CultureInfo.CurrentUICulture), _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
@@ -257,7 +257,7 @@ namespace DaemonMaster
                     if (String.IsNullOrWhiteSpace(textBoxUsername.Text) ||
                         String.IsNullOrWhiteSpace(textBoxPassword.Password))
                     {
-                        MessageBox.Show(resManager.GetString("invalid_values", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(_resManager.GetString("invalid_values", CultureInfo.CurrentUICulture), _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
 
@@ -266,7 +266,7 @@ namespace DaemonMaster
                         if (!SystemManagement.ValidateUserWin32(textBoxUsername.Text,
                             SecurityManagement.ConvertStringToSecureString(textBoxPassword.Password)))
                         {
-                            MessageBox.Show(resManager.GetString("invalid_user", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                            MessageBox.Show(_resManager.GetString("invalid_user", CultureInfo.CurrentUICulture), _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
                             return;
                         }
 
@@ -277,7 +277,7 @@ namespace DaemonMaster
                     {
                         if (!SystemManagement.ValidateUserWin32(textBoxUsername.Text, daemon.Password))
                         {
-                            MessageBox.Show(resManager.GetString("invalid_user", CultureInfo.CurrentUICulture), resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                            MessageBox.Show(_resManager.GetString("invalid_user", CultureInfo.CurrentUICulture), _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
                             return;
                         }
                     }
@@ -343,18 +343,18 @@ namespace DaemonMaster
                         ServiceManagement.CreateInteractiveService(daemon);
                         RegistryManagement.SaveInRegistry(daemon);
 
-                        DaemonInfo daemonInfo = new DaemonInfo
+                        DaemonItem daemonItem = new DaemonItem
                         {
                             DisplayName = daemon.DisplayName,
                             ServiceName = daemon.ServiceName,
                             FullPath = daemon.FullPath
                         };
 
-                        OnDaemonSavedEvent(daemonInfo);
+                        OnDaemonSavedEvent(daemonItem);
 
                         MessageBox.Show(
-                            resManager.GetString("the_service_installation_was_successful",
-                                CultureInfo.CurrentUICulture), resManager.GetString("success"), MessageBoxButton.OK,
+                            _resManager.GetString("the_service_installation_was_successful",
+                                CultureInfo.CurrentUICulture), _resManager.GetString("success"), MessageBoxButton.OK,
                             MessageBoxImage.Information);
 
                         this.Close();
@@ -362,7 +362,7 @@ namespace DaemonMaster
                     catch (Exception ex)
                     {
                         MessageBox.Show(
-                            resManager.GetString("the_service_installation_was_unsuccessful",
+                            _resManager.GetString("the_service_installation_was_unsuccessful",
                                 CultureInfo.CurrentUICulture) + ex.Message, "Error", MessageBoxButton.OK,
                             MessageBoxImage.Error);
                     }
@@ -374,7 +374,7 @@ namespace DaemonMaster
                         ServiceManagement.ChangeServiceConfig(daemon);
                         RegistryManagement.SaveInRegistry(daemon);
 
-                        DaemonInfo newDaemonInfo = new DaemonInfo
+                        DaemonItem newDaemonItem = new DaemonItem
                         {
                             ServiceName = daemon.ServiceName,
                             DisplayName = daemon.DisplayName,
@@ -382,21 +382,21 @@ namespace DaemonMaster
                         };
 
                         //Replace the GUI Item with the new infos
-                        OnDaemonEditEvent(_oldDaemonInfo, newDaemonInfo);
+                        OnDaemonEditEvent(_oldDaemonItem, newDaemonItem);
                         this.Close();
                     }
                     catch (Exception ex)
                     {
                         MessageBox.Show(
-                            resManager.GetString("data_cannot_be_saved", CultureInfo.CurrentUICulture) + ex.Message,
-                            resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
+                            _resManager.GetString("data_cannot_be_saved", CultureInfo.CurrentUICulture) + ex.Message,
+                            _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
                             MessageBoxImage.Error);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -411,14 +411,14 @@ namespace DaemonMaster
 
 
 
-        private static void OnDaemonSavedEvent(DaemonInfo daemonInfo)
+        private static void OnDaemonSavedEvent(DaemonItem daemonItem)
         {
-            DaemonSavedEvent?.Invoke(daemonInfo);
+            DaemonSavedEvent?.Invoke(daemonItem);
         }
 
-        private static void OnDaemonEditEvent(DaemonInfo oldDaemonInfo, DaemonInfo newDaemonInfo)
+        private static void OnDaemonEditEvent(DaemonItem oldDaemonItem, DaemonItem newDaemonItem)
         {
-            DaemonEditEvent?.Invoke(oldDaemonInfo, newDaemonInfo);
+            DaemonEditEvent?.Invoke(oldDaemonItem, newDaemonItem);
         }
 
         private void textBoxDescription_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)

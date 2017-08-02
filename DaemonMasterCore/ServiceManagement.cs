@@ -20,12 +20,12 @@
 using DaemonMasterCore.Exceptions;
 using DaemonMasterCore.Win32;
 using DaemonMasterCore.Win32.PInvoke;
+using NLog;
 using System;
-using System.Diagnostics;
+using System.ComponentModel;
 using System.IO;
 using System.ServiceProcess;
-using System.Windows;
-using NLog;
+using DaemonMasterCore.WPF;
 
 namespace DaemonMasterCore
 {
@@ -169,7 +169,7 @@ namespace DaemonMasterCore
         /// </summary>
         public static void DeleteAllServices()
         {
-            foreach (var daemon in RegistryManagement.LoadDaemonInfosFromRegistry())
+            foreach (var daemon in RegistryManagement.LoadDaemonItemsFromRegistry())
             {
                 try
                 {
@@ -189,7 +189,7 @@ namespace DaemonMasterCore
         /// </summary>
         public static void KillAllServices()
         {
-            foreach (var daemon in RegistryManagement.LoadDaemonInfosFromRegistry())
+            foreach (var daemon in RegistryManagement.LoadDaemonItemsFromRegistry())
             {
                 try
                 {
@@ -274,21 +274,47 @@ namespace DaemonMasterCore
         /// <returns></returns>
         public static bool IsServiceRunning(string serviceName)
         {
-            try
+            using (ServiceController scManager = new ServiceController(serviceName))
             {
-                using (ServiceController scManager = new ServiceController(serviceName))
-                {
-                    if (scManager.Status == ServiceControllerStatus.Running)
-                        return true;
+                if (scManager.Status == ServiceControllerStatus.Running)
+                    return true;
 
-                    return false;
-                }
-            }
-            catch (Exception)
-            {
                 return false;
             }
         }
+
+        /// <summary>
+        /// Give the currennt status of the service
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <returns></returns>
+        public static ServiceControllerStatus GetServiceStatus(string serviceName)
+        {
+            using (ServiceController serviceController = new ServiceController(serviceName))
+            {
+                return serviceController.Status;
+            }
+        }
+
+        /// <summary>
+        /// Return the PID of the service
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <returns></returns>
+        //https://social.msdn.microsoft.com/Forums/vstudio/en-US/a979351c-800f-41e7-b153-2d53ff6aac29/how-to-get-running-windows-service-process-id-?forum=netfxbcl, 02.08.2017
+        public static uint GetPIDByServiceName(string serviceName)
+        {
+
+            uint processId = 0;
+            string qry = "SELECT PROCESSID FROM WIN32_SERVICE WHERE NAME = '" + serviceName + "'";
+            System.Management.ManagementObjectSearcher searcher = new System.Management.ManagementObjectSearcher(qry);
+            foreach (System.Management.ManagementObject mngntObj in searcher.Get())
+            {
+                processId = (uint)mngntObj["PROCESSID"];
+            }
+            return processId;
+        }
+
 
 
 

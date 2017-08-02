@@ -65,7 +65,7 @@
     <Compile Include="Daemon.cs" />
     <Compile Include="DaemonMasterUtils.cs" />
     <Compile Include="JsonManagement.cs" />
-    <Compile Include="DaemonInfo.cs" />
+    <Compile Include="DaemonItem.cs" />
     <Compile Include="ProcessManagement.cs" />
     <Compile Include="SystemManagement.cs" />
     <Compile Include="Win32\PInvoke\DLLFiles.cs" />

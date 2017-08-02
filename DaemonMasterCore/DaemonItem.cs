@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: DaemonInfo
+//  DaemonMaster: DaemonItem
 //  
 //  This file is part of DeamonMaster.
 // 
@@ -18,17 +18,22 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
+using System.ServiceProcess;
 using System.Windows.Media;
 
 namespace DaemonMasterCore
 {
-    public class DaemonInfo
+    public class DaemonItem
     {
         private ImageSource _icon = null;
         private string _fullPath = null;
 
         public string DisplayName { get; set; }
         public string ServiceName { get; set; }
+
+        public ServiceControllerStatus ServiceState;
+
+        public uint PID { get; set; }
 
         public string FullPath
         {
@@ -42,6 +47,5 @@ namespace DaemonMasterCore
         }
 
         public ImageSource Icon => _icon;
-
     }
 }

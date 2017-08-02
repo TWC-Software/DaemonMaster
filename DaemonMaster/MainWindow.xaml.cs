@@ -37,7 +37,7 @@ namespace DaemonMaster
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly ObservableCollection<DaemonInfo> _processCollection = null;
+        private readonly ObservableCollection<DaemonItem> _processCollection = null;
         private readonly ResourceManager _resManager = new ResourceManager("DaemonMaster.Language.lang", typeof(MainWindow).Assembly);
 
         public MainWindow()
@@ -61,13 +61,13 @@ namespace DaemonMaster
             if (!AskToEnableInteractiveServices())
                 this.Close();
 
-            _processCollection = RegistryManagement.LoadDaemonInfosFromRegistry();
+            _processCollection = RegistryManagement.LoadDaemonItemsFromRegistry();
 
             //Add Event
             _processCollection.CollectionChanged += ProcessList_CollectionChanged;
 
             //Aktualisiert die Liste zum start
-            listBoxDaemons.ItemsSource = _processCollection;
+            listViewDaemons.ItemsSource = _processCollection;
 
             if (!ServiceManagement.CheckUI0DetectService())
             {
@@ -97,20 +97,20 @@ namespace DaemonMaster
 
         private void buttonDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (listBoxDaemons.SelectedItem == null)
+            if (listViewDaemons.SelectedItem == null)
                 return;
 
-            RemoveDaemon((DaemonInfo)listBoxDaemons.SelectedItem);
+            RemoveDaemon((DaemonItem)listViewDaemons.SelectedItem);
         }
 
         private void buttonFilter_Click(object sender, RoutedEventArgs e)
         {
 
-            foreach (DaemonInfo d in _processCollection)
+            foreach (DaemonItem d in _processCollection)
             {
                 if (d.DisplayName.Contains(textBoxFilter.Text))
                 {
-                    listBoxDaemons.SelectedItem = d;
+                    listViewDaemons.SelectedItem = d;
                     break;
                 }
             }
@@ -124,26 +124,26 @@ namespace DaemonMaster
         //ListBox
         private void MenuItemStart_Click(object sender, RoutedEventArgs e)
         {
-            if (listBoxDaemons.SelectedItem == null)
+            if (listViewDaemons.SelectedItem == null)
                 return;
 
-            StartService((DaemonInfo)listBoxDaemons.SelectedItem);
+            StartService((DaemonItem)listViewDaemons.SelectedItem);
         }
 
         private void MenuItemStop_Click(object sender, RoutedEventArgs e)
         {
-            if (listBoxDaemons.SelectedItem == null)
+            if (listViewDaemons.SelectedItem == null)
                 return;
 
-            StopService((DaemonInfo)listBoxDaemons.SelectedItem);
+            StopService((DaemonItem)listViewDaemons.SelectedItem);
         }
 
         private void MenuItemDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (listBoxDaemons.SelectedItem == null)
+            if (listViewDaemons.SelectedItem == null)
                 return;
 
-            RemoveDaemon((DaemonInfo)listBoxDaemons.SelectedItem);
+            RemoveDaemon((DaemonItem)listViewDaemons.SelectedItem);
         }
 
         private void listBoxDaemons_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -160,15 +160,15 @@ namespace DaemonMaster
 
         private void MenuItem_Click_RemoveDaemon(object sender, RoutedEventArgs e)
         {
-            if (listBoxDaemons.SelectedItem == null)
+            if (listViewDaemons.SelectedItem == null)
                 return;
 
-            RemoveDaemon((DaemonInfo)listBoxDaemons.SelectedItem);
+            RemoveDaemon((DaemonItem)listViewDaemons.SelectedItem);
         }
 
         private void MenuItem_Click_EditDaemon(object sender, RoutedEventArgs e)
         {
-            if (listBoxDaemons.SelectedItem == null)
+            if (listViewDaemons.SelectedItem == null)
                 return;
 
             EditDaemon();
@@ -198,14 +198,14 @@ namespace DaemonMaster
 
         private void MenuItemStartWS_OnClick(object sender, RoutedEventArgs e)
         {
-            if (listBoxDaemons.SelectedItem == null)
+            if (listViewDaemons.SelectedItem == null)
                 return;
 
-            DaemonInfo daemonInfo = (DaemonInfo)listBoxDaemons.SelectedItem;
+            DaemonItem daemonItem = (DaemonItem)listViewDaemons.SelectedItem;
 
             try
             {
-                switch (ProcessManagement.CreateNewProcess(daemonInfo.ServiceName))
+                switch (ProcessManagement.CreateNewProcess(daemonItem.ServiceName))
                 {
                     case ProcessManagement.DaemonProcessState.Unsuccessful:
                         MessageBox.Show(_resManager.GetString("start_was_unsuccessful"),
@@ -229,21 +229,21 @@ namespace DaemonMaster
 
         private void MenuItemStopWS_OnClick(object sender, RoutedEventArgs e)
         {
-            if (listBoxDaemons.SelectedItem == null)
+            if (listViewDaemons.SelectedItem == null)
                 return;
 
-            DaemonInfo daemonInfo = (DaemonInfo)listBoxDaemons.SelectedItem;
+            DaemonItem daemonItem = (DaemonItem)listViewDaemons.SelectedItem;
 
             try
             {
-                switch (ProcessManagement.DeleteProcess(daemonInfo.ServiceName))
+                switch (ProcessManagement.DeleteProcess(daemonItem.ServiceName))
                 {
                     case ProcessManagement.DaemonProcessState.Unsuccessful:
                         MessageBoxResult result = MessageBox.Show(_resManager.GetString("stop_was_unsuccessful"),
                             _resManager.GetString("error"), MessageBoxButton.YesNo, MessageBoxImage.Error);
 
                         if (result == MessageBoxResult.Yes)
-                            ProcessManagement.KillAndDeleteProcess(daemonInfo.ServiceName);
+                            ProcessManagement.KillAndDeleteProcess(daemonItem.ServiceName);
                         break;
                     case ProcessManagement.DaemonProcessState.Successful:
                         MessageBox.Show(_resManager.GetString("stop_was_successful"),
@@ -263,13 +263,13 @@ namespace DaemonMaster
 
         private void MenuItemKillWS_OnClick(object sender, RoutedEventArgs e)
         {
-            if (listBoxDaemons.SelectedItem == null)
+            if (listViewDaemons.SelectedItem == null)
                 return;
-            DaemonInfo daemonInfo = (DaemonInfo)listBoxDaemons.SelectedItem;
+            DaemonItem daemonItem = (DaemonItem)listViewDaemons.SelectedItem;
 
             try
             {
-                if (ProcessManagement.KillAndDeleteProcess(daemonInfo.ServiceName))
+                if (ProcessManagement.KillAndDeleteProcess(daemonItem.ServiceName))
                 {
                     MessageBox.Show(_resManager.GetString("the_process_killing_was_successful"),
                         _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
@@ -296,7 +296,7 @@ namespace DaemonMaster
 
         private void ProcessList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) // Wenn sich was ändert kommt es in die Liste
         {
-            listBoxDaemons.ItemsSource = _processCollection;
+            listViewDaemons.ItemsSource = _processCollection;
         }
 
 
@@ -306,16 +306,16 @@ namespace DaemonMaster
             addProcessWindow.ShowDialog(); // Fenster geht auf, Code geht erst weiter wenn Fesnter geschlossen ist
         }
 
-        private void OpenEditDaemonWindow(DaemonInfo daemonInfo)
+        private void OpenEditDaemonWindow(DaemonItem daemonItem)
         {
-            if (ServiceManagement.IsServiceRunning(daemonInfo.ServiceName))
+            if (ServiceManagement.IsServiceRunning(daemonItem.ServiceName))
             {
                 MessageBoxResult result = MessageBox.Show(_resManager.GetString("you_must_stop_the_service_first"),
                     _resManager.GetString("information"), MessageBoxButton.YesNo, MessageBoxImage.Information);
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    StopService(daemonInfo);
+                    StopService(daemonItem);
                 }
                 else
                 {
@@ -323,7 +323,7 @@ namespace DaemonMaster
                 }
             }
 
-            EditAddWindow addProcessWindow = new EditAddWindow(daemonInfo);
+            EditAddWindow addProcessWindow = new EditAddWindow(daemonItem);
             addProcessWindow.ShowDialog();
 
 
@@ -356,7 +356,7 @@ namespace DaemonMaster
 
         private void AddDaemon()
         {
-            if (listBoxDaemons.Items.Count <= 256)
+            if (listViewDaemons.Items.Count <= 256)
             {
                 OpenAddDaemonWindow();
             }
@@ -366,12 +366,12 @@ namespace DaemonMaster
             }
         }
 
-        private void RemoveDaemon(DaemonInfo daemonInfo)
+        private void RemoveDaemon(DaemonItem daemonItem)
         {
             try
             {
-                ServiceManagement.DeleteService(daemonInfo.ServiceName);
-                _processCollection.RemoveAt(listBoxDaemons.SelectedIndex);
+                ServiceManagement.DeleteService(daemonItem.ServiceName);
+                _processCollection.RemoveAt(listViewDaemons.SelectedIndex);
 
                 MessageBox.Show(_resManager.GetString("the_service_deletion_was_successful"),
                     _resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
@@ -383,7 +383,7 @@ namespace DaemonMaster
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    StopService(daemonInfo);
+                    StopService(daemonItem);
                 }
             }
             catch (Exception ex)
@@ -394,15 +394,15 @@ namespace DaemonMaster
 
         private void EditDaemon()
         {
-            if (listBoxDaemons.SelectedItem == null)
+            if (listViewDaemons.SelectedItem == null)
                 return;
 
-            OpenEditDaemonWindow((DaemonInfo)listBoxDaemons.SelectedItem);
+            OpenEditDaemonWindow((DaemonItem)listViewDaemons.SelectedItem);
         }
 
-        private void StartService(DaemonInfo daemonInfo)
+        private void StartService(DaemonItem daemonItem)
         {
-            switch (ServiceManagement.StartService(daemonInfo.ServiceName))
+            switch (ServiceManagement.StartService(daemonItem.ServiceName))
             {
                 case ServiceManagement.State.Error | ServiceManagement.State.Unsuccessful:
                     MessageBox.Show(_resManager.GetString("cannot_start_the_service"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
@@ -418,9 +418,9 @@ namespace DaemonMaster
             }
         }
 
-        private void StopService(DaemonInfo daemonInfo)
+        private void StopService(DaemonItem daemonItem)
         {
-            switch (ServiceManagement.StopService(daemonInfo.ServiceName))
+            switch (ServiceManagement.StopService(daemonItem.ServiceName))
             {
                 case ServiceManagement.State.Error | ServiceManagement.State.Unsuccessful:
                     MessageBox.Show(_resManager.GetString("cannot_stop_the_service"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
@@ -463,6 +463,15 @@ namespace DaemonMaster
             }
         }
 
+        private void UpdateListView()
+        {
+            foreach (var daemonItem in _processCollection)
+            {
+                daemonItem.ServiceState = ServiceManagement.GetServiceStatus(daemonItem.ServiceName);
+                daemonItem.PID = ServiceManagement.GetPIDByServiceName(daemonItem.ServiceName);
+            }
+        }
+
         private void CheckForUpdates()
         {
             AutoUpdater.CurrentCulture = CultureInfo.CurrentCulture;
@@ -479,15 +488,15 @@ namespace DaemonMaster
 
         #region EventHandler
 
-        private void EditAddWindow_DaemonSavedEvent(DaemonInfo daemonInfo) // Fügt Deamon Objekt der Liste hinzu
+        private void EditAddWindow_DaemonSavedEvent(DaemonItem daemonItem) // Fügt Deamon Objekt der Liste hinzu
         {
-            _processCollection.Add(daemonInfo);
+            _processCollection.Add(daemonItem);
         }
 
         //Replace the old info with the new
-        private void EditAddWindowOnDaemonEditEvent(DaemonInfo oldDaemonInfo, DaemonInfo newDaemonInfo)
+        private void EditAddWindowOnDaemonEditEvent(DaemonItem oldDaemonItem, DaemonItem newDaemonItem)
         {
-            _processCollection[_processCollection.IndexOf(oldDaemonInfo)] = newDaemonInfo;
+            _processCollection[_processCollection.IndexOf(oldDaemonItem)] = newDaemonItem;
         }
 
         #endregion

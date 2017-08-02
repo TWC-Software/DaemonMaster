@@ -390,4 +390,7 @@
   <data name="data_will_be_overwritten" xml:space="preserve">
     <value>Les données existantes seront écrasées sur la charge! !</value>
   </data>
+  <data name="pid" xml:space="preserve">
+    <value>PID</value>
+  </data>
 </root>

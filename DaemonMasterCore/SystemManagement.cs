@@ -27,6 +27,7 @@ namespace DaemonMasterCore
 {
     public static class SystemManagement
     {
+        [Obsolete]
         public static bool ValidateUser(string username, SecureString password)
         {
             using (PrincipalContext pc = new PrincipalContext(ContextType.Machine))

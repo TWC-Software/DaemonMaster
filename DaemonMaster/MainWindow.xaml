@@ -20,20 +20,36 @@
             </Grid>
         </GroupBox>
         
-        <ListBox x:Name="listBoxDaemons" HorizontalAlignment="Left" Height="255" Margin="10,21,0,0" VerticalAlignment="Top" Width="497" MouseDoubleClick="listBoxDaemons_MouseDoubleClick">
-            <ListBox.ItemTemplate>
+        <ListView x:Name="listViewDaemons" HorizontalAlignment="Left" Height="255" Margin="10,21,0,0" VerticalAlignment="Top" Width="497" MouseDoubleClick="listBoxDaemons_MouseDoubleClick">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Path=Icon}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="{x:Static resx:lang.service}" DisplayMemberBinding="{Binding DisplayName}"/>
+                    <GridViewColumn Header="{x:Static resx:lang.pid}" DisplayMemberBinding="{Binding PID}"/>
+                    <GridViewColumn Header="{x:Static resx:lang.status}" DisplayMemberBinding="{Binding ElementName=Status}"/>
+                </GridView>
+            </ListView.View>
+
+            <!--<ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="{Binding Path=Icon}"/>
                         <TextBlock Text="{Binding Path=DisplayName}" FontSize="17" Margin="5,5,0,0"/>
                     </StackPanel>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
+            </ListView.ItemTemplate>-->
 
-            <ListBox.Resources>
+            <ListView.Resources>
                 <!--http://stackoverflow.com/questions/9549231/how-to-right-click-on-item-from-listbox-and-open-menu-on-wpf-->
                 <!--Defines a context menu-->
-                <ContextMenu x:Key="MyContextMenu">
+                <ContextMenu x:Key="ContextMenu">
                     <MenuItem Header="{x:Static resx:lang.button_start_service}" Click="MenuItemStart_Click"/>
                     <MenuItem Header="{x:Static resx:lang.button_stop_service}" Click="MenuItemStop_Click"/>
                     <MenuItem Header="{x:Static resx:lang.button_delete_service}" Click="MenuItemDelete_Click"/>
@@ -43,12 +59,12 @@
                     <MenuItem Header="{x:Static resx:lang.button_kill}" Click="MenuItemKillWS_OnClick"/>
                 </ContextMenu>
 
-                <!--Sets a context menu for each ListBoxItem in the current ListBox-->
-                <Style TargetType="{x:Type ListBoxItem}">
-                    <Setter Property="ContextMenu" Value="{StaticResource MyContextMenu}"/>
+                <!--Sets a context menu for each ListViewItem in the current ListBox-->
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="ContextMenu" Value="{StaticResource ContextMenu}"/>
                 </Style>
-            </ListBox.Resources>
-        </ListBox>
+            </ListView.Resources>
+        </ListView>
         
         <Menu x:Name="menu" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="519">
             <MenuItem Header="{x:Static resx:lang.button_file}">
