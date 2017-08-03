@@ -17,16 +17,26 @@
 //   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DaemonMaster
+namespace DaemonMasterCore.Config
 {
     public class Config
     {
-        public string Language { get; set; }
+        private uint _updateInterval = 5;
+
+        public uint UpdateInterval
+        {
+            get
+            {
+                if (_updateInterval < 1)
+                    return 1;
+
+                return _updateInterval;
+            }
+
+            set
+            {
+                _updateInterval = value;
+            }
+        }
     }
 }

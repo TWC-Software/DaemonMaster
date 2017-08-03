@@ -60,6 +60,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\Config.cs" />
+    <Compile Include="Config\ConfigManagement.cs" />
     <Compile Include="Exceptions\ServiceStoppedException.cs" />
     <Compile Include="Exceptions\ServiceNotStoppedException.cs" />
     <Compile Include="Daemon.cs" />

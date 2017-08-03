@@ -29,6 +29,7 @@ using System.Resources;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using DaemonMasterCore.Config;
 using Itenso.Windows.Controls.ListViewLayout;
 
 
@@ -53,6 +54,10 @@ namespace DaemonMaster
             //Initialize GUI
             InitializeComponent();
 
+            //Load and apply config
+            ConfigManagement.LoadConfig();
+            StartListViewUpdateTimer(ConfigManagement.Config.UpdateInterval);
+
             //Erstellt die Liste (leere oder mit gespeicherten Elementen)
 
             //Add events
@@ -72,8 +77,6 @@ namespace DaemonMaster
             {
                 MessageBox.Show(_resManager.GetString("error_ui0service", CultureInfo.CurrentUICulture), _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
-            StartListViewUpdateTimer();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -506,6 +509,8 @@ namespace DaemonMaster
                     ProcessManagement.KillAndDeleteAllProcesses();
                 }
             }
+
+            ConfigManagement.SaveConfig();
         }
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
@@ -517,11 +522,11 @@ namespace DaemonMaster
         //                                        GUI Update Timer                                              //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void StartListViewUpdateTimer()
+        private void StartListViewUpdateTimer(uint interval)
         {
             DispatcherTimer guiDispatcherTimer = new DispatcherTimer();
             guiDispatcherTimer.Tick += UpdateListView;
-            guiDispatcherTimer.Interval = new TimeSpan(0, 0, 0, 1, 0);
+            guiDispatcherTimer.Interval = TimeSpan.FromSeconds(interval);
             guiDispatcherTimer.Start();
         }
 
