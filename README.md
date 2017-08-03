@@ -27,6 +27,7 @@ You can download the pre-release here: [Click here](https://github.com/TWC-Softw
 - NLog - Jaroslaw Kowalski, Kim Christensen, Julian Verdurmen - BSD 3 clause "New" or "Revised" License
 - AutoUpdater.NET - RBSoft - MIT License
 - Active Directory Object Picker - Tulpep - MS-PL License
+- ListView Layout Manager - Jani Giannoudis - CPOL License
 
 ## Copyright 
 MCPC10,
