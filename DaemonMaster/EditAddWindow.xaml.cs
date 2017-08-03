@@ -26,6 +26,7 @@ using System.Globalization;
 using System.IO;
 using System.Resources;
 using System.Windows;
+using DaemonMaster.Language;
 using Tulpep.ActiveDirectoryObjectPicker;
 
 namespace DaemonMaster
@@ -35,7 +36,7 @@ namespace DaemonMaster
     /// </summary>
     public partial class EditAddWindow : Window
     {
-        private readonly ResourceManager _resManager = new ResourceManager("DaemonMaster.Language.lang", typeof(EditAddWindow).Assembly);
+        private readonly ResourceManager _resManager = new ResourceManager(typeof(lang));
 
         //Erstellt ein Event 
         internal delegate void DaemonSavedDelegate(DaemonItem daemon);
@@ -43,10 +44,10 @@ namespace DaemonMaster
         internal delegate void DaemonEditDelegate(DaemonItem oldDaemonItem, DaemonItem newDaemonItem);
         internal static event DaemonEditDelegate DaemonEditEvent;
 
-        private Daemon daemon = null;
-        private DaemonItem _oldDaemonItem = null;
-
-        private readonly bool onEdit = false;
+        public DaemonItem DaemonItem { get; private set; } = null;
+        public DaemonItem OldDaemonItem { get; private set; } = null;
+        private readonly bool onEditMode = false;
+        private readonly Daemon daemon = null;
 
         public EditAddWindow()
         {
@@ -59,7 +60,7 @@ namespace DaemonMaster
         public EditAddWindow(DaemonItem daemonItem) : this() // This = Konstruktor davor wird auch ausgeführt (=> Ableitung vom Oberen)
         {
             textBoxServiceName.IsReadOnly = true;
-            _oldDaemonItem = daemonItem;
+            OldDaemonItem = daemonItem;
 
             try
             {
@@ -69,12 +70,13 @@ namespace DaemonMaster
                 daemon = RegistryManagement.LoadDaemonFromRegistry(daemonItem.ServiceName);
                 LoadDataIntoUI(daemon);
 
-                onEdit = true;
+                onEditMode = true;
             }
             catch (Exception)
             {
                 MessageBox.Show(_resManager.GetString("cannot_load_data_from_registry"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
 
+                DialogResult = false;
                 this.Close();
             }
         }
@@ -176,6 +178,7 @@ namespace DaemonMaster
 
         private void buttonCancel_OnClick(object sender, RoutedEventArgs e)
         {
+            DialogResult = false;
             this.Close();
         }
 
@@ -336,27 +339,26 @@ namespace DaemonMaster
 
 
 
-                if (!onEdit)
+                if (!onEditMode)
                 {
                     try
                     {
                         ServiceManagement.CreateInteractiveService(daemon);
                         RegistryManagement.SaveInRegistry(daemon);
 
-                        DaemonItem daemonItem = new DaemonItem
+                        DaemonItem = new DaemonItem
                         {
                             DisplayName = daemon.DisplayName,
                             ServiceName = daemon.ServiceName,
                             FullPath = daemon.FullPath
                         };
 
-                        OnDaemonSavedEvent(daemonItem);
-
                         MessageBox.Show(
                             _resManager.GetString("the_service_installation_was_successful",
                                 CultureInfo.CurrentUICulture), _resManager.GetString("success"), MessageBoxButton.OK,
                             MessageBoxImage.Information);
 
+                        DialogResult = true;
                         this.Close();
                     }
                     catch (Exception ex)
@@ -374,15 +376,14 @@ namespace DaemonMaster
                         ServiceManagement.ChangeServiceConfig(daemon);
                         RegistryManagement.SaveInRegistry(daemon);
 
-                        DaemonItem newDaemonItem = new DaemonItem
+                        DaemonItem = new DaemonItem
                         {
-                            ServiceName = daemon.ServiceName,
                             DisplayName = daemon.DisplayName,
+                            ServiceName = daemon.ServiceName,
                             FullPath = daemon.FullPath
                         };
 
-                        //Replace the GUI Item with the new infos
-                        OnDaemonEditEvent(_oldDaemonItem, newDaemonItem);
+                        DialogResult = true;
                         this.Close();
                     }
                     catch (Exception ex)
@@ -401,30 +402,6 @@ namespace DaemonMaster
         }
 
         #endregion
-
-
-
-
-
-
-
-
-
-
-        private static void OnDaemonSavedEvent(DaemonItem daemonItem)
-        {
-            DaemonSavedEvent?.Invoke(daemonItem);
-        }
-
-        private static void OnDaemonEditEvent(DaemonItem oldDaemonItem, DaemonItem newDaemonItem)
-        {
-            DaemonEditEvent?.Invoke(oldDaemonItem, newDaemonItem);
-        }
-
-        private void textBoxDescription_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-
-        }
     }
 }
 //[] 

@@ -17,6 +17,8 @@
 //   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
+using System;
+
 namespace DaemonMasterCore.Config
 {
     public class Config
@@ -38,5 +40,6 @@ namespace DaemonMasterCore.Config
                 _updateInterval = value;
             }
         }
+        public string Language { get; set; } = "windows";
     }
 }

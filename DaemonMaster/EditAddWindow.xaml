@@ -48,7 +48,7 @@
                     </GroupBox>
                     <Label x:Name="labelDisplayName" Content="{x:Static resx:lang.label_display_name}" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top"/>
                     <CoreWPF:PlaceholderTextBox x:Name="textBoxDisplayName" Height="23" Margin="147,42,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_display_name}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
-                    <CoreWPF:PlaceholderTextBox x:Name="textBoxDescription" Height="23" Margin="147,70,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_description}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" SpellCheck.IsEnabled="True" TextChanged="textBoxDescription_TextChanged"/>
+                    <CoreWPF:PlaceholderTextBox x:Name="textBoxDescription" Height="23" Margin="147,70,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_description}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" SpellCheck.IsEnabled="True"/>
                     <Label x:Name="labelDescription" Content="{x:Static resx:lang.label_description}" HorizontalAlignment="Left" Margin="10,66,0,0" VerticalAlignment="Top"/>
                     <ComboBox x:Name="comboBoxStartType" HorizontalAlignment="Left" Margin="147,126,0,0" VerticalAlignment="Top" Width="321" RenderTransformOrigin="1.217,1.045" SelectedIndex="0">
                         <ComboBoxItem Content="{x:Static resx:lang.starttype_automatic}"/>

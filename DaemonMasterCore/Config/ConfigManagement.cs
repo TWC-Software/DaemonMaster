@@ -26,9 +26,9 @@ namespace DaemonMasterCore.Config
     public static class ConfigManagement
     {
         private static readonly string ConfigFile = AppDomain.CurrentDomain.BaseDirectory + "settings.config";
-        public static Config Config = null;
+        private static Config _config = new Config();
 
-        public static void LoadConfig()
+        public static Config LoadConfig()
         {
             if (!File.Exists(ConfigFile))
                 SaveConfig();
@@ -36,7 +36,8 @@ namespace DaemonMasterCore.Config
             using (StreamReader streamReader = File.OpenText(ConfigFile))
             {
                 JsonSerializer serializer = new JsonSerializer();
-                Config = (Config)serializer.Deserialize(streamReader, typeof(Config));
+                _config = (Config)serializer.Deserialize(streamReader, typeof(Config));
+                return _config;
             }
         }
 
@@ -44,8 +45,11 @@ namespace DaemonMasterCore.Config
         {
             using (StreamWriter streamWriter = File.CreateText(ConfigFile))
             {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(streamWriter, Config);
+                JsonSerializer serializer = new JsonSerializer()
+                {
+                    Formatting = Formatting.Indented
+                };
+                serializer.Serialize(streamWriter, _config);
             }
         }
     }

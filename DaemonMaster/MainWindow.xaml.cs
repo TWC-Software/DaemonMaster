@@ -20,18 +20,18 @@
 
 using AutoUpdaterDotNET;
 using DaemonMasterCore;
+using DaemonMasterCore.Config;
 using DaemonMasterCore.Exceptions;
 using DaemonMasterCore.Win32.PInvoke;
 using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Resources;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
-using DaemonMasterCore.Config;
-using Itenso.Windows.Controls.ListViewLayout;
-
+using DaemonMaster.Language;
 
 namespace DaemonMaster
 {
@@ -41,28 +41,41 @@ namespace DaemonMaster
     public partial class MainWindow : Window
     {
         private readonly ObservableCollection<DaemonItem> _processCollection = null;
-        private readonly ResourceManager _resManager = new ResourceManager("DaemonMaster.Language.lang", typeof(MainWindow).Assembly);
+        private readonly ResourceManager _resManager = new ResourceManager(typeof(lang));
 
         public MainWindow()
         {
+            //Load and apply config
+            Config config = ConfigManagement.LoadConfig();
+
+            #region Chose language
             //Set the language of the threads
-            //Thread.CurrentThread.CurrentCulture = CultureInfo.CurrentCulture;
-            //Thread.CurrentThread.CurrentUICulture = CultureInfo.CurrentCulture;
-            //CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture;
-            //CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.CurrentCulture;
+            CultureInfo cultureInfo;
+            if (String.IsNullOrWhiteSpace(config.Language) || config.Language == "windows")
+            {
+                cultureInfo = CultureInfo.CurrentCulture;
+            }
+            else
+            {
+                try
+                {
+                    cultureInfo = new CultureInfo(config.Language);
+                }
+                catch (Exception)
+                {
+                    cultureInfo = CultureInfo.CurrentCulture;
+                }
+            }
+
+            Thread.CurrentThread.CurrentCulture = cultureInfo;
+            Thread.CurrentThread.CurrentUICulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+            #endregion
 
             //Initialize GUI
             InitializeComponent();
-
-            //Load and apply config
-            ConfigManagement.LoadConfig();
-            StartListViewUpdateTimer(ConfigManagement.Config.UpdateInterval);
-
-            //Erstellt die Liste (leere oder mit gespeicherten Elementen)
-
-            //Add events
-            EditAddWindow.DaemonSavedEvent += EditAddWindow_DaemonSavedEvent;
-            EditAddWindow.DaemonEditEvent += EditAddWindowOnDaemonEditEvent;
+            StartListViewUpdateTimer(config.UpdateInterval);
 
             //Fragt, wenn der RegKey nicht gesetzt ist, ob dieser gesetzt werden soll
             if (!AskToEnableInteractiveServices())
@@ -301,7 +314,11 @@ namespace DaemonMaster
         private void OpenAddDaemonWindow()
         {
             EditAddWindow addProcessWindow = new EditAddWindow(); // Neues Event Im EditAddWindow Fenster
-            addProcessWindow.ShowDialog(); // Fenster geht auf, Code geht erst weiter wenn Fesnter geschlossen ist
+            var dialogResult = addProcessWindow.ShowDialog(); // Fenster geht auf, Code geht erst weiter wenn Fesnter geschlossen ist
+            if (dialogResult.HasValue && dialogResult.Value)
+            {
+                _processCollection.Add(addProcessWindow.DaemonItem);
+            }
         }
 
         private void OpenEditDaemonWindow(DaemonItem daemonItem)
@@ -322,9 +339,11 @@ namespace DaemonMaster
             }
 
             EditAddWindow addProcessWindow = new EditAddWindow(daemonItem);
-            addProcessWindow.ShowDialog();
-
-
+            var dialogResult = addProcessWindow.ShowDialog();
+            if (dialogResult.HasValue && dialogResult.Value)
+            {
+                _processCollection[_processCollection.IndexOf(addProcessWindow.OldDaemonItem)] = addProcessWindow.DaemonItem;
+            }
         }
 
 
@@ -474,22 +493,6 @@ namespace DaemonMaster
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                          EVENT HANDLER                                               //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        #region EventHandler
-
-        private void EditAddWindow_DaemonSavedEvent(DaemonItem daemonItem) // Fügt Deamon Objekt der Liste hinzu
-        {
-            _processCollection.Add(daemonItem);
-        }
-
-        //Replace the old info with the new
-        private void EditAddWindowOnDaemonEditEvent(DaemonItem oldDaemonItem, DaemonItem newDaemonItem)
-        {
-            _processCollection[_processCollection.IndexOf(oldDaemonItem)] = newDaemonItem;
-        }
-
-        #endregion
-
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
