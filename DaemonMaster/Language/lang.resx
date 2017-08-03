@@ -400,4 +400,25 @@
   <data name="pid" xml:space="preserve">
     <value>PID</value>
   </data>
+  <data name="enum_stopped" xml:space="preserve">
+    <value>Stopped</value>
+  </data>
+  <data name="enum_start_pending" xml:space="preserve">
+    <value>Start pending</value>
+  </data>
+  <data name="enum_stop_pending" xml:space="preserve">
+    <value>Stop pending</value>
+  </data>
+  <data name="enum_running" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="enum_continue_pending" xml:space="preserve">
+    <value>Continue pending</value>
+  </data>
+  <data name="enum_pause_pending" xml:space="preserve">
+    <value>Pause pending</value>
+  </data>
+  <data name="enum_paused" xml:space="preserve">
+    <value>Paused</value>
+  </data>
 </root>

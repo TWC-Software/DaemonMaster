@@ -28,6 +28,8 @@ using System.Globalization;
 using System.Resources;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
+using Itenso.Windows.Controls.ListViewLayout;
 
 
 namespace DaemonMaster
@@ -63,9 +65,6 @@ namespace DaemonMaster
 
             _processCollection = RegistryManagement.LoadDaemonItemsFromRegistry();
 
-            //Add Event
-            _processCollection.CollectionChanged += ProcessList_CollectionChanged;
-
             //Aktualisiert die Liste zum start
             listViewDaemons.ItemsSource = _processCollection;
 
@@ -73,6 +72,8 @@ namespace DaemonMaster
             {
                 MessageBox.Show(_resManager.GetString("error_ui0service", CultureInfo.CurrentUICulture), _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
+            StartListViewUpdateTimer();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -294,12 +295,6 @@ namespace DaemonMaster
 
         #region Other
 
-        private void ProcessList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) // Wenn sich was ändert kommt es in die Liste
-        {
-            listViewDaemons.ItemsSource = _processCollection;
-        }
-
-
         private void OpenAddDaemonWindow()
         {
             EditAddWindow addProcessWindow = new EditAddWindow(); // Neues Event Im EditAddWindow Fenster
@@ -463,15 +458,6 @@ namespace DaemonMaster
             }
         }
 
-        private void UpdateListView()
-        {
-            foreach (var daemonItem in _processCollection)
-            {
-                daemonItem.ServiceState = ServiceManagement.GetServiceStatus(daemonItem.ServiceName);
-                daemonItem.PID = ServiceManagement.GetPIDByServiceName(daemonItem.ServiceName);
-            }
-        }
-
         private void CheckForUpdates()
         {
             AutoUpdater.CurrentCulture = CultureInfo.CurrentCulture;
@@ -525,6 +511,30 @@ namespace DaemonMaster
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             CheckForUpdates();
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                        GUI Update Timer                                              //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void StartListViewUpdateTimer()
+        {
+            DispatcherTimer guiDispatcherTimer = new DispatcherTimer();
+            guiDispatcherTimer.Tick += UpdateListView;
+            guiDispatcherTimer.Interval = new TimeSpan(0, 0, 0, 1, 0);
+            guiDispatcherTimer.Start();
+        }
+
+        private void UpdateListView(object sender, EventArgs e)
+        {
+            foreach (var daemonItem in _processCollection)
+            {
+                daemonItem.ServiceState = ServiceManagement.GetServiceStatus(daemonItem.ServiceName);
+                daemonItem.PID = ServiceManagement.GetPIDByServiceName(daemonItem.ServiceName);
+            }
+
+            //Force refresh of the listview
+            listViewDaemons.Items.Refresh();
         }
     }
 }

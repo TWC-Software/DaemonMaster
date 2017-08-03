@@ -31,7 +31,7 @@ namespace DaemonMasterCore
         public string DisplayName { get; set; }
         public string ServiceName { get; set; }
 
-        public ServiceControllerStatus ServiceState;
+        public ServiceControllerStatus ServiceState { get; set; }
 
         public uint PID { get; set; }
 

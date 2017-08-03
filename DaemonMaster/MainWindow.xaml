@@ -4,9 +4,17 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DaemonMaster"
+        xmlns:LocalWPF="clr-namespace:DaemonMaster.WPF"
         xmlns:resx="clr-namespace:DaemonMaster.Language"
+        xmlns:ctrl="clr-namespace:Itenso.Windows.Controls.ListViewLayout;assembly=Itenso.Windows.Controls.ListViewLayout"
         mc:Ignorable="d"
         Title="DaemonMaster" Height="383.811" Width="525" Background="White" Foreground="Black" ResizeMode="NoResize" Closing="Window_Closing" Loaded="MainWindow_OnLoaded">
+
+
+    <Window.Resources>
+        <LocalWPF:ServiceControllerStatusConverter x:Key="serviceControllerStatusConverter"/>
+    </Window.Resources>
+
     <Grid>
         <Button x:Name="buttonAdd" Content="{x:Static resx:lang.button_add_service}" HorizontalAlignment="Left" Margin="271,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonAdd_Click"/>
         <Button x:Name="buttonDelete" Content="{x:Static resx:lang.button_delete_service}" HorizontalAlignment="Left" Margin="431,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonDelete_Click"/>
@@ -19,11 +27,11 @@
                 <TextBox x:Name="textBoxFilter" HorizontalAlignment="Left" Height="23" Margin="1,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="154"/>
             </Grid>
         </GroupBox>
-        
-        <ListView x:Name="listViewDaemons" HorizontalAlignment="Left" Height="255" Margin="10,21,0,0" VerticalAlignment="Top" Width="497" MouseDoubleClick="listBoxDaemons_MouseDoubleClick">
+
+        <ListView x:Name="listViewDaemons" HorizontalAlignment="Left" Height="255" Margin="10,21,0,0" VerticalAlignment="Top" Width="497" MouseDoubleClick="listBoxDaemons_MouseDoubleClick"  ctrl:ListViewLayoutManager.Enabled="true">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn>
+                    <GridViewColumn ctrl:FixedColumn.Width="50" Width="50">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Image Source="{Binding Path=Icon}"/>
@@ -31,9 +39,9 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="{x:Static resx:lang.service}" DisplayMemberBinding="{Binding DisplayName}"/>
-                    <GridViewColumn Header="{x:Static resx:lang.pid}" DisplayMemberBinding="{Binding PID}"/>
-                    <GridViewColumn Header="{x:Static resx:lang.status}" DisplayMemberBinding="{Binding ElementName=Status}"/>
+                    <GridViewColumn Header="{x:Static resx:lang.service}" DisplayMemberBinding="{Binding DisplayName}" ctrl:ProportionalColumn.Width="1" />
+                    <GridViewColumn Header="{x:Static resx:lang.pid}" DisplayMemberBinding="{Binding PID}" ctrl:ProportionalColumn.Width="1"/>
+                    <GridViewColumn Header="{x:Static resx:lang.status}" DisplayMemberBinding="{Binding ServiceState, Converter={StaticResource serviceControllerStatusConverter}}" ctrl:ProportionalColumn.Width="1" />
                 </GridView>
             </ListView.View>
 

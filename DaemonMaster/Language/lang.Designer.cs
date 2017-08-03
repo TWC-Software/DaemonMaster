@@ -386,6 +386,69 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Continue pending ähnelt.
+        /// </summary>
+        public static string enum_continue_pending {
+            get {
+                return ResourceManager.GetString("enum_continue_pending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pause pending ähnelt.
+        /// </summary>
+        public static string enum_pause_pending {
+            get {
+                return ResourceManager.GetString("enum_pause_pending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Paused ähnelt.
+        /// </summary>
+        public static string enum_paused {
+            get {
+                return ResourceManager.GetString("enum_paused", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Running ähnelt.
+        /// </summary>
+        public static string enum_running {
+            get {
+                return ResourceManager.GetString("enum_running", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Start pending ähnelt.
+        /// </summary>
+        public static string enum_start_pending {
+            get {
+                return ResourceManager.GetString("enum_start_pending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Stop pending ähnelt.
+        /// </summary>
+        public static string enum_stop_pending {
+            get {
+                return ResourceManager.GetString("enum_stop_pending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Stopped ähnelt.
+        /// </summary>
+        public static string enum_stopped {
+            get {
+                return ResourceManager.GetString("enum_stopped", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Error ähnelt.
         /// </summary>
         public static string error {

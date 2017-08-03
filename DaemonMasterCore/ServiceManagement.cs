@@ -26,6 +26,7 @@ using System.ComponentModel;
 using System.IO;
 using System.ServiceProcess;
 using DaemonMasterCore.WPF;
+using System.Resources;
 
 namespace DaemonMasterCore
 {
