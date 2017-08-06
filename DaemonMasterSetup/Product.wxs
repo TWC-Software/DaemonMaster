@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"><?define DaemonMaster_TargetDir=$(var.DaemonMaster.TargetDir)?>
 
-	<Product Id="78E506DD-DB6E-40C8-A721-FC944586503F" Name="DaemonMaster" Language="1033" Version="0.1.0.0" Manufacturer="TWC-Software" UpgradeCode="35f44a50-d9e4-480e-9171-45a6591150b8">
+	<Product Id="672F3DEF-6F32-4F1B-9A5B-8B15E2E3598E" Name="DaemonMaster" Language="1033" Version="0.1.1.0" Manufacturer="TWC-Software" UpgradeCode="35f44a50-d9e4-480e-9171-45a6591150b8">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
 		<!--Set install dir-->
@@ -20,7 +20,7 @@
 		<!--<WixVariable Id="WixUIBannerBmp" Value="Images\installer_top-banner.bmp" />
 		<WixVariable Id="WixUIDialogBmp" Value="Images\installer_background.bmp" />-->
 
-		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="no"/>
 		<!--Output only one file-->
 		<MediaTemplate EmbedCab="yes" />
 
