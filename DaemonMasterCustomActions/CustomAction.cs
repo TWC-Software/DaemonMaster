@@ -21,6 +21,7 @@
 using DaemonMasterCore;
 using Microsoft.Deployment.WindowsInstaller;
 using System;
+using System.IO;
 using System.Threading;
 
 namespace DaemonMasterCustomActions
@@ -30,14 +31,14 @@ namespace DaemonMasterCustomActions
         [CustomAction]
         public static ActionResult UninstallAllServices(Session session)
         {
-            session.Log("Begin the unistall of all services");
+            session.Log("Begin the uninstall of all services");
 
             try
             {
                 session.Log("Killing all services...");
                 ServiceManagement.KillAllServices();
 
-                Thread.Sleep(2000);
+                Thread.Sleep(1000);
 
                 session.Log("Deleting all services...");
                 ServiceManagement.DeleteAllServices();
@@ -51,5 +52,33 @@ namespace DaemonMasterCustomActions
             session.Log("Success");
             return ActionResult.Success;
         }
+
+        [CustomAction]
+        public static ActionResult RemoveResidualFiles(Session session)
+        {
+            session.Log("Start the removal of residual files...");
+
+            string path = session.CustomActionData["INSTALLEDPATH"];
+            string settingsFile = path + "settings.config";
+            string logsDir = path + "logs";
+
+            try
+            {
+                if (File.Exists(settingsFile))
+                    File.Delete(settingsFile);
+
+                if (Directory.Exists(logsDir))
+                    Directory.Delete(logsDir, true);
+            }
+            catch (Exception e)
+            {
+                session.Log(e.Message);
+                return ActionResult.Failure;
+            }
+
+            session.Log("Success");
+            return ActionResult.Success;
+        }
     }
 }
+
