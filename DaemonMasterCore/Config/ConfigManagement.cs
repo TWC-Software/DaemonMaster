@@ -28,6 +28,7 @@ namespace DaemonMasterCore.Config
         private static readonly string ConfigFile = AppDomain.CurrentDomain.BaseDirectory + "settings.config";
         private static Config _config = new Config();
 
+
         public static Config LoadConfig()
         {
             if (!File.Exists(ConfigFile))
@@ -40,6 +41,8 @@ namespace DaemonMasterCore.Config
                 return _config;
             }
         }
+
+        public static Config GetConfig => _config;
 
         public static void SaveConfig()
         {

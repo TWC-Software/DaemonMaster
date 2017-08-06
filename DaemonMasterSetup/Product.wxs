@@ -1,36 +1,36 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"><?define DaemonMaster_TargetDir=$(var.DaemonMaster.TargetDir)?>
-	
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"><?define DaemonMaster_TargetDir=$(var.DaemonMaster.TargetDir)?>
+
 	<Product Id="78E506DD-DB6E-40C8-A721-FC944586503F" Name="DaemonMaster" Language="1033" Version="0.1.0.0" Manufacturer="TWC-Software" UpgradeCode="35f44a50-d9e4-480e-9171-45a6591150b8">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
- 
+
 		<!--Set install dir-->
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
-		
+
 		<!--Use UI-->
 		<UIRef Id="WixUI_InstallDir" />
-		
+
 		<!--Add icon-->
 		<Icon Id="DaemonMaster.ico" SourceFile="$(var.ProjectDir)DaemonMaster.ico" />
 		<Property Id="ARPPRODUCTICON" Value="DaemonMaster.ico" />
-		
+
 		<!--Add license-->
 		<WixVariable Id="WixUILicenseRtf" Value="$(var.ProjectDir)\gpl-3.0.rtf" />
 		<!--Add custom UI images-->
 		<!--<WixVariable Id="WixUIBannerBmp" Value="Images\installer_top-banner.bmp" />
 		<WixVariable Id="WixUIDialogBmp" Value="Images\installer_background.bmp" />-->
-		
+
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 		<!--Output only one file-->
 		<MediaTemplate EmbedCab="yes" />
-		
+
 		<!--Add events-->
 		<InstallExecuteSequence>
 			<Custom Action="UninstallAllServicesAction" After="InstallInitialize">(REMOVE="ALL") AND (NOT UPGRADINGPRODUCTCODE)</Custom>
-		  <Custom Action="SetRemoveResidualFilesProperty" Before="RemoveResidualFilesAction" />
+			<Custom Action="SetRemoveResidualFilesProperty" Before="RemoveResidualFilesAction" />
 			<Custom Action="RemoveResidualFilesAction" After="UninstallAllServicesAction" />
 		</InstallExecuteSequence>
-		
+
 		<!--Component refs-->
 		<Feature Id="ProductFeature" Title="DaemonMaster" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
@@ -45,7 +45,7 @@
 	<Fragment>
 		<Binary Id="DaemonMasterCustomActions.CA.dll" SourceFile="$(var.DaemonMasterCustomActions.TargetDir)$(var.DaemonMasterCustomActions.TargetName).CA.dll" />
 		<CustomAction Id="UninstallAllServicesAction" BinaryKey="DaemonMasterCustomActions.CA.dll" DllEntry="UninstallAllServices" Execute="deferred" Return="check" Impersonate="no" />
-	  <CustomAction Id="SetRemoveResidualFilesProperty" Return="check" Property="RemoveResidualFilesAction" Value="INSTALLEDPATH=[INSTALLFOLDER]" />
+		<CustomAction Id="SetRemoveResidualFilesProperty" Return="check" Property="RemoveResidualFilesAction" Value="INSTALLEDPATH=[INSTALLFOLDER]" />
 		<CustomAction Id="RemoveResidualFilesAction" BinaryKey="DaemonMasterCustomActions.CA.dll" DllEntry="RemoveResidualFiles" Execute="deferred" Return="check" Impersonate="no" />
 	</Fragment>
 
@@ -53,12 +53,12 @@
 	<Fragment>
 		<Directory Id="TARGETDIR" Name="SourceDir">
 			<Directory Id="ProgramFilesFolder">
-				 <Directory Id="INSTALLFOLDER" Name="DaemonMaster">
+				<Directory Id="INSTALLFOLDER" Name="DaemonMaster">
 					<Directory Id="de" Name="de" />
 					<Directory Id="fr" Name="fr" />
 				</Directory>
 			</Directory>
-			
+
 			<Directory Id="ProgramMenuFolder">
 				<Directory Id="AppProgramsFolder" Name="DaemonMaster" />
 			</Directory>
@@ -68,43 +68,43 @@
 
 	<!--Programm files-->
 	<Fragment>
-		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">      
-		<Component Id="DaemonMaster.exe" Guid="300485D3-61E1-4D59-A95C-2434E27B0AA2">
-			<File Id="DaemonMaster.exe" Name="DaemonMaster.exe" Source="$(var.DaemonMaster_TargetDir)DaemonMaster.exe" />
-		</Component>
-		<Component Id="DaemonMaster.exe.config" Guid="7DA23D6D-9CF8-49EF-9C56-02D169845AAD">
-			<File Id="DaemonMaster.exe.config" Name="DaemonMaster.exe.config" Source="$(var.DaemonMaster_TargetDir)DaemonMaster.exe.config" />
-		</Component>
-		<Component Id="DaemonMasterCore.dll" Guid="899CC3EC-272E-4D35-8907-04F92FBB3FB6">
-			<File Id="DaemonMasterCore.dll" Name="DaemonMasterCore.dll" Source="$(var.DaemonMaster_TargetDir)DaemonMasterCore.dll" />
-		</Component>
-		<Component Id="NLog.config" Guid="33C94FCB-747F-42C7-8CF8-53DF7507584F">
-			<File Id="NLog.config" Name="NLog.config" Source="$(var.DaemonMaster_TargetDir)NLog.config" />
-		</Component>
-		<Component Id="DaemonMasterService.exe" Guid="1893D9BE-142F-4980-A7DC-CB931C374808">
-			<File Id="DaemonMasterService.exe" Name="DaemonMasterService.exe" Source="$(var.DaemonMaster_TargetDir)DaemonMasterService.exe" />
-		</Component>
-		<Component Id="DaemonMasterService.exe.config" Guid="01CE7483-7FD2-4120-809D-17F73DD56508">
-			<File Id="DaemonMasterService.exe.config" Name="DaemonMasterService.exe.config" Source="$(var.DaemonMaster_TargetDir)DaemonMasterService.exe.config" />
-		</Component>
-		<Component Id="ActiveDirectoryObjectPicker.dll" Guid="3D80951D-4529-48FC-B5D0-12092460B122">
-			<File Id="ActiveDirectoryObjectPicker.dll" Name="ActiveDirectoryObjectPicker.dll" Source="$(var.DaemonMaster_TargetDir)ActiveDirectoryObjectPicker.dll" />
-		</Component>
-		<Component Id="AutoUpdater.NET.dll" Guid="3E42D217-4DAE-4E74-B01B-C44ADE1FE8CC">
-			<File Id="AutoUpdater.NET.dll" Name="AutoUpdater.NET.dll" Source="$(var.DaemonMaster_TargetDir)AutoUpdater.NET.dll" />
-		</Component>
-		<Component Id="Newtonsoft.Json.dll" Guid="AE9F419F-0A04-4633-849D-DF2DD72C7544">
-			<File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.DaemonMaster_TargetDir)Newtonsoft.Json.dll" />
-		</Component>
-		<Component Id="NLog.dll" Guid="D2C70A83-7555-4225-9CB7-3411F593C7BF">
-			<File Id="NLog.dll" Name="NLog.dll" Source="$(var.DaemonMaster_TargetDir)NLog.dll" />
-		</Component>
-		<Component Id="Itenso.Windows.Controls.ListViewLayout.dll" Guid="CE027854-AA63-4E4F-A065-0BAE04896A96">
-			<File Id="Itenso.Windows.Controls.ListViewLayout.dll" Name="Itenso.Windows.Controls.ListViewLayout.dll" Source="$(var.DaemonMaster_TargetDir)Itenso.Windows.Controls.ListViewLayout.dll" />
-		</Component>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<Component Id="DaemonMaster.exe" Guid="300485D3-61E1-4D59-A95C-2434E27B0AA2">
+				<File Id="DaemonMaster.exe" Name="DaemonMaster.exe" Source="$(var.DaemonMaster_TargetDir)DaemonMaster.exe" />
+			</Component>
+			<Component Id="DaemonMaster.exe.config" Guid="7DA23D6D-9CF8-49EF-9C56-02D169845AAD">
+				<File Id="DaemonMaster.exe.config" Name="DaemonMaster.exe.config" Source="$(var.DaemonMaster_TargetDir)DaemonMaster.exe.config" />
+			</Component>
+			<Component Id="DaemonMasterCore.dll" Guid="899CC3EC-272E-4D35-8907-04F92FBB3FB6">
+				<File Id="DaemonMasterCore.dll" Name="DaemonMasterCore.dll" Source="$(var.DaemonMaster_TargetDir)DaemonMasterCore.dll" />
+			</Component>
+			<Component Id="NLog.config" Guid="33C94FCB-747F-42C7-8CF8-53DF7507584F">
+				<File Id="NLog.config" Name="NLog.config" Source="$(var.DaemonMaster_TargetDir)NLog.config" />
+			</Component>
+			<Component Id="DaemonMasterService.exe" Guid="1893D9BE-142F-4980-A7DC-CB931C374808">
+				<File Id="DaemonMasterService.exe" Name="DaemonMasterService.exe" Source="$(var.DaemonMaster_TargetDir)DaemonMasterService.exe" />
+			</Component>
+			<Component Id="DaemonMasterService.exe.config" Guid="01CE7483-7FD2-4120-809D-17F73DD56508">
+				<File Id="DaemonMasterService.exe.config" Name="DaemonMasterService.exe.config" Source="$(var.DaemonMaster_TargetDir)DaemonMasterService.exe.config" />
+			</Component>
+			<Component Id="ActiveDirectoryObjectPicker.dll" Guid="3D80951D-4529-48FC-B5D0-12092460B122">
+				<File Id="ActiveDirectoryObjectPicker.dll" Name="ActiveDirectoryObjectPicker.dll" Source="$(var.DaemonMaster_TargetDir)ActiveDirectoryObjectPicker.dll" />
+			</Component>
+			<Component Id="AutoUpdater.NET.dll" Guid="3E42D217-4DAE-4E74-B01B-C44ADE1FE8CC">
+				<File Id="AutoUpdater.NET.dll" Name="AutoUpdater.NET.dll" Source="$(var.DaemonMaster_TargetDir)AutoUpdater.NET.dll" />
+			</Component>
+			<Component Id="Newtonsoft.Json.dll" Guid="AE9F419F-0A04-4633-849D-DF2DD72C7544">
+				<File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.DaemonMaster_TargetDir)Newtonsoft.Json.dll" />
+			</Component>
+			<Component Id="NLog.dll" Guid="D2C70A83-7555-4225-9CB7-3411F593C7BF">
+				<File Id="NLog.dll" Name="NLog.dll" Source="$(var.DaemonMaster_TargetDir)NLog.dll" />
+			</Component>
+			<Component Id="Itenso.Windows.Controls.ListViewLayout.dll" Guid="CE027854-AA63-4E4F-A065-0BAE04896A96">
+				<File Id="Itenso.Windows.Controls.ListViewLayout.dll" Name="Itenso.Windows.Controls.ListViewLayout.dll" Source="$(var.DaemonMaster_TargetDir)Itenso.Windows.Controls.ListViewLayout.dll" />
+			</Component>
 		</ComponentGroup>
 	</Fragment>
-	
+
 	<!--Shortcuts-->
 	<Fragment>
 		<DirectoryRef Id="AppProgramsFolder">
@@ -122,7 +122,7 @@
 			</Component>
 		</DirectoryRef>
 	</Fragment>
-	
+
 	<!--German translations files-->
 	<Fragment>
 		<ComponentGroup Id="de_files" Directory="de">
