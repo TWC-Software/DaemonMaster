@@ -33,10 +33,11 @@ namespace DaemonMasterCore
     {
         private static readonly Dictionary<string, DaemonProcess> Processes = new Dictionary<string, DaemonProcess>();
 
+        // TODO Make the function complete
         public static void StartProcessAsUser(string filePath, string args, NativeMethods.PRIORITY_CLASS priority)
         {
+
             string fileDir = Path.GetDirectoryName(filePath);
-            string fileName = Path.GetFileName(filePath);
 
             //Set only the length to inherit the security attributes of the existing token
             NativeMethods.SECURITY_ATTRIBUTES securityAttributes = new NativeMethods.SECURITY_ATTRIBUTES();

@@ -22,11 +22,8 @@ using DaemonMasterCore.Win32;
 using DaemonMasterCore.Win32.PInvoke;
 using NLog;
 using System;
-using System.ComponentModel;
 using System.IO;
 using System.ServiceProcess;
-using DaemonMasterCore.WPF;
-using System.Resources;
 
 namespace DaemonMasterCore
 {
@@ -97,7 +94,7 @@ namespace DaemonMasterCore
                 {
                     if (scManager.Status == ServiceControllerStatus.Running)
                         return State.AlreadyStarted;
-
+                    // TODO Revert
                     string[] args = new string[1] { "-startInUserSession" };
 
                     //Startet den Service
