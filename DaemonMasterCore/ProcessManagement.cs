@@ -20,13 +20,91 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Security;
+using DaemonMasterCore.Win32;
+using DaemonMasterCore.Win32.PInvoke;
 
 namespace DaemonMasterCore
 {
     public static class ProcessManagement
     {
         private static readonly Dictionary<string, DaemonProcess> Processes = new Dictionary<string, DaemonProcess>();
+
+        public static void StartProcessAsUser(string filePath, string args, NativeMethods.PRIORITY_CLASS priority)
+        {
+            string fileDir = Path.GetDirectoryName(filePath);
+            string fileName = Path.GetFileName(filePath);
+
+            //Set only the length to inherit the security attributes of the existing token
+            NativeMethods.SECURITY_ATTRIBUTES securityAttributes = new NativeMethods.SECURITY_ATTRIBUTES();
+            securityAttributes.nLength = Marshal.SizeOf(securityAttributes);
+
+            // flags that specify the priority and creation method of the process
+            uint creationFlags = (uint)priority | NativeMethods.CREATE_NEW_CONSOLE;
+
+            NativeMethods.STARTUPINFO startupinfo = new NativeMethods.STARTUPINFO();
+            startupinfo.cb = Marshal.SizeOf(startupinfo);
+            startupinfo.dwFlags = (uint)NativeMethods.STARTINFO_FLAGS.STARTF_USESHOWWINDOW;
+            startupinfo.wShowWindow = (short)NativeMethods.WINDOW_SHOW_STYLE.SW_SHOW;
+            startupinfo.lpTitle = null;
+
+
+            //Get user session ID
+            uint currentUserSessionId = NativeMethods.WTSGetActiveConsoleSessionId();
+
+            //Get user token
+            using (TokenHandle currentUserToken = TokenHandle.GetTokenFromSessionID(currentUserSessionId))
+            {
+                NativeMethods.PROCESS_INFORMATION processInformation = new NativeMethods.PROCESS_INFORMATION();
+
+                try
+                {
+                    if (!NativeMethods.CreateProcessAsUser(
+                        currentUserToken,
+                        null,
+                        String.Format("\"{0}\" {1}", filePath.Replace(@"\", @"\\"), args),
+                    ref securityAttributes,
+                        ref securityAttributes,
+                        false,
+                        creationFlags,
+                        IntPtr.Zero,
+                        fileDir,
+                        ref startupinfo,
+                        out processInformation))
+                    {
+                        throw new Win32Exception(Marshal.GetLastWin32Error());
+                    }
+                }
+                finally
+                {
+                    if (processInformation.hProcess != IntPtr.Zero)
+                        NativeMethods.CloseHandle(processInformation.hProcess);
+
+                    if (processInformation.hThread != IntPtr.Zero)
+                        NativeMethods.CloseHandle(processInformation.hThread);
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         /// <summary>
         /// Get the Process object of the given service name, if no process exists to the given service name the function return null

@@ -21,6 +21,7 @@
 using DaemonMasterCore;
 using System;
 using System.ServiceProcess;
+using DaemonMasterCore.Win32.PInvoke;
 using NLog;
 
 namespace DaemonMasterService
@@ -42,6 +43,16 @@ namespace DaemonMasterService
         {
             base.OnStart(args);
 
+            bool startInUserSession = false;
+
+            //Read args
+            switch (args[0])
+            {
+                case "-startInUserSession":
+                    startInUserSession = true;
+                    break;
+            }
+
             //Get the name of the service
             _serviceName = DaemonMasterUtils.GetServiceName();
 
@@ -51,19 +62,27 @@ namespace DaemonMasterService
             try
             {
                 _logger.Info("Starting the process...");
-                switch (ProcessManagement.CreateNewProcess(_serviceName))
+                if (startInUserSession)
                 {
-                    case ProcessManagement.DaemonProcessState.Successful:
-                        _logger.Info("The start of the process was successful!");
-                        break;
+                    Daemon daemon = RegistryManagement.LoadDaemonFromRegistry(_serviceName);
+                    ProcessManagement.StartProcessAsUser(daemon.FullPath, daemon.Parameter, NativeMethods.PRIORITY_CLASS.NORMAL_PRIORITY_CLASS);
+                }
+                else
+                {
+                    switch (ProcessManagement.CreateNewProcess(_serviceName))
+                    {
+                        case ProcessManagement.DaemonProcessState.Successful:
+                            _logger.Info("The start of the process was successful!");
+                            break;
 
-                    case ProcessManagement.DaemonProcessState.Unsuccessful:
-                        _logger.Info("The start of the process was unsuccessful!");
-                        break;
+                        case ProcessManagement.DaemonProcessState.Unsuccessful:
+                            _logger.Info("The start of the process was unsuccessful!");
+                            break;
 
-                    case ProcessManagement.DaemonProcessState.AlreadyStarted:
-                        _logger.Info("The process is already started!");
-                        break;
+                        case ProcessManagement.DaemonProcessState.AlreadyStarted:
+                            _logger.Info("The process is already started!");
+                            break;
+                    }
                 }
             }
             catch (Exception e)

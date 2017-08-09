@@ -44,6 +44,9 @@ namespace DaemonMasterCore.Win32.PInvoke
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GenerateConsoleCtrlEvent(CtrlEvent dwCtrlEvent, uint dwProcessGroupId);
 
+        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Auto)]
+        internal static extern uint WTSGetActiveConsoleSessionId();
+
 
         //FLAGS
 

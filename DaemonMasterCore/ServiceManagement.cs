@@ -98,9 +98,11 @@ namespace DaemonMasterCore
                     if (scManager.Status == ServiceControllerStatus.Running)
                         return State.AlreadyStarted;
 
+                    string[] args = new string[1] { "-startInUserSession" };
+
                     //Startet den Service
                     if (scManager.Status != ServiceControllerStatus.StartPending)
-                        scManager.Start();
+                        scManager.Start(args);
 
                     //Prüft ob der Service gestartet ist oder einen Timeout gemacht hat
                     scManager.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromMilliseconds(WaitForStatusTimeout));

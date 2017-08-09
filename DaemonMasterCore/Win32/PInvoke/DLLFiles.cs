@@ -25,5 +25,6 @@ namespace DaemonMasterCore.Win32.PInvoke
         public const string KERNEL32 = "KERNEL32.dll";
         public const string WINSTA = "WINSTA.dll";
         public const string USER32 = "USER32.dll";
+        public const string WTSAPI32 = "wtsapi32.dll";
     }
 }

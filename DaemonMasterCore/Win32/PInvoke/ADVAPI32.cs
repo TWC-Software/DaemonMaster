@@ -25,6 +25,8 @@ namespace DaemonMasterCore.Win32.PInvoke
     //FROM PINVOKE.NET
     public static partial class NativeMethods
     {
+        #region Win32 DllImports
+
         [DllImport(DLLFiles.ADVAPI32, EntryPoint = "CreateServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern ServiceHandle CreateService
         (
@@ -66,7 +68,7 @@ namespace DaemonMasterCore.Win32.PInvoke
         internal static extern bool DeleteService(ServiceHandle hService);
 
         [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern bool QueryServiceStatusEx(ServiceHandle hService, int infoLevel, IntPtr buffer, int bufferSize, out int bytesNeeded);
+        internal static extern bool QueryServiceStatusEx(ServiceHandle hService, uint infoLevel, IntPtr buffer, int bufferSize, out int bytesNeeded);
 
         [DllImport(DLLFiles.ADVAPI32, EntryPoint = "ChangeServiceConfigW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -81,7 +83,8 @@ namespace DaemonMasterCore.Win32.PInvoke
         internal static extern bool ChangeServiceConfig2(ServiceHandle hService, INFO_LEVEL dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_CONFIG_DELAYED_AUTO_START_INFO lpInfo);
 
         [DllImport(DLLFiles.ADVAPI32, EntryPoint = "LogonUserW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
-        public static extern bool LogonUser(
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool LogonUser(
             string lpszUsername,
             string lpszDomain,
             IntPtr lpszPassword,
@@ -90,14 +93,35 @@ namespace DaemonMasterCore.Win32.PInvoke
             out IntPtr phToken
         );
 
-        //---------------------//
+        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "CreateProcessAsUserW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool CreateProcessAsUser(
+            TokenHandle hToken,
+            string lpApplicationName,
+            string lpCommandLine,
+            ref SECURITY_ATTRIBUTES lpProcessAttributes,
+            ref SECURITY_ATTRIBUTES lpThreadAttributes,
+            bool bInheritHandles,
+            uint dwCreationFlags,
+            IntPtr lpEnvironment,
+            string lpCurrentDirectory,
+            ref STARTUPINFO lpStartupInfo,
+            out PROCESS_INFORMATION lpProcessInformation);
+
+        #endregion
+
+        #region Constants
 
         /// <summary>
         /// Needed for QueryServiceStatusEx as infoLevel
         /// </summary>
-        public const int SC_STATUS_PROCESS_INFO = 0x0;
+        public const uint SC_STATUS_PROCESS_INFO = 0x0;
 
-        //---------------------//
+        public const uint CREATE_NEW_CONSOLE = 0x00000010;
+
+        #endregion
+
+        #region Structures
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct SERVICE_STATUS
@@ -137,7 +161,49 @@ namespace DaemonMasterCore.Win32.PInvoke
             public bool delayedStart;
         }
 
-        //---------------------//
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        public struct SECURITY_ATTRIBUTES
+        {
+            public int nLength;
+            public IntPtr lpSecurityDescriptor;
+            public int bInheritHandle;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        internal struct PROCESS_INFORMATION
+        {
+            public IntPtr hProcess;
+            public IntPtr hThread;
+            public uint dwProcessId;
+            public uint dwThreadId;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        public struct STARTUPINFO
+        {
+            public int cb;
+            public String lpReserved;
+            public String lpDesktop;
+            public String lpTitle;
+            public uint dwX;
+            public uint dwY;
+            public uint dwXSize;
+            public uint dwYSize;
+            public uint dwXCountChars;
+            public uint dwYCountChars;
+            public uint dwFillAttribute;
+            public uint dwFlags;
+            public short wShowWindow;
+            public short cbReserved2;
+            public IntPtr lpReserved2;
+            public IntPtr hStdInput;
+            public IntPtr hStdOutput;
+            public IntPtr hStdError;
+        }
+
+        #endregion
+
+        #region Enumerations
 
         /// <summary>
         /// Access mask 
@@ -521,6 +587,13 @@ namespace DaemonMasterCore.Win32.PInvoke
             SERVICE_STOPPED = 0x00000001
         }
 
+        [Flags]
+        public enum STARTINFO_FLAGS
+        {
+            STARTF_USESHOWWINDOW = 0x00000001,
+            //Not complete
+        }
+
         public enum LOGON_TYP
         {
             Interactive = 2,
@@ -538,5 +611,32 @@ namespace DaemonMasterCore.Win32.PInvoke
             WinNT40 = 2,
             WinNT50 = 3
         }
+
+        public enum PRIORITY_CLASS
+        {
+            IDLE_PRIORITY_CLASS = 0x40,
+            NORMAL_PRIORITY_CLASS = 0x20,
+            HIGH_PRIORITY_CLASS = 0x80,
+            REALTIME_PRIORITY_CLASS = 0x100
+        }
+
+        public enum WINDOW_SHOW_STYLE
+        {
+            SW_FORCEMINIMIZE = 11,
+            SW_HIDE = 0,
+            SW_MAXIMIZE = 3,
+            SW_MINIMIZE = 6,
+            SW_RESTORE = 9,
+            SW_SHOW = 5,
+            SW_SHOWDEFAULT = 10,
+            SW_SHOWMAXIMIZED = 3,
+            SW_SHOWMINIMIZED = 2,
+            SW_SHOWMINNOACTIVE = 7,
+            SW_SHOWNA = 8,
+            SW_SHOWNOACTIVATE = 4,
+            SW_SHOWNORMAL = 1,
+        }
+
+        #endregion
     }
 }

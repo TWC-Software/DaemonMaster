@@ -71,9 +71,11 @@
     <Compile Include="ProcessManagement.cs" />
     <Compile Include="SystemManagement.cs" />
     <Compile Include="Win32\PInvoke\DLLFiles.cs" />
+    <Compile Include="Win32\PInvoke\WTSAPI32.cs" />
     <Compile Include="Win32\ServiceControlManager.cs" />
     <Compile Include="Win32\ServiceHandle.cs" />
     <Compile Include="Win32\ThreadHandle.cs" />
+    <Compile Include="Win32\TokenHandle.cs" />
     <Compile Include="WPF\InvertBooleanConverter.cs" />
     <Compile Include="WPF\PlaceholderTextBox.cs" />
     <Compile Include="DaemonProcess.cs" />

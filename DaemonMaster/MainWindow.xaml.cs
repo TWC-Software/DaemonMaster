@@ -75,13 +75,14 @@ namespace DaemonMaster
 
             //Initialize GUI
             InitializeComponent();
-            StartListViewUpdateTimer(config.UpdateInterval);
 
             //Fragt, wenn der RegKey nicht gesetzt ist, ob dieser gesetzt werden soll
             if (!AskToEnableInteractiveServices())
                 this.Close();
 
             _processCollection = RegistryManagement.LoadDaemonItemsFromRegistry();
+            //Start ListView Updater
+            StartListViewUpdateTimer(config.UpdateInterval);
 
             //Aktualisiert die Liste zum start
             listViewDaemons.ItemsSource = _processCollection;
@@ -531,6 +532,9 @@ namespace DaemonMaster
             guiDispatcherTimer.Tick += UpdateListView;
             guiDispatcherTimer.Interval = TimeSpan.FromSeconds(interval);
             guiDispatcherTimer.Start();
+
+            //Force Update on startup
+            UpdateListView(null, EventArgs.Empty);
         }
 
         private void UpdateListView(object sender, EventArgs e)
