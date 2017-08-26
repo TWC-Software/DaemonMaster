@@ -20,12 +20,13 @@ using DaemonMasterCore.Win32.PInvoke;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
 namespace DaemonMasterCore.Win32
 {
-    public class ServiceHandle : SafeHandle
+    public class ServiceHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
-        public ServiceHandle() : base(IntPtr.Zero, true)
+        public ServiceHandle() : base(true)
         {
         }
 
@@ -33,8 +34,6 @@ namespace DaemonMasterCore.Win32
         {
             return NativeMethods.CloseServiceHandle(handle);
         }
-
-        public override bool IsInvalid => handle == IntPtr.Zero;
 
         public void Start()
         {

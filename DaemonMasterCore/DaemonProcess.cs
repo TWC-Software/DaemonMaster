@@ -21,8 +21,12 @@ using DaemonMasterCore.Win32;
 using DaemonMasterCore.Win32.PInvoke;
 using NLog;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Security.Authentication;
+using System.Text;
 using System.Threading;
 
 namespace DaemonMasterCore
@@ -32,7 +36,7 @@ namespace DaemonMasterCore
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly Daemon _daemon = null;
-        private readonly Process _process = new Process();
+        private readonly Process _process = null;
 
         //Don't change!!
         private int _restarts = 0;
@@ -45,20 +49,30 @@ namespace DaemonMasterCore
 
         #region Constructor/Init
 
-        public DaemonProcess(string serviceName)
+        public DaemonProcess(string serviceName, bool startInUserSessionAsService = false)
         {
             _daemon = RegistryManagement.LoadDaemonFromRegistry(serviceName);
-            Init();
+
+            if (startInUserSessionAsService)
+            {
+                _process = ProcessManagement.StartProcessAsUser(_daemon.FullPath, _daemon.Parameter);
+                InitProcessAsServiceInUserSession();
+            }
+            else
+            {
+                _process = new Process();
+                InitProcessAsService();
+            }
         }
 
-        private void Init()
+        private void InitProcessAsService()
         {
             //Create the start info for the process
             ProcessStartInfo startInfo = new ProcessStartInfo()
             {
                 FileName = _daemon.FullPath,
                 Arguments = _daemon.Parameter,
-                UseShellExecute = false //For .ink              
+                UseShellExecute = false
             };
 
             if (!_daemon.UseLocalSystem)
@@ -82,6 +96,13 @@ namespace DaemonMasterCore
             _process.EnableRaisingEvents = true;
             _process.Exited += ProcessOnExited;
         }
+
+        private void InitProcessAsServiceInUserSession()
+        {
+            //Enable raising events for auto restart
+            _process.EnableRaisingEvents = true;
+            _process.Exited += ProcessOnExited;
+        }
         #endregion
 
 
@@ -93,7 +114,7 @@ namespace DaemonMasterCore
 
         internal ProcessManagement.DaemonProcessState StartProcess()
         {
-            if (_process.Start())
+            if (!_process.HasExited || _process.Start())
             {
                 return ProcessManagement.DaemonProcessState.Successful;
             }
@@ -112,14 +133,26 @@ namespace DaemonMasterCore
 
             try
             {
-                //If console app then send Ctrl-C or Ctrl-Break command
-                if (_daemon.ConsoleApplication)
+                if (_process.MainWindowHandle != IntPtr.Zero)
                 {
-                    CloseConsoleApplication(_daemon.UseCtrlC);
+                    //Send close main window command
+                    _process.CloseMainWindow();
                 }
+                else
+                {
+                    //If console app then send Ctrl-C or Ctrl-Break command
+                    if (_daemon.ConsoleApplication)
+                    {
+                        CloseConsoleApplication(_daemon.UseCtrlC);
+                    }
+                    else
+                    {
 
-                //Send close main window command
-                _process.CloseMainWindow();
+                        _process.Kill();
+                        _process.Close();
+                        return ProcessManagement.DaemonProcessState.Successful;
+                    }
+                }
 
                 //Wait for a defined time
                 if (_process.WaitForExit(_daemon.ProcessKillTime))
@@ -246,6 +279,7 @@ namespace DaemonMasterCore
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                         Other functions                                              //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
         internal bool CloseConsoleApplication(bool useCtrlC)
         {

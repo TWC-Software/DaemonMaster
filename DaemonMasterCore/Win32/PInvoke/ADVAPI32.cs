@@ -19,6 +19,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace DaemonMasterCore.Win32.PInvoke
 {
@@ -98,11 +99,11 @@ namespace DaemonMasterCore.Win32.PInvoke
         internal static extern bool CreateProcessAsUser(
             TokenHandle hToken,
             string lpApplicationName,
-            string lpCommandLine,
+            StringBuilder lpCommandLine,
             ref SECURITY_ATTRIBUTES lpProcessAttributes,
             ref SECURITY_ATTRIBUTES lpThreadAttributes,
             bool bInheritHandles,
-            uint dwCreationFlags,
+            int dwCreationFlags,
             IntPtr lpEnvironment,
             string lpCurrentDirectory,
             ref STARTUPINFO lpStartupInfo,
@@ -117,7 +118,7 @@ namespace DaemonMasterCore.Win32.PInvoke
         /// </summary>
         public const uint SC_STATUS_PROCESS_INFO = 0x0;
 
-        public const uint CREATE_NEW_CONSOLE = 0x00000010;
+        public const int CREATE_NEW_CONSOLE = 0x00000010;
 
         #endregion
 

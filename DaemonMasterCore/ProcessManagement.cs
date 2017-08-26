@@ -21,9 +21,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Security;
+using System.Text;
+using System.Threading;
 using DaemonMasterCore.Win32;
 using DaemonMasterCore.Win32.PInvoke;
 
@@ -33,25 +35,24 @@ namespace DaemonMasterCore
     {
         private static readonly Dictionary<string, DaemonProcess> Processes = new Dictionary<string, DaemonProcess>();
 
-        // TODO Make the function complete
-        public static void StartProcessAsUser(string filePath, string args, NativeMethods.PRIORITY_CLASS priority)
+        [Description("Only for services that run under the LocalSystem")]
+        public static Process StartProcessAsUser(string filePath, string arguments)
         {
-
             string fileDir = Path.GetDirectoryName(filePath);
+
+            //Set the startinfos (like desktop)
+            NativeMethods.STARTUPINFO startupInfo = new NativeMethods.STARTUPINFO();
+            startupInfo.cb = Marshal.SizeOf(startupInfo);
+            startupInfo.lpDesktop = @"winsta0\default";
+
+            NativeMethods.PROCESS_INFORMATION processInformation = new NativeMethods.PROCESS_INFORMATION();
+
+            //Flags that specify the priority and creation method of the process
+            int creationFlags = (int)NativeMethods.PRIORITY_CLASS.NORMAL_PRIORITY_CLASS | NativeMethods.CREATE_NEW_CONSOLE;
 
             //Set only the length to inherit the security attributes of the existing token
             NativeMethods.SECURITY_ATTRIBUTES securityAttributes = new NativeMethods.SECURITY_ATTRIBUTES();
             securityAttributes.nLength = Marshal.SizeOf(securityAttributes);
-
-            // flags that specify the priority and creation method of the process
-            uint creationFlags = (uint)priority | NativeMethods.CREATE_NEW_CONSOLE;
-
-            NativeMethods.STARTUPINFO startupinfo = new NativeMethods.STARTUPINFO();
-            startupinfo.cb = Marshal.SizeOf(startupinfo);
-            startupinfo.dwFlags = (uint)NativeMethods.STARTINFO_FLAGS.STARTF_USESHOWWINDOW;
-            startupinfo.wShowWindow = (short)NativeMethods.WINDOW_SHOW_STYLE.SW_SHOW;
-            startupinfo.lpTitle = null;
-
 
             //Get user session ID
             uint currentUserSessionId = NativeMethods.WTSGetActiveConsoleSessionId();
@@ -59,25 +60,25 @@ namespace DaemonMasterCore
             //Get user token
             using (TokenHandle currentUserToken = TokenHandle.GetTokenFromSessionID(currentUserSessionId))
             {
-                NativeMethods.PROCESS_INFORMATION processInformation = new NativeMethods.PROCESS_INFORMATION();
-
                 try
                 {
                     if (!NativeMethods.CreateProcessAsUser(
                         currentUserToken,
                         null,
-                        String.Format("\"{0}\" {1}", filePath.Replace(@"\", @"\\"), args),
-                    ref securityAttributes,
+                        BuildCommandLineString(filePath, arguments),
+                        ref securityAttributes,
                         ref securityAttributes,
                         false,
                         creationFlags,
                         IntPtr.Zero,
                         fileDir,
-                        ref startupinfo,
+                        ref startupInfo,
                         out processInformation))
                     {
-                        throw new Win32Exception(Marshal.GetLastWin32Error());
+                        throw new Win32Exception("CreateProcessAsUser:" + Marshal.GetLastWin32Error());
                     }
+
+                    return Process.GetProcessById((int)processInformation.dwProcessId);
                 }
                 finally
                 {
@@ -90,20 +91,30 @@ namespace DaemonMasterCore
             }
         }
 
+        [Description("Check if the string is quoted, if not it do it here")]
+        private static StringBuilder BuildCommandLineString(string filePath, string arguments)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            filePath = filePath.Trim();
 
+            bool filePathIsQuoted = filePath.StartsWith("\"", StringComparison.Ordinal) && filePath.EndsWith("\"", StringComparison.Ordinal);
+            if (!filePathIsQuoted)
+                stringBuilder.Append("\"");
 
+            stringBuilder.Append(filePath);
 
+            if (!filePathIsQuoted)
+                stringBuilder.Append("\"");
 
+            //Adds arguments to the StringBuilder
+            if (!String.IsNullOrEmpty(arguments))
+            {
+                stringBuilder.Append(" ");
+                stringBuilder.Append(arguments);
+            }
 
-
-
-
-
-
-
-
-
-
+            return stringBuilder;
+        }
 
 
 
@@ -136,12 +147,12 @@ namespace DaemonMasterCore
         /// </summary>
         /// <param name="serviceName"></param>
         /// <returns></returns>
-        public static DaemonProcessState CreateNewProcess(string serviceName)
+        public static DaemonProcessState CreateNewProcess(string serviceName, bool startProcessAsUser = false)
         {
             if (IsProcessAlreadyThere(serviceName))
                 return DaemonProcessState.AlreadyStarted;
 
-            DaemonProcess process = new DaemonProcess(serviceName);
+            DaemonProcess process = new DaemonProcess(serviceName, startProcessAsUser);
             DaemonProcessState result = process.StartProcess();
 
             switch (result)

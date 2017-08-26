@@ -1,17 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using DaemonMasterCore.Win32.PInvoke;
+using Microsoft.Win32.SafeHandles;
+using System;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
 
 namespace DaemonMasterCore.Win32
 {
-    class TokenHandle : SafeHandle
+    class TokenHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
-        public TokenHandle() : base(IntPtr.Zero, true)
+        public TokenHandle() : base(true)
         {
         }
 
@@ -19,8 +16,6 @@ namespace DaemonMasterCore.Win32
         {
             return NativeMethods.CloseHandle(handle);
         }
-
-        public override bool IsInvalid => handle == IntPtr.Zero;
 
         public static TokenHandle GetTokenFromSessionID(uint sessionID)
         {

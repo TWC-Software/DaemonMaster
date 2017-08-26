@@ -21,12 +21,13 @@ using DaemonMasterCore.Win32.PInvoke;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
 namespace DaemonMasterCore.Win32
 {
-    public class ServiceControlManager : SafeHandle
+    public class ServiceControlManager : SafeHandleZeroOrMinusOneIsInvalid
     {
-        public ServiceControlManager() : base(IntPtr.Zero, true)
+        public ServiceControlManager() : base(true)
         {
         }
 
@@ -34,8 +35,6 @@ namespace DaemonMasterCore.Win32
         {
             return NativeMethods.CloseServiceHandle(handle);
         }
-
-        public override bool IsInvalid => handle == IntPtr.Zero;
 
         //Give a ServiceControlManager object as return value 
         public static ServiceControlManager Connect(NativeMethods.SCM_ACCESS access)

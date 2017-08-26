@@ -17,15 +17,15 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 using DaemonMasterCore.Win32.PInvoke;
-using System;
+using Microsoft.Win32.SafeHandles;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 namespace DaemonMasterCore.Win32
 {
-    public class ThreadHandle : SafeHandle
+    public class ThreadHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
-        public ThreadHandle() : base(IntPtr.Zero, true)
+        public ThreadHandle() : base(true)
         {
         }
 
@@ -33,8 +33,6 @@ namespace DaemonMasterCore.Win32
         {
             return NativeMethods.CloseHandle(handle);
         }
-
-        public override bool IsInvalid => handle == IntPtr.Zero;
 
         public static ThreadHandle OpenThread(NativeMethods.ThreadAccess desiredAccess, bool inheritHandle, int processId)
         {
