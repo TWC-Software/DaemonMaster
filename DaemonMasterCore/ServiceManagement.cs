@@ -22,8 +22,11 @@ using DaemonMasterCore.Win32;
 using DaemonMasterCore.Win32.PInvoke;
 using NLog;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.ServiceProcess;
+using NativeMethods = DaemonMasterCore.Win32.PInvoke.NativeMethods;
 
 namespace DaemonMasterCore
 {
@@ -80,65 +83,75 @@ namespace DaemonMasterCore
         }
 
         /// <summary>
-        /// Start the service. Possible return values are AlreadyStarted, Successful and Error
+        /// Start the service. Possible return values are AlreadyStarted, Successful
         /// </summary>
         /// <param name="serviceName"></param>
+        /// <param name="startProcessInUserSession">If true the service start the process in the current user session</param>
         /// <returns></returns>
-        public static State StartService(string serviceName)
+        public static DaemonServiceState StartService(string serviceName, bool startProcessInUserSession = false)
         {
-            try
+            using (ServiceController scManager = new ServiceController(serviceName))
             {
-                //if (!CheckUI0DetectService())
-                //    return State.Unsuccessful;
-                using (ServiceController scManager = new ServiceController(serviceName))
+                //Create an list for the arguments
+                List<string> args = new List<string>();
+
+                if (scManager.Status == ServiceControllerStatus.Running)
+                    return DaemonServiceState.AlreadyStarted;
+
+                #region Arguments
+
+                if (startProcessInUserSession)
+                    args.Add("-startInUserSession");
+
+                #endregion
+
+                //Start the service
+                if (scManager.Status != ServiceControllerStatus.StartPending)
+                    scManager.Start(args.ToArray());
+
+                try
                 {
-                    if (scManager.Status == ServiceControllerStatus.Running)
-                        return State.AlreadyStarted;
-                    // TODO Revert
-                    string[] args = new string[1] { "-startInUserSession" };
-
-                    //Startet den Service
-                    if (scManager.Status != ServiceControllerStatus.StartPending)
-                        scManager.Start(args);
-
-                    //Prüft ob der Service gestartet ist oder einen Timeout gemacht hat
+                    //Check if the service has been started or not
                     scManager.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromMilliseconds(WaitForStatusTimeout));
-
-                    return State.Successful;
                 }
-            }
-            catch (Exception)
-            {
-                return State.Error;
+                catch (System.ServiceProcess.TimeoutException)
+                {
+                    return DaemonServiceState.Unsuccessful;
+                }
+
+                return DaemonServiceState.Successful;
             }
         }
 
         /// <summary>
-        /// Stop the service. Possible return values are AlreadyStopped, Successful and Error
+        /// Stop the service. Possible return values are AlreadyStopped, Successful
         /// </summary>
         /// <param name="serviceName"></param>
         /// <returns></returns>
-        public static State StopService(string serviceName)
+        public static DaemonServiceState StopService(string serviceName)
         {
-            try
+
+            using (ServiceController scManager = new ServiceController(serviceName))
             {
-                using (ServiceController scManager = new ServiceController(serviceName))
+                if (scManager.Status == ServiceControllerStatus.Stopped)
+                    return DaemonServiceState.AlreadyStopped;
+
+                //Stoppt den Service
+                if (scManager.Status != ServiceControllerStatus.StopPending)
+                    scManager.Stop();
+
+
+                try
                 {
-                    if (scManager.Status == ServiceControllerStatus.Stopped)
-                        return State.AlreadyStopped;
-
-                    //Stoppt den Service
-                    if (scManager.Status != ServiceControllerStatus.StopPending)
-                        scManager.Stop();
-
-                    //Prüft ob der Service gestoppt ist oder einen Timeout gemacht hat
+                    //Check if the service has been stopped or not
                     scManager.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromMilliseconds(WaitForStatusTimeout));
-                    return State.Successful;
                 }
-            }
-            catch (Exception)
-            {
-                return State.Error;
+                catch (System.ServiceProcess.TimeoutException)
+                {
+                    return DaemonServiceState.Unsuccessful;
+                }
+
+                return DaemonServiceState.Successful;
             }
         }
 
@@ -161,6 +174,25 @@ namespace DaemonMasterCore
 
                     serviceHandle.DeleteService();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Kill the service if its running. Possible return values are AlreadyStopped, Successful
+        /// </summary>
+        /// <param name="serviceName"></param>
+        public static DaemonServiceState KillService(string serviceName)
+        {
+            int pid = (int)GetPIDByServiceName(serviceName);
+
+            if (pid != 0)
+            {
+                Process.GetProcessById(pid).Kill();
+                return DaemonServiceState.Successful;
+            }
+            else
+            {
+                return DaemonServiceState.AlreadyStopped;
             }
         }
 
@@ -193,19 +225,16 @@ namespace DaemonMasterCore
             {
                 try
                 {
-                    using (ServiceController serviceController = new ServiceController(daemon.ServiceName))
+                    _logger.Info("Killing '" + daemon.DisplayName + "'...");
+                    switch (KillService(daemon.ServiceName))
                     {
-                        _logger.Info("Killing '" + daemon.DisplayName + "'...");
-                        if (serviceController.Status != ServiceControllerStatus.Stopped &&
-                            serviceController.Status != ServiceControllerStatus.StopPending)
-                        {
-                            serviceController.ExecuteCommand(128);
+                        case DaemonServiceState.AlreadyStopped:
+                            _logger.Warn("Already stopped");
+                            break;
+
+                        case DaemonServiceState.Successful:
                             _logger.Info("Success");
-                        }
-                        else if (serviceController.Status == ServiceControllerStatus.StopPending)
-                        {
-                            _logger.Warn("Can't kill the service, stop is already in progress '" + daemon.DisplayName + "'");
-                        }
+                            break;
                     }
                 }
                 catch (Exception e)
@@ -214,7 +243,6 @@ namespace DaemonMasterCore
                 }
             }
         }
-
 
         /// <summary>
         /// Change the service config
@@ -315,26 +343,6 @@ namespace DaemonMasterCore
             return processId;
         }
 
-
-
-
         #endregion
-
-        [Flags]
-        public enum State
-        {
-            NotStopped,
-            NotStarted,
-            AlreadyStopped,
-            AlreadyStarted,
-            Stopped,
-            Running,
-            Paused,
-            Deleted,
-            Successful,
-            Unsuccessful,
-            Error,
-            ParametersArNotValid
-        }
     }
 }

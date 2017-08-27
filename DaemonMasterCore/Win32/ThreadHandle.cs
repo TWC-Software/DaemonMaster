@@ -31,12 +31,12 @@ namespace DaemonMasterCore.Win32
 
         protected override bool ReleaseHandle()
         {
-            return NativeMethods.CloseHandle(handle);
+            return PInvoke.NativeMethods.CloseHandle(handle);
         }
 
-        public static ThreadHandle OpenThread(NativeMethods.ThreadAccess desiredAccess, bool inheritHandle, int processId)
+        public static ThreadHandle OpenThread(PInvoke.NativeMethods.ThreadAccess desiredAccess, bool inheritHandle, int processId)
         {
-            ThreadHandle threadHandle = NativeMethods.OpenThread(desiredAccess, inheritHandle, (uint)processId);
+            ThreadHandle threadHandle = PInvoke.NativeMethods.OpenThread(desiredAccess, inheritHandle, (uint)processId);
 
             if (threadHandle.IsInvalid)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -46,13 +46,13 @@ namespace DaemonMasterCore.Win32
 
         public void PauseThread()
         {
-            if (!NativeMethods.SuspendThread(this))
+            if (!PInvoke.NativeMethods.SuspendThread(this))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
         public void ResumeThread()
         {
-            if (!NativeMethods.ResumeThread(this))
+            if (!PInvoke.NativeMethods.ResumeThread(this))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
     }

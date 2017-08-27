@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace DaemonMasterCore.Win32
 {
-    class TokenHandle : SafeHandleZeroOrMinusOneIsInvalid
+    public class TokenHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
         public TokenHandle() : base(true)
         {
@@ -14,13 +14,13 @@ namespace DaemonMasterCore.Win32
 
         protected override bool ReleaseHandle()
         {
-            return NativeMethods.CloseHandle(handle);
+            return PInvoke.NativeMethods.CloseHandle(handle);
         }
 
         public static TokenHandle GetTokenFromSessionID(uint sessionID)
         {
             TokenHandle currentUserToken;
-            if (!NativeMethods.WTSQueryUserToken(sessionID, out currentUserToken))
+            if (!PInvoke.NativeMethods.WTSQueryUserToken(sessionID, out currentUserToken))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             return currentUserToken;
         }

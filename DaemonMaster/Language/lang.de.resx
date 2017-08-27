@@ -291,9 +291,6 @@
   <data name="the_process_killing_was_successful" xml:space="preserve">
     <value>Der Prozess wurde erfolgreich "gekillt"!</value>
   </data>
-  <data name="the_process_killing_was_unsuccessful" xml:space="preserve">
-    <value>Der Prozess konnte nicht "gekillt" werden!</value>
-  </data>
   <data name="start_was_successful" xml:space="preserve">
     <value>Start war erfolgreich!</value>
   </data>

@@ -1,211 +1,9 @@
-/////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: NativeMethods
-//  
-//  This file is part of DeamonMaster.
-// 
-//  DeamonMaster is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//   DeamonMaster is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU General Public License for more details.
-//
-//   You should have received a copy of the GNU General Public License
-//   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
-/////////////////////////////////////////////////////////////////////////////////////////
-
 using System;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace DaemonMasterCore.Win32.PInvoke
 {
-    //FROM PINVOKE.NET
     public static partial class NativeMethods
     {
-        #region Win32 DllImports
-
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "CreateServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern ServiceHandle CreateService
-        (
-            ServiceControlManager hSCManager,
-            string lpServiceName,
-            string lpDisplayName,
-            SERVICE_ACCESS dwDesiredAccess,
-            SERVICE_TYPE dwServiceType,
-            SERVICE_START dwStartType,
-            SERVICE_ERROR_CONTROL dwErrorControl,
-            string lpBinaryPathName,
-            string lpLoadOrderGroup,
-            string lpdwTagId,
-            string lpDependencies,
-            string lpServiceStartName,
-            string lpPassword
-        );
-
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "OpenSCManagerW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern ServiceControlManager OpenSCManager(string machineName, string databaseName, SCM_ACCESS dwAccess);
-
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "OpenServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern ServiceHandle OpenService(ServiceControlManager hSCManager, string lpServiceName, SERVICE_ACCESS dwDesiredAccess);
-
-        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool CloseServiceHandle(IntPtr hSCManager);
-
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "StartServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool StartService(ServiceHandle hService, uint dwNumServiceArgs, string[] lpServiceArgVectors);
-
-        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool ControlService(ServiceHandle hService, SERVICE_CONTROL dwControl, ref SERVICE_STATUS lpServiceStatus);
-
-        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool DeleteService(ServiceHandle hService);
-
-        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern bool QueryServiceStatusEx(ServiceHandle hService, uint infoLevel, IntPtr buffer, int bufferSize, out int bytesNeeded);
-
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "ChangeServiceConfigW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool ChangeServiceConfig(ServiceHandle hService, SERVICE_TYPE dwServiceType, SERVICE_START dwStartType, SERVICE_ERROR_CONTROL dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, string lpdwTagId, string lpDependencies, string lpServiceStartName, string lpPassword, string lpDisplayName);
-
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "ChangeServiceConfig2W", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool ChangeServiceConfig2(ServiceHandle hService, INFO_LEVEL dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_DESCRIPTION lpInfo);
-
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "ChangeServiceConfig2W", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool ChangeServiceConfig2(ServiceHandle hService, INFO_LEVEL dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_CONFIG_DELAYED_AUTO_START_INFO lpInfo);
-
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "LogonUserW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool LogonUser(
-            string lpszUsername,
-            string lpszDomain,
-            IntPtr lpszPassword,
-            LOGON_TYP dwLogonType,
-            LOGON_PROVIDER dwLogonProvider,
-            out IntPtr phToken
-        );
-
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "CreateProcessAsUserW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool CreateProcessAsUser(
-            TokenHandle hToken,
-            string lpApplicationName,
-            StringBuilder lpCommandLine,
-            ref SECURITY_ATTRIBUTES lpProcessAttributes,
-            ref SECURITY_ATTRIBUTES lpThreadAttributes,
-            bool bInheritHandles,
-            int dwCreationFlags,
-            IntPtr lpEnvironment,
-            string lpCurrentDirectory,
-            ref STARTUPINFO lpStartupInfo,
-            out PROCESS_INFORMATION lpProcessInformation);
-
-        #endregion
-
-        #region Constants
-
-        /// <summary>
-        /// Needed for QueryServiceStatusEx as infoLevel
-        /// </summary>
-        public const uint SC_STATUS_PROCESS_INFO = 0x0;
-
-        public const int CREATE_NEW_CONSOLE = 0x00000010;
-
-        #endregion
-
-        #region Structures
-
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct SERVICE_STATUS
-        {
-            public int serviceType;
-            public int currentState;
-            public int controlsAccepted;
-            public int win32ExitCode;
-            public int serviceSpecificExitCode;
-            public int checkPoint;
-            public int waitHint;
-        }
-
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct SERVICE_STATUS_PROCESS
-        {
-            public int serviceType;
-            public SERVICE_STATE currentState;
-            public int controlsAccepted;
-            public int win32ExitCode;
-            public int serviceSpecificExitCode;
-            public int checkPoint;
-            public int waitHint;
-            public int processID;
-            public int serviceFlags;
-        }
-
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct SERVICE_DESCRIPTION
-        {
-            public string lpDescription;
-        }
-
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct SERVICE_CONFIG_DELAYED_AUTO_START_INFO
-        {
-            public bool delayedStart;
-        }
-
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct SECURITY_ATTRIBUTES
-        {
-            public int nLength;
-            public IntPtr lpSecurityDescriptor;
-            public int bInheritHandle;
-        }
-
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        internal struct PROCESS_INFORMATION
-        {
-            public IntPtr hProcess;
-            public IntPtr hThread;
-            public uint dwProcessId;
-            public uint dwThreadId;
-        }
-
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct STARTUPINFO
-        {
-            public int cb;
-            public String lpReserved;
-            public String lpDesktop;
-            public String lpTitle;
-            public uint dwX;
-            public uint dwY;
-            public uint dwXSize;
-            public uint dwYSize;
-            public uint dwXCountChars;
-            public uint dwYCountChars;
-            public uint dwFillAttribute;
-            public uint dwFlags;
-            public short wShowWindow;
-            public short cbReserved2;
-            public IntPtr lpReserved2;
-            public IntPtr hStdInput;
-            public IntPtr hStdOutput;
-            public IntPtr hStdError;
-        }
-
-        #endregion
-
-        #region Enumerations
-
         /// <summary>
         /// Access mask 
         /// </summary>
@@ -305,23 +103,23 @@ namespace DaemonMasterCore.Win32.PInvoke
             /// rights in this table.
             /// </summary>
             SC_MANAGER_ALL_ACCESS = ACCESS_MASK.STANDARD_RIGHTS_REQUIRED |
-                SC_MANAGER_CONNECT |
-                SC_MANAGER_CREATE_SERVICE |
-                SC_MANAGER_ENUMERATE_SERVICE |
-                SC_MANAGER_LOCK |
-                SC_MANAGER_QUERY_LOCK_STATUS |
-                SC_MANAGER_MODIFY_BOOT_CONFIG,
+                                    SC_MANAGER_CONNECT |
+                                    SC_MANAGER_CREATE_SERVICE |
+                                    SC_MANAGER_ENUMERATE_SERVICE |
+                                    SC_MANAGER_LOCK |
+                                    SC_MANAGER_QUERY_LOCK_STATUS |
+                                    SC_MANAGER_MODIFY_BOOT_CONFIG,
 
             GENERIC_READ = ACCESS_MASK.STANDARD_RIGHTS_READ |
-                SC_MANAGER_ENUMERATE_SERVICE |
-                SC_MANAGER_QUERY_LOCK_STATUS,
+                           SC_MANAGER_ENUMERATE_SERVICE |
+                           SC_MANAGER_QUERY_LOCK_STATUS,
 
             GENERIC_WRITE = ACCESS_MASK.STANDARD_RIGHTS_WRITE |
-                SC_MANAGER_CREATE_SERVICE |
-                SC_MANAGER_MODIFY_BOOT_CONFIG,
+                            SC_MANAGER_CREATE_SERVICE |
+                            SC_MANAGER_MODIFY_BOOT_CONFIG,
 
             GENERIC_EXECUTE = ACCESS_MASK.STANDARD_RIGHTS_EXECUTE |
-                SC_MANAGER_CONNECT | SC_MANAGER_LOCK,
+                              SC_MANAGER_CONNECT | SC_MANAGER_LOCK,
 
             GENERIC_ALL = SC_MANAGER_ALL_ACCESS,
         }
@@ -390,30 +188,30 @@ namespace DaemonMasterCore.Win32.PInvoke
             /// Includes STANDARD_RIGHTS_REQUIRED in addition to all access rights in this table.
             /// </summary>
             SERVICE_ALL_ACCESS = (ACCESS_MASK.STANDARD_RIGHTS_REQUIRED |
-                SERVICE_QUERY_CONFIG |
-                SERVICE_CHANGE_CONFIG |
-                SERVICE_QUERY_STATUS |
-                SERVICE_ENUMERATE_DEPENDENTS |
-                SERVICE_START |
-                SERVICE_STOP |
-                SERVICE_PAUSE_CONTINUE |
-                SERVICE_INTERROGATE |
-                SERVICE_USER_DEFINED_CONTROL),
+                                  SERVICE_QUERY_CONFIG |
+                                  SERVICE_CHANGE_CONFIG |
+                                  SERVICE_QUERY_STATUS |
+                                  SERVICE_ENUMERATE_DEPENDENTS |
+                                  SERVICE_START |
+                                  SERVICE_STOP |
+                                  SERVICE_PAUSE_CONTINUE |
+                                  SERVICE_INTERROGATE |
+                                  SERVICE_USER_DEFINED_CONTROL),
 
             GENERIC_READ = ACCESS_MASK.STANDARD_RIGHTS_READ |
-                SERVICE_QUERY_CONFIG |
-                SERVICE_QUERY_STATUS |
-                SERVICE_INTERROGATE |
-                SERVICE_ENUMERATE_DEPENDENTS,
+                           SERVICE_QUERY_CONFIG |
+                           SERVICE_QUERY_STATUS |
+                           SERVICE_INTERROGATE |
+                           SERVICE_ENUMERATE_DEPENDENTS,
 
             GENERIC_WRITE = ACCESS_MASK.STANDARD_RIGHTS_WRITE |
-                SERVICE_CHANGE_CONFIG,
+                            SERVICE_CHANGE_CONFIG,
 
             GENERIC_EXECUTE = ACCESS_MASK.STANDARD_RIGHTS_EXECUTE |
-                SERVICE_START |
-                SERVICE_STOP |
-                SERVICE_PAUSE_CONTINUE |
-                SERVICE_USER_DEFINED_CONTROL,
+                              SERVICE_START |
+                              SERVICE_STOP |
+                              SERVICE_PAUSE_CONTINUE |
+                              SERVICE_USER_DEFINED_CONTROL,
 
             /// <summary>
             /// Required to call the QueryServiceObjectSecurity or 
@@ -638,6 +436,56 @@ namespace DaemonMasterCore.Win32.PInvoke
             SW_SHOWNORMAL = 1,
         }
 
-        #endregion
+        [Flags]
+        public enum ThreadAccess : int
+        {
+            TERMINATE = (0x0001),
+            SUSPEND_RESUME = (0x0002),
+            GET_CONTEXT = (0x0008),
+            SET_CONTEXT = (0x0010),
+            SET_INFORMATION = (0x0020),
+            QUERY_INFORMATION = (0x0040),
+            SET_THREAD_TOKEN = (0x0080),
+            IMPERSONATE = (0x0100),
+            DIRECT_IMPERSONATION = (0x0200)
+        }
+
+        [Flags]
+        public enum CtrlEvent : int
+        {
+            CTRL_C_EVENT = (0x0000),
+            CTRL_BREAK_EVENT = (0x0001)
+        }
+
+        [Flags]
+        public enum JobObjectLimitFlags : UInt32
+        {
+            Workingset = 0x00000001,
+            ProcessTime = 0x00000002,
+            JobTime = 0x00000004,
+            ActiveProcess = 0x00000008,
+            Affinity = 0x00000010,
+            PriorityClass = 0x00000020,
+            PreserveJobTime = 0x00000040,
+            SchedulingClass = 0x00000080,
+            ProcessMemory = 0x00000100,
+            JobMemory = 0x00000200,
+            DieOnUnhandledException = 0x00000400,
+            BreakawayOk = 0x00000800,
+            SilentBreakawayOk = 0x00001000,
+            KillOnJobClose = 0x00002000,
+            SubsetAffinity = 0x00004000,
+        }
+
+        public enum JobObjectInfoType
+        {
+            AssociateCompletionPortInformation = 7,
+            BasicLimitInformation = 2,
+            BasicUIRestrictions = 4,
+            EndOfJobTimeInformation = 6,
+            ExtendedLimitInformation = 9,
+            SecurityLimitInformation = 5,
+            GroupInformation = 11
+        }
     }
 }

@@ -62,6 +62,8 @@
   <ItemGroup>
     <Compile Include="Config\Config.cs" />
     <Compile Include="Config\ConfigManagement.cs" />
+    <Compile Include="DaemonProcessState.cs" />
+    <Compile Include="DaemonServiceState.cs" />
     <Compile Include="Exceptions\ServiceStoppedException.cs" />
     <Compile Include="Exceptions\ServiceNotStoppedException.cs" />
     <Compile Include="Daemon.cs" />
@@ -70,8 +72,13 @@
     <Compile Include="DaemonItem.cs" />
     <Compile Include="ProcessManagement.cs" />
     <Compile Include="SystemManagement.cs" />
+    <Compile Include="Jobs\KillChildProcessJob.cs" />
+    <Compile Include="Win32\JobHandle.cs" />
+    <Compile Include="Win32\PInvoke\NativeMethodsConsts.cs" />
+    <Compile Include="Win32\PInvoke\NativeMethodsStructs.cs" />
+    <Compile Include="Win32\PInvoke\NativeMethods.cs" />
     <Compile Include="Win32\PInvoke\DLLFiles.cs" />
-    <Compile Include="Win32\PInvoke\WTSAPI32.cs" />
+    <Compile Include="Win32\PInvoke\NativeMethodsEnums.cs" />
     <Compile Include="Win32\ServiceControlManager.cs" />
     <Compile Include="Win32\ServiceHandle.cs" />
     <Compile Include="Win32\ThreadHandle.cs" />
@@ -83,10 +90,6 @@
     <Compile Include="SecurityManagement.cs" />
     <Compile Include="ServiceManagement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Win32\PInvoke\ADVAPI32.cs" />
-    <Compile Include="Win32\PInvoke\KERNEL32.cs" />
-    <Compile Include="Win32\PInvoke\USER32.cs" />
-    <Compile Include="Win32\PInvoke\WINSTA.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -102,5 +105,6 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

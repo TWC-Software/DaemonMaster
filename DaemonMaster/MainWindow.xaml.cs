@@ -214,7 +214,7 @@ namespace DaemonMaster
             MessageBox.Show(_resManager.GetString("currently_unavailable"), _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        private void MenuItemStartWS_OnClick(object sender, RoutedEventArgs e)
+        private void MenuItemStartInSession_OnClick(object sender, RoutedEventArgs e)
         {
             if (listViewDaemons.SelectedItem == null)
                 return;
@@ -223,29 +223,29 @@ namespace DaemonMaster
 
             try
             {
-                switch (ProcessManagement.CreateNewProcess(daemonItem.ServiceName))
+                switch (ServiceManagement.StartService(daemonItem.ServiceName, true))
                 {
-                    case ProcessManagement.DaemonProcessState.Unsuccessful:
+                    case DaemonServiceState.Unsuccessful:
                         MessageBox.Show(_resManager.GetString("start_was_unsuccessful"),
                             _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
                         break;
-                    case ProcessManagement.DaemonProcessState.Successful:
+                    case DaemonServiceState.Successful:
                         MessageBox.Show(_resManager.GetString("start_was_successful"),
                             _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                         break;
-                    case ProcessManagement.DaemonProcessState.AlreadyStopped:
+                    case DaemonServiceState.AlreadyStopped:
                         MessageBox.Show(_resManager.GetString("the_selected_process_is_already_started"),
                             _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                         break;
                 }
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void MenuItemStopWS_OnClick(object sender, RoutedEventArgs e)
+        private void MenuItemStopInSession_OnClick(object sender, RoutedEventArgs e)
         {
             if (listViewDaemons.SelectedItem == null)
                 return;
@@ -254,20 +254,21 @@ namespace DaemonMaster
 
             try
             {
-                switch (ProcessManagement.DeleteProcess(daemonItem.ServiceName))
+                switch (ServiceManagement.StopService(daemonItem.ServiceName))
                 {
-                    case ProcessManagement.DaemonProcessState.Unsuccessful:
+                    case DaemonServiceState.Unsuccessful:
                         MessageBoxResult result = MessageBox.Show(_resManager.GetString("stop_was_unsuccessful"),
                             _resManager.GetString("error"), MessageBoxButton.YesNo, MessageBoxImage.Error);
 
-                        if (result == MessageBoxResult.Yes)
-                            ProcessManagement.KillAndDeleteProcess(daemonItem.ServiceName);
+                        //TODO: Kill system for the service and process
+                        //if (result == MessageBoxResult.Yes)
+
                         break;
-                    case ProcessManagement.DaemonProcessState.Successful:
+                    case DaemonServiceState.Successful:
                         MessageBox.Show(_resManager.GetString("stop_was_successful"),
                             _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                         break;
-                    case ProcessManagement.DaemonProcessState.AlreadyStopped:
+                    case DaemonServiceState.AlreadyStopped:
                         MessageBox.Show(_resManager.GetString("the_selected_process_does_not_exist"),
                             _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
                         break;
@@ -279,29 +280,51 @@ namespace DaemonMaster
             }
         }
 
-        private void MenuItemKillWS_OnClick(object sender, RoutedEventArgs e)
+        private void MenuItemKillInSession_OnClick(object sender, RoutedEventArgs e)
         {
             if (listViewDaemons.SelectedItem == null)
                 return;
+
+
             DaemonItem daemonItem = (DaemonItem)listViewDaemons.SelectedItem;
 
             try
             {
-                if (ProcessManagement.KillAndDeleteProcess(daemonItem.ServiceName))
+                switch (ServiceManagement.KillService(daemonItem.ServiceName))
                 {
-                    MessageBox.Show(_resManager.GetString("the_process_killing_was_successful"),
-                        _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                else
-                {
-                    MessageBox.Show(_resManager.GetString("the_process_killing_was_unsuccessful"),
-                        _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                    case DaemonServiceState.AlreadyStopped:
+                        MessageBox.Show(_resManager.GetString("cannot_stop_the_service_already_stopped"),
+                            _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                        break;
+
+                    case DaemonServiceState.Successful:
+                        MessageBox.Show(_resManager.GetString("the_process_killing_was_successful"),
+                            _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                        break;
                 }
             }
             catch (Exception exception)
             {
                 MessageBox.Show(exception.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
+
+            //try
+            //{
+            //    if ((daemonItem.ServiceName))
+            //    {
+            //        
+            //    }
+            //    else
+            //    {
+            //        MessageBox.Show(_resManager.GetString("the_process_killing_was_unsuccessful"),
+            //            _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+            //    }
+            //}
+            //catch (Exception exception)
+            //{
+            //    MessageBox.Show(exception.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+            //}
         }
 
         #endregion
@@ -420,37 +443,51 @@ namespace DaemonMaster
 
         private void StartService(DaemonItem daemonItem)
         {
-            switch (ServiceManagement.StartService(daemonItem.ServiceName))
+            try
             {
-                case ServiceManagement.State.Error | ServiceManagement.State.Unsuccessful:
-                    MessageBox.Show(_resManager.GetString("cannot_start_the_service"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-                    break;
+                switch (ServiceManagement.StartService(daemonItem.ServiceName))
+                {
+                    case DaemonServiceState.Unsuccessful:
+                        MessageBox.Show(_resManager.GetString("cannot_start_the_service"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                        break;
 
-                case ServiceManagement.State.AlreadyStarted:
-                    MessageBox.Show(_resManager.GetString("cannot_start_the_service_already_running"), _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                    break;
+                    case DaemonServiceState.AlreadyStarted:
+                        MessageBox.Show(_resManager.GetString("cannot_start_the_service_already_running"), _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                        break;
 
-                case ServiceManagement.State.Successful:
-                    MessageBox.Show(_resManager.GetString("service_start_was_successful"), _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                    break;
+                    case DaemonServiceState.Successful:
+                        MessageBox.Show(_resManager.GetString("service_start_was_successful"), _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void StopService(DaemonItem daemonItem)
         {
-            switch (ServiceManagement.StopService(daemonItem.ServiceName))
+            try
             {
-                case ServiceManagement.State.Error | ServiceManagement.State.Unsuccessful:
-                    MessageBox.Show(_resManager.GetString("cannot_stop_the_service"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-                    break;
+                switch (ServiceManagement.StopService(daemonItem.ServiceName))
+                {
+                    case DaemonServiceState.Unsuccessful:
+                        MessageBox.Show(_resManager.GetString("cannot_stop_the_service"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                        break;
 
-                case ServiceManagement.State.AlreadyStopped:
-                    MessageBox.Show(_resManager.GetString("cannot_stop_the_service_already_stopped"), _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                    break;
+                    case DaemonServiceState.AlreadyStopped:
+                        MessageBox.Show(_resManager.GetString("cannot_stop_the_service_already_stopped"), _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                        break;
 
-                case ServiceManagement.State.Successful:
-                    MessageBox.Show(_resManager.GetString("service_stop_was_successful"), _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                    break;
+                    case DaemonServiceState.Successful:
+                        MessageBox.Show(_resManager.GetString("service_stop_was_successful"), _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -497,22 +534,23 @@ namespace DaemonMaster
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            //Kill all running processes
-            if (ProcessManagement.IsDictionaryEmpty())
-            {
-                MessageBoxResult result = MessageBox.Show(_resManager.GetString("all_processes_will_be_killed"), _resManager.GetString("warning"), MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+            //TODO
+            ////Kill all running processes
+            //if (ProcessManagement.IsDictionaryEmpty())
+            //{
+            //    MessageBoxResult result = MessageBox.Show(_resManager.GetString("all_processes_will_be_killed"), _resManager.GetString("warning"), MessageBoxButton.OKCancel, MessageBoxImage.Warning);
 
-                //Cancel the shutdown, else kill all processes
-                if (result == MessageBoxResult.Cancel)
-                {
-                    e.Cancel = true;
-                    return;
-                }
-                else
-                {
-                    ProcessManagement.KillAndDeleteAllProcesses();
-                }
-            }
+            //    //Cancel the shutdown, else kill all processes
+            //    if (result == MessageBoxResult.Cancel)
+            //    {
+            //        e.Cancel = true;
+            //        return;
+            //    }
+            //    else
+            //    {
+            //        ProcessManagement.KillAndDeleteAllProcesses();
+            //    }
+            //}
 
             ConfigManagement.SaveConfig();
         }

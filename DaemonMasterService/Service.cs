@@ -33,6 +33,7 @@ namespace DaemonMasterService
         private static Logger _logger = LogManager.GetCurrentClassLogger();
         private static string _serviceName = null;
         private bool startInUserSession = false;
+        private DaemonProcess _daemonProcess = null;
 
         public Service(bool enablePause)
         {
@@ -47,33 +48,40 @@ namespace DaemonMasterService
             base.OnStart(args);
 
             //Read args
-            switch (args[0])
+            foreach (var arg in args)
             {
-                case "-startInUserSession":
-                    startInUserSession = true;
-                    break;
+                switch (arg)
+                {
+                    case "-startInUserSession":
+                        startInUserSession = true;
+                        break;
+                }
             }
-
-            //Get the name of the service
-            _serviceName = DaemonMasterUtils.GetServiceName();
-
-            //Change the filename of the log file to the service name
-            LogManager.Configuration.Variables["logName"] = _serviceName;
 
             try
             {
+                //Get the name of the service
+                _serviceName = DaemonMasterUtils.GetServiceName();
+
+                //Change the filename of the log file to the service name
+                LogManager.Configuration.Variables["logName"] = _serviceName;
+
+                //create a new DaemonProcess object
+                _daemonProcess = new DaemonProcess(_serviceName, startInUserSession);
+
+
                 _logger.Info("Starting the process...");
-                switch (ProcessManagement.CreateNewProcess(_serviceName, startInUserSession))
+                switch (_daemonProcess.StartProcess())
                 {
-                    case ProcessManagement.DaemonProcessState.Successful:
+                    case DaemonProcessState.Successful:
                         _logger.Info("The start of the process was successful!");
                         break;
 
-                    case ProcessManagement.DaemonProcessState.Unsuccessful:
+                    case DaemonProcessState.Unsuccessful:
                         _logger.Info("The start of the process was unsuccessful!");
                         break;
 
-                    case ProcessManagement.DaemonProcessState.AlreadyStarted:
+                    case DaemonProcessState.AlreadyStarted:
                         _logger.Info("The process is already started!");
                         break;
                 }
@@ -88,18 +96,18 @@ namespace DaemonMasterService
         protected override void OnStop()
         {
             //Stop the process and give feedback in logs 
-            switch (ProcessManagement.DeleteProcess(_serviceName))
+            switch (_daemonProcess.StopProcess())
             {
-                case ProcessManagement.DaemonProcessState.Successful:
+                case DaemonProcessState.Successful:
                     _logger.Info("The stop of the process was successful!");
                     break;
 
-                case ProcessManagement.DaemonProcessState.Unsuccessful:
+                case DaemonProcessState.Unsuccessful:
                     _logger.Warn("The stop of the process was unsuccessful! Killing the process...");
-                    _logger.Info(ProcessManagement.KillAndDeleteProcess(_serviceName) ? "Successful!" : "Unsuccessful!");
+                    _logger.Info(_daemonProcess.KillProcess() ? "Successful!" : "Unsuccessful!");
                     break;
 
-                case ProcessManagement.DaemonProcessState.AlreadyStopped:
+                case DaemonProcessState.AlreadyStopped:
                     _logger.Info("The process is already stopped!");
                     break;
             }
@@ -110,7 +118,7 @@ namespace DaemonMasterService
         protected override void OnPause()
         {
             _logger.Info("Suspending process thread...");
-            _logger.Info(ProcessManagement.PauseProcess(_serviceName) ? "Successful!" : "Unsuccessful!");
+            _logger.Info(_daemonProcess.PauseProcess() ? "Successful!" : "Unsuccessful!");
 
 
             base.OnPause();
@@ -121,14 +129,14 @@ namespace DaemonMasterService
             base.OnContinue();
 
             _logger.Info("Resuming suspend process thread...");
-            _logger.Info(ProcessManagement.ResumeProcess(_serviceName) ? "Successful!" : "Unsuccessful!");
+            _logger.Info(_daemonProcess.ResumeProcess() ? "Successful!" : "Unsuccessful!");
         }
 
         protected override void OnCustomCommand(int command)
         {
             if (command == (int)Commands.Kill)
             {
-                ProcessManagement.KillAndDeleteProcess(_serviceName);
+                //TODO: Kill
                 Stop();
             }
         }

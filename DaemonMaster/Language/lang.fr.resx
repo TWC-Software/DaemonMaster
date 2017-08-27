@@ -291,9 +291,6 @@
   <data name="the_process_killing_was_successful" xml:space="preserve">
     <value>L' arrêt du processus a été couronné de succès!</value>
   </data>
-  <data name="the_process_killing_was_unsuccessful" xml:space="preserve">
-    <value>L' arrêt du processus a échoué !!</value>
-  </data>
   <data name="start_was_successful" xml:space="preserve">
     <value>Le début a été couronné de succès!</value>
   </data>

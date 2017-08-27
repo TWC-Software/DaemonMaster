@@ -32,75 +32,75 @@ namespace DaemonMasterCore.Win32
 
         protected override bool ReleaseHandle()
         {
-            return NativeMethods.CloseServiceHandle(handle);
+            return PInvoke.NativeMethods.CloseServiceHandle(handle);
         }
 
         public void Start()
         {
-            if (!NativeMethods.StartService(this, 0, null))
+            if (!PInvoke.NativeMethods.StartService(this, 0, null))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
         public void Stop()
         {
-            NativeMethods.SERVICE_STATUS serviceStatus = new NativeMethods.SERVICE_STATUS();
-            if (!NativeMethods.ControlService(this, NativeMethods.SERVICE_CONTROL.STOP, ref serviceStatus))
+            PInvoke.NativeMethods.SERVICE_STATUS serviceStatus = new PInvoke.NativeMethods.SERVICE_STATUS();
+            if (!PInvoke.NativeMethods.ControlService(this, PInvoke.NativeMethods.SERVICE_CONTROL.STOP, ref serviceStatus))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
         public void DeleteService()
         {
-            if (!NativeMethods.DeleteService(this))
+            if (!PInvoke.NativeMethods.DeleteService(this))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
         public void SetDescription(string description)
         {
             //Create an struct with description of the service
-            NativeMethods.SERVICE_DESCRIPTION serviceDescription;
+            PInvoke.NativeMethods.SERVICE_DESCRIPTION serviceDescription;
             serviceDescription.lpDescription = description;
 
             //Set the description of the service
-            if (!NativeMethods.ChangeServiceConfig2(this, NativeMethods.INFO_LEVEL.SERVICE_CONFIG_DESCRIPTION, ref serviceDescription))
+            if (!PInvoke.NativeMethods.ChangeServiceConfig2(this, PInvoke.NativeMethods.INFO_LEVEL.SERVICE_CONFIG_DESCRIPTION, ref serviceDescription))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
         public void SetDelayedStart(bool enable)
         {
             // //Create an struct with description of the service
-            NativeMethods.SERVICE_CONFIG_DELAYED_AUTO_START_INFO serviceDelayedStart;
+            PInvoke.NativeMethods.SERVICE_CONFIG_DELAYED_AUTO_START_INFO serviceDelayedStart;
             serviceDelayedStart.delayedStart = enable;
 
             //Set the description of the service
-            if (!NativeMethods.ChangeServiceConfig2(this, NativeMethods.INFO_LEVEL.SERVICE_CONFIG_DELAYED_AUTO_START_INFO,
+            if (!PInvoke.NativeMethods.ChangeServiceConfig2(this, PInvoke.NativeMethods.INFO_LEVEL.SERVICE_CONFIG_DELAYED_AUTO_START_INFO,
                 ref serviceDelayedStart))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
-        public void ChangeConfig(NativeMethods.SERVICE_START startType, string displayName)
+        public void ChangeConfig(PInvoke.NativeMethods.SERVICE_START startType, string displayName)
         {
-            if (!NativeMethods.ChangeServiceConfig(this, NativeMethods.SERVICE_TYPE.SERVICE_NO_CHANGE, startType,
-                NativeMethods.SERVICE_ERROR_CONTROL.SERVICE_NO_CHANGE, null, null, null, null/*String.Concat(daemon.DependOnService)*/, null, null, displayName))
+            if (!PInvoke.NativeMethods.ChangeServiceConfig(this, PInvoke.NativeMethods.SERVICE_TYPE.SERVICE_NO_CHANGE, startType,
+                PInvoke.NativeMethods.SERVICE_ERROR_CONTROL.SERVICE_NO_CHANGE, null, null, null, null/*String.Concat(daemon.DependOnService)*/, null, null, displayName))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
         //http://www.pinvoke.net/default.aspx/advapi32.QueryServiceStatusEx
-        public NativeMethods.SERVICE_STATUS_PROCESS QueryServiceStatusEx()
+        public PInvoke.NativeMethods.SERVICE_STATUS_PROCESS QueryServiceStatusEx()
         {
             IntPtr buffer = IntPtr.Zero;
             int size = 0;
 
             try
             {
-                NativeMethods.QueryServiceStatusEx(this, NativeMethods.SC_STATUS_PROCESS_INFO, buffer, size, out size);
+                PInvoke.NativeMethods.QueryServiceStatusEx(this, PInvoke.NativeMethods.SC_STATUS_PROCESS_INFO, buffer, size, out size);
                 //Reserviere Speicher in der gr��e von size
                 buffer = Marshal.AllocHGlobal(size);
 
-                if (!NativeMethods.QueryServiceStatusEx(this, NativeMethods.SC_STATUS_PROCESS_INFO, buffer, size, out size))
+                if (!PInvoke.NativeMethods.QueryServiceStatusEx(this, PInvoke.NativeMethods.SC_STATUS_PROCESS_INFO, buffer, size, out size))
                     throw new Win32Exception(Marshal.GetLastWin32Error());
 
 
-                return (NativeMethods.SERVICE_STATUS_PROCESS)Marshal.PtrToStructure(buffer, typeof(NativeMethods.SERVICE_STATUS_PROCESS));
+                return (PInvoke.NativeMethods.SERVICE_STATUS_PROCESS)Marshal.PtrToStructure(buffer, typeof(PInvoke.NativeMethods.SERVICE_STATUS_PROCESS));
             }
             finally
             {

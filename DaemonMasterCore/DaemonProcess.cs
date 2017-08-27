@@ -17,23 +17,21 @@
 //   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
+using DaemonMasterCore.Jobs;
 using DaemonMasterCore.Win32;
-using DaemonMasterCore.Win32.PInvoke;
 using NLog;
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
-using System.Runtime.InteropServices;
 using System.Security.Authentication;
-using System.Text;
 using System.Threading;
+using NativeMethods = DaemonMasterCore.Win32.PInvoke.NativeMethods;
 
 namespace DaemonMasterCore
 {
-    internal class DaemonProcess : IDisposable
+    public class DaemonProcess : IDisposable
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private KillChildProcessJob killChildProcessJob = new KillChildProcessJob();
 
         private readonly Daemon _daemon = null;
         private readonly Process _process = null;
@@ -102,6 +100,7 @@ namespace DaemonMasterCore
             //Enable raising events for auto restart
             _process.EnableRaisingEvents = true;
             _process.Exited += ProcessOnExited;
+            killChildProcessJob.AssignProcess(_process);
         }
         #endregion
 
@@ -112,21 +111,27 @@ namespace DaemonMasterCore
 
         #region Start/Stop/Pause/Resume/etc
 
-        internal ProcessManagement.DaemonProcessState StartProcess()
+        public DaemonProcessState StartProcess()
         {
-            if (!_process.HasExited || _process.Start())
+            if (IsRunning())
             {
-                return ProcessManagement.DaemonProcessState.Successful;
+                return DaemonProcessState.Successful;
             }
 
-            return ProcessManagement.DaemonProcessState.Unsuccessful;
+            if (_process.Start())
+            {
+                killChildProcessJob.AssignProcess(_process);
+                return DaemonProcessState.Successful;
+            }
+
+            return DaemonProcessState.Unsuccessful;
         }
 
-        internal ProcessManagement.DaemonProcessState StopProcess()
+        public DaemonProcessState StopProcess()
         {
             //If process already stoppend return
             if (!IsRunning())
-                return ProcessManagement.DaemonProcessState.AlreadyStopped;
+                return DaemonProcessState.AlreadyStopped;
 
             //Disable raising events (disable auto restart)
             _process.EnableRaisingEvents = false;
@@ -135,6 +140,7 @@ namespace DaemonMasterCore
             {
                 if (_process.MainWindowHandle != IntPtr.Zero)
                 {
+                    Logger.Warn("Send close main window command...");
                     //Send close main window command
                     _process.CloseMainWindow();
                 }
@@ -143,14 +149,15 @@ namespace DaemonMasterCore
                     //If console app then send Ctrl-C or Ctrl-Break command
                     if (_daemon.ConsoleApplication)
                     {
+                        Logger.Warn("Send Ctrl-C / Ctrl-Break command...");
                         CloseConsoleApplication(_daemon.UseCtrlC);
                     }
                     else
                     {
-
+                        Logger.Warn("The process has no GUI and is not a console app!\n => Killing the process...");
                         _process.Kill();
                         _process.Close();
-                        return ProcessManagement.DaemonProcessState.Successful;
+                        return DaemonProcessState.Successful;
                     }
                 }
 
@@ -158,22 +165,22 @@ namespace DaemonMasterCore
                 if (_process.WaitForExit(_daemon.ProcessKillTime))
                 {
                     _process.Close();
-                    return ProcessManagement.DaemonProcessState.Successful;
+                    return DaemonProcessState.Successful;
                 }
 
-                return ProcessManagement.DaemonProcessState.Unsuccessful;
+                return DaemonProcessState.Unsuccessful;
             }
             catch (Exception)
             {
-                return ProcessManagement.DaemonProcessState.Unsuccessful;
+                return DaemonProcessState.Unsuccessful;
             }
         }
 
-        internal ProcessManagement.DaemonProcessState KillProcess()
+        public bool KillProcess()
         {
             //If process already stoppend return
             if (!IsRunning())
-                return ProcessManagement.DaemonProcessState.AlreadyStopped;
+                return true;
 
             //Disable raising events (disable auto restart)
             _process.EnableRaisingEvents = false;
@@ -183,16 +190,16 @@ namespace DaemonMasterCore
             {
                 _process.Kill();
                 _process.Close();
-                return ProcessManagement.DaemonProcessState.Successful;
+                return true;
             }
             catch (Exception)
             {
-                return ProcessManagement.DaemonProcessState.Unsuccessful;
+                return false;
             }
         }
 
 
-        internal bool PauseProcess()
+        public bool PauseProcess()
         {
             if (_process == null)
                 throw new NullReferenceException();
@@ -212,7 +219,7 @@ namespace DaemonMasterCore
             }
         }
 
-        internal bool ResumeProcess()
+        public bool ResumeProcess()
         {
             if (_process == null)
                 throw new NullReferenceException();
@@ -237,7 +244,7 @@ namespace DaemonMasterCore
         //                                     ProcessOnExited event                                            //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        internal void ProcessOnExited(object sender, EventArgs eventArgs)
+        public void ProcessOnExited(object sender, EventArgs eventArgs)
         {
             #region Counter reset system
 
@@ -281,7 +288,7 @@ namespace DaemonMasterCore
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-        internal bool CloseConsoleApplication(bool useCtrlC)
+        public bool CloseConsoleApplication(bool useCtrlC)
         {
             if (_process == null)
                 throw new NullReferenceException();
@@ -297,7 +304,7 @@ namespace DaemonMasterCore
             }
         }
 
-        internal bool IsRunning()
+        public bool IsRunning()
         {
             if (_process == null)
                 throw new ArgumentNullException("_process");
@@ -313,11 +320,11 @@ namespace DaemonMasterCore
             }
             catch (InvalidOperationException)
             {
-                return true;
+                return false;
             }
         }
 
-        internal Daemon GetDaemon => _daemon;
+        public Daemon GetDaemon => _daemon;
 
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -344,6 +351,7 @@ namespace DaemonMasterCore
             if (disposing)
             {
                 _process?.Dispose();
+                killChildProcessJob?.Dispose();
             }
 
             // Free any unmanaged objects here.

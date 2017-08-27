@@ -19,7 +19,7 @@ namespace DaemonMaster.Language {
     // -Klasse über ein Tool wie ResGen oder Visual Studio automatisch generiert.
     // Um einen Member hinzuzufügen oder zu entfernen, bearbeiten Sie die .ResX-Datei und führen dann ResGen
     // mit der /str-Option erneut aus, oder Sie erstellen Ihr VS-Projekt neu.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class lang {
@@ -850,15 +850,6 @@ namespace DaemonMaster.Language {
         public static string the_process_killing_was_successful {
             get {
                 return ResourceManager.GetString("the_process_killing_was_successful", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die The process killing was unsuccessful! ähnelt.
-        /// </summary>
-        public static string the_process_killing_was_unsuccessful {
-            get {
-                return ResourceManager.GetString("the_process_killing_was_unsuccessful", resourceCulture);
             }
         }
         

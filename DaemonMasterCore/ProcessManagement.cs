@@ -28,15 +28,14 @@ using System.Text;
 using System.Threading;
 using DaemonMasterCore.Win32;
 using DaemonMasterCore.Win32.PInvoke;
+using NativeMethods = DaemonMasterCore.Win32.PInvoke.NativeMethods;
 
 namespace DaemonMasterCore
 {
     public static class ProcessManagement
     {
-        private static readonly Dictionary<string, DaemonProcess> Processes = new Dictionary<string, DaemonProcess>();
-
         [Description("Only for services that run under the LocalSystem")]
-        public static Process StartProcessAsUser(string filePath, string arguments)
+        internal static Process StartProcessAsUser(string filePath, string arguments)
         {
             string fileDir = Path.GetDirectoryName(filePath);
 
@@ -51,8 +50,8 @@ namespace DaemonMasterCore
             int creationFlags = (int)NativeMethods.PRIORITY_CLASS.NORMAL_PRIORITY_CLASS | NativeMethods.CREATE_NEW_CONSOLE;
 
             //Set only the length to inherit the security attributes of the existing token
-            NativeMethods.SECURITY_ATTRIBUTES securityAttributes = new NativeMethods.SECURITY_ATTRIBUTES();
-            securityAttributes.nLength = Marshal.SizeOf(securityAttributes);
+            //NativeMethods.SECURITY_ATTRIBUTES securityAttributes = new NativeMethods.SECURITY_ATTRIBUTES();
+            //securityAttributes.nLength = Marshal.SizeOf(securityAttributes);
 
             //Get user session ID
             uint currentUserSessionId = NativeMethods.WTSGetActiveConsoleSessionId();
@@ -66,8 +65,8 @@ namespace DaemonMasterCore
                         currentUserToken,
                         null,
                         BuildCommandLineString(filePath, arguments),
-                        ref securityAttributes,
-                        ref securityAttributes,
+                        null,
+                        null,
                         false,
                         creationFlags,
                         IntPtr.Zero,
@@ -117,174 +116,5 @@ namespace DaemonMasterCore
         }
 
 
-
-        /// <summary>
-        /// Get the Process object of the given service name, if no process exists to the given service name the function return null
-        /// </summary>
-        /// <param name="serviceName"></param>
-        /// <returns></returns>
-        //public static DaemonProcess GetProcessByName(string serviceName)
-        //{
-        //    if (IsProcessAlreadyThere(serviceName))
-        //    {
-        //        return Processes[serviceName];
-        //    }
-        //    return null;
-        //}
-
-        /// <summary>
-        /// Check if the Process with the given service name already exists
-        /// </summary>
-        /// <param name="serviceName"></param>
-        /// <returns></returns>
-        private static bool IsProcessAlreadyThere(string serviceName)
-        {
-            return Processes.ContainsKey(serviceName);
-        }
-
-        /// <summary>
-        /// Create a new process with the service name (return the process object)
-        /// </summary>
-        /// <param name="serviceName"></param>
-        /// <returns></returns>
-        public static DaemonProcessState CreateNewProcess(string serviceName, bool startProcessAsUser = false)
-        {
-            if (IsProcessAlreadyThere(serviceName))
-                return DaemonProcessState.AlreadyStarted;
-
-            DaemonProcess process = new DaemonProcess(serviceName, startProcessAsUser);
-            DaemonProcessState result = process.StartProcess();
-
-            switch (result)
-            {
-                case DaemonProcessState.AlreadyStarted:
-                    break;
-
-                case DaemonProcessState.Successful:
-                    Processes.Add(serviceName, process);
-                    break;
-
-                case DaemonProcessState.Unsuccessful:
-                    break;
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Dispose the process with the given service name
-        /// </summary>
-        /// <param name="serviceName"></param>
-        public static DaemonProcessState DeleteProcess(string serviceName)
-        {
-            if (!IsProcessAlreadyThere(serviceName))
-                return DaemonProcessState.AlreadyStopped;
-
-            DaemonProcess process = Processes[serviceName];
-            DaemonProcessState result = process.StopProcess();
-
-            switch (result)
-            {
-                case DaemonProcessState.AlreadyStopped:
-                    break;
-
-                case DaemonProcessState.Successful:
-                    process.Dispose();
-                    Processes.Remove(serviceName);
-                    break;
-
-                case DaemonProcessState.Unsuccessful:
-                    break;
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Kill and Dispose the process with the given service name
-        /// </summary>
-        /// <param name="serviceName"></param>
-        /// <returns></returns>
-        public static bool KillAndDeleteProcess(string serviceName)
-        {
-            if (!IsProcessAlreadyThere(serviceName))
-                return false;
-
-            Processes[serviceName].KillProcess();
-            Processes[serviceName].Dispose();
-            Processes.Remove(serviceName);
-            return true;
-        }
-
-        /// <summary>
-        /// Pause the process
-        /// </summary>
-        /// <param name="serviceName"></param>
-        /// <returns></returns>
-        public static bool PauseProcess(string serviceName)
-        {
-            if (!IsProcessAlreadyThere(serviceName))
-                return false;
-
-            return Processes[serviceName].PauseProcess();
-        }
-
-        /// <summary>
-        /// Resume the process
-        /// </summary>
-        /// <param name="serviceName"></param>
-        /// <returns></returns>
-        public static bool ResumeProcess(string serviceName)
-        {
-            if (!IsProcessAlreadyThere(serviceName))
-                return false;
-
-            return Processes[serviceName].ResumeProcess();
-        }
-
-        /// <summary>
-        /// Kill all processes in the list
-        /// </summary>
-        public static void KillAndDeleteAllProcesses()
-        {
-            foreach (var process in Processes)
-            {
-                try
-                {
-                    DaemonProcess daemonProcess = process.Value;
-
-                    daemonProcess.KillProcess();
-                    daemonProcess.Dispose();
-                }
-                catch (Exception)
-                {
-                    continue;
-                }
-            }
-
-            //Clear process list
-            Processes.Clear();
-        }
-
-        /// <summary>
-        /// If dictionary/list empty
-        /// </summary>
-        /// <returns></returns>
-        public static bool IsDictionaryEmpty()
-        {
-            return Processes.Count > 1;
-        }
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //                                              Other                                                   //
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public enum DaemonProcessState
-        {
-            AlreadyStopped,
-            AlreadyStarted,
-            Successful,
-            Unsuccessful,
-        }
     }
 }
