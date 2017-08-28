@@ -33,6 +33,10 @@ namespace DaemonMasterCore.Jobs
 
         public KillChildProcessJob()
         {
+            //Return if the windows version is lower or equal to win7
+            if (Environment.OSVersion.Version.Major <= 6 && Environment.OSVersion.Version.Minor <= 1)
+                return;
+
             //Create job
             _jobHandle = JobHandle.CreateJob(null, "KillChildProcessJob" + Process.GetCurrentProcess().Id);
 
@@ -62,12 +66,14 @@ namespace DaemonMasterCore.Jobs
 
         public void AssignProcess(SafeProcessHandle processHandle)
         {
-            _jobHandle.AssignProcess(processHandle);
+            if (!_jobHandle.IsInvalid)
+                _jobHandle.AssignProcess(processHandle);
         }
 
         public void AssignProcess(Process process)
         {
-            _jobHandle.AssignProcess(process.SafeHandle);
+            if (!_jobHandle.IsInvalid)
+                _jobHandle.AssignProcess(process.SafeHandle);
         }
 
 

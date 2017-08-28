@@ -178,21 +178,45 @@ namespace DaemonMasterCore
         }
 
         /// <summary>
-        /// Kill the service if its running. Possible return values are AlreadyStopped, Successful
+        /// Kill the service if its running. Possible return values are AlreadyStopped, Successful, Unsuccessful (only alternativ mode)
         /// </summary>
         /// <param name="serviceName"></param>
-        public static DaemonServiceState KillService(string serviceName)
+        public static DaemonServiceState KillService(string serviceName, bool useAlternativMethod = false)
         {
-            int pid = (int)GetPIDByServiceName(serviceName);
-
-            if (pid != 0)
+            if (useAlternativMethod)
             {
-                Process.GetProcessById(pid).Kill();
-                return DaemonServiceState.Successful;
+                using (ServiceController serviceController = new ServiceController(serviceName))
+                {
+                    if (serviceController.Status == ServiceControllerStatus.Stopped)
+                        return DaemonServiceState.AlreadyStopped;
+
+                    //Execute command to kill
+                    serviceController.ExecuteCommand(128);
+
+                    try
+                    {
+                        serviceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromMilliseconds(WaitForStatusTimeout));
+                        return DaemonServiceState.Successful;
+                    }
+                    catch (System.ServiceProcess.TimeoutException)
+                    {
+                        return DaemonServiceState.Unsuccessful;
+                    }
+                }
             }
             else
             {
-                return DaemonServiceState.AlreadyStopped;
+                int pid = (int)GetPIDByServiceName(serviceName);
+
+                if (pid != 0)
+                {
+                    Process.GetProcessById(pid).Kill();
+                    return DaemonServiceState.Successful;
+                }
+                else
+                {
+                    return DaemonServiceState.AlreadyStopped;
+                }
             }
         }
 

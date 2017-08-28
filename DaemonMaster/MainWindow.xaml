@@ -58,13 +58,14 @@
                 <!--http://stackoverflow.com/questions/9549231/how-to-right-click-on-item-from-listbox-and-open-menu-on-wpf-->
                 <!--Defines a context menu-->
                 <ContextMenu x:Key="ContextMenu">
-                    <MenuItem Header="{x:Static resx:lang.button_start_service}" Click="MenuItemStart_Click"/>
-                    <MenuItem Header="{x:Static resx:lang.button_stop_service}" Click="MenuItemStop_Click"/>
-                    <MenuItem Header="{x:Static resx:lang.button_delete_service}" Click="MenuItemDelete_Click"/>
+                    <MenuItem Header="{x:Static resx:lang.button_start_service}" Click="MenuItem_Start_OnClick"/>
+                    <MenuItem Header="{x:Static resx:lang.button_stop_service}" Click="MenuItem_Stop_OnClick"/>
+                    <MenuItem Header="{x:Static resx:lang.button_kill_service}" Click="MenuItem_Kill_OnClick"/>
+                    <MenuItem Header="{x:Static resx:lang.button_delete_service}" Click="MenuItem_Delete_OnClick"/>
                     <Separator/>
-                    <MenuItem Header="{x:Static resx:lang.button_start}" Click="MenuItemStartInSession_OnClick"/>
-                    <MenuItem Header="{x:Static resx:lang.button_stop}" Click="MenuItemStopInSession_OnClick"/>
-                    <MenuItem Header="{x:Static resx:lang.button_kill}" Click="MenuItemKillInSession_OnClick"/>
+                    <MenuItem Header="{x:Static resx:lang.button_start}" Click="MenuItem_StartInSession_OnClick"/>
+                    <MenuItem Header="{x:Static resx:lang.button_stop}" Click="MenuItem_StopInSession_OnClick"/>
+                    <MenuItem Header="{x:Static resx:lang.button_kill}" Click="MenuItem_KillInSession_OnClick"/>
                 </ContextMenu>
 
                 <!--Sets a context menu for each ListViewItem in the current ListBox-->

@@ -418,4 +418,10 @@
   <data name="enum_paused" xml:space="preserve">
     <value>Paused</value>
   </data>
+  <data name="button_kill_service" xml:space="preserve">
+    <value>Kill Service</value>
+  </data>
+  <data name="the_process_killing_was_unsuccessful" xml:space="preserve">
+    <value>The service killing was unsuccessful</value>
+  </data>
 </root>

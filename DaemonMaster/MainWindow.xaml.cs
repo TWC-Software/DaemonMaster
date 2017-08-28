@@ -140,7 +140,7 @@ namespace DaemonMaster
         }
 
         //ListBox
-        private void MenuItemStart_Click(object sender, RoutedEventArgs e)
+        private void MenuItem_Start_OnClick(object sender, RoutedEventArgs e)
         {
             if (listViewDaemons.SelectedItem == null)
                 return;
@@ -148,7 +148,7 @@ namespace DaemonMaster
             StartService((DaemonItem)listViewDaemons.SelectedItem);
         }
 
-        private void MenuItemStop_Click(object sender, RoutedEventArgs e)
+        private void MenuItem_Stop_OnClick(object sender, RoutedEventArgs e)
         {
             if (listViewDaemons.SelectedItem == null)
                 return;
@@ -156,7 +156,15 @@ namespace DaemonMaster
             StopService((DaemonItem)listViewDaemons.SelectedItem);
         }
 
-        private void MenuItemDelete_Click(object sender, RoutedEventArgs e)
+        private void MenuItem_Kill_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (listViewDaemons.SelectedItem == null)
+                return;
+
+            KillService((DaemonItem)listViewDaemons.SelectedItem);
+        }
+
+        private void MenuItem_Delete_OnClick(object sender, RoutedEventArgs e)
         {
             if (listViewDaemons.SelectedItem == null)
                 return;
@@ -214,7 +222,7 @@ namespace DaemonMaster
             MessageBox.Show(_resManager.GetString("currently_unavailable"), _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        private void MenuItemStartInSession_OnClick(object sender, RoutedEventArgs e)
+        private void MenuItem_StartInSession_OnClick(object sender, RoutedEventArgs e)
         {
             if (listViewDaemons.SelectedItem == null)
                 return;
@@ -245,7 +253,7 @@ namespace DaemonMaster
             }
         }
 
-        private void MenuItemStopInSession_OnClick(object sender, RoutedEventArgs e)
+        private void MenuItem_StopInSession_OnClick(object sender, RoutedEventArgs e)
         {
             if (listViewDaemons.SelectedItem == null)
                 return;
@@ -280,51 +288,12 @@ namespace DaemonMaster
             }
         }
 
-        private void MenuItemKillInSession_OnClick(object sender, RoutedEventArgs e)
+        private void MenuItem_KillInSession_OnClick(object sender, RoutedEventArgs e)
         {
             if (listViewDaemons.SelectedItem == null)
                 return;
 
-
-            DaemonItem daemonItem = (DaemonItem)listViewDaemons.SelectedItem;
-
-            try
-            {
-                switch (ServiceManagement.KillService(daemonItem.ServiceName))
-                {
-                    case DaemonServiceState.AlreadyStopped:
-                        MessageBox.Show(_resManager.GetString("cannot_stop_the_service_already_stopped"),
-                            _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-                        break;
-
-                    case DaemonServiceState.Successful:
-                        MessageBox.Show(_resManager.GetString("the_process_killing_was_successful"),
-                            _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                        break;
-                }
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-
-
-            //try
-            //{
-            //    if ((daemonItem.ServiceName))
-            //    {
-            //        
-            //    }
-            //    else
-            //    {
-            //        MessageBox.Show(_resManager.GetString("the_process_killing_was_unsuccessful"),
-            //            _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-            //    }
-            //}
-            //catch (Exception exception)
-            //{
-            //    MessageBox.Show(exception.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-            //}
+            KillService((DaemonItem)listViewDaemons.SelectedItem);
         }
 
         #endregion
@@ -488,6 +457,45 @@ namespace DaemonMaster
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void KillService(DaemonItem daemonItem)
+        {
+            try
+            {
+                //If windows 7 or lower
+                DaemonServiceState daemonServiceState;
+                if (Environment.OSVersion.Version.Major <= 6 && Environment.OSVersion.Version.Minor <= 1)
+                {
+                    daemonServiceState = ServiceManagement.KillService(daemonItem.ServiceName, true);
+                }
+                else
+                {
+                    daemonServiceState = ServiceManagement.KillService(daemonItem.ServiceName);
+                }
+
+                switch (daemonServiceState)
+                {
+                    case DaemonServiceState.AlreadyStopped:
+                        MessageBox.Show(_resManager.GetString("cannot_stop_the_service_already_stopped"),
+                            _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                        break;
+
+                    case DaemonServiceState.Successful:
+                        MessageBox.Show(_resManager.GetString("the_process_killing_was_successful"),
+                            _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+                        break;
+
+                    case DaemonServiceState.Unsuccessful:
+                        MessageBox.Show(_resManager.GetString("the_process_killing_was_unsuccessful"),
+                            _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                        break;
+                }
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

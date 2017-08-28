@@ -136,7 +136,7 @@ namespace DaemonMasterService
         {
             if (command == (int)Commands.Kill)
             {
-                //TODO: Kill
+                _daemonProcess.KillProcess();
                 Stop();
             }
         }

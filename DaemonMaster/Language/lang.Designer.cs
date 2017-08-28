@@ -178,6 +178,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kill Service ähnelt.
+        /// </summary>
+        public static string button_kill_service {
+            get {
+                return ResourceManager.GetString("button_kill_service", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Load data from shortcut ähnelt.
         /// </summary>
         public static string button_load_shortcut {
@@ -850,6 +859,15 @@ namespace DaemonMaster.Language {
         public static string the_process_killing_was_successful {
             get {
                 return ResourceManager.GetString("the_process_killing_was_successful", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die The service killing was unsuccessful ähnelt.
+        /// </summary>
+        public static string the_process_killing_was_unsuccessful {
+            get {
+                return ResourceManager.GetString("the_process_killing_was_unsuccessful", resourceCulture);
             }
         }
         
