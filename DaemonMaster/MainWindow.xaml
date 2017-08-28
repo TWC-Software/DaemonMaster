@@ -39,9 +39,9 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="{x:Static resx:lang.service}" DisplayMemberBinding="{Binding DisplayName}" ctrl:ProportionalColumn.Width="1" />
-                    <GridViewColumn Header="{x:Static resx:lang.pid}" DisplayMemberBinding="{Binding PID}" ctrl:ProportionalColumn.Width="1"/>
-                    <GridViewColumn Header="{x:Static resx:lang.status}" DisplayMemberBinding="{Binding ServiceState, Converter={StaticResource serviceControllerStatusConverter}}" ctrl:ProportionalColumn.Width="1" />
+                    <GridViewColumn Header="{x:Static resx:lang.service}" DisplayMemberBinding="{Binding DisplayName}" Width="120"/>
+                    <GridViewColumn Header="{x:Static resx:lang.pid}" DisplayMemberBinding="{Binding PID}" Width="70"/>
+                    <GridViewColumn Header="{x:Static resx:lang.status}" DisplayMemberBinding="{Binding ServiceState, Converter={StaticResource serviceControllerStatusConverter}}" Width="70"/>
                 </GridView>
             </ListView.View>
 
@@ -77,18 +77,18 @@
         
         <Menu x:Name="menu" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="519">
             <MenuItem Header="{x:Static resx:lang.button_file}">
-                <MenuItem Header="{x:Static resx:lang.button_export}" Click="MenuItem_Click_Export"/>
-                <MenuItem Header="{x:Static resx:lang.button_import}" Click="MenuItem_Click_Import"/>
+                <MenuItem Header="{x:Static resx:lang.button_export}" Click="MenuItem_Export_OnClick"/>
+                <MenuItem Header="{x:Static resx:lang.button_import}" Click="MenuItem_Import_OnClick"/>
             </MenuItem>
             <MenuItem Header="{x:Static resx:lang.button_edit_service}">
-                <MenuItem Header="{x:Static resx:lang.button_add_service}" Click="MenuItem_Click_AddDaemon"/>
-                <MenuItem Header="{x:Static resx:lang.button_edit_service}" Click="MenuItem_Click_EditDaemon"/>
-                <MenuItem Header="{x:Static resx:lang.button_delete_service}" Click="MenuItem_Click_RemoveDaemon"/>
+                <MenuItem Header="{x:Static resx:lang.button_add_service}" Click="MenuItem_AddDaemon_OnClick"/>
+                <MenuItem Header="{x:Static resx:lang.button_edit_service}" Click="MenuItem_EditDaemon_OnClick"/>
+                <MenuItem Header="{x:Static resx:lang.button_delete_service}" Click="MenuItem_RemoveDaemon_OnClick"/>
             </MenuItem>
             <MenuItem Header="{x:Static resx:lang.button_help}">
-                <MenuItem Header="{x:Static resx:lang.button_check_for_updates}" Click="MenuItem_Click_CheckForUpdates"/>
+                <MenuItem Header="{x:Static resx:lang.button_check_for_updates}" Click="MenuItem_CheckForUpdates_OnClick"/>
                 <Separator/>
-                <MenuItem Header="{x:Static resx:lang.button_credits}" Click="MenuItem_Click_Credits"/>
+                <MenuItem Header="{x:Static resx:lang.button_credits}" Click="MenuItem_Credits_OnClick"/>
             </MenuItem>
         </Menu>
     </Grid>

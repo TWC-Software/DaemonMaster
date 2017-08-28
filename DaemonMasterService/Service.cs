@@ -134,16 +134,19 @@ namespace DaemonMasterService
 
         protected override void OnCustomCommand(int command)
         {
-            if (command == (int)Commands.Kill)
+            switch ((ServiceCommands)command)
             {
-                _daemonProcess.KillProcess();
-                Stop();
+                case ServiceCommands.KillChildAndStop:
+                    _daemonProcess.KillProcess();
+                    Stop();
+                    break;
             }
         }
 
-        public enum Commands : int
+        private new void Stop()
         {
-            Kill = 128,
+            _daemonProcess.Dispose();
+            base.Stop();
         }
     }
 }

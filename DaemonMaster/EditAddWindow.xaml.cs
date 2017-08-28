@@ -27,6 +27,7 @@ using System.IO;
 using System.Resources;
 using System.Windows;
 using DaemonMaster.Language;
+using DaemonMasterCore.Exceptions;
 using Tulpep.ActiveDirectoryObjectPicker;
 
 namespace DaemonMaster
@@ -65,7 +66,7 @@ namespace DaemonMaster
             try
             {
                 if (ServiceManagement.StopService(daemonItem.ServiceName) < 0)
-                    throw new Exception("Service must be stopped");
+                    throw new ServiceNotStoppedException();
 
                 daemon = RegistryManagement.LoadDaemonFromRegistry(daemonItem.ServiceName);
                 LoadDataIntoUI(daemon);
@@ -80,6 +81,20 @@ namespace DaemonMaster
                 this.Close();
             }
         }
+
+        public EditAddWindow(Daemon daemon) : this()
+        {
+            try
+            {
+                LoadDataIntoUI(daemon);
+            }
+            catch (Exception)
+            {
+                DialogResult = false;
+                this.Close();
+            }
+        }
+
 
         private void LoadDataIntoUI(Daemon daemon)
         {
@@ -135,13 +150,14 @@ namespace DaemonMaster
             OpenFileDialog openFileDialog =
                 new OpenFileDialog
                 {
-                    DereferenceLinks = true,
-                    CheckFileExists = true,
-                    CheckPathExists = true,
-                    AddExtension = true,
                     InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
                     Filter = "Exe files (*.exe)|*.exe|" +
-                             "All files (*.*)|*.*"
+                             "All files (*.*)|*.*",
+                    AddExtension = true,
+                    CheckFileExists = true,
+                    CheckPathExists = true,
+                    DereferenceLinks = true,
+                    Multiselect = false
                 };
 
             //Wenn eine Datei gewählt worden ist
@@ -192,6 +208,7 @@ namespace DaemonMaster
                     CheckFileExists = true,
                     CheckPathExists = true,
                     AddExtension = true,
+                    Multiselect = false,
                     InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
                     Filter = "Shortcut (*.lnk)|*.lnk|" +
                              "All files (*.*)|*.*"
@@ -365,7 +382,7 @@ namespace DaemonMaster
                     {
                         MessageBox.Show(
                             _resManager.GetString("the_service_installation_was_unsuccessful",
-                                CultureInfo.CurrentUICulture) + ex.Message, "Error", MessageBoxButton.OK,
+                                CultureInfo.CurrentUICulture) + "\n" + ex.Message, "Error", MessageBoxButton.OK,
                             MessageBoxImage.Error);
                     }
                 }

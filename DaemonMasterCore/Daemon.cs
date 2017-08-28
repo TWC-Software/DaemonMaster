@@ -21,6 +21,7 @@
 using DaemonMasterCore.Win32.PInvoke;
 using System;
 using System.Security;
+using Newtonsoft.Json;
 
 namespace DaemonMasterCore
 {
@@ -62,6 +63,8 @@ namespace DaemonMasterCore
         public string Parameter { get; set; }
         public bool UseLocalSystem { get; set; }
         public string Username { get; set; }
+
+        [JsonIgnore]
         public SecureString Password { get; set; }
 
         public int MaxRestarts { get; set; }

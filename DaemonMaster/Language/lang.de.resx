@@ -423,4 +423,10 @@
   <data name="the_process_killing_was_unsuccessful" xml:space="preserve">
     <value>Der Dienst konnte nicht "gekillt" werden</value>
   </data>
+  <data name="cannot_import_daemon" xml:space="preserve">
+    <value>Daemon konnte nicht importiert werden :(</value>
+  </data>
+  <data name="cannot_export_daemon" xml:space="preserve">
+    <value>Daemon konnte nicht exportiert werden :(</value>
+  </data>
 </root>

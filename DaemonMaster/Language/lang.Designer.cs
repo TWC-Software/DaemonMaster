@@ -286,6 +286,24 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Cannot export daemon :( ähnelt.
+        /// </summary>
+        public static string cannot_export_daemon {
+            get {
+                return ResourceManager.GetString("cannot_export_daemon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Cannot import daemon :( ähnelt.
+        /// </summary>
+        public static string cannot_import_daemon {
+            get {
+                return ResourceManager.GetString("cannot_import_daemon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Cannot load data from registry! ähnelt.
         /// </summary>
         public static string cannot_load_data_from_registry {

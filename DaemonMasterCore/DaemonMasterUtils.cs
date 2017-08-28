@@ -23,6 +23,7 @@ using System.IO;
 using System.Management;
 using System.Windows;
 using System.Windows.Media;
+using Newtonsoft.Json;
 
 namespace DaemonMasterCore
 {
@@ -106,6 +107,34 @@ namespace DaemonMasterCore
                 return folderItem.IsLink;
 
             return false;
+        }
+
+
+        public static void ExportItem(string serviceName, string path)
+        {
+            Daemon daemon = RegistryManagement.LoadDaemonFromRegistry(serviceName);
+
+            using (StreamWriter streamWriter = File.CreateText(path))
+            {
+                JsonSerializer serializer = new JsonSerializer()
+                {
+                    Formatting = Formatting.Indented
+                };
+                serializer.Serialize(streamWriter, daemon);
+            }
+        }
+
+        public static Daemon ImportItem(string path)
+        {
+            if (!File.Exists(path))
+                throw new FileNotFoundException();
+
+            using (StreamReader streamReader = File.OpenText(path))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                Daemon daemon = (Daemon)serializer.Deserialize(streamReader, typeof(Daemon));
+                return daemon;
+            }
         }
     }
 

@@ -19,10 +19,12 @@
 
 
 using AutoUpdaterDotNET;
+using DaemonMaster.Language;
 using DaemonMasterCore;
 using DaemonMasterCore.Config;
 using DaemonMasterCore.Exceptions;
 using DaemonMasterCore.Win32.PInvoke;
+using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -31,7 +33,6 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
-using DaemonMaster.Language;
 
 namespace DaemonMaster
 {
@@ -179,12 +180,12 @@ namespace DaemonMaster
 
         //MENU
 
-        private void MenuItem_Click_AddDaemon(object sender, RoutedEventArgs e)
+        private void MenuItem_AddDaemon_OnClick(object sender, RoutedEventArgs e)
         {
             AddDaemon();
         }
 
-        private void MenuItem_Click_RemoveDaemon(object sender, RoutedEventArgs e)
+        private void MenuItem_RemoveDaemon_OnClick(object sender, RoutedEventArgs e)
         {
             if (listViewDaemons.SelectedItem == null)
                 return;
@@ -192,7 +193,7 @@ namespace DaemonMaster
             RemoveDaemon((DaemonItem)listViewDaemons.SelectedItem);
         }
 
-        private void MenuItem_Click_EditDaemon(object sender, RoutedEventArgs e)
+        private void MenuItem_EditDaemon_OnClick(object sender, RoutedEventArgs e)
         {
             if (listViewDaemons.SelectedItem == null)
                 return;
@@ -200,26 +201,72 @@ namespace DaemonMaster
             EditDaemon();
         }
 
-        private void MenuItem_Click_CheckForUpdates(object sender, RoutedEventArgs e)
+        private void MenuItem_CheckForUpdates_OnClick(object sender, RoutedEventArgs e)
         {
             CheckForUpdates();
         }
 
-        private void MenuItem_Click_Credits(object sender, RoutedEventArgs e)
+        private void MenuItem_Credits_OnClick(object sender, RoutedEventArgs e)
         {
             CreditsWindow creditsWindow = new CreditsWindow();
             creditsWindow.ShowDialog();
         }
 
-        private void MenuItem_Click_Export(object sender, RoutedEventArgs e)
+        private void MenuItem_Export_OnClick(object sender, RoutedEventArgs e)
         {
-            //DaemonMasterCore.ExportList(_processCollection);
-            MessageBox.Show(_resManager.GetString("currently_unavailable"), _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+            if (listViewDaemons.SelectedItem == null)
+                return;
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
+                Filter = "DMDF (*.dmdf)|*.dmdf|" +
+                         "All files (*.*)|*.*",
+                DefaultExt = "dmdf",
+                AddExtension = true,
+                CheckFileExists = false,
+                CheckPathExists = true
+            };
+
+            try
+            {
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    DaemonMasterUtils.ExportItem(((DaemonItem)listViewDaemons.SelectedItem).ServiceName, saveFileDialog.FileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(_resManager.GetString("cannot_export_daemon") + "\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
-        private void MenuItem_Click_Import(object sender, RoutedEventArgs e)
+        private void MenuItem_Import_OnClick(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(_resManager.GetString("currently_unavailable"), _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
+
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
+                Filter = "DMDF (*.dmdf)|*.dmdf|" +
+                         "All files (*.*)|*.*",
+                AddExtension = true,
+                CheckFileExists = true,
+                CheckPathExists = true,
+                DereferenceLinks = true,
+                Multiselect = false
+            };
+
+            try
+            {
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    ImportDaemon(DaemonMasterUtils.ImportItem(openFileDialog.FileName));
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(_resManager.GetString("cannot_import_daemon") + "\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void MenuItem_StartInSession_OnClick(object sender, RoutedEventArgs e)
@@ -304,42 +351,6 @@ namespace DaemonMaster
 
         #region Other
 
-        private void OpenAddDaemonWindow()
-        {
-            EditAddWindow addProcessWindow = new EditAddWindow(); // Neues Event Im EditAddWindow Fenster
-            var dialogResult = addProcessWindow.ShowDialog(); // Fenster geht auf, Code geht erst weiter wenn Fesnter geschlossen ist
-            if (dialogResult.HasValue && dialogResult.Value)
-            {
-                _processCollection.Add(addProcessWindow.DaemonItem);
-            }
-        }
-
-        private void OpenEditDaemonWindow(DaemonItem daemonItem)
-        {
-            if (ServiceManagement.IsServiceRunning(daemonItem.ServiceName))
-            {
-                MessageBoxResult result = MessageBox.Show(_resManager.GetString("you_must_stop_the_service_first"),
-                    _resManager.GetString("information"), MessageBoxButton.YesNo, MessageBoxImage.Information);
-
-                if (result == MessageBoxResult.Yes)
-                {
-                    StopService(daemonItem);
-                }
-                else
-                {
-                    return;
-                }
-            }
-
-            EditAddWindow addProcessWindow = new EditAddWindow(daemonItem);
-            var dialogResult = addProcessWindow.ShowDialog();
-            if (dialogResult.HasValue && dialogResult.Value)
-            {
-                _processCollection[_processCollection.IndexOf(addProcessWindow.OldDaemonItem)] = addProcessWindow.DaemonItem;
-            }
-        }
-
-
         private bool AskToEnableInteractiveServices()
         {
             //Wenn der RegKey nicht gestetzt ist, soll der Nutzer gefragt werden
@@ -368,11 +379,26 @@ namespace DaemonMaster
         {
             if (listViewDaemons.Items.Count <= 256)
             {
-                OpenAddDaemonWindow();
+                EditAddWindow addProcessWindow = new EditAddWindow(); // Neues Event Im EditAddWindow Fenster
+                var dialogResult = addProcessWindow.ShowDialog(); // Fenster geht auf, Code geht erst weiter wenn Fesnter geschlossen ist
+                if (dialogResult.HasValue && dialogResult.Value)
+                {
+                    _processCollection.Add(addProcessWindow.DaemonItem);
+                }
             }
             else
             {
                 MessageBox.Show(_resManager.GetString("max_limit_reached"), _resManager.GetString("warning"), MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void ImportDaemon(Daemon daemon)
+        {
+            EditAddWindow addProcessWindow = new EditAddWindow(daemon); // Neues Event Im EditAddWindow Fenster
+            var dialogResult = addProcessWindow.ShowDialog(); // Fenster geht auf, Code geht erst weiter wenn Fesnter geschlossen ist
+            if (dialogResult.HasValue && dialogResult.Value)
+            {
+                _processCollection.Add(addProcessWindow.DaemonItem);
             }
         }
 
@@ -407,7 +433,29 @@ namespace DaemonMaster
             if (listViewDaemons.SelectedItem == null)
                 return;
 
-            OpenEditDaemonWindow((DaemonItem)listViewDaemons.SelectedItem);
+            DaemonItem daemonItem = (DaemonItem)listViewDaemons.SelectedItem;
+
+            if (ServiceManagement.IsServiceRunning(daemonItem.ServiceName))
+            {
+                MessageBoxResult result = MessageBox.Show(_resManager.GetString("you_must_stop_the_service_first"),
+                    _resManager.GetString("information"), MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    StopService(daemonItem);
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            EditAddWindow addProcessWindow = new EditAddWindow(daemonItem);
+            var dialogResult = addProcessWindow.ShowDialog();
+            if (dialogResult.HasValue && dialogResult.Value)
+            {
+                _processCollection[_processCollection.IndexOf(addProcessWindow.OldDaemonItem)] = addProcessWindow.DaemonItem;
+            }
         }
 
         private void StartService(DaemonItem daemonItem)
@@ -464,18 +512,7 @@ namespace DaemonMaster
         {
             try
             {
-                //If windows 7 or lower
-                DaemonServiceState daemonServiceState;
-                if (Environment.OSVersion.Version.Major <= 6 && Environment.OSVersion.Version.Minor <= 1)
-                {
-                    daemonServiceState = ServiceManagement.KillService(daemonItem.ServiceName, true);
-                }
-                else
-                {
-                    daemonServiceState = ServiceManagement.KillService(daemonItem.ServiceName);
-                }
-
-                switch (daemonServiceState)
+                switch (ServiceManagement.KillService(daemonItem.ServiceName))
                 {
                     case DaemonServiceState.AlreadyStopped:
                         MessageBox.Show(_resManager.GetString("cannot_stop_the_service_already_stopped"),
@@ -542,24 +579,6 @@ namespace DaemonMaster
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            //TODO
-            ////Kill all running processes
-            //if (ProcessManagement.IsDictionaryEmpty())
-            //{
-            //    MessageBoxResult result = MessageBox.Show(_resManager.GetString("all_processes_will_be_killed"), _resManager.GetString("warning"), MessageBoxButton.OKCancel, MessageBoxImage.Warning);
-
-            //    //Cancel the shutdown, else kill all processes
-            //    if (result == MessageBoxResult.Cancel)
-            //    {
-            //        e.Cancel = true;
-            //        return;
-            //    }
-            //    else
-            //    {
-            //        ProcessManagement.KillAndDeleteAllProcesses();
-            //    }
-            //}
-
             ConfigManagement.SaveConfig();
         }
 

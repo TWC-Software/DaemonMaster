@@ -19,7 +19,6 @@
 
 using DaemonMasterCore.Exceptions;
 using DaemonMasterCore.Win32;
-using DaemonMasterCore.Win32.PInvoke;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -178,34 +177,15 @@ namespace DaemonMasterCore
         }
 
         /// <summary>
-        /// Kill the service if its running. Possible return values are AlreadyStopped, Successful, Unsuccessful (only alternativ mode)
+        /// Kill the service if its running. Possible return values are AlreadyStopped, Successful, Unsuccessful (not in job object mode)
         /// </summary>
         /// <param name="serviceName"></param>
-        public static DaemonServiceState KillService(string serviceName, bool useAlternativMethod = false)
+        /// <param name="useJobObjectMethod"></param>
+        public static DaemonServiceState KillService(string serviceName, bool useJobObjectMethod = false)
         {
-            if (useAlternativMethod)
+            if (useJobObjectMethod)
             {
-                using (ServiceController serviceController = new ServiceController(serviceName))
-                {
-                    if (serviceController.Status == ServiceControllerStatus.Stopped)
-                        return DaemonServiceState.AlreadyStopped;
 
-                    //Execute command to kill
-                    serviceController.ExecuteCommand(128);
-
-                    try
-                    {
-                        serviceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromMilliseconds(WaitForStatusTimeout));
-                        return DaemonServiceState.Successful;
-                    }
-                    catch (System.ServiceProcess.TimeoutException)
-                    {
-                        return DaemonServiceState.Unsuccessful;
-                    }
-                }
-            }
-            else
-            {
                 int pid = (int)GetPIDByServiceName(serviceName);
 
                 if (pid != 0)
@@ -216,6 +196,27 @@ namespace DaemonMasterCore
                 else
                 {
                     return DaemonServiceState.AlreadyStopped;
+                }
+            }
+            else
+            {
+                using (ServiceController serviceController = new ServiceController(serviceName))
+                {
+                    if (serviceController.Status == ServiceControllerStatus.Stopped)
+                        return DaemonServiceState.AlreadyStopped;
+
+                    //Execute command to kill
+                    serviceController.ExecuteCommand((int)ServiceCommands.KillChildAndStop);
+
+                    try
+                    {
+                        serviceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromMilliseconds(WaitForStatusTimeout));
+                        return DaemonServiceState.Successful;
+                    }
+                    catch (System.ServiceProcess.TimeoutException)
+                    {
+                        return DaemonServiceState.Unsuccessful;
+                    }
                 }
             }
         }
