@@ -61,11 +61,13 @@
                     <MenuItem Header="{x:Static resx:lang.button_start_service}" Click="MenuItem_Start_OnClick"/>
                     <MenuItem Header="{x:Static resx:lang.button_stop_service}" Click="MenuItem_Stop_OnClick"/>
                     <MenuItem Header="{x:Static resx:lang.button_kill_service}" Click="MenuItem_Kill_OnClick"/>
-                    <MenuItem Header="{x:Static resx:lang.button_delete_service}" Click="MenuItem_Delete_OnClick"/>
                     <Separator/>
                     <MenuItem Header="{x:Static resx:lang.button_start}" Click="MenuItem_StartInSession_OnClick"/>
-                    <MenuItem Header="{x:Static resx:lang.button_stop}" Click="MenuItem_StopInSession_OnClick"/>
-                    <MenuItem Header="{x:Static resx:lang.button_kill}" Click="MenuItem_KillInSession_OnClick"/>
+                    <Separator/>
+                    <MenuItem Header="{x:Static resx:lang.button_export}" Click="MenuItem_Export_OnClick"/>
+                    <MenuItem Header="{x:Static resx:lang.button_import}" Click="MenuItem_Import_OnClick"/>
+                    <Separator/>
+                    <MenuItem Header="{x:Static resx:lang.button_delete_service}" Click="MenuItem_Delete_OnClick"/>
                 </ContextMenu>
 
                 <!--Sets a context menu for each ListViewItem in the current ListBox-->

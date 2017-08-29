@@ -28,7 +28,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Resources;
+using System.ServiceProcess;
 using System.Windows;
+using System.Windows.Data;
 using DaemonMaster.Language;
 using DaemonMasterCore.Exceptions;
 using Tulpep.ActiveDirectoryObjectPicker;
@@ -44,7 +46,8 @@ namespace DaemonMaster
 
         public DaemonItem DaemonItem { get; private set; } = null;
         public DaemonItem OldDaemonItem { get; private set; } = null;
-        private ObservableCollection<string> _dependObservableCollection;
+        private ObservableCollection<ServiceInfo> _dependObservableCollection;
+        private ObservableCollection<ServiceInfo> _serviceObservableCollection;
         private bool onEditMode = false;
         private Daemon daemon = null;
 
@@ -129,8 +132,6 @@ namespace DaemonMaster
             textBoxMaxRestarts.Text = daemon.MaxRestarts.ToString();
             textBoxProcessKillTime.Text = daemon.ProcessKillTime.ToString();
             textBoxProcessRestartDelay.Text = daemon.ProcessRestartDelay.ToString();
-            _dependObservableCollection = new ObservableCollection<string>(daemon.DependOnService);
-            listBoxDependOnService.ItemsSource = _dependObservableCollection;
 
 
             if (String.IsNullOrWhiteSpace(daemon.Username) || daemon.UseLocalSystem || daemon.Password == null)
@@ -160,6 +161,45 @@ namespace DaemonMaster
                     comboBoxStartType.SelectedIndex = 3;
                     break;
             }
+
+            #region Listboxes
+
+            //Load Data into _dependObservableCollection
+            _dependObservableCollection = new ObservableCollection<ServiceInfo>();
+            foreach (var dep in daemon.DependOnService)
+            {
+                ServiceInfo serviceInfo = new ServiceInfo()
+                {
+                    DisplayName = DaemonMasterUtils.GetDisplayName(dep),
+                    ServiceName = dep
+                };
+
+                _dependObservableCollection.Add(serviceInfo);
+            }
+            //Sort list alphabetical
+            ICollectionView collectionView1 = CollectionViewSource.GetDefaultView(_dependObservableCollection);
+            collectionView1.SortDescriptions.Add(new SortDescription("DisplayName", ListSortDirection.Ascending));
+            listBoxDependOnService.ItemsSource = collectionView1;
+
+            //Load Data into _serviceObservableCollection
+            _serviceObservableCollection = new ObservableCollection<ServiceInfo>();
+            foreach (var service in ServiceController.GetServices())
+            {
+                ServiceInfo serviceInfo = new ServiceInfo()
+                {
+                    DisplayName = service.DisplayName,
+                    ServiceName = service.ServiceName
+                };
+
+                if (_dependObservableCollection.All(x => x.ServiceName != serviceInfo.ServiceName))
+                    _serviceObservableCollection.Add(serviceInfo);
+            }
+            //Sort list alphabetical
+            ICollectionView collectionView2 = CollectionViewSource.GetDefaultView(_serviceObservableCollection);
+            collectionView2.SortDescriptions.Add(new SortDescription("DisplayName", ListSortDirection.Ascending));
+            listBoxAllServices.ItemsSource = collectionView2;
+
+            #endregion
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -278,7 +318,17 @@ namespace DaemonMaster
             if (listBoxDependOnService.SelectedItem == null)
                 return;
 
-            _dependObservableCollection.RemoveAt(listBoxDependOnService.SelectedIndex);
+            _serviceObservableCollection.Add((ServiceInfo)listBoxDependOnService.SelectedItem);
+            _dependObservableCollection.Remove((ServiceInfo)listBoxDependOnService.SelectedItem);
+        }
+
+        private void buttonAddDependentService_Click(object sender, RoutedEventArgs e)
+        {
+            if (listBoxAllServices.SelectedItem == null)
+                return;
+
+            _dependObservableCollection.Add((ServiceInfo)listBoxAllServices.SelectedItem);
+            _serviceObservableCollection.Remove((ServiceInfo)listBoxAllServices.SelectedItem);
         }
 
         #endregion
@@ -368,7 +418,7 @@ namespace DaemonMaster
                 daemon.ProcessKillTime = processKillTime;
                 daemon.ProcessRestartDelay = processRestartDelay;
                 daemon.CounterResetTime = counterResetTime;
-                daemon.DependOnService = _dependObservableCollection.ToArray();
+                daemon.DependOnService = _dependObservableCollection.Select(x => x.ServiceName).ToArray();
 
                 switch (comboBoxStartType.SelectedIndex)
                 {

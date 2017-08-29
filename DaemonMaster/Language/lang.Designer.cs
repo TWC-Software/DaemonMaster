@@ -133,7 +133,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Export list ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Export ähnelt.
         /// </summary>
         public static string button_export {
             get {
@@ -160,20 +160,11 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Import list ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Import ähnelt.
         /// </summary>
         public static string button_import {
             get {
                 return ResourceManager.GetString("button_import", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Kill process ähnelt.
-        /// </summary>
-        public static string button_kill {
-            get {
-                return ResourceManager.GetString("button_kill", resourceCulture);
             }
         }
         
@@ -232,7 +223,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Start ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Start (in session) ähnelt.
         /// </summary>
         public static string button_start {
             get {
@@ -246,15 +237,6 @@ namespace DaemonMaster.Language {
         public static string button_start_service {
             get {
                 return ResourceManager.GetString("button_start_service", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Stop ähnelt.
-        /// </summary>
-        public static string button_stop {
-            get {
-                return ResourceManager.GetString("button_stop", resourceCulture);
             }
         }
         
@@ -575,7 +557,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Counter reset time: ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Max. restarts reset time: ähnelt.
         /// </summary>
         public static string label_counter_reset_time {
             get {
@@ -584,7 +566,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Depend on service: ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Depend on: ähnelt.
         /// </summary>
         public static string label_depend_on_service {
             get {
@@ -656,7 +638,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Process kill time: ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kill time: ähnelt.
         /// </summary>
         public static string label_process_kill_time {
             get {
@@ -665,7 +647,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Process restart delay: ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Restart delay: ähnelt.
         /// </summary>
         public static string label_process_restart_delay {
             get {
@@ -773,7 +755,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Time between crasch and restart ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Time between crash and restart ähnelt.
         /// </summary>
         public static string placeholder_process_restart_delay {
             get {
@@ -908,24 +890,6 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Stop was successful! ähnelt.
-        /// </summary>
-        public static string stop_was_successful {
-            get {
-                return ResourceManager.GetString("stop_was_successful", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Stop was unsuccessful! Do you want kill the process? ähnelt.
-        /// </summary>
-        public static string stop_was_unsuccessful {
-            get {
-                return ResourceManager.GetString("stop_was_unsuccessful", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Success ähnelt.
         /// </summary>
         public static string success {
@@ -940,6 +904,24 @@ namespace DaemonMaster.Language {
         public static string switch_to_session_0 {
             get {
                 return ResourceManager.GetString("switch_to_session_0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Advanced ähnelt.
+        /// </summary>
+        public static string tabitem_advanced {
+            get {
+                return ResourceManager.GetString("tabitem_advanced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Console ähnelt.
+        /// </summary>
+        public static string tabitem_console {
+            get {
+                return ResourceManager.GetString("tabitem_console", resourceCulture);
             }
         }
         

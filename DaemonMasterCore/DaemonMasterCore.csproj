@@ -71,6 +71,7 @@
     <Compile Include="DaemonItem.cs" />
     <Compile Include="ProcessManagement.cs" />
     <Compile Include="ServiceCommands.cs" />
+    <Compile Include="ServiceInfo.cs" />
     <Compile Include="SystemManagement.cs" />
     <Compile Include="Jobs\KillChildProcessJob.cs" />
     <Compile Include="Win32\JobHandle.cs" />

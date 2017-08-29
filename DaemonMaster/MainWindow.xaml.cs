@@ -300,48 +300,6 @@ namespace DaemonMaster
             }
         }
 
-        private void MenuItem_StopInSession_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (listViewDaemons.SelectedItem == null)
-                return;
-
-            DaemonItem daemonItem = (DaemonItem)listViewDaemons.SelectedItem;
-
-            try
-            {
-                switch (ServiceManagement.StopService(daemonItem.ServiceName))
-                {
-                    case DaemonServiceState.Unsuccessful:
-                        MessageBoxResult result = MessageBox.Show(_resManager.GetString("stop_was_unsuccessful"),
-                            _resManager.GetString("error"), MessageBoxButton.YesNo, MessageBoxImage.Error);
-
-                        if (result == MessageBoxResult.Yes)
-                            KillService(daemonItem);
-                        break;
-                    case DaemonServiceState.Successful:
-                        MessageBox.Show(_resManager.GetString("stop_was_successful"),
-                            _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                        break;
-                    case DaemonServiceState.AlreadyStopped:
-                        MessageBox.Show(_resManager.GetString("the_selected_process_does_not_exist"),
-                            _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                        break;
-                }
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void MenuItem_KillInSession_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (listViewDaemons.SelectedItem == null)
-                return;
-
-            KillService((DaemonItem)listViewDaemons.SelectedItem);
-        }
-
         #endregion
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -53,23 +53,24 @@
                     <Button x:Name="buttonLoadShortcut" Content="{x:Static resx:lang.button_load_shortcut}" Margin="399,194,0,0" Click="buttonLoadShortcut_OnClick"  Height="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="465"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="Advanced">
+            <TabItem Header="{x:Static resx:lang.tabitem_advanced}">
                 <Grid>
-                    <CoreWPF:PlaceholderTextBox x:Name="textBoxMaxRestarts" HorizontalAlignment="Left" Height="23" Margin="147,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="318" Placeholder="{x:Static resx:lang.placeholder_max_restarts}"/>
+                    <CoreWPF:PlaceholderTextBox x:Name="textBoxMaxRestarts" HorizontalAlignment="Left" Height="23" Margin="239,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="268" Placeholder="{x:Static resx:lang.placeholder_max_restarts}"/>
                     <Label x:Name="labelMaxRestarts" Content="{x:Static resx:lang.label_max_restarts}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
-                    <CoreWPF:PlaceholderTextBox x:Name="textBoxProcessKillTime" HorizontalAlignment="Left" Height="23" Margin="147,39,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="318" Placeholder="{x:Static resx:lang.placeholder_process_kill_time}"/>
+                    <CoreWPF:PlaceholderTextBox x:Name="textBoxProcessKillTime" HorizontalAlignment="Left" Height="23" Margin="239,39,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="268" Placeholder="{x:Static resx:lang.placeholder_process_kill_time}"/>
                     <Label x:Name="labelProcessKillTime" Content="{x:Static resx:lang.label_process_kill_time}" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
-                    <CoreWPF:PlaceholderTextBox x:Name="textBoxProcessRestartDelay" HorizontalAlignment="Left" Height="23" Margin="147,65,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="318" Placeholder="{x:Static resx:lang.placeholder_process_restart_delay}"/>
+                    <CoreWPF:PlaceholderTextBox x:Name="textBoxProcessRestartDelay" HorizontalAlignment="Left" Height="23" Margin="239,65,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="268" Placeholder="{x:Static resx:lang.placeholder_process_restart_delay}"/>
                     <Label x:Name="labelProcessRestartDelay" Content="{x:Static resx:lang.label_process_restart_delay}" HorizontalAlignment="Left" Margin="10,62,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
-                    <CoreWPF:PlaceholderTextBox x:Name="textBoxCounterResetTime" HorizontalAlignment="Left" Height="23" Margin="147,91,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="318" Placeholder="{x:Static resx:lang.placeholder_counter_reset_time}"/>
+                    <CoreWPF:PlaceholderTextBox x:Name="textBoxCounterResetTime" HorizontalAlignment="Left" Height="23" Margin="239,91,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="268" Placeholder="{x:Static resx:lang.placeholder_counter_reset_time}"/>
                     <Label x:Name="labelCounterResetTime" Content="{x:Static resx:lang.label_counter_reset_time}" HorizontalAlignment="Left" Margin="10,88,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
-                    <ListBox x:Name="listBoxDependOnService" HorizontalAlignment="Left" Height="104" Margin="147,124,0,0" VerticalAlignment="Top" Width="318"/>
+                    <ListBox x:Name="listBoxDependOnService" HorizontalAlignment="Left" Height="104" Margin="147,124,0,0" VerticalAlignment="Top" Width="360" DisplayMemberPath="DisplayName"/>
                     <Label x:Name="labelDependOnService" Content="{x:Static resx:lang.label_depend_on_service}" HorizontalAlignment="Left" Margin="10,124,0,0" VerticalAlignment="Top"/>
-                    <Button x:Name="buttonAddDependentService" Content="{x:Static resx:lang.button_add}" Margin="26,155,777,57"/>
+                    <Button x:Name="buttonAddDependentService" Content="{x:Static resx:lang.button_add}" Margin="26,155,777,57" Click="buttonAddDependentService_Click"/>
                     <Button x:Name="buttonRemoveDependentService" Content="{x:Static resx:lang.button_remove}" Margin="26,186,777,26" Click="buttonRemoveDependentService_Click"/>
+                    <ListBox x:Name="listBoxAllServices" Margin="514,124,10,10" DisplayMemberPath="DisplayName"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="Console">
+            <TabItem Header="{x:Static resx:lang.tabitem_console}">
                 <Grid>
 
 

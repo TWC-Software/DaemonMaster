@@ -23,6 +23,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Management;
+using System.ServiceProcess;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
@@ -133,6 +134,14 @@ namespace DaemonMasterCore
             stringBuilder.Append("\0");
 
             return stringBuilder;
+        }
+
+        public static string GetDisplayName(string serviceName)
+        {
+            using (ServiceController sc = new ServiceController(serviceName))
+            {
+                return sc.DisplayName;
+            }
         }
 
         public static void ExportItem(string serviceName, string path)

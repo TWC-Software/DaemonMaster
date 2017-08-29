@@ -232,13 +232,13 @@
     <value>Générique</value>
   </data>
   <data name="button_export" xml:space="preserve">
-    <value>Exporter une liste</value>
+    <value>Exporter</value>
   </data>
   <data name="button_file" xml:space="preserve">
     <value>Fichier</value>
   </data>
   <data name="button_import" xml:space="preserve">
-    <value>Importer une liste</value>
+    <value>Importer</value>
   </data>
   <data name="button_save" xml:space="preserve">
     <value>Enregistrer</value>
@@ -273,20 +273,8 @@
   <data name="button_start" xml:space="preserve">
     <value>Commencer !</value>
   </data>
-  <data name="button_stop" xml:space="preserve">
-    <value>Arrêtez !</value>
-  </data>
-  <data name="stop_was_successful" xml:space="preserve">
-    <value>Arrêter avec succes!</value>
-  </data>
-  <data name="stop_was_unsuccessful" xml:space="preserve">
-    <value>Stop n'a pas réussi! Voulez-vous tuer le processus?</value>
-  </data>
   <data name="the_selected_process_does_not_exist" xml:space="preserve">
     <value>Le processus sélectionné n'existe pas !!</value>
-  </data>
-  <data name="button_kill" xml:space="preserve">
-    <value>Tuer le processus</value>
   </data>
   <data name="the_process_killing_was_successful" xml:space="preserve">
     <value>L' arrêt du processus a été couronné de succès!</value>

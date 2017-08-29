@@ -226,13 +226,13 @@
     <value>Autoren</value>
   </data>
   <data name="button_export" xml:space="preserve">
-    <value>Exportiere Liste</value>
+    <value>Exportiere</value>
   </data>
   <data name="button_file" xml:space="preserve">
     <value>Datei</value>
   </data>
   <data name="button_import" xml:space="preserve">
-    <value>Importiere Liste</value>
+    <value>Importiere</value>
   </data>
   <data name="button_save" xml:space="preserve">
     <value>Speichern</value>
@@ -271,22 +271,10 @@
     <value>Wollen Sie die Daten der Verknüpfung nutzen? Alle vorhandenen Daten werden dabei überschrieben!</value>
   </data>
   <data name="button_start" xml:space="preserve">
-    <value>Start</value>
-  </data>
-  <data name="button_stop" xml:space="preserve">
-    <value>Stop</value>
-  </data>
-  <data name="stop_was_successful" xml:space="preserve">
-    <value>Stop war erfolgreich!</value>
-  </data>
-  <data name="stop_was_unsuccessful" xml:space="preserve">
-    <value>Stopp war nicht erfolgreich, wollen Sie den Prozess "Killen"?</value>
+    <value>Start (auf Desktop)</value>
   </data>
   <data name="the_selected_process_does_not_exist" xml:space="preserve">
     <value>Der gewählte Prozess existiert nicht!</value>
-  </data>
-  <data name="button_kill" xml:space="preserve">
-    <value>Prozess "killen"</value>
   </data>
   <data name="the_process_killing_was_successful" xml:space="preserve">
     <value>Der Prozess wurde erfolgreich "gekillt"!</value>
@@ -431,5 +419,38 @@
   </data>
   <data name="button_remove" xml:space="preserve">
     <value>Löschen</value>
+  </data>
+  <data name="label_max_restarts" xml:space="preserve">
+    <value>Max. Neustarts:</value>
+  </data>
+  <data name="placeholder_max_restarts" xml:space="preserve">
+    <value>Unlimitierte Neustarts =&gt; -1</value>
+  </data>
+  <data name="label_process_kill_time" xml:space="preserve">
+    <value>Kill Zeit:</value>
+  </data>
+  <data name="placeholder_process_kill_time" xml:space="preserve">
+    <value>0 =&gt; ...</value>
+  </data>
+  <data name="label_process_restart_delay" xml:space="preserve">
+    <value>Neustart Verzögerung:</value>
+  </data>
+  <data name="placeholder_process_restart_delay" xml:space="preserve">
+    <value>Zeit zwischen crash und Neustart</value>
+  </data>
+  <data name="label_counter_reset_time" xml:space="preserve">
+    <value>"Max. Neustarts" rücksetz Zeit:</value>
+  </data>
+  <data name="placeholder_counter_reset_time" xml:space="preserve">
+    <value>Zeit bevor der Zähler zurückgesetzt wird</value>
+  </data>
+  <data name="label_depend_on_service" xml:space="preserve">
+    <value>Abhängig von:</value>
+  </data>
+  <data name="tabitem_advanced" xml:space="preserve">
+    <value>Erweitert</value>
+  </data>
+  <data name="tabitem_console" xml:space="preserve">
+    <value>Konsole</value>
   </data>
 </root>

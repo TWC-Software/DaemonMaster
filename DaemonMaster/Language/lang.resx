@@ -226,13 +226,13 @@
     <value>Credits</value>
   </data>
   <data name="button_export" xml:space="preserve">
-    <value>Export list</value>
+    <value>Export</value>
   </data>
   <data name="button_file" xml:space="preserve">
     <value>File</value>
   </data>
   <data name="button_import" xml:space="preserve">
-    <value>Import list</value>
+    <value>Import</value>
   </data>
   <data name="button_save" xml:space="preserve">
     <value>Save</value>
@@ -271,22 +271,10 @@
     <value>Do you want to use the data of the shortcut? All existing data will be overwritten!</value>
   </data>
   <data name="button_start" xml:space="preserve">
-    <value>Start</value>
-  </data>
-  <data name="button_stop" xml:space="preserve">
-    <value>Stop</value>
-  </data>
-  <data name="stop_was_successful" xml:space="preserve">
-    <value>Stop was successful!</value>
-  </data>
-  <data name="stop_was_unsuccessful" xml:space="preserve">
-    <value>Stop was unsuccessful! Do you want kill the process?</value>
+    <value>Start (in session)</value>
   </data>
   <data name="the_selected_process_does_not_exist" xml:space="preserve">
     <value>The selected process does not exist!</value>
-  </data>
-  <data name="button_kill" xml:space="preserve">
-    <value>Kill process</value>
   </data>
   <data name="the_process_killing_was_successful" xml:space="preserve">
     <value>The process killing was successful!</value>
@@ -437,27 +425,33 @@
     <value>unlimited restarts =&gt; -1</value>
   </data>
   <data name="label_process_kill_time" xml:space="preserve">
-    <value>Process kill time:</value>
+    <value>Kill time:</value>
   </data>
   <data name="placeholder_process_kill_time" xml:space="preserve">
     <value>0 =&gt; ...</value>
   </data>
   <data name="label_process_restart_delay" xml:space="preserve">
-    <value>Process restart delay:</value>
+    <value>Restart delay:</value>
   </data>
   <data name="placeholder_process_restart_delay" xml:space="preserve">
-    <value>Time between crasch and restart</value>
+    <value>Time between crash and restart</value>
   </data>
   <data name="label_counter_reset_time" xml:space="preserve">
-    <value>Counter reset time:</value>
+    <value>Max. restarts reset time:</value>
   </data>
   <data name="placeholder_counter_reset_time" xml:space="preserve">
     <value>Time befor the restart counter will be reset</value>
   </data>
   <data name="label_depend_on_service" xml:space="preserve">
-    <value>Depend on service:</value>
+    <value>Depend on:</value>
   </data>
   <data name="button_remove" xml:space="preserve">
     <value>Remove</value>
+  </data>
+  <data name="tabitem_advanced" xml:space="preserve">
+    <value>Advanced</value>
+  </data>
+  <data name="tabitem_console" xml:space="preserve">
+    <value>Console</value>
   </data>
 </root>
