@@ -17,11 +17,10 @@
 //   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using DaemonMasterCore.Win32.PInvoke;
-using System;
+using Microsoft.Win32.SafeHandles;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using Microsoft.Win32.SafeHandles;
+using System.Text;
 
 namespace DaemonMasterCore.Win32
 {
@@ -58,7 +57,7 @@ namespace DaemonMasterCore.Win32
             string binaryPathName,
             string loadOrderGroup,
             string tagId,
-            string dependencies,
+            StringBuilder dependencies,
             string serviceStartName,
             string password)
         {

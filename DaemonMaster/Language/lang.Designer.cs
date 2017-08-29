@@ -81,9 +81,9 @@ namespace DaemonMaster.Language {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Add ähnelt.
         /// </summary>
-        public static string button_add_service {
+        public static string button_add {
             get {
-                return ResourceManager.GetString("button_add_service", resourceCulture);
+                return ResourceManager.GetString("button_add", resourceCulture);
             }
         }
         
@@ -192,6 +192,15 @@ namespace DaemonMaster.Language {
         public static string button_load_shortcut {
             get {
                 return ResourceManager.GetString("button_load_shortcut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Remove ähnelt.
+        /// </summary>
+        public static string button_remove {
+            get {
+                return ResourceManager.GetString("button_remove", resourceCulture);
             }
         }
         
@@ -566,6 +575,24 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Counter reset time: ähnelt.
+        /// </summary>
+        public static string label_counter_reset_time {
+            get {
+                return ResourceManager.GetString("label_counter_reset_time", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Depend on service: ähnelt.
+        /// </summary>
+        public static string label_depend_on_service {
+            get {
+                return ResourceManager.GetString("label_depend_on_service", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Description: ähnelt.
         /// </summary>
         public static string label_description {
@@ -602,6 +629,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Max Restarts: ähnelt.
+        /// </summary>
+        public static string label_max_restarts {
+            get {
+                return ResourceManager.GetString("label_max_restarts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Parameter(s): ähnelt.
         /// </summary>
         public static string label_parameters {
@@ -616,6 +652,24 @@ namespace DaemonMaster.Language {
         public static string label_password {
             get {
                 return ResourceManager.GetString("label_password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Process kill time: ähnelt.
+        /// </summary>
+        public static string label_process_kill_time {
+            get {
+                return ResourceManager.GetString("label_process_kill_time", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Process restart delay: ähnelt.
+        /// </summary>
+        public static string label_process_restart_delay {
+            get {
+                return ResourceManager.GetString("label_process_restart_delay", resourceCulture);
             }
         }
         
@@ -665,6 +719,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Time befor the restart counter will be reset ähnelt.
+        /// </summary>
+        public static string placeholder_counter_reset_time {
+            get {
+                return ResourceManager.GetString("placeholder_counter_reset_time", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die &lt;Please enter a description&gt; ähnelt.
         /// </summary>
         public static string placeholder_description {
@@ -688,6 +751,33 @@ namespace DaemonMaster.Language {
         public static string placeholder_file_path {
             get {
                 return ResourceManager.GetString("placeholder_file_path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die unlimited restarts =&gt; -1 ähnelt.
+        /// </summary>
+        public static string placeholder_max_restarts {
+            get {
+                return ResourceManager.GetString("placeholder_max_restarts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die 0 =&gt; ... ähnelt.
+        /// </summary>
+        public static string placeholder_process_kill_time {
+            get {
+                return ResourceManager.GetString("placeholder_process_kill_time", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Time between crasch and restart ähnelt.
+        /// </summary>
+        public static string placeholder_process_restart_delay {
+            get {
+                return ResourceManager.GetString("placeholder_process_restart_delay", resourceCulture);
             }
         }
         

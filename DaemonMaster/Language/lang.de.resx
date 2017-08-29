@@ -213,7 +213,7 @@
   <data name="button_switch_to_session_0" xml:space="preserve">
     <value>Wechsle zu Sitzung 0</value>
   </data>
-  <data name="button_add_service" xml:space="preserve">
+  <data name="button_add" xml:space="preserve">
     <value>Hinzufügen</value>
   </data>
   <data name="button_delete_service" xml:space="preserve">
@@ -428,5 +428,8 @@
   </data>
   <data name="cannot_export_daemon" xml:space="preserve">
     <value>Daemon konnte nicht exportiert werden :(</value>
+  </data>
+  <data name="button_remove" xml:space="preserve">
+    <value>Löschen</value>
   </data>
 </root>

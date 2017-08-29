@@ -315,9 +315,8 @@ namespace DaemonMaster
                         MessageBoxResult result = MessageBox.Show(_resManager.GetString("stop_was_unsuccessful"),
                             _resManager.GetString("error"), MessageBoxButton.YesNo, MessageBoxImage.Error);
 
-                        //TODO: Kill system for the service and process
-                        //if (result == MessageBoxResult.Yes)
-
+                        if (result == MessageBoxResult.Yes)
+                            KillService(daemonItem);
                         break;
                     case DaemonServiceState.Successful:
                         MessageBox.Show(_resManager.GetString("stop_was_successful"),
@@ -379,7 +378,7 @@ namespace DaemonMaster
         {
             if (listViewDaemons.Items.Count <= 256)
             {
-                EditAddWindow addProcessWindow = new EditAddWindow(); // Neues Event Im EditAddWindow Fenster
+                EditAddWindow addProcessWindow = EditAddWindow.OpenEditAddWindowWithDefaultValues(); // Neues Event Im EditAddWindow Fenster
                 var dialogResult = addProcessWindow.ShowDialog(); // Fenster geht auf, Code geht erst weiter wenn Fesnter geschlossen ist
                 if (dialogResult.HasValue && dialogResult.Value)
                 {
@@ -394,7 +393,7 @@ namespace DaemonMaster
 
         private void ImportDaemon(Daemon daemon)
         {
-            EditAddWindow addProcessWindow = new EditAddWindow(daemon); // Neues Event Im EditAddWindow Fenster
+            EditAddWindow addProcessWindow = EditAddWindow.OpenEditAddWindowForImporting(daemon); // Neues Event Im EditAddWindow Fenster
             var dialogResult = addProcessWindow.ShowDialog(); // Fenster geht auf, Code geht erst weiter wenn Fesnter geschlossen ist
             if (dialogResult.HasValue && dialogResult.Value)
             {
@@ -450,7 +449,7 @@ namespace DaemonMaster
                 }
             }
 
-            EditAddWindow addProcessWindow = new EditAddWindow(daemonItem);
+            EditAddWindow addProcessWindow = EditAddWindow.OpenEditAddWindowForEditing(daemonItem);
             var dialogResult = addProcessWindow.ShowDialog();
             if (dialogResult.HasValue && dialogResult.Value)
             {

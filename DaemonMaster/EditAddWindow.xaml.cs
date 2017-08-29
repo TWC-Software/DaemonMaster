@@ -22,8 +22,11 @@ using DaemonMasterCore;
 using DaemonMasterCore.Win32.PInvoke;
 using Microsoft.Win32;
 using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Resources;
 using System.Windows;
 using DaemonMaster.Language;
@@ -39,18 +42,13 @@ namespace DaemonMaster
     {
         private readonly ResourceManager _resManager = new ResourceManager(typeof(lang));
 
-        //Erstellt ein Event 
-        internal delegate void DaemonSavedDelegate(DaemonItem daemon);
-        internal static event DaemonSavedDelegate DaemonSavedEvent;
-        internal delegate void DaemonEditDelegate(DaemonItem oldDaemonItem, DaemonItem newDaemonItem);
-        internal static event DaemonEditDelegate DaemonEditEvent;
-
         public DaemonItem DaemonItem { get; private set; } = null;
         public DaemonItem OldDaemonItem { get; private set; } = null;
-        private readonly bool onEditMode = false;
-        private readonly Daemon daemon = null;
+        private ObservableCollection<string> _dependObservableCollection;
+        private bool onEditMode = false;
+        private Daemon daemon = null;
 
-        public EditAddWindow()
+        private EditAddWindow()
         {
             InitializeComponent();
 
@@ -58,51 +56,81 @@ namespace DaemonMaster
             daemon = new Daemon();
         }
 
-        public EditAddWindow(DaemonItem daemonItem) : this() // This = Konstruktor davor wird auch ausgeführt (=> Ableitung vom Oberen)
+        public static EditAddWindow OpenEditAddWindowWithDefaultValues()
         {
-            textBoxServiceName.IsReadOnly = true;
-            OldDaemonItem = daemonItem;
+            EditAddWindow editAddWindow = new EditAddWindow();
+            try
+            {
+                editAddWindow.LoadDataIntoUI(editAddWindow.daemon);
+            }
+            catch (Exception)
+            {
+                editAddWindow.DialogResult = false;
+                editAddWindow.Close();
+            }
+            return editAddWindow;
+        }
+
+        public static EditAddWindow OpenEditAddWindowForEditing(DaemonItem daemonItem)
+        {
+            EditAddWindow editAddWindow = new EditAddWindow();
+            editAddWindow.textBoxServiceName.IsReadOnly = true;
+            editAddWindow.OldDaemonItem = daemonItem;
 
             try
             {
                 if (ServiceManagement.StopService(daemonItem.ServiceName) < 0)
                     throw new ServiceNotStoppedException();
 
-                daemon = RegistryManagement.LoadDaemonFromRegistry(daemonItem.ServiceName);
-                LoadDataIntoUI(daemon);
+                editAddWindow.daemon = RegistryManagement.LoadDaemonFromRegistry(daemonItem.ServiceName);
+                editAddWindow.LoadDataIntoUI(editAddWindow.daemon);
 
-                onEditMode = true;
+                editAddWindow.onEditMode = true;
             }
             catch (Exception)
             {
-                MessageBox.Show(_resManager.GetString("cannot_load_data_from_registry"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(editAddWindow._resManager.GetString("cannot_load_data_from_registry"), editAddWindow._resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
 
-                DialogResult = false;
-                this.Close();
+                editAddWindow.DialogResult = false;
+                editAddWindow.Close();
             }
+            return editAddWindow;
         }
 
-        public EditAddWindow(Daemon daemon) : this()
+        public static EditAddWindow OpenEditAddWindowForImporting(Daemon daemon)
         {
+            EditAddWindow editAddWindow = new EditAddWindow();
             try
             {
-                LoadDataIntoUI(daemon);
+                editAddWindow.LoadDataIntoUI(daemon);
             }
             catch (Exception)
             {
-                DialogResult = false;
-                this.Close();
+                editAddWindow.DialogResult = false;
+                editAddWindow.Close();
             }
+            return editAddWindow;
         }
 
 
         private void LoadDataIntoUI(Daemon daemon)
         {
+            //General Tab
             textBoxDisplayName.Text = daemon.DisplayName;
-            textBoxServiceName.Text = daemon.ServiceName.Substring(13);
-            textBoxFilePath.Text = daemon.FullPath;
+            if (!String.IsNullOrWhiteSpace(daemon.ServiceName))
+                textBoxServiceName.Text = daemon.ServiceName.Substring(13);
+            if (!String.IsNullOrWhiteSpace(daemon.FileName) && !String.IsNullOrWhiteSpace(daemon.FileDir))
+                textBoxFilePath.Text = daemon.FullPath;
             textBoxParam.Text = daemon.Parameter;
             textBoxDescription.Text = daemon.Description;
+
+            //Advanced Tab
+            textBoxCounterResetTime.Text = daemon.CounterResetTime.ToString();
+            textBoxMaxRestarts.Text = daemon.MaxRestarts.ToString();
+            textBoxProcessKillTime.Text = daemon.ProcessKillTime.ToString();
+            textBoxProcessRestartDelay.Text = daemon.ProcessRestartDelay.ToString();
+            _dependObservableCollection = new ObservableCollection<string>(daemon.DependOnService);
+            listBoxDependOnService.ItemsSource = _dependObservableCollection;
 
 
             if (String.IsNullOrWhiteSpace(daemon.Username) || daemon.UseLocalSystem || daemon.Password == null)
@@ -245,6 +273,14 @@ namespace DaemonMaster
             }
         }
 
+        private void buttonRemoveDependentService_Click(object sender, RoutedEventArgs e)
+        {
+            if (listBoxDependOnService.SelectedItem == null)
+                return;
+
+            _dependObservableCollection.RemoveAt(listBoxDependOnService.SelectedIndex);
+        }
+
         #endregion
 
 
@@ -266,7 +302,11 @@ namespace DaemonMaster
 
 
                 if (String.IsNullOrWhiteSpace(textBoxDisplayName.Text) ||
-                    String.IsNullOrWhiteSpace(textBoxServiceName.Text))
+                    String.IsNullOrWhiteSpace(textBoxServiceName.Text) ||
+                    !int.TryParse(textBoxMaxRestarts.Text, out var maxRestarts) ||
+                    !int.TryParse(textBoxProcessKillTime.Text, out var processKillTime) ||
+                    !int.TryParse(textBoxProcessRestartDelay.Text, out var processRestartDelay) ||
+                    !int.TryParse(textBoxCounterResetTime.Text, out var counterResetTime))
                 {
                     MessageBox.Show(_resManager.GetString("invalid_values", CultureInfo.CurrentUICulture), _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
@@ -323,6 +363,12 @@ namespace DaemonMaster
 
                 daemon.Parameter = textBoxParam.Text;
                 daemon.Description = textBoxDescription.Text;
+
+                daemon.MaxRestarts = maxRestarts;
+                daemon.ProcessKillTime = processKillTime;
+                daemon.ProcessRestartDelay = processRestartDelay;
+                daemon.CounterResetTime = counterResetTime;
+                daemon.DependOnService = _dependObservableCollection.ToArray();
 
                 switch (comboBoxStartType.SelectedIndex)
                 {
@@ -421,4 +467,3 @@ namespace DaemonMaster
         #endregion
     }
 }
-//[] 

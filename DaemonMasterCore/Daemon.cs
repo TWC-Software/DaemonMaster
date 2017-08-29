@@ -20,7 +20,10 @@
 
 using DaemonMasterCore.Win32.PInvoke;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Security;
+using System.Windows.Documents;
 using Newtonsoft.Json;
 
 namespace DaemonMasterCore

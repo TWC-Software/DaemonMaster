@@ -20,6 +20,7 @@
 using DaemonMasterCore.Win32.PInvoke;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ServiceProcess;
 

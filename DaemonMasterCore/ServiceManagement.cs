@@ -71,7 +71,7 @@ namespace DaemonMasterCore
                     DaemonMasterServicePath + DaemonMasterServiceFile + DaemonMasterServiceParameter,
                     null,
                     null,
-                    "UI0Detect",
+                    DaemonMasterUtils.ConvertStringArrayToDoubleNullTerminatedString(daemon.DependOnService),
                     null,
                     null))
                 {
@@ -286,7 +286,7 @@ namespace DaemonMasterCore
                     if (status.currentState != NativeMethods.SERVICE_STATE.SERVICE_STOPPED)
                         throw new ServiceNotStoppedException();
 
-                    serviceHandle.ChangeConfig(daemon.StartType, daemon.DisplayName);
+                    serviceHandle.ChangeConfig(daemon.StartType, daemon.DisplayName, DaemonMasterUtils.ConvertStringArrayToDoubleNullTerminatedString(daemon.DependOnService));
                     serviceHandle.SetDescription(daemon.Description);
                     serviceHandle.SetDelayedStart(daemon.DelayedStart);
                 }

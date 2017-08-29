@@ -17,13 +17,15 @@
 //   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
+using Newtonsoft.Json;
 using Shell32;
 using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Management;
+using System.Text;
 using System.Windows;
 using System.Windows.Media;
-using Newtonsoft.Json;
 
 namespace DaemonMasterCore
 {
@@ -109,6 +111,29 @@ namespace DaemonMasterCore
             return false;
         }
 
+        public static StringBuilder ConvertListToDoubleNullTerminatedString(ObservableCollection<string> stringList)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (string item in stringList)
+            {
+                stringBuilder.Append(item.Trim()).Append("\0");
+            }
+            stringBuilder.Append("\0");
+
+            return stringBuilder;
+        }
+
+        public static StringBuilder ConvertStringArrayToDoubleNullTerminatedString(string[] stringArray)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (string item in stringArray)
+            {
+                stringBuilder.Append(item.Trim()).Append("\0");
+            }
+            stringBuilder.Append("\0");
+
+            return stringBuilder;
+        }
 
         public static void ExportItem(string serviceName, string path)
         {

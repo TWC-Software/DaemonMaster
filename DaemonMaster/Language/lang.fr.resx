@@ -219,7 +219,7 @@
   <data name="button_switch_to_session_0" xml:space="preserve">
     <value>Passer à la Session 0</value>
   </data>
-  <data name="button_add_service" xml:space="preserve">
+  <data name="button_add" xml:space="preserve">
     <value>Ajouter</value>
   </data>
   <data name="button_delete_service" xml:space="preserve">

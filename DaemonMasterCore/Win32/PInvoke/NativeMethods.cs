@@ -26,10 +26,7 @@ namespace DaemonMasterCore.Win32.PInvoke
 {
     public static partial class NativeMethods
     {
-
-
-
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "CreateServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Auto, SetLastError = true)]
         public static extern ServiceHandle CreateService
         (
             ServiceControlManager hSCManager,
@@ -42,50 +39,50 @@ namespace DaemonMasterCore.Win32.PInvoke
             string lpBinaryPathName,
             string lpLoadOrderGroup,
             string lpdwTagId,
-            string lpDependencies,
+            StringBuilder lpDependencies,
             string lpServiceStartName,
             string lpPassword
         );
 
 
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "OpenSCManagerW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Auto, SetLastError = true)]
         public static extern ServiceControlManager OpenSCManager(string machineName, string databaseName, NativeMethods.SCM_ACCESS dwAccess);
 
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "OpenServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Auto, SetLastError = true)]
         public static extern ServiceHandle OpenService(ServiceControlManager hSCManager, string lpServiceName, NativeMethods.SERVICE_ACCESS dwDesiredAccess);
 
-        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CloseServiceHandle(IntPtr hSCManager);
 
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "StartServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool StartService(ServiceHandle hService, uint dwNumServiceArgs, string[] lpServiceArgVectors);
 
-        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ControlService(ServiceHandle hService, NativeMethods.SERVICE_CONTROL dwControl, ref NativeMethods.SERVICE_STATUS lpServiceStatus);
 
-        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool DeleteService(ServiceHandle hService);
 
-        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Auto)]
         public static extern bool QueryServiceStatusEx(ServiceHandle hService, uint infoLevel, IntPtr buffer, int bufferSize, out int bytesNeeded);
 
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "ChangeServiceConfigW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool ChangeServiceConfig(ServiceHandle hService, NativeMethods.SERVICE_TYPE dwServiceType, NativeMethods.SERVICE_START dwStartType, NativeMethods.SERVICE_ERROR_CONTROL dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, string lpdwTagId, string lpDependencies, string lpServiceStartName, string lpPassword, string lpDisplayName);
+        public static extern bool ChangeServiceConfig(ServiceHandle hService, NativeMethods.SERVICE_TYPE dwServiceType, NativeMethods.SERVICE_START dwStartType, NativeMethods.SERVICE_ERROR_CONTROL dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, string lpdwTagId, StringBuilder lpDependencies, string lpServiceStartName, string lpPassword, string lpDisplayName);
 
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "ChangeServiceConfig2W", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ChangeServiceConfig2(ServiceHandle hService, NativeMethods.INFO_LEVEL dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref NativeMethods.SERVICE_DESCRIPTION lpInfo);
 
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "ChangeServiceConfig2W", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ChangeServiceConfig2(ServiceHandle hService, NativeMethods.INFO_LEVEL dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref NativeMethods.SERVICE_CONFIG_DELAYED_AUTO_START_INFO lpInfo);
 
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "LogonUserW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool LogonUser(
             string lpszUsername,
@@ -96,7 +93,7 @@ namespace DaemonMasterCore.Win32.PInvoke
             out IntPtr phToken
         );
 
-        [DllImport(DLLFiles.ADVAPI32, EntryPoint = "CreateProcessAsUserW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CreateProcessAsUser(
             TokenHandle hToken,
@@ -136,13 +133,13 @@ namespace DaemonMasterCore.Win32.PInvoke
         [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Auto)]
         public static extern uint WTSGetActiveConsoleSessionId();
 
-        [DllImport(DLLFiles.KERNEL32, EntryPoint = "CreateJobObjectW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport(DLLFiles.KERNEL32, CharSet = CharSet.Auto, SetLastError = true)]
         public static extern JobHandle CreateJobObject(SECURITY_ATTRIBUTES lpJobAttributes, string lpName);
 
-        [DllImport(DLLFiles.KERNEL32, SetLastError = true)]
+        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Auto)]
         public static extern bool SetInformationJobObject(JobHandle hJob, JobObjectInfoType infoType, IntPtr lpJobObjectInfo, uint cbJobObjectInfoLength);
 
-        [DllImport(DLLFiles.KERNEL32, SetLastError = true)]
+        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Auto)]
         public static extern bool AssignProcessToJobObject(JobHandle hJob, SafeProcessHandle hProcess);
 
 
@@ -154,7 +151,7 @@ namespace DaemonMasterCore.Win32.PInvoke
 
         //WTSAPI32
 
-        [DllImport(DLLFiles.WTSAPI32, SetLastError = true)]
+        [DllImport(DLLFiles.WTSAPI32, SetLastError = true, CharSet = CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool WTSQueryUserToken(UInt32 sessionId, out TokenHandle Token);
     }

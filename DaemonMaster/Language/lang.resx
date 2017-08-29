@@ -213,7 +213,7 @@
   <data name="button_switch_to_session_0" xml:space="preserve">
     <value>Switch to Session 0</value>
   </data>
-  <data name="button_add_service" xml:space="preserve">
+  <data name="button_add" xml:space="preserve">
     <value>Add</value>
   </data>
   <data name="button_delete_service" xml:space="preserve">
@@ -429,5 +429,35 @@
   </data>
   <data name="cannot_export_daemon" xml:space="preserve">
     <value>Cannot export daemon :(</value>
+  </data>
+  <data name="label_max_restarts" xml:space="preserve">
+    <value>Max Restarts:</value>
+  </data>
+  <data name="placeholder_max_restarts" xml:space="preserve">
+    <value>unlimited restarts =&gt; -1</value>
+  </data>
+  <data name="label_process_kill_time" xml:space="preserve">
+    <value>Process kill time:</value>
+  </data>
+  <data name="placeholder_process_kill_time" xml:space="preserve">
+    <value>0 =&gt; ...</value>
+  </data>
+  <data name="label_process_restart_delay" xml:space="preserve">
+    <value>Process restart delay:</value>
+  </data>
+  <data name="placeholder_process_restart_delay" xml:space="preserve">
+    <value>Time between crasch and restart</value>
+  </data>
+  <data name="label_counter_reset_time" xml:space="preserve">
+    <value>Counter reset time:</value>
+  </data>
+  <data name="placeholder_counter_reset_time" xml:space="preserve">
+    <value>Time befor the restart counter will be reset</value>
+  </data>
+  <data name="label_depend_on_service" xml:space="preserve">
+    <value>Depend on service:</value>
+  </data>
+  <data name="button_remove" xml:space="preserve">
+    <value>Remove</value>
   </data>
 </root>

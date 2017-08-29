@@ -29,7 +29,6 @@ namespace DaemonMasterService
 {
     public partial class Service : ServiceBase
     {
-        private static Process process = null;
         private static Logger _logger = LogManager.GetCurrentClassLogger();
         private static string _serviceName = null;
         private bool startInUserSession = false;

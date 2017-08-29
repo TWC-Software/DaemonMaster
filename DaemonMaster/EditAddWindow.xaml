@@ -18,16 +18,8 @@
         <Button x:Name="buttonCancel" Content="{x:Static resx:lang.button_cancel}" Margin="741,276,0,0"  Click="buttonCancel_OnClick"  Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139"/>
 
         <TabControl VerticalContentAlignment="Center" Margin="0,0,0,42" RenderTransformOrigin="0,0">
-            <TabControl.RenderTransform>
-                <TransformGroup>
-                    <ScaleTransform/>
-                    <SkewTransform AngleX="-0.401"/>
-                    <RotateTransform/>
-                    <TranslateTransform X="-0.993"/>
-                </TransformGroup>
-            </TabControl.RenderTransform>
-            <TabItem Header="{x:Static resx:lang.tabitem_general}">
-                <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,0,0" Height="282" Width="874">
+            <TabItem Header="{x:Static resx:lang.tabitem_general}" IsSelected="True">
+                <Grid>
                     <Label x:Name="labelServiceName" Content="{x:Static resx:lang.label_service_name}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                     <CoreWPF:PlaceholderTextBox x:Name="textBoxServiceName" Height="23" Margin="147,14,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_service_name}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" />
                     <Button x:Name="buttonSearchPath" Content="{x:Static resx:lang.button_search_file}" HorizontalAlignment="Left" Margin="147,194,0,0" VerticalAlignment="Top" Width="247" Click="buttonSearchPath_OnClick"/>
@@ -61,8 +53,28 @@
                     <Button x:Name="buttonLoadShortcut" Content="{x:Static resx:lang.button_load_shortcut}" Margin="399,194,0,0" Click="buttonLoadShortcut_OnClick"  Height="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="465"/>
                 </Grid>
             </TabItem>
-            <!--<TabItem Header="Security" />
-        <TabItem Header="Details" />-->
+            <TabItem Header="Advanced">
+                <Grid>
+                    <CoreWPF:PlaceholderTextBox x:Name="textBoxMaxRestarts" HorizontalAlignment="Left" Height="23" Margin="147,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="318" Placeholder="{x:Static resx:lang.placeholder_max_restarts}"/>
+                    <Label x:Name="labelMaxRestarts" Content="{x:Static resx:lang.label_max_restarts}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
+                    <CoreWPF:PlaceholderTextBox x:Name="textBoxProcessKillTime" HorizontalAlignment="Left" Height="23" Margin="147,39,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="318" Placeholder="{x:Static resx:lang.placeholder_process_kill_time}"/>
+                    <Label x:Name="labelProcessKillTime" Content="{x:Static resx:lang.label_process_kill_time}" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
+                    <CoreWPF:PlaceholderTextBox x:Name="textBoxProcessRestartDelay" HorizontalAlignment="Left" Height="23" Margin="147,65,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="318" Placeholder="{x:Static resx:lang.placeholder_process_restart_delay}"/>
+                    <Label x:Name="labelProcessRestartDelay" Content="{x:Static resx:lang.label_process_restart_delay}" HorizontalAlignment="Left" Margin="10,62,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
+                    <CoreWPF:PlaceholderTextBox x:Name="textBoxCounterResetTime" HorizontalAlignment="Left" Height="23" Margin="147,91,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="318" Placeholder="{x:Static resx:lang.placeholder_counter_reset_time}"/>
+                    <Label x:Name="labelCounterResetTime" Content="{x:Static resx:lang.label_counter_reset_time}" HorizontalAlignment="Left" Margin="10,88,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
+                    <ListBox x:Name="listBoxDependOnService" HorizontalAlignment="Left" Height="104" Margin="147,124,0,0" VerticalAlignment="Top" Width="318"/>
+                    <Label x:Name="labelDependOnService" Content="{x:Static resx:lang.label_depend_on_service}" HorizontalAlignment="Left" Margin="10,124,0,0" VerticalAlignment="Top"/>
+                    <Button x:Name="buttonAddDependentService" Content="{x:Static resx:lang.button_add}" Margin="26,155,777,57"/>
+                    <Button x:Name="buttonRemoveDependentService" Content="{x:Static resx:lang.button_remove}" Margin="26,186,777,26" Click="buttonRemoveDependentService_Click"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Console">
+                <Grid>
+
+
+                </Grid>
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>

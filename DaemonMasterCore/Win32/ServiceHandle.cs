@@ -20,6 +20,7 @@ using DaemonMasterCore.Win32.PInvoke;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Text;
 using Microsoft.Win32.SafeHandles;
 
 namespace DaemonMasterCore.Win32
@@ -77,10 +78,10 @@ namespace DaemonMasterCore.Win32
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
-        public void ChangeConfig(PInvoke.NativeMethods.SERVICE_START startType, string displayName)
+        public void ChangeConfig(PInvoke.NativeMethods.SERVICE_START startType, string displayName, StringBuilder dependencies)
         {
             if (!PInvoke.NativeMethods.ChangeServiceConfig(this, PInvoke.NativeMethods.SERVICE_TYPE.SERVICE_NO_CHANGE, startType,
-                PInvoke.NativeMethods.SERVICE_ERROR_CONTROL.SERVICE_NO_CHANGE, null, null, null, null/*String.Concat(daemon.DependOnService)*/, null, null, displayName))
+                PInvoke.NativeMethods.SERVICE_ERROR_CONTROL.SERVICE_NO_CHANGE, null, null, null, dependencies, null, null, displayName))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 

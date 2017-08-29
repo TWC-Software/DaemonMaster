@@ -16,7 +16,7 @@
     </Window.Resources>
 
     <Grid>
-        <Button x:Name="buttonAdd" Content="{x:Static resx:lang.button_add_service}" HorizontalAlignment="Left" Margin="271,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonAdd_Click"/>
+        <Button x:Name="buttonAdd" Content="{x:Static resx:lang.button_add}" HorizontalAlignment="Left" Margin="271,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonAdd_Click"/>
         <Button x:Name="buttonDelete" Content="{x:Static resx:lang.button_delete_service}" HorizontalAlignment="Left" Margin="431,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonDelete_Click"/>
         <Button x:Name="buttonEdit" Content="{x:Static resx:lang.button_edit_service}" HorizontalAlignment="Left" Margin="351,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonEdit_Click"/>
         <Button x:Name="buttonSwitchToSession0" Content="{x:Static resx:lang.button_switch_to_session_0}" HorizontalAlignment="Left" Margin="271,319,0,0" VerticalAlignment="Top" Width="235" Click="buttonSwitchToSession0_Click"/>
@@ -81,7 +81,7 @@
                 <MenuItem Header="{x:Static resx:lang.button_import}" Click="MenuItem_Import_OnClick"/>
             </MenuItem>
             <MenuItem Header="{x:Static resx:lang.button_edit_service}">
-                <MenuItem Header="{x:Static resx:lang.button_add_service}" Click="MenuItem_AddDaemon_OnClick"/>
+                <MenuItem Header="{x:Static resx:lang.button_add}" Click="MenuItem_AddDaemon_OnClick"/>
                 <MenuItem Header="{x:Static resx:lang.button_edit_service}" Click="MenuItem_EditDaemon_OnClick"/>
                 <MenuItem Header="{x:Static resx:lang.button_delete_service}" Click="MenuItem_RemoveDaemon_OnClick"/>
             </MenuItem>

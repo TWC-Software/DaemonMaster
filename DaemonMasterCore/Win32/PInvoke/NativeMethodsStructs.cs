@@ -24,7 +24,7 @@ namespace DaemonMasterCore.Win32.PInvoke
 {
     public static partial class NativeMethods
     {
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         public class SECURITY_ATTRIBUTES
         {
             public int nLength;
@@ -32,7 +32,7 @@ namespace DaemonMasterCore.Win32.PInvoke
             public int bInheritHandle;
         }
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         public struct SERVICE_STATUS
         {
             public int serviceType;
@@ -44,7 +44,7 @@ namespace DaemonMasterCore.Win32.PInvoke
             public int waitHint;
         }
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         public struct SERVICE_STATUS_PROCESS
         {
             public int serviceType;
@@ -58,19 +58,19 @@ namespace DaemonMasterCore.Win32.PInvoke
             public int serviceFlags;
         }
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         public struct SERVICE_DESCRIPTION
         {
             public string lpDescription;
         }
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         public struct SERVICE_CONFIG_DELAYED_AUTO_START_INFO
         {
             public bool delayedStart;
         }
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         public struct PROCESS_INFORMATION
         {
             public IntPtr hProcess;
@@ -79,7 +79,7 @@ namespace DaemonMasterCore.Win32.PInvoke
             public uint dwThreadId;
         }
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         public struct STARTUPINFO
         {
             public int cb;
@@ -102,7 +102,7 @@ namespace DaemonMasterCore.Win32.PInvoke
             public IntPtr hStdError;
         }
 
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         public struct JOBOBJECT_BASIC_LIMIT_INFORMATION
         {
             public Int64 PerProcessUserTimeLimit;
@@ -116,7 +116,7 @@ namespace DaemonMasterCore.Win32.PInvoke
             public UInt32 SchedulingClass;
         }
 
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         public struct IO_COUNTERS
         {
             public UInt64 ReadOperationCount;
@@ -127,7 +127,7 @@ namespace DaemonMasterCore.Win32.PInvoke
             public UInt64 OtherTransferCount;
         }
 
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         public struct JOBOBJECT_EXTENDED_LIMIT_INFORMATION
         {
             public JOBOBJECT_BASIC_LIMIT_INFORMATION BasicLimitInformation;
