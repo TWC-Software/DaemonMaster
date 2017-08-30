@@ -205,7 +205,7 @@
     <value>WARNUNG: In Windows 10 können sie ihre Maus und ihre Tastatur nicht benutzen!</value>
   </data>
   <data name="title" xml:space="preserve">
-    <value>DaemonMaster Version 1</value>
+    <value>DaemonMaster Version 0.2.0.0</value>
   </data>
   <data name="currently_unavailable" xml:space="preserve">
     <value>Derzeit nicht verfügbar :(</value>

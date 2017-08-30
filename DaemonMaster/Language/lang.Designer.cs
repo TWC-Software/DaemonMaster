@@ -1061,7 +1061,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die DeamonMaster Version 1 ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die DeamonMaster Version 0.2.0.0 ähnelt.
         /// </summary>
         public static string title {
             get {

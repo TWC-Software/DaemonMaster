@@ -184,7 +184,7 @@
     <value>Service successfully stopped!</value>
   </data>
   <data name="title" xml:space="preserve">
-    <value>DeamonMaster Version 1</value>
+    <value>DeamonMaster Version 0.2.0.0</value>
   </data>
   <data name="success" xml:space="preserve">
     <value>Success</value>

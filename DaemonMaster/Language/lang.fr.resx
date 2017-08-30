@@ -214,7 +214,7 @@
     <value>Ajouter</value>
   </data>
   <data name="title" xml:space="preserve">
-    <value>DeamonMaster, Version 1 !</value>
+    <value>DeamonMaster, Version 0.2.0.0 !</value>
   </data>
   <data name="button_switch_to_session_0" xml:space="preserve">
     <value>Passer à la Session 0</value>
