@@ -336,11 +336,18 @@ namespace DaemonMaster
         {
             if (listViewDaemons.Items.Count <= 256)
             {
-                EditAddWindow addProcessWindow = EditAddWindow.OpenEditAddWindowWithDefaultValues(); // Neues Event Im EditAddWindow Fenster
-                var dialogResult = addProcessWindow.ShowDialog(); // Fenster geht auf, Code geht erst weiter wenn Fesnter geschlossen ist
-                if (dialogResult.HasValue && dialogResult.Value)
+                try
                 {
-                    _processCollection.Add(addProcessWindow.DaemonItem);
+                    EditAddWindow addProcessWindow = EditAddWindow.OpenEditAddWindowWithDefaultValues(); // Neues Event Im EditAddWindow Fenster
+                    var dialogResult = addProcessWindow.ShowDialog(); // Fenster geht auf, Code geht erst weiter wenn Fenster geschlossen ist
+                    if (dialogResult.HasValue && dialogResult.Value)
+                    {
+                        _processCollection.Add(addProcessWindow.DaemonItem);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(_resManager.GetString("cannot_load_data_from_registry") + "\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             else
@@ -351,11 +358,18 @@ namespace DaemonMaster
 
         private void ImportDaemon(Daemon daemon)
         {
-            EditAddWindow addProcessWindow = EditAddWindow.OpenEditAddWindowForImporting(daemon); // Neues Event Im EditAddWindow Fenster
-            var dialogResult = addProcessWindow.ShowDialog(); // Fenster geht auf, Code geht erst weiter wenn Fesnter geschlossen ist
-            if (dialogResult.HasValue && dialogResult.Value)
+            try
             {
-                _processCollection.Add(addProcessWindow.DaemonItem);
+                EditAddWindow addProcessWindow = EditAddWindow.OpenEditAddWindowForImporting(daemon); // Neues Event Im EditAddWindow Fenster
+                var dialogResult = addProcessWindow.ShowDialog(); // Fenster geht auf, Code geht erst weiter wenn Fesnter geschlossen ist
+                if (dialogResult.HasValue && dialogResult.Value)
+                {
+                    _processCollection.Add(addProcessWindow.DaemonItem);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(_resManager.GetString("cannot_load_data_from_registry") + "\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -407,11 +421,18 @@ namespace DaemonMaster
                 }
             }
 
-            EditAddWindow addProcessWindow = EditAddWindow.OpenEditAddWindowForEditing(daemonItem);
-            var dialogResult = addProcessWindow.ShowDialog();
-            if (dialogResult.HasValue && dialogResult.Value)
+            try
             {
-                _processCollection[_processCollection.IndexOf(addProcessWindow.OldDaemonItem)] = addProcessWindow.DaemonItem;
+                EditAddWindow addProcessWindow = EditAddWindow.OpenEditAddWindowForEditing(daemonItem);
+                var dialogResult = addProcessWindow.ShowDialog();
+                if (dialogResult.HasValue && dialogResult.Value)
+                {
+                    _processCollection[_processCollection.IndexOf(addProcessWindow.OldDaemonItem)] = addProcessWindow.DaemonItem;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(_resManager.GetString("cannot_load_data_from_registry") + "\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

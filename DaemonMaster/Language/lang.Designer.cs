@@ -358,6 +358,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Is console application ähnelt.
+        /// </summary>
+        public static string checkbox_is_console_app {
+            get {
+                return ResourceManager.GetString("checkbox_is_console_app", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Use Local System account ähnelt.
         /// </summary>
         public static string checkbox_use_local_system_account {
@@ -566,7 +575,16 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Depend on: ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Depend on (Group): ähnelt.
+        /// </summary>
+        public static string label_depend_on_group {
+            get {
+                return ResourceManager.GetString("label_depend_on_group", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Depend on (Service): ähnelt.
         /// </summary>
         public static string label_depend_on_service {
             get {
@@ -661,6 +679,15 @@ namespace DaemonMaster.Language {
         public static string label_service_name {
             get {
                 return ResourceManager.GetString("label_service_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Use to shutdown: ähnelt.
+        /// </summary>
+        public static string label_shutdown_console_app {
+            get {
+                return ResourceManager.GetString("label_shutdown_console_app", resourceCulture);
             }
         }
         
@@ -800,6 +827,24 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Use Ctrl+Break ähnelt.
+        /// </summary>
+        public static string radiobutton_use_ctrlbreak {
+            get {
+                return ResourceManager.GetString("radiobutton_use_ctrlbreak", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Use Ctrl+C ähnelt.
+        /// </summary>
+        public static string radiobutton_use_ctrlc {
+            get {
+                return ResourceManager.GetString("radiobutton_use_ctrlc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Service ähnelt.
         /// </summary>
         public static string service {
@@ -917,11 +962,11 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Console ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Dependencies ähnelt.
         /// </summary>
-        public static string tabitem_console {
+        public static string tabitem_dependencies {
             get {
-                return ResourceManager.GetString("tabitem_console", resourceCulture);
+                return ResourceManager.GetString("tabitem_dependencies", resourceCulture);
             }
         }
         

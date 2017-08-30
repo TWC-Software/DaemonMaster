@@ -445,12 +445,27 @@
     <value>Zeit bevor der Zähler zurückgesetzt wird</value>
   </data>
   <data name="label_depend_on_service" xml:space="preserve">
-    <value>Abhängig von:</value>
+    <value>Abhängig von (Dienst):</value>
   </data>
   <data name="tabitem_advanced" xml:space="preserve">
     <value>Erweitert</value>
   </data>
-  <data name="tabitem_console" xml:space="preserve">
-    <value>Konsole</value>
+  <data name="checkbox_is_console_app" xml:space="preserve">
+    <value>Konsolenanwendung</value>
+  </data>
+  <data name="tabitem_dependencies" xml:space="preserve">
+    <value>Abhängigkeiten</value>
+  </data>
+  <data name="label_depend_on_group" xml:space="preserve">
+    <value>Abhänig von (Gruppe):</value>
+  </data>
+  <data name="radiobutton_use_ctrlc" xml:space="preserve">
+    <value>Nutze Ctrl+C</value>
+  </data>
+  <data name="radiobutton_use_ctrlbreak" xml:space="preserve">
+    <value>Nutze Ctrl+Break</value>
+  </data>
+  <data name="label_shutdown_console_app" xml:space="preserve">
+    <value>Zum stoppen:</value>
   </data>
 </root>

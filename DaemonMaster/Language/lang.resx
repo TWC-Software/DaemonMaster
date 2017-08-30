@@ -443,7 +443,7 @@
     <value>Time befor the restart counter will be reset</value>
   </data>
   <data name="label_depend_on_service" xml:space="preserve">
-    <value>Depend on:</value>
+    <value>Depend on (Service):</value>
   </data>
   <data name="button_remove" xml:space="preserve">
     <value>Remove</value>
@@ -451,7 +451,22 @@
   <data name="tabitem_advanced" xml:space="preserve">
     <value>Advanced</value>
   </data>
-  <data name="tabitem_console" xml:space="preserve">
-    <value>Console</value>
+  <data name="checkbox_is_console_app" xml:space="preserve">
+    <value>Is console application</value>
+  </data>
+  <data name="tabitem_dependencies" xml:space="preserve">
+    <value>Dependencies</value>
+  </data>
+  <data name="label_depend_on_group" xml:space="preserve">
+    <value>Depend on (Group):</value>
+  </data>
+  <data name="radiobutton_use_ctrlc" xml:space="preserve">
+    <value>Use Ctrl+C</value>
+  </data>
+  <data name="radiobutton_use_ctrlbreak" xml:space="preserve">
+    <value>Use Ctrl+Break</value>
+  </data>
+  <data name="label_shutdown_console_app" xml:space="preserve">
+    <value>Use to shutdown:</value>
   </data>
 </root>

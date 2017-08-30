@@ -63,17 +63,25 @@
                     <Label x:Name="labelProcessRestartDelay" Content="{x:Static resx:lang.label_process_restart_delay}" HorizontalAlignment="Left" Margin="10,62,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
                     <CoreWPF:PlaceholderTextBox x:Name="textBoxCounterResetTime" HorizontalAlignment="Left" Height="23" Margin="239,91,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="268" Placeholder="{x:Static resx:lang.placeholder_counter_reset_time}"/>
                     <Label x:Name="labelCounterResetTime" Content="{x:Static resx:lang.label_counter_reset_time}" HorizontalAlignment="Left" Margin="10,88,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
-                    <ListBox x:Name="listBoxDependOnService" HorizontalAlignment="Left" Height="104" Margin="147,124,0,0" VerticalAlignment="Top" Width="360" DisplayMemberPath="DisplayName"/>
-                    <Label x:Name="labelDependOnService" Content="{x:Static resx:lang.label_depend_on_service}" HorizontalAlignment="Left" Margin="10,124,0,0" VerticalAlignment="Top"/>
-                    <Button x:Name="buttonAddDependentService" Content="{x:Static resx:lang.button_add}" Margin="26,155,777,57" Click="buttonAddDependentService_Click"/>
-                    <Button x:Name="buttonRemoveDependentService" Content="{x:Static resx:lang.button_remove}" Margin="26,186,777,26" Click="buttonRemoveDependentService_Click"/>
-                    <ListBox x:Name="listBoxAllServices" Margin="514,124,10,10" DisplayMemberPath="DisplayName"/>
+                    <CheckBox x:Name="checkBoxIsConsoleApp" Content="{x:Static resx:lang.checkbox_is_console_app}" HorizontalAlignment="Left" Margin="10,136,0,0" VerticalAlignment="Top"/>
+                    <RadioButton x:Name="radioButtonUseCtrlC" Content="{x:Static resx:lang.radiobutton_use_ctrlc}" HorizontalAlignment="Left" Margin="387,159,0,0" VerticalAlignment="Top" IsEnabled="{Binding ElementName=checkBoxIsConsoleApp, Path=IsChecked}"/>
+                    <RadioButton x:Name="radioButtonUseCtrlBreak" Content="{x:Static resx:lang.radiobutton_use_ctrlbreak}" HorizontalAlignment="Left" Margin="387,139,0,0" VerticalAlignment="Top" IsChecked="True" IsEnabled="{Binding ElementName=checkBoxIsConsoleApp, Path=IsChecked}"/>
+                    <Label x:Name="labelShutdownConsoleApp" Content="{x:Static resx:lang.label_shutdown_console_app}" HorizontalAlignment="Left" Margin="239,133,0,0" VerticalAlignment="Top" IsEnabled="{Binding ElementName=checkBoxIsConsoleApp, Path=IsChecked}"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="{x:Static resx:lang.tabitem_console}">
+            <TabItem Header="{x:Static resx:lang.tabitem_dependencies}">
                 <Grid>
+                    <ListBox x:Name="listBoxDependOnService" HorizontalAlignment="Left" Height="104" Margin="147,10,0,0" VerticalAlignment="Top" Width="360" DisplayMemberPath="DisplayName"/>
+                    <Label x:Name="labelDependOnService" Content="{x:Static resx:lang.label_depend_on_service}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                    <Button x:Name="buttonAddDependentService" Content="{x:Static resx:lang.button_add}" Margin="26,41,777,171" Click="buttonAddDependentService_Click"/>
+                    <Button x:Name="buttonRemoveDependentService" Content="{x:Static resx:lang.button_remove}" Margin="26,72,777,140" Click="buttonRemoveDependentService_Click"/>
+                    <ListBox x:Name="listBoxAllServices" Margin="514,10,10,124" DisplayMemberPath="DisplayName"/>
 
-
+                    <ListBox x:Name="listBoxDependOnGroup" HorizontalAlignment="Left" Height="104" Margin="147,119,0,0" VerticalAlignment="Top" Width="360"/>
+                    <Label x:Name="labelDependOnGroup" Content="{x:Static resx:lang.label_depend_on_group}" HorizontalAlignment="Left" Margin="10,119,0,0" VerticalAlignment="Top"/>
+                    <Button x:Name="buttonAddDependentGroup" Content="{x:Static resx:lang.button_add}" Margin="26,150,777,62" Click="buttonAddDependentGroup_Click"/>
+                    <Button x:Name="buttonRemoveDependentGroup" Content="{x:Static resx:lang.button_remove}" Margin="26,181,777,31" Click="buttonRemoveDependentGroup_Click"/>
+                    <ListBox x:Name="listBoxAllGroups" Margin="514,119,10,15"/>
                 </Grid>
             </TabItem>
         </TabControl>

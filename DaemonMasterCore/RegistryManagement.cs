@@ -87,7 +87,8 @@ namespace DaemonMasterCore
                     ServiceName = Convert.ToString(serviceName),
                     DisplayName = Convert.ToString(key.GetValue("DisplayName")),
                     Description = Convert.ToString(key.GetValue("Description")),
-                    DependOnService = (string[])key.GetValue("DependOnService", String.Empty),
+                    DependOnService = (string[])key.GetValue("DependOnService", new string[0]),
+                    DependOnGroup = (string[])key.GetValue("DependOnGroup", new string[0]),
                     DelayedStart = Convert.ToBoolean(key.GetValue("DelayedAutostart", false)),
                     StartType = (NativeMethods.SERVICE_START)Convert.ToUInt32(key.GetValue("Start", 2))
                 };
@@ -153,6 +154,18 @@ namespace DaemonMasterCore
                 }
             }
             return daemons;
+        }
+
+        public static string[] GetAllServiceGroups()
+        {
+            //Open Regkey folder
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\ServiceGroupOrder", false))
+            {
+                if (key == null)
+                    throw new Exception("Can't open registry key!");
+
+                return (string[])key.GetValue("List", String.Empty);
+            }
         }
 
 

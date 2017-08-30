@@ -112,30 +112,6 @@ namespace DaemonMasterCore
             return false;
         }
 
-        public static StringBuilder ConvertListToDoubleNullTerminatedString(ObservableCollection<string> stringList)
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            foreach (string item in stringList)
-            {
-                stringBuilder.Append(item.Trim()).Append("\0");
-            }
-            stringBuilder.Append("\0");
-
-            return stringBuilder;
-        }
-
-        public static StringBuilder ConvertStringArrayToDoubleNullTerminatedString(string[] stringArray)
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            foreach (string item in stringArray)
-            {
-                stringBuilder.Append(item.Trim()).Append("\0");
-            }
-            stringBuilder.Append("\0");
-
-            return stringBuilder;
-        }
-
         public static string GetDisplayName(string serviceName)
         {
             using (ServiceController sc = new ServiceController(serviceName))

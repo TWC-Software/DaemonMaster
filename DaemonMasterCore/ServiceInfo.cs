@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DaemonMasterCore
 {
-    public class ServiceInfo
+    public struct ServiceInfo
     {
         public string DisplayName { get; set; }
         public string ServiceName { get; set; }

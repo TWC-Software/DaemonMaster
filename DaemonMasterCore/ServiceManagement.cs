@@ -24,7 +24,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.ServiceProcess;
+using System.Text;
 using NativeMethods = DaemonMasterCore.Win32.PInvoke.NativeMethods;
 
 namespace DaemonMasterCore
@@ -71,7 +73,7 @@ namespace DaemonMasterCore
                     DaemonMasterServicePath + DaemonMasterServiceFile + DaemonMasterServiceParameter,
                     null,
                     null,
-                    DaemonMasterUtils.ConvertStringArrayToDoubleNullTerminatedString(daemon.DependOnService),
+                    ConvertDependenciesArraysToDoubleNullTerminatedString(daemon.DependOnService, daemon.DependOnGroup),
                     null,
                     null))
                 {
@@ -286,7 +288,7 @@ namespace DaemonMasterCore
                     if (status.currentState != NativeMethods.SERVICE_STATE.SERVICE_STOPPED)
                         throw new ServiceNotStoppedException();
 
-                    serviceHandle.ChangeConfig(daemon.StartType, daemon.DisplayName, DaemonMasterUtils.ConvertStringArrayToDoubleNullTerminatedString(daemon.DependOnService));
+                    serviceHandle.ChangeConfig(daemon.StartType, daemon.DisplayName, ConvertDependenciesArraysToDoubleNullTerminatedString(daemon.DependOnService, daemon.DependOnGroup));
                     serviceHandle.SetDescription(daemon.Description);
                     serviceHandle.SetDelayedStart(daemon.DelayedStart);
                 }
@@ -367,6 +369,31 @@ namespace DaemonMasterCore
             }
             return processId;
         }
+
+
+        /// <summary>
+        /// Join service dependencies and group dependencies string arrays and add double null termination to them
+        /// </summary>
+        /// <param name="stringServiceDependencies"></param>
+        /// <param name="stringGroupDependencies"></param>
+        /// <returns></returns>
+        private static StringBuilder ConvertDependenciesArraysToDoubleNullTerminatedString(string[] stringServiceDependencies, string[] stringGroupDependencies)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (string item in stringServiceDependencies)
+            {
+                stringBuilder.Append(item.Trim()).Append("\0");
+            }
+
+            foreach (string item in stringGroupDependencies)
+            {
+                stringBuilder.Append(NativeMethods.SC_GROUP_IDENTIFIER + item.Trim()).Append("\0");
+            }
+            stringBuilder.Append("\0");
+
+            return stringBuilder;
+        }
+
 
         #endregion
     }

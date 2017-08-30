@@ -26,6 +26,7 @@ namespace DaemonMasterCore.Win32.PInvoke
         /// </summary>
         public const uint SC_STATUS_PROCESS_INFO = 0x0;
         public const int CREATE_NEW_CONSOLE = 0x00000010;
+        public const string SC_GROUP_IDENTIFIER = "+";
 
     }
 }

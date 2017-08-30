@@ -18,7 +18,9 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
+using DaemonMaster.Language;
 using DaemonMasterCore;
+using DaemonMasterCore.Exceptions;
 using DaemonMasterCore.Win32.PInvoke;
 using Microsoft.Win32;
 using System;
@@ -31,8 +33,6 @@ using System.Resources;
 using System.ServiceProcess;
 using System.Windows;
 using System.Windows.Data;
-using DaemonMaster.Language;
-using DaemonMasterCore.Exceptions;
 using Tulpep.ActiveDirectoryObjectPicker;
 
 namespace DaemonMaster
@@ -44,33 +44,29 @@ namespace DaemonMaster
     {
         private readonly ResourceManager _resManager = new ResourceManager(typeof(lang));
 
-        public DaemonItem DaemonItem { get; private set; } = null;
-        public DaemonItem OldDaemonItem { get; private set; } = null;
-        private ObservableCollection<ServiceInfo> _dependObservableCollection;
-        private ObservableCollection<ServiceInfo> _serviceObservableCollection;
-        private bool onEditMode = false;
-        private Daemon daemon = null;
+        public DaemonItem DaemonItem { get; private set; }
+        public DaemonItem OldDaemonItem { get; private set; }
+
+        private ObservableCollection<ServiceInfo> _dependOnServiceObservableCollection;
+        private ObservableCollection<ServiceInfo> _allServicesObservableCollection;
+        private ObservableCollection<string> _dependOnGroupObservableCollection;
+        private ObservableCollection<string> _allGroupsObservableCollection;
+
+        private bool _onEditMode = false;
+        private Daemon _daemon = null;
 
         private EditAddWindow()
         {
             InitializeComponent();
 
             textBoxFilePath.IsReadOnly = true;
-            daemon = new Daemon();
+            _daemon = new Daemon();
         }
 
         public static EditAddWindow OpenEditAddWindowWithDefaultValues()
         {
             EditAddWindow editAddWindow = new EditAddWindow();
-            try
-            {
-                editAddWindow.LoadDataIntoUI(editAddWindow.daemon);
-            }
-            catch (Exception)
-            {
-                editAddWindow.DialogResult = false;
-                editAddWindow.Close();
-            }
+            editAddWindow.LoadDataIntoUI(editAddWindow._daemon);
             return editAddWindow;
         }
 
@@ -80,38 +76,20 @@ namespace DaemonMaster
             editAddWindow.textBoxServiceName.IsReadOnly = true;
             editAddWindow.OldDaemonItem = daemonItem;
 
-            try
-            {
-                if (ServiceManagement.StopService(daemonItem.ServiceName) < 0)
-                    throw new ServiceNotStoppedException();
+            if (ServiceManagement.StopService(daemonItem.ServiceName) < 0)
+                throw new ServiceNotStoppedException();
 
-                editAddWindow.daemon = RegistryManagement.LoadDaemonFromRegistry(daemonItem.ServiceName);
-                editAddWindow.LoadDataIntoUI(editAddWindow.daemon);
+            editAddWindow._daemon = RegistryManagement.LoadDaemonFromRegistry(daemonItem.ServiceName);
+            editAddWindow.LoadDataIntoUI(editAddWindow._daemon);
 
-                editAddWindow.onEditMode = true;
-            }
-            catch (Exception)
-            {
-                MessageBox.Show(editAddWindow._resManager.GetString("cannot_load_data_from_registry"), editAddWindow._resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-
-                editAddWindow.DialogResult = false;
-                editAddWindow.Close();
-            }
+            editAddWindow._onEditMode = true;
             return editAddWindow;
         }
 
         public static EditAddWindow OpenEditAddWindowForImporting(Daemon daemon)
         {
             EditAddWindow editAddWindow = new EditAddWindow();
-            try
-            {
-                editAddWindow.LoadDataIntoUI(daemon);
-            }
-            catch (Exception)
-            {
-                editAddWindow.DialogResult = false;
-                editAddWindow.Close();
-            }
+            editAddWindow.LoadDataIntoUI(daemon);
             return editAddWindow;
         }
 
@@ -132,6 +110,9 @@ namespace DaemonMaster
             textBoxMaxRestarts.Text = daemon.MaxRestarts.ToString();
             textBoxProcessKillTime.Text = daemon.ProcessKillTime.ToString();
             textBoxProcessRestartDelay.Text = daemon.ProcessRestartDelay.ToString();
+            checkBoxIsConsoleApp.IsChecked = _daemon.ConsoleApplication;
+            radioButtonUseCtrlC.IsChecked = _daemon.UseCtrlC;
+            radioButtonUseCtrlBreak.IsChecked = !_daemon.UseCtrlC;
 
 
             if (String.IsNullOrWhiteSpace(daemon.Username) || daemon.UseLocalSystem || daemon.Password == null)
@@ -162,10 +143,10 @@ namespace DaemonMaster
                     break;
             }
 
-            #region Listboxes
+            #region Dependency Listboxes
 
-            //Load Data into _dependObservableCollection
-            _dependObservableCollection = new ObservableCollection<ServiceInfo>();
+            //Load Data into _dependOnServiceObservableCollection
+            _dependOnServiceObservableCollection = new ObservableCollection<ServiceInfo>();
             foreach (var dep in daemon.DependOnService)
             {
                 ServiceInfo serviceInfo = new ServiceInfo()
@@ -174,15 +155,15 @@ namespace DaemonMaster
                     ServiceName = dep
                 };
 
-                _dependObservableCollection.Add(serviceInfo);
+                _dependOnServiceObservableCollection.Add(serviceInfo);
             }
             //Sort list alphabetical
-            ICollectionView collectionView1 = CollectionViewSource.GetDefaultView(_dependObservableCollection);
+            ICollectionView collectionView1 = CollectionViewSource.GetDefaultView(_dependOnServiceObservableCollection);
             collectionView1.SortDescriptions.Add(new SortDescription("DisplayName", ListSortDirection.Ascending));
             listBoxDependOnService.ItemsSource = collectionView1;
 
-            //Load Data into _serviceObservableCollection
-            _serviceObservableCollection = new ObservableCollection<ServiceInfo>();
+            //Load Data into _allServicesObservableCollection
+            _allServicesObservableCollection = new ObservableCollection<ServiceInfo>();
             foreach (var service in ServiceController.GetServices())
             {
                 ServiceInfo serviceInfo = new ServiceInfo()
@@ -191,13 +172,27 @@ namespace DaemonMaster
                     ServiceName = service.ServiceName
                 };
 
-                if (_dependObservableCollection.All(x => x.ServiceName != serviceInfo.ServiceName))
-                    _serviceObservableCollection.Add(serviceInfo);
+                if (_dependOnServiceObservableCollection.All(x => x.ServiceName != serviceInfo.ServiceName))
+                    _allServicesObservableCollection.Add(serviceInfo);
             }
             //Sort list alphabetical
-            ICollectionView collectionView2 = CollectionViewSource.GetDefaultView(_serviceObservableCollection);
+            ICollectionView collectionView2 = CollectionViewSource.GetDefaultView(_allServicesObservableCollection);
             collectionView2.SortDescriptions.Add(new SortDescription("DisplayName", ListSortDirection.Ascending));
             listBoxAllServices.ItemsSource = collectionView2;
+
+            //Load Data into _allGroupsObservableCollection
+            _allGroupsObservableCollection = new ObservableCollection<string>(RegistryManagement.GetAllServiceGroups());
+            //Sort list alphabetical
+            ICollectionView collectionView3 = CollectionViewSource.GetDefaultView(_allGroupsObservableCollection);
+            collectionView3.SortDescriptions.Add(new SortDescription());
+            listBoxAllGroups.ItemsSource = collectionView3;
+
+            //Load Data into _dependOnGroupObservableCollection
+            _dependOnGroupObservableCollection = new ObservableCollection<string>(daemon.DependOnGroup);
+            //Sort list alphabetical
+            ICollectionView collectionView4 = CollectionViewSource.GetDefaultView(_dependOnGroupObservableCollection);
+            collectionView3.SortDescriptions.Add(new SortDescription());
+            listBoxDependOnGroup.ItemsSource = collectionView4;
 
             #endregion
         }
@@ -318,8 +313,8 @@ namespace DaemonMaster
             if (listBoxDependOnService.SelectedItem == null)
                 return;
 
-            _serviceObservableCollection.Add((ServiceInfo)listBoxDependOnService.SelectedItem);
-            _dependObservableCollection.Remove((ServiceInfo)listBoxDependOnService.SelectedItem);
+            _allServicesObservableCollection.Add((ServiceInfo)listBoxDependOnService.SelectedItem);
+            _dependOnServiceObservableCollection.Remove((ServiceInfo)listBoxDependOnService.SelectedItem);
         }
 
         private void buttonAddDependentService_Click(object sender, RoutedEventArgs e)
@@ -327,8 +322,26 @@ namespace DaemonMaster
             if (listBoxAllServices.SelectedItem == null)
                 return;
 
-            _dependObservableCollection.Add((ServiceInfo)listBoxAllServices.SelectedItem);
-            _serviceObservableCollection.Remove((ServiceInfo)listBoxAllServices.SelectedItem);
+            _dependOnServiceObservableCollection.Add((ServiceInfo)listBoxAllServices.SelectedItem);
+            _allServicesObservableCollection.Remove((ServiceInfo)listBoxAllServices.SelectedItem);
+        }
+
+        private void buttonAddDependentGroup_Click(object sender, RoutedEventArgs e)
+        {
+            if (listBoxAllGroups.SelectedItem == null)
+                return;
+
+            _dependOnGroupObservableCollection.Add((string)listBoxAllGroups.SelectedItem);
+            _allGroupsObservableCollection.Remove((string)listBoxAllGroups.SelectedItem);
+        }
+
+        private void buttonRemoveDependentGroup_Click(object sender, RoutedEventArgs e)
+        {
+            if (listBoxDependOnGroup.SelectedItem == null)
+                return;
+
+            _allGroupsObservableCollection.Add((string)listBoxDependOnGroup.SelectedItem);
+            _dependOnGroupObservableCollection.Remove((string)listBoxDependOnGroup.SelectedItem);
         }
 
         #endregion
@@ -356,13 +369,14 @@ namespace DaemonMaster
                     !int.TryParse(textBoxMaxRestarts.Text, out var maxRestarts) ||
                     !int.TryParse(textBoxProcessKillTime.Text, out var processKillTime) ||
                     !int.TryParse(textBoxProcessRestartDelay.Text, out var processRestartDelay) ||
-                    !int.TryParse(textBoxCounterResetTime.Text, out var counterResetTime))
+                    !int.TryParse(textBoxCounterResetTime.Text, out var counterResetTime) ||
+                    ((checkBoxIsConsoleApp.IsChecked ?? false) && !(radioButtonUseCtrlBreak.IsChecked ?? true) && !(radioButtonUseCtrlC.IsChecked ?? true)))
                 {
                     MessageBox.Show(_resManager.GetString("invalid_values", CultureInfo.CurrentUICulture), _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
-                if (!(bool)checkBoxUseLocalSystem.IsChecked)
+                if (!checkBoxUseLocalSystem.IsChecked ?? true)
                 {
                     if (String.IsNullOrWhiteSpace(textBoxUsername.Text) ||
                         String.IsNullOrWhiteSpace(textBoxPassword.Password))
@@ -380,12 +394,12 @@ namespace DaemonMaster
                             return;
                         }
 
-                        daemon.Username = textBoxUsername.Text;
-                        daemon.Password = textBoxPassword.SecurePassword;
+                        _daemon.Username = textBoxUsername.Text;
+                        _daemon.Password = textBoxPassword.SecurePassword;
                     }
                     else
                     {
-                        if (!SystemManagement.ValidateUserWin32(textBoxUsername.Text, daemon.Password))
+                        if (!SystemManagement.ValidateUserWin32(textBoxUsername.Text, _daemon.Password))
                         {
                             MessageBox.Show(_resManager.GetString("invalid_user", CultureInfo.CurrentUICulture), _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
                             return;
@@ -394,76 +408,79 @@ namespace DaemonMaster
                 }
                 else
                 {
-                    daemon.Username = String.Empty;
-                    daemon.Password = null;
+                    _daemon.Username = String.Empty;
+                    _daemon.Password = null;
                 }
 
                 string fileDir = Path.GetDirectoryName(textBoxFilePath.Text);
                 string fileName = Path.GetFileName(textBoxFilePath.Text);
                 string fileExtension = Path.GetExtension(textBoxFilePath.Text);
 
-                daemon.UseLocalSystem = (bool)checkBoxUseLocalSystem.IsChecked;
+                _daemon.UseLocalSystem = checkBoxUseLocalSystem.IsChecked ?? true;
 
-                daemon.DisplayName = textBoxDisplayName.Text;
-                daemon.ServiceName = "DaemonMaster_" + textBoxServiceName.Text;
+                _daemon.DisplayName = textBoxDisplayName.Text;
+                _daemon.ServiceName = "DaemonMaster_" + textBoxServiceName.Text;
 
-                daemon.FileDir = fileDir;
-                daemon.FileName = fileName;
-                daemon.FileExtension = fileExtension;
+                _daemon.FileDir = fileDir;
+                _daemon.FileName = fileName;
+                _daemon.FileExtension = fileExtension;
 
-                daemon.Parameter = textBoxParam.Text;
-                daemon.Description = textBoxDescription.Text;
+                _daemon.Parameter = textBoxParam.Text;
+                _daemon.Description = textBoxDescription.Text;
 
-                daemon.MaxRestarts = maxRestarts;
-                daemon.ProcessKillTime = processKillTime;
-                daemon.ProcessRestartDelay = processRestartDelay;
-                daemon.CounterResetTime = counterResetTime;
-                daemon.DependOnService = _dependObservableCollection.Select(x => x.ServiceName).ToArray();
+                _daemon.MaxRestarts = maxRestarts;
+                _daemon.ProcessKillTime = processKillTime;
+                _daemon.ProcessRestartDelay = processRestartDelay;
+                _daemon.CounterResetTime = counterResetTime;
+                _daemon.DependOnService = _dependOnServiceObservableCollection.Select(x => x.ServiceName).ToArray();
+                _daemon.DependOnGroup = _dependOnGroupObservableCollection.ToArray();
+                _daemon.ConsoleApplication = checkBoxIsConsoleApp.IsChecked ?? false;
+                _daemon.UseCtrlC = _daemon.ConsoleApplication && (radioButtonUseCtrlC.IsChecked ?? true) && !(radioButtonUseCtrlBreak.IsChecked ?? false);
 
                 switch (comboBoxStartType.SelectedIndex)
                 {
 
                     //Automatic
                     case 0:
-                        daemon.DelayedStart = false;
-                        daemon.StartType = NativeMethods.SERVICE_START.SERVICE_AUTO_START;
+                        _daemon.DelayedStart = false;
+                        _daemon.StartType = NativeMethods.SERVICE_START.SERVICE_AUTO_START;
                         break;
 
 
                     //Automatic with delay
                     case 1:
-                        daemon.DelayedStart = true;
-                        daemon.StartType = NativeMethods.SERVICE_START.SERVICE_AUTO_START;
+                        _daemon.DelayedStart = true;
+                        _daemon.StartType = NativeMethods.SERVICE_START.SERVICE_AUTO_START;
                         break;
 
                     //Manual
                     case 2:
-                        daemon.DelayedStart = false;
-                        daemon.StartType = NativeMethods.SERVICE_START.SERVICE_DEMAND_START;
+                        _daemon.DelayedStart = false;
+                        _daemon.StartType = NativeMethods.SERVICE_START.SERVICE_DEMAND_START;
                         break;
 
                     //Disabled
                     case 3:
-                        daemon.DelayedStart = false;
-                        daemon.StartType = NativeMethods.SERVICE_START.SERVICE_DISABLED;
+                        _daemon.DelayedStart = false;
+                        _daemon.StartType = NativeMethods.SERVICE_START.SERVICE_DISABLED;
                         break;
                 }
 
 
 
 
-                if (!onEditMode)
+                if (!_onEditMode)
                 {
                     try
                     {
-                        ServiceManagement.CreateInteractiveService(daemon);
-                        RegistryManagement.SaveInRegistry(daemon);
+                        ServiceManagement.CreateInteractiveService(_daemon);
+                        RegistryManagement.SaveInRegistry(_daemon);
 
                         DaemonItem = new DaemonItem
                         {
-                            DisplayName = daemon.DisplayName,
-                            ServiceName = daemon.ServiceName,
-                            FullPath = daemon.FullPath
+                            DisplayName = _daemon.DisplayName,
+                            ServiceName = _daemon.ServiceName,
+                            FullPath = _daemon.FullPath
                         };
 
                         MessageBox.Show(
@@ -486,14 +503,14 @@ namespace DaemonMaster
                 {
                     try
                     {
-                        ServiceManagement.ChangeServiceConfig(daemon);
-                        RegistryManagement.SaveInRegistry(daemon);
+                        ServiceManagement.ChangeServiceConfig(_daemon);
+                        RegistryManagement.SaveInRegistry(_daemon);
 
                         DaemonItem = new DaemonItem
                         {
-                            DisplayName = daemon.DisplayName,
-                            ServiceName = daemon.ServiceName,
-                            FullPath = daemon.FullPath
+                            DisplayName = _daemon.DisplayName,
+                            ServiceName = _daemon.ServiceName,
+                            FullPath = _daemon.FullPath
                         };
 
                         DialogResult = true;
