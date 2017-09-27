@@ -34,8 +34,5 @@ You can download the pre-release here: [Click here](https://github.com/TWC-Softw
 - stuffi3000,
 - rocky20798
 
-## Donation
-[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://paypal.me/stuffi3000)
-
 ## License 
 GPL 3.0
