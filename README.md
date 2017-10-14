@@ -30,11 +30,9 @@ You can download the pre-release here: [Click here](https://github.com/TWC-Softw
 - ListView Layout Manager - Jani Giannoudis - CPOL License
 
 ## Copyright 
-MCPC10,
-stuffi3000
-
-## Donation
-[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://paypal.me/stuffi3000)
+- MCPC10,
+- stuffi3000,
+- rocky20798
 
 ## License 
 GPL 3.0
