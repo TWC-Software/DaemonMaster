@@ -75,6 +75,7 @@
     <Compile Include="SystemManagement.cs" />
     <Compile Include="Jobs\KillChildProcessJob.cs" />
     <Compile Include="Win32\JobHandle.cs" />
+    <Compile Include="Win32\ShellLinkWrapper.cs" />
     <Compile Include="Win32\PInvoke\NativeMethodsConsts.cs" />
     <Compile Include="Win32\PInvoke\NativeMethodsStructs.cs" />
     <Compile Include="Win32\PInvoke\NativeMethods.cs" />

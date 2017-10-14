@@ -40,6 +40,10 @@ namespace DaemonMasterCore
         private int _restarts = 0;
         private DateTime? lastRestartTime = null;
 
+        //Needed for shortcut support
+        private string realPath = String.Empty;
+        private string realArgs = String.Empty;
+
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                        Constructor + Init                                            //
@@ -51,9 +55,23 @@ namespace DaemonMasterCore
         {
             _daemon = RegistryManagement.LoadDaemonFromRegistry(serviceName);
 
+            //If it's a shortcut load the infos from them
+            if (DaemonMasterUtils.IsShortcut(_daemon.FullPath))
+            {
+                ShellLinkWrapper.ShortcutInfo shortcutInfo = ShellLinkWrapper.ResolveShortcut(_daemon.FullPath);
+                realPath = shortcutInfo.FilePath;
+                realArgs = DaemonMasterUtils.ParseAndJoinArguments(shortcutInfo.Arguments, _daemon.Parameter);
+                Logger.Info(realArgs);
+            }
+            else
+            {
+                realPath = _daemon.FullPath;
+                realArgs = _daemon.Parameter;
+            }
+
             if (startInUserSessionAsService)
             {
-                _process = ProcessManagement.StartProcessAsUser(_daemon.FullPath, _daemon.Parameter);
+                _process = ProcessManagement.StartProcessAsUser(realPath, realArgs);
                 InitProcessAsServiceInUserSession();
             }
             else
@@ -68,8 +86,8 @@ namespace DaemonMasterCore
             //Create the start info for the process
             ProcessStartInfo startInfo = new ProcessStartInfo()
             {
-                FileName = _daemon.FullPath,
-                Arguments = _daemon.Parameter,
+                FileName = realPath,
+                Arguments = realArgs,
                 UseShellExecute = false
             };
 

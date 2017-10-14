@@ -50,6 +50,7 @@ namespace DaemonMaster
             Config config = ConfigManagement.LoadConfig();
 
             #region Chose language
+
             //Set the language of the threads
             CultureInfo cultureInfo;
             if (String.IsNullOrWhiteSpace(config.Language) || config.Language == "windows")
@@ -72,6 +73,7 @@ namespace DaemonMaster
             Thread.CurrentThread.CurrentUICulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
             #endregion
 
             //Initialize GUI
@@ -90,7 +92,9 @@ namespace DaemonMaster
 
             if (!ServiceManagement.CheckUI0DetectService())
             {
-                MessageBox.Show(_resManager.GetString("error_ui0service", CultureInfo.CurrentUICulture), _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(_resManager.GetString("error_ui0service", CultureInfo.CurrentUICulture),
+                    _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
 

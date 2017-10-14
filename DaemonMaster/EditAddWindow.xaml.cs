@@ -64,8 +64,11 @@ namespace DaemonMaster
 
             InitializeComponent();
 
-            //if (!_config.ActivateLegacyFunctions)
-            //    buttonLoadShortcut.IsEnabled = false;
+            #region Legacy functions
+
+            if (!_config.ActivateLegacyFunctions)
+                buttonLoadShortcut.IsEnabled = false;
+            #endregion
 
             textBoxFilePath.IsReadOnly = true;
             _daemon = new Daemon();
@@ -239,7 +242,7 @@ namespace DaemonMaster
                     AddExtension = true,
                     CheckFileExists = true,
                     CheckPathExists = true,
-                    DereferenceLinks = true,
+                    DereferenceLinks = false,
                     Multiselect = false
                 };
 
@@ -305,19 +308,20 @@ namespace DaemonMaster
                     MessageBoxResult result = MessageBox.Show(_resManager.GetString("data_will_be_overwritten", CultureInfo.CurrentUICulture), _resManager.GetString("warning", CultureInfo.CurrentUICulture), MessageBoxButton.YesNo, MessageBoxImage.Warning);
                     if (result == MessageBoxResult.Yes)
                     {
-                        ShortcutInfo shortcutInfo = DaemonMasterUtils.GetShortcutInfos(openFileDialog.FileName);
-                        textBoxParam.Text = shortcutInfo.Arguments;
-                        textBoxFilePath.Text = shortcutInfo.FilePath;
+                        //TODO: Remove
+                        //ShortcutInfo shortcutInfo = DaemonMasterUtils.GetShortcutInfos(openFileDialog.FileName);
+                        //textBoxParam.Text = shortcutInfo.Arguments;
+                        //textBoxFilePath.Text = shortcutInfo.FilePath;
 
-                        if (String.IsNullOrWhiteSpace(textBoxDescription.Text))
-                        {
-                            textBoxDescription.Text = shortcutInfo.Description;
-                        }
+                        //if (String.IsNullOrWhiteSpace(textBoxDescription.Text))
+                        //{
+                        //    textBoxDescription.Text = shortcutInfo.Description;
+                        //}
 
-                        if (String.IsNullOrWhiteSpace(textBoxDisplayName.Text))
-                        {
-                            textBoxDisplayName.Text = Path.GetFileNameWithoutExtension(openFileDialog.SafeFileName);
-                        }
+                        //if (String.IsNullOrWhiteSpace(textBoxDisplayName.Text))
+                        //{
+                        //    textBoxDisplayName.Text = Path.GetFileNameWithoutExtension(openFileDialog.SafeFileName);
+                        //}
                     }
                 }
                 else

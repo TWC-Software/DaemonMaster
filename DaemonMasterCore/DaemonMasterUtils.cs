@@ -17,14 +17,13 @@
 //   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
+using DaemonMasterCore.Win32;
 using Newtonsoft.Json;
-using Shell32;
 using System;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Management;
 using System.ServiceProcess;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Media;
 
@@ -32,11 +31,19 @@ namespace DaemonMasterCore
 {
     public static class DaemonMasterUtils
     {
-        //Gibt das Icon der Datei zurück
+        /// <summary>
+        /// GIve the icon of an .exe or file
+        /// </summary>
+        /// <param name="fullPath"></param>
+        /// <returns></returns>
         public static ImageSource GetIcon(string fullPath)
         {
             try
             {
+                //Get the real filePath if it's a shortcut
+                if (IsShortcut(fullPath))
+                    fullPath = ShellLinkWrapper.ResolveShortcut(fullPath).FilePath;
+
                 using (System.Drawing.Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(fullPath))
                 {
                     return System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
@@ -75,41 +82,33 @@ namespace DaemonMasterCore
             throw new Exception("Can not get the ServiceName");
         }
 
-        public static ShortcutInfo GetShortcutInfos(string shortcutFullPath)
-        {
-            string directory = Path.GetDirectoryName(shortcutFullPath);
-            string file = Path.GetFileName(shortcutFullPath);
-
-            Shell shell = new Shell();
-            Folder folder = shell.NameSpace(directory);
-            FolderItem folderItem = folder.ParseName(file);
-
-            ShellLinkObject link = (ShellLinkObject)folderItem.GetLink;
-
-            ShortcutInfo shortcutInfo = new ShortcutInfo()
-            {
-                FilePath = link.Path,
-                Arguments = link.Arguments,
-                WorkingDir = link.WorkingDirectory,
-                Description = link.Description,
-            };
-
-            return shortcutInfo;
-        }
-
+        /// <summary>
+        /// Check if the file is a shortcut (.lnk)
+        /// </summary>
+        /// <param name="shortcutFullPath"></param>
+        /// <returns></returns>
         public static bool IsShortcut(string shortcutFullPath)
         {
-            string directory = Path.GetDirectoryName(shortcutFullPath);
-            string file = Path.GetFileName(shortcutFullPath);
+            return String.Equals(Path.GetExtension(shortcutFullPath), ".lnk", StringComparison.OrdinalIgnoreCase);
+        }
 
-            Shell shell = new Shell();
-            Folder folder = shell.NameSpace(directory);
-            FolderItem folderItem = folder.ParseName(file);
+        /// <summary>
+        /// Remove unused spaces and join the strings
+        /// </summary>
+        /// <param name="shortcutArgs"></param>
+        /// <param name="userArgs"></param>
+        /// <returns></returns>
+        public static string ParseAndJoinArguments(string shortcutArgs, string userArgs)
+        {
+            //Remove leading and trailing white-space characters
+            shortcutArgs.Trim();
+            userArgs.Trim();
 
-            if (folderItem != null)
-                return folderItem.IsLink;
+            //Combine strings with space
+            string args = String.Concat(shortcutArgs, " ", userArgs);
 
-            return false;
+            //Remove double spaces etc
+            return Regex.Replace(args, @"\s+", " ");
         }
 
         public static string GetDisplayName(string serviceName)
@@ -146,13 +145,5 @@ namespace DaemonMasterCore
                 return daemon;
             }
         }
-    }
-
-    public class ShortcutInfo
-    {
-        public string FilePath { get; set; }
-        public string WorkingDir { get; set; }
-        public string Arguments { get; set; }
-        public string Description { get; set; }
     }
 }
