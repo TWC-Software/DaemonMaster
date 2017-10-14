@@ -546,7 +546,7 @@ namespace DaemonMaster
             AutoUpdater.CurrentCulture = CultureInfo.CurrentCulture;
             AutoUpdater.ShowSkipButton = true;
             AutoUpdater.OpenDownloadPage = true;
-            AutoUpdater.Start("https://raw.githubusercontent.com/TWC-Software/DaemonMaster/master/AutoUpdater.xml", typeof(MainWindow).Assembly);
+            AutoUpdater.Start("http://raw.githubusercontent.com/TWC-Software/DaemonMaster/master/AutoUpdater.xml", typeof(MainWindow).Assembly);
         }
 
         #endregion
