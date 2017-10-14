@@ -33,6 +33,7 @@ using System.Resources;
 using System.ServiceProcess;
 using System.Windows;
 using System.Windows.Data;
+using DaemonMasterCore.Config;
 using Tulpep.ActiveDirectoryObjectPicker;
 
 namespace DaemonMaster
@@ -43,6 +44,7 @@ namespace DaemonMaster
     public partial class EditAddWindow : Window
     {
         private readonly ResourceManager _resManager = new ResourceManager(typeof(lang));
+        private readonly Config _config;
 
         public DaemonItem DaemonItem { get; private set; }
         public DaemonItem OldDaemonItem { get; private set; }
@@ -57,7 +59,13 @@ namespace DaemonMaster
 
         private EditAddWindow()
         {
+            //Load config settings from file
+            _config = ConfigManagement.LoadConfig();
+
             InitializeComponent();
+
+            //if (!_config.ActivateLegacyFunctions)
+            //    buttonLoadShortcut.IsEnabled = false;
 
             textBoxFilePath.IsReadOnly = true;
             _daemon = new Daemon();
@@ -145,6 +153,7 @@ namespace DaemonMaster
 
             #region Dependency Listboxes
 
+            #region DependOnService
             //Load Data into _dependOnServiceObservableCollection
             _dependOnServiceObservableCollection = new ObservableCollection<ServiceInfo>();
             foreach (var dep in daemon.DependOnService)
@@ -157,10 +166,14 @@ namespace DaemonMaster
 
                 _dependOnServiceObservableCollection.Add(serviceInfo);
             }
+
             //Sort list alphabetical
             ICollectionView collectionView1 = CollectionViewSource.GetDefaultView(_dependOnServiceObservableCollection);
             collectionView1.SortDescriptions.Add(new SortDescription("DisplayName", ListSortDirection.Ascending));
             listBoxDependOnService.ItemsSource = collectionView1;
+            #endregion
+
+            #region AllServices
 
             //Load Data into _allServicesObservableCollection
             _allServicesObservableCollection = new ObservableCollection<ServiceInfo>();
@@ -179,6 +192,9 @@ namespace DaemonMaster
             ICollectionView collectionView2 = CollectionViewSource.GetDefaultView(_allServicesObservableCollection);
             collectionView2.SortDescriptions.Add(new SortDescription("DisplayName", ListSortDirection.Ascending));
             listBoxAllServices.ItemsSource = collectionView2;
+            #endregion
+
+            #region AllGroups
 
             //Load Data into _allGroupsObservableCollection
             _allGroupsObservableCollection = new ObservableCollection<string>(RegistryManagement.GetAllServiceGroups());
@@ -186,6 +202,9 @@ namespace DaemonMaster
             ICollectionView collectionView3 = CollectionViewSource.GetDefaultView(_allGroupsObservableCollection);
             collectionView3.SortDescriptions.Add(new SortDescription());
             listBoxAllGroups.ItemsSource = collectionView3;
+            #endregion
+
+            #region DependOnGroup
 
             //Load Data into _dependOnGroupObservableCollection
             _dependOnGroupObservableCollection = new ObservableCollection<string>(daemon.DependOnGroup);
@@ -193,6 +212,7 @@ namespace DaemonMaster
             ICollectionView collectionView4 = CollectionViewSource.GetDefaultView(_dependOnGroupObservableCollection);
             collectionView3.SortDescriptions.Add(new SortDescription());
             listBoxDependOnGroup.ItemsSource = collectionView4;
+            #endregion
 
             #endregion
         }

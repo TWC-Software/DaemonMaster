@@ -51,8 +51,8 @@ namespace DaemonMasterCore
         public string DisplayName { get; set; }
         public string ServiceName { get; set; }
         public string Description { get; set; }
-        public string[] DependOnService { get; set; }
-        public string[] DependOnGroup { get; set; }
+        public string[] DependOnService { get; set; } = new string[0];
+        public string[] DependOnGroup { get; set; } = new string[0];
         public NativeMethods.SERVICE_START StartType { get; set; }
         public bool DelayedStart { get; set; }
 

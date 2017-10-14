@@ -41,5 +41,6 @@ namespace DaemonMasterCore.Config
             }
         }
         public string Language { get; set; } = "windows";
+        public bool ActivateLegacyFunctions { get; set; } = false;
     }
 }
