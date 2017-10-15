@@ -178,7 +178,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Load data from shortcut (Legacy) ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Load data from shortcut (legacy) ähnelt.
         /// </summary>
         public static string button_load_shortcut {
             get {
@@ -620,7 +620,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Filter ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Filter (legacy) ähnelt.
         /// </summary>
         public static string label_filter {
             get {

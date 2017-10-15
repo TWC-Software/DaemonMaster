@@ -247,7 +247,7 @@
     <value>Stop Service</value>
   </data>
   <data name="label_filter" xml:space="preserve">
-    <value>Filter</value>
+    <value>Filter (legacy)</value>
   </data>
   <data name="cannot_load_data_from_registry" xml:space="preserve">
     <value>Cannot load data from registry!</value>
@@ -370,7 +370,7 @@
     <value>Invalid shortcut</value>
   </data>
   <data name="button_load_shortcut" xml:space="preserve">
-    <value>Load data from shortcut (Legacy)</value>
+    <value>Load data from shortcut (legacy)</value>
   </data>
   <data name="data_will_be_overwritten" xml:space="preserve">
     <value>Existing data will be overwritten on load!

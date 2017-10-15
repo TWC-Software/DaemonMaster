@@ -239,7 +239,7 @@ namespace DaemonMaster
                 new OpenFileDialog
                 {
                     InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
-                    Filter = "Exe files (*.exe)|*.exe|" +
+                    Filter = "Application files (*.exe, *.lnk)|*.exe; *.lnk|" +
                              "All files (*.*)|*.*",
                     AddExtension = true,
                     CheckFileExists = true,
@@ -248,12 +248,12 @@ namespace DaemonMaster
                     Multiselect = false
                 };
 
-            //Wenn eine Datei gewählt worden ist
+            //If a file has been chosen
             if (openFileDialog.ShowDialog() == true)
             {
                 textBoxFilePath.Text = openFileDialog.FileName;
 
-                //Wenn der Name noch leer oder der Standart Name geladen ist, soll er ihn mit dem Datei namen befüllen
+                //If the display name is empty, then it will use the file name
                 if (String.IsNullOrWhiteSpace(textBoxDisplayName.Text))
                 {
                     textBoxDisplayName.Text = Path.GetFileNameWithoutExtension(openFileDialog.SafeFileName);
@@ -376,10 +376,10 @@ namespace DaemonMaster
                 return;
 
             //Remove leading and trailing white-space characters
-            string trimmed = args.Trim();
+            args = args.Trim();
 
             //Remove double spaces etc
-            textBoxParam.Text = Regex.Replace(trimmed, @"\s+", " ");
+            textBoxParam.Text = Regex.Replace(args, @"\s+", " ");
         }
         #endregion
 

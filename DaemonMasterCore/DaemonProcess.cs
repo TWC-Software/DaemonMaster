@@ -23,6 +23,7 @@ using NLog;
 using System;
 using System.Diagnostics;
 using System.Security.Authentication;
+using System.Text.RegularExpressions;
 using System.Threading;
 using NativeMethods = DaemonMasterCore.Win32.PInvoke.NativeMethods;
 
@@ -63,7 +64,7 @@ namespace DaemonMasterCore
                 using (ShellLinkWrapper shellLinkWrapper = new ShellLinkWrapper(_daemon.FullPath))
                 {
                     realPath = shellLinkWrapper.FilePath;
-                    realArgs = DaemonMasterUtils.FormattingAndJoinArguments(shellLinkWrapper.Arguments, _daemon.Parameter);
+                    realArgs = FormattingAndJoinArguments(shellLinkWrapper.Arguments, _daemon.Parameter);
                 }
             }
             else
@@ -349,6 +350,19 @@ namespace DaemonMasterCore
         }
 
         public Daemon GetDaemon => _daemon;
+
+        private string FormattingAndJoinArguments(string shortcutArgs, string userArgs)
+        {
+            //Remove leading and trailing white-space characters
+            shortcutArgs = shortcutArgs.Trim();
+            userArgs = userArgs.Trim();
+
+            //Combine strings with space
+            string args = String.Concat(shortcutArgs, " ", userArgs);
+
+            //Remove double spaces etc
+            return Regex.Replace(args, @"\s+", " ");
+        }
 
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////

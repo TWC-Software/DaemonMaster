@@ -247,7 +247,7 @@
     <value>Stop Service</value>
   </data>
   <data name="label_filter" xml:space="preserve">
-    <value>Filter</value>
+    <value>Filter (veraltet)</value>
   </data>
   <data name="switch_to_session_0" xml:space="preserve">
     <value>Wechsle zu Sitzung 0</value>
@@ -370,7 +370,7 @@
     <value>Ungültige Verknüpfung</value>
   </data>
   <data name="button_load_shortcut" xml:space="preserve">
-    <value>Lade Informationen aus einer Verknüpfung (Veraltet)</value>
+    <value>Lade Informationen aus einer Verknüpfung (veraltet)</value>
   </data>
   <data name="data_will_be_overwritten" xml:space="preserve">
     <value>Vorhandene Daten werden beim Laden überschrieben!</value>

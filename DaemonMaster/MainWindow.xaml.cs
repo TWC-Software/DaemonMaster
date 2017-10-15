@@ -17,7 +17,6 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-
 using AutoUpdaterDotNET;
 using DaemonMaster.Language;
 using DaemonMasterCore;
@@ -41,19 +40,21 @@ namespace DaemonMaster
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Config _config;
+
         private readonly ObservableCollection<DaemonItem> _processCollection = null;
         private readonly ResourceManager _resManager = new ResourceManager(typeof(lang));
 
         public MainWindow()
         {
             //Load and apply config
-            Config config = ConfigManagement.LoadConfig();
+            _config = ConfigManagement.LoadConfig();
 
             #region Chose language
 
             //Set the language of the threads
             CultureInfo cultureInfo;
-            if (String.IsNullOrWhiteSpace(config.Language) || config.Language == "windows")
+            if (String.IsNullOrWhiteSpace(_config.Language) || _config.Language == "windows")
             {
                 cultureInfo = CultureInfo.CurrentCulture;
             }
@@ -61,7 +62,7 @@ namespace DaemonMaster
             {
                 try
                 {
-                    cultureInfo = new CultureInfo(config.Language);
+                    cultureInfo = new CultureInfo(_config.Language);
                 }
                 catch (Exception)
                 {
@@ -79,13 +80,19 @@ namespace DaemonMaster
             //Initialize GUI
             InitializeComponent();
 
+            #region Legacy functions
+
+            if (!_config.ActivateLegacyFunctions)
+                groupBoxFilter.IsEnabled = false;
+            #endregion
+
             //Fragt, wenn der RegKey nicht gesetzt ist, ob dieser gesetzt werden soll
             if (!AskToEnableInteractiveServices())
                 this.Close();
 
             _processCollection = RegistryManagement.LoadDaemonItemsFromRegistry();
             //Start ListView Updater
-            StartListViewUpdateTimer(config.UpdateInterval);
+            StartListViewUpdateTimer(_config.UpdateInterval);
 
             //Aktualisiert die Liste zum start
             listViewDaemons.ItemsSource = _processCollection;
@@ -177,45 +184,6 @@ namespace DaemonMaster
             RemoveDaemon((DaemonItem)listViewDaemons.SelectedItem);
         }
 
-        private void listBoxDaemons_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            EditDaemon();
-        }
-
-        //MENU
-
-        private void MenuItem_AddDaemon_OnClick(object sender, RoutedEventArgs e)
-        {
-            AddDaemon();
-        }
-
-        private void MenuItem_RemoveDaemon_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (listViewDaemons.SelectedItem == null)
-                return;
-
-            RemoveDaemon((DaemonItem)listViewDaemons.SelectedItem);
-        }
-
-        private void MenuItem_EditDaemon_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (listViewDaemons.SelectedItem == null)
-                return;
-
-            EditDaemon();
-        }
-
-        private void MenuItem_CheckForUpdates_OnClick(object sender, RoutedEventArgs e)
-        {
-            CheckForUpdates();
-        }
-
-        private void MenuItem_Credits_OnClick(object sender, RoutedEventArgs e)
-        {
-            CreditsWindow creditsWindow = new CreditsWindow();
-            creditsWindow.ShowDialog();
-        }
-
         private void MenuItem_Export_OnClick(object sender, RoutedEventArgs e)
         {
             if (listViewDaemons.SelectedItem == null)
@@ -304,6 +272,44 @@ namespace DaemonMaster
             }
         }
 
+        private void listBoxDaemons_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            EditDaemon();
+        }
+
+        //MENU
+
+        private void MenuItem_AddDaemon_OnClick(object sender, RoutedEventArgs e)
+        {
+            AddDaemon();
+        }
+
+        private void MenuItem_RemoveDaemon_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (listViewDaemons.SelectedItem == null)
+                return;
+
+            RemoveDaemon((DaemonItem)listViewDaemons.SelectedItem);
+        }
+
+        private void MenuItem_EditDaemon_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (listViewDaemons.SelectedItem == null)
+                return;
+
+            EditDaemon();
+        }
+
+        private void MenuItem_CheckForUpdates_OnClick(object sender, RoutedEventArgs e)
+        {
+            CheckForUpdates();
+        }
+
+        private void MenuItem_Credits_OnClick(object sender, RoutedEventArgs e)
+        {
+            CreditsWindow creditsWindow = new CreditsWindow();
+            creditsWindow.ShowDialog();
+        }
         #endregion
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////

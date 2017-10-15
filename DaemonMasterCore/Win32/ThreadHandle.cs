@@ -31,10 +31,10 @@ namespace DaemonMasterCore.Win32
 
         protected override bool ReleaseHandle()
         {
-            return PInvoke.NativeMethods.CloseHandle(handle);
+            return NativeMethods.CloseHandle(handle);
         }
 
-        public static ThreadHandle OpenThread(PInvoke.NativeMethods.ThreadAccess desiredAccess, bool inheritHandle, int processId)
+        public static ThreadHandle OpenThread(NativeMethods.ThreadAccess desiredAccess, bool inheritHandle, int processId)
         {
             ThreadHandle threadHandle = PInvoke.NativeMethods.OpenThread(desiredAccess, inheritHandle, (uint)processId);
 

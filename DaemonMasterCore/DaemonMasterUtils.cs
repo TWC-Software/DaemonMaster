@@ -87,25 +87,6 @@ namespace DaemonMasterCore
             throw new Exception("Can not get the ServiceName");
         }
 
-        /// <summary>
-        /// Remove unused spaces and join the strings
-        /// </summary>
-        /// <param name="shortcutArgs"></param>
-        /// <param name="userArgs"></param>
-        /// <returns></returns>
-        public static string FormattingAndJoinArguments(string shortcutArgs, string userArgs)
-        {
-            //Remove leading and trailing white-space characters
-            string trimmedShortcutArgs = shortcutArgs.Trim();
-            string trimmedUserArgs = userArgs.Trim();
-
-            //Combine strings with space
-            string args = String.Concat(trimmedShortcutArgs, " ", trimmedUserArgs);
-
-            //Remove double spaces etc
-            return Regex.Replace(args, @"\s+", " ");
-        }
-
         public static string GetDisplayName(string serviceName)
         {
             using (ServiceController sc = new ServiceController(serviceName))

@@ -18,16 +18,13 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
+using DaemonMasterCore.Win32;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
-using DaemonMasterCore.Win32;
-using DaemonMasterCore.Win32.PInvoke;
 using NativeMethods = DaemonMasterCore.Win32.PInvoke.NativeMethods;
 
 namespace DaemonMasterCore
