@@ -370,7 +370,7 @@
     <value>Ungültige Verknüpfung</value>
   </data>
   <data name="button_load_shortcut" xml:space="preserve">
-    <value>Lade Informationen aus einer Verknüpfung</value>
+    <value>Lade Informationen aus einer Verknüpfung (Veraltet)</value>
   </data>
   <data name="data_will_be_overwritten" xml:space="preserve">
     <value>Vorhandene Daten werden beim Laden überschrieben!</value>

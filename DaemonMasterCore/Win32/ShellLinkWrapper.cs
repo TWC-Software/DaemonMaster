@@ -14,20 +14,24 @@
 //   GNU General Public License for more details.
 //
 //   You should have received a copy of the GNU General Public License
-//   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+//   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.ComponentModel;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace DaemonMasterCore.Win32
 {
-    public class ShellLinkWrapper
+    public class ShellLinkWrapper : IDisposable
     {
-        #region From http://pinvoke.net and https://stackoverflow.com/questions/139010/how-to-resolve-a-lnk-in-c-sharp
-        const uint STGM_READ = 0;
-        const int MAX_PATH = 260;
+        private bool _isDisposed = false;
+
+        #region From http://pinvoke.net and https://stackoverflow.com/questions/139010/how-to-resolve-a-lnk-in-c-sharp and me ;)       
+
+        private IShellLinkW shellLink;
 
         [ComImport]
         [Guid("00021401-0000-0000-C000-000000000046")]
@@ -40,61 +44,78 @@ namespace DaemonMasterCore.Win32
         interface IShellLinkW
         {
             /// <summary>Retrieves the path and file name of a Shell link object</summary>
-            void GetPath([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile, int cchMaxPath,
+            [return: MarshalAs(UnmanagedType.I4)]
+            int GetPath([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile, int cchMaxPath,
                 out WIN32_FIND_DATAW pfd, SLGP_FLAGS fFlags);
 
             /// <summary>Retrieves the list of item identifiers for a Shell link object</summary>
-            void GetIDList(out IntPtr ppidl);
+            [return: MarshalAs(UnmanagedType.I4)]
+            int GetIDList(out IntPtr ppidl);
 
             /// <summary>Sets the pointer to an item identifier list (PIDL) for a Shell link object.</summary>
-            void SetIDList(IntPtr pidl);
+            [return: MarshalAs(UnmanagedType.I4)]
+            int SetIDList(IntPtr pidl);
 
             /// <summary>Retrieves the description string for a Shell link object</summary>
-            void GetDescription([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszName, int cchMaxName);
+            [return: MarshalAs(UnmanagedType.I4)]
+            int GetDescription([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszName, int cchMaxName);
 
             /// <summary>Sets the description for a Shell link object. The description can be any application-defined string</summary>
-            void SetDescription([MarshalAs(UnmanagedType.LPWStr)] string pszName);
+            [return: MarshalAs(UnmanagedType.I4)]
+            int SetDescription([MarshalAs(UnmanagedType.LPWStr)] string pszName);
 
             /// <summary>Retrieves the name of the working directory for a Shell link object</summary>
-            void GetWorkingDirectory([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszDir, int cchMaxPath);
+            [return: MarshalAs(UnmanagedType.I4)]
+            int GetWorkingDirectory([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszDir, int cchMaxPath);
 
             /// <summary>Sets the name of the working directory for a Shell link object</summary>
-            void SetWorkingDirectory([MarshalAs(UnmanagedType.LPWStr)] string pszDir);
+            [return: MarshalAs(UnmanagedType.I4)]
+            int SetWorkingDirectory([MarshalAs(UnmanagedType.LPWStr)] string pszDir);
 
             /// <summary>Retrieves the command-line arguments associated with a Shell link object</summary>
-            void GetArguments([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszArgs, int cchMaxPath);
+            [return: MarshalAs(UnmanagedType.I4)]
+            int GetArguments([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszArgs, int cchMaxPath);
 
             /// <summary>Sets the command-line arguments for a Shell link object</summary>
-            void SetArguments([MarshalAs(UnmanagedType.LPWStr)] string pszArgs);
+            [return: MarshalAs(UnmanagedType.I4)]
+            int SetArguments([MarshalAs(UnmanagedType.LPWStr)] string pszArgs);
 
             /// <summary>Retrieves the hot key for a Shell link object</summary>
-            void GetHotkey(out short pwHotkey);
+            [return: MarshalAs(UnmanagedType.I4)]
+            int GetHotkey(out short pwHotkey);
 
             /// <summary>Sets a hot key for a Shell link object</summary>
-            void SetHotkey(short wHotkey);
+            [return: MarshalAs(UnmanagedType.I4)]
+            int SetHotkey(short wHotkey);
 
             /// <summary>Retrieves the show command for a Shell link object</summary>
-            void GetShowCmd(out int piShowCmd);
+            [return: MarshalAs(UnmanagedType.I4)]
+            int GetShowCmd(out int piShowCmd);
 
             /// <summary>Sets the show command for a Shell link object. The show command sets the initial show state of the window.</summary>
-            void SetShowCmd(int iShowCmd);
+            [return: MarshalAs(UnmanagedType.I4)]
+            int SetShowCmd(int iShowCmd);
 
             /// <summary>Retrieves the location (path and index) of the icon for a Shell link object</summary>
-            void GetIconLocation([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszIconPath,
+            [return: MarshalAs(UnmanagedType.I4)]
+            int GetIconLocation([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszIconPath,
                 int cchIconPath, out int piIcon);
 
             /// <summary>Sets the location (path and index) of the icon for a Shell link object</summary>
-            void SetIconLocation([MarshalAs(UnmanagedType.LPWStr)] string pszIconPath, int iIcon);
+            [return: MarshalAs(UnmanagedType.I4)]
+            int SetIconLocation([MarshalAs(UnmanagedType.LPWStr)] string pszIconPath, int iIcon);
 
             /// <summary>Sets the relative path to the Shell link object</summary>
-            void SetRelativePath([MarshalAs(UnmanagedType.LPWStr)] string pszPathRel, int dwReserved);
+            [return: MarshalAs(UnmanagedType.I4)]
+            int SetRelativePath([MarshalAs(UnmanagedType.LPWStr)] string pszPathRel, int dwReserved);
 
             /// <summary>Attempts to find the target of a Shell link, even if it has been moved or renamed</summary>
-            void Resolve(IntPtr hwnd, SLR_FLAGS fFlags);
+            [return: MarshalAs(UnmanagedType.I4)]
+            int Resolve(IntPtr hwnd, SLR_FLAGS fFlags);
 
             /// <summary>Sets the path and file name of a Shell link object</summary>
-            void SetPath([MarshalAs(UnmanagedType.LPWStr)] string pszFile);
-
+            [return: MarshalAs(UnmanagedType.I4)]
+            int SetPath([MarshalAs(UnmanagedType.LPWStr)] string pszFile);
         }
 
         [ComImport]
@@ -182,7 +203,7 @@ namespace DaemonMasterCore.Win32
             SLGP_RAWPATH = 0x4
         }
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         struct WIN32_FIND_DATAW
         {
             public uint dwFileAttributes;
@@ -196,41 +217,149 @@ namespace DaemonMasterCore.Win32
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)] public string cFileName;
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 14)] public string cAlternateFileName;
         }
-        #endregion 
+        #endregion
 
-        public static ShortcutInfo ResolveShortcut(string fileName)
+        private const uint STGM_READ = 0;
+        private const int MAX_PATH = 260;
+        private const int INFOTIPSIZE = 1024;
+
+        //Constructor
+        public ShellLinkWrapper(string filePath)
         {
-            ShortcutInfo shortcutInfo = new ShortcutInfo();
-            StringBuilder sb = new StringBuilder(MAX_PATH);
-            ShellLink link = new ShellLink();
-            ((IPersistFile)link).Load(fileName, STGM_READ);
+            try
+            {
+                shellLink = (IShellLinkW)new ShellLink();
+            }
+            catch (Exception)
+            {
+                throw new COMException("Failed to create shellLink object!");
+            }
 
-            //Path
-            WIN32_FIND_DATAW data = new WIN32_FIND_DATAW();
-            ((IShellLinkW)link).GetPath(sb, sb.Capacity, out data, 0);
-            shortcutInfo.FilePath = sb.ToString();
-
-            //Args
-            ((IShellLinkW)link).GetArguments(sb, sb.Capacity);
-            shortcutInfo.Arguments = sb.ToString();
-
-            //Working dir
-            ((IShellLinkW)link).GetWorkingDirectory(sb, sb.Capacity);
-            shortcutInfo.WorkingDir = sb.ToString();
-
-            //Description
-            ((IShellLinkW)link).GetDescription(sb, sb.Capacity);
-            shortcutInfo.Description = sb.ToString();
-
-            return shortcutInfo;
+            //Load shortcut
+            LoadShortcut(filePath);
         }
 
-        public class ShortcutInfo
+        private IPersistFile PersistFile
         {
-            public string FilePath { get; set; }
-            public string WorkingDir { get; set; }
-            public string Arguments { get; set; }
-            public string Description { get; set; }
+            get
+            {
+                IPersistFile persistFile = shellLink as IPersistFile;
+
+                if (persistFile == null)
+                    throw new COMException("Failed to create IPersistFile from shellLink!");
+
+                return persistFile;
+            }
         }
+
+        private void LoadShortcut(string filePath)
+        {
+            if (String.IsNullOrWhiteSpace(filePath))
+                throw new ArgumentException("File path is not valid!");
+
+            if (!File.Exists(filePath))
+                throw new ArgumentException("File is not found! ( " + filePath + " )");
+
+            PersistFile.Load(filePath, STGM_READ);
+        }
+
+
+        public string FilePath
+        {
+            get
+            {
+                StringBuilder stringBuilder = new StringBuilder(MAX_PATH);
+                WIN32_FIND_DATAW data = new WIN32_FIND_DATAW();
+
+                if (shellLink.GetPath(stringBuilder, stringBuilder.Capacity, out data, 0) > 0)
+                    throw new Win32Exception(Marshal.GetHRForLastWin32Error());
+
+                return stringBuilder.ToString();
+            }
+        }
+
+        public string WorkingDir
+        {
+            get
+            {
+                StringBuilder stringBuilder = new StringBuilder(MAX_PATH);
+
+                if (shellLink.GetWorkingDirectory(stringBuilder, stringBuilder.Capacity) > 0)
+                    throw new Win32Exception(Marshal.GetHRForLastWin32Error());
+
+                return stringBuilder.ToString();
+            }
+        }
+
+        public string Arguments
+        {
+            get
+            {
+                StringBuilder stringBuilder = new StringBuilder(INFOTIPSIZE);
+
+                if (shellLink.GetArguments(stringBuilder, stringBuilder.Capacity) > 0)
+                    throw new Win32Exception(Marshal.GetHRForLastWin32Error());
+
+                return stringBuilder.ToString();
+            }
+        }
+
+        public string Description
+        {
+            get
+            {
+                StringBuilder stringBuilder = new StringBuilder(INFOTIPSIZE);
+
+                if (shellLink.GetDescription(stringBuilder, stringBuilder.Capacity) > 0)
+                    throw new Win32Exception(Marshal.GetHRForLastWin32Error());
+
+                return stringBuilder.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Check if the file is a shortcut (.lnk)
+        /// </summary>
+        /// <param name="shortcutFullPath"></param>
+        /// <returns></returns>
+        public static bool IsShortcut(string shortcutFullPath)
+        {
+            return String.Equals(Path.GetExtension(shortcutFullPath), ".lnk", StringComparison.OrdinalIgnoreCase);
+        }
+
+
+        #region Dispose
+
+        ~ShellLinkWrapper()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_isDisposed)
+                return;
+
+            if (disposing)
+            {
+                //Free managed objects here
+            }
+            //Free unmanaged objects here
+
+            if (shellLink != null)
+            {
+                // Release all references.
+                Marshal.FinalReleaseComObject(shellLink);
+                shellLink = null;
+            }
+            _isDisposed = true;
+        }
+        #endregion
     }
 }

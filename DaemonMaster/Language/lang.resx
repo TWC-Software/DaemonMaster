@@ -370,7 +370,7 @@
     <value>Invalid shortcut</value>
   </data>
   <data name="button_load_shortcut" xml:space="preserve">
-    <value>Load data from shortcut</value>
+    <value>Load data from shortcut (Legacy)</value>
   </data>
   <data name="data_will_be_overwritten" xml:space="preserve">
     <value>Existing data will be overwritten on load!

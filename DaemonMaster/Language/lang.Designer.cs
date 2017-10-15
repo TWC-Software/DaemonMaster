@@ -178,7 +178,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Load data from shortcut ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Load data from shortcut (Legacy) ähnelt.
         /// </summary>
         public static string button_load_shortcut {
             get {

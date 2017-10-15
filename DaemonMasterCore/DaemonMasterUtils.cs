@@ -14,7 +14,7 @@
 //   GNU General Public License for more details.
 //
 //   You should have received a copy of the GNU General Public License
-//   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+//   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
 using DaemonMasterCore.Win32;
@@ -41,8 +41,13 @@ namespace DaemonMasterCore
             try
             {
                 //Get the real filePath if it's a shortcut
-                if (IsShortcut(fullPath))
-                    fullPath = ShellLinkWrapper.ResolveShortcut(fullPath).FilePath;
+                if (ShellLinkWrapper.IsShortcut(fullPath))
+                {
+                    using (ShellLinkWrapper shellLinkWrapper = new ShellLinkWrapper(fullPath))
+                    {
+                        fullPath = shellLinkWrapper.FilePath;
+                    }
+                }
 
                 using (System.Drawing.Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(fullPath))
                 {
@@ -83,29 +88,19 @@ namespace DaemonMasterCore
         }
 
         /// <summary>
-        /// Check if the file is a shortcut (.lnk)
-        /// </summary>
-        /// <param name="shortcutFullPath"></param>
-        /// <returns></returns>
-        public static bool IsShortcut(string shortcutFullPath)
-        {
-            return String.Equals(Path.GetExtension(shortcutFullPath), ".lnk", StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
         /// Remove unused spaces and join the strings
         /// </summary>
         /// <param name="shortcutArgs"></param>
         /// <param name="userArgs"></param>
         /// <returns></returns>
-        public static string ParseAndJoinArguments(string shortcutArgs, string userArgs)
+        public static string FormattingAndJoinArguments(string shortcutArgs, string userArgs)
         {
             //Remove leading and trailing white-space characters
-            shortcutArgs.Trim();
-            userArgs.Trim();
+            string trimmedShortcutArgs = shortcutArgs.Trim();
+            string trimmedUserArgs = userArgs.Trim();
 
             //Combine strings with space
-            string args = String.Concat(shortcutArgs, " ", userArgs);
+            string args = String.Concat(trimmedShortcutArgs, " ", trimmedUserArgs);
 
             //Remove double spaces etc
             return Regex.Replace(args, @"\s+", " ");

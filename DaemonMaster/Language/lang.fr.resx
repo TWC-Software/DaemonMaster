@@ -373,7 +373,7 @@
     <value>Chargez les données à partir du raccourci!</value>
   </data>
   <data name="data_will_be_overwritten" xml:space="preserve">
-    <value>Les données existantes seront écrasées sur la charge! !</value>
+    <value>Les données existantes seront écrasées sur la charge!! (dépassé)</value>
   </data>
   <data name="pid" xml:space="preserve">
     <value>PID</value>

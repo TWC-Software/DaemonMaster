@@ -14,7 +14,7 @@
 //   GNU General Public License for more details.
 //
 //   You should have received a copy of the GNU General Public License
-//   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+//   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
@@ -78,6 +78,12 @@ namespace DaemonMasterCore.Jobs
 
 
         #region Dispose
+
+        ~KillChildProcessJob()
+        {
+            Dispose(false);
+        }
+
         public void Dispose()
         {
             Dispose(true);
@@ -97,11 +103,6 @@ namespace DaemonMasterCore.Jobs
             }
             //Free unmanaged objects here
             _isDisposed = true;
-        }
-
-        ~KillChildProcessJob()
-        {
-            Dispose(false);
         }
         #endregion
     }

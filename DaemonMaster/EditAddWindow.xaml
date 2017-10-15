@@ -26,7 +26,7 @@
 
                     <CoreWPF:PlaceholderTextBox x:Name="textBoxFilePath" Height="23" Margin="147,166,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_file_path}" VerticalAlignment="Top" IsReadOnly="True" HorizontalAlignment="Left" Width="717" UndoLimit="0"/>
                     <Label x:Name="labelFilePath" Content="{x:Static resx:lang.label_file_path}" HorizontalAlignment="Left" Margin="10,162,0,0" VerticalAlignment="Top"/>
-                    <TextBox x:Name="textBoxParam" Height="23" Width="321" Margin="147,98,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                    <TextBox x:Name="textBoxParam" Height="23" Width="321" Margin="147,98,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" LostFocus="TextBoxParam_OnLostFocus"/>
                     <Label x:Name="labelParam" Content="{x:Static resx:lang.label_parameters}" HorizontalAlignment="Left" Margin="10,95,0,0" VerticalAlignment="Top"/>
                     <GroupBox x:Name="groupBoxCustomUsername" Header="{x:Static resx:lang.groupbox_custom_user}" HorizontalAlignment="Left" Height="116" Margin="486,-3,0,0" VerticalAlignment="Top" Width="378">
                         <Grid HorizontalAlignment="Left" Height="100" Margin="0,0,-2,-6" VerticalAlignment="Top" Width="267">

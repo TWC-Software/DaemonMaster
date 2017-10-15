@@ -14,7 +14,7 @@
 //   GNU General Public License for more details.
 //
 //   You should have received a copy of the GNU General Public License
-//   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+//   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
 using DaemonMasterCore.Jobs;
@@ -56,18 +56,24 @@ namespace DaemonMasterCore
             _daemon = RegistryManagement.LoadDaemonFromRegistry(serviceName);
 
             //If it's a shortcut load the infos from them
-            if (DaemonMasterUtils.IsShortcut(_daemon.FullPath))
+            if (ShellLinkWrapper.IsShortcut(_daemon.FullPath))
             {
-                ShellLinkWrapper.ShortcutInfo shortcutInfo = ShellLinkWrapper.ResolveShortcut(_daemon.FullPath);
-                realPath = shortcutInfo.FilePath;
-                realArgs = DaemonMasterUtils.ParseAndJoinArguments(shortcutInfo.Arguments, _daemon.Parameter);
-                Logger.Info(realArgs);
+                Logger.Info("Found shortcut, reading data...");
+
+                using (ShellLinkWrapper shellLinkWrapper = new ShellLinkWrapper(_daemon.FullPath))
+                {
+                    realPath = shellLinkWrapper.FilePath;
+                    realArgs = DaemonMasterUtils.FormattingAndJoinArguments(shellLinkWrapper.Arguments, _daemon.Parameter);
+                }
             }
             else
             {
                 realPath = _daemon.FullPath;
                 realArgs = _daemon.Parameter;
             }
+
+            Logger.Info("File path:" + realPath);
+            Logger.Info("Args:" + realArgs);
 
             if (startInUserSessionAsService)
             {

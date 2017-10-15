@@ -14,7 +14,7 @@
 //   GNU General Public License for more details.
 //
 //   You should have received a copy of the GNU General Public License
-//   along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+//   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -31,9 +31,11 @@ using System.IO;
 using System.Linq;
 using System.Resources;
 using System.ServiceProcess;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Data;
 using DaemonMasterCore.Config;
+using DaemonMasterCore.Win32;
 using Tulpep.ActiveDirectoryObjectPicker;
 
 namespace DaemonMaster
@@ -284,6 +286,7 @@ namespace DaemonMaster
             this.Close();
         }
 
+        [Obsolete("Legacy function")]
         private void buttonLoadShortcut_OnClick(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog =
@@ -300,28 +303,23 @@ namespace DaemonMaster
                              "All files (*.*)|*.*"
                 };
 
-            //Wenn eine Datei gewählt worden ist
+            //If a file has been chosen
             if (openFileDialog.ShowDialog() == true)
             {
-                if (DaemonMasterUtils.IsShortcut(openFileDialog.FileName))
+                if (ShellLinkWrapper.IsShortcut(openFileDialog.FileName))
                 {
                     MessageBoxResult result = MessageBox.Show(_resManager.GetString("data_will_be_overwritten", CultureInfo.CurrentUICulture), _resManager.GetString("warning", CultureInfo.CurrentUICulture), MessageBoxButton.YesNo, MessageBoxImage.Warning);
                     if (result == MessageBoxResult.Yes)
                     {
-                        //TODO: Remove
-                        //ShortcutInfo shortcutInfo = DaemonMasterUtils.GetShortcutInfos(openFileDialog.FileName);
-                        //textBoxParam.Text = shortcutInfo.Arguments;
-                        //textBoxFilePath.Text = shortcutInfo.FilePath;
+                        using (ShellLinkWrapper shellLinkWrapper = new ShellLinkWrapper(openFileDialog.FileName))
+                        {
+                            textBoxParam.Text = shellLinkWrapper.Arguments;
+                            textBoxDescription.Text = shellLinkWrapper.Description;
+                            textBoxFilePath.Text = shellLinkWrapper.FilePath;
 
-                        //if (String.IsNullOrWhiteSpace(textBoxDescription.Text))
-                        //{
-                        //    textBoxDescription.Text = shortcutInfo.Description;
-                        //}
-
-                        //if (String.IsNullOrWhiteSpace(textBoxDisplayName.Text))
-                        //{
-                        //    textBoxDisplayName.Text = Path.GetFileNameWithoutExtension(openFileDialog.SafeFileName);
-                        //}
+                            if (String.IsNullOrWhiteSpace(textBoxDisplayName.Text))
+                                textBoxDisplayName.Text = Path.GetFileNameWithoutExtension(openFileDialog.SafeFileName);
+                        }
                     }
                 }
                 else
@@ -368,6 +366,21 @@ namespace DaemonMaster
             _dependOnGroupObservableCollection.Remove((string)listBoxDependOnGroup.SelectedItem);
         }
 
+
+        //Auto formatting the given arguments on focus lost
+        private void TextBoxParam_OnLostFocus(object sender, RoutedEventArgs e)
+        {
+            string args = textBoxParam.Text;
+
+            if (String.IsNullOrWhiteSpace(args))
+                return;
+
+            //Remove leading and trailing white-space characters
+            string trimmed = args.Trim();
+
+            //Remove double spaces etc
+            textBoxParam.Text = Regex.Replace(trimmed, @"\s+", " ");
+        }
         #endregion
 
 
@@ -554,7 +567,6 @@ namespace DaemonMaster
                 MessageBox.Show(ex.Message, _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
         #endregion
     }
 }
