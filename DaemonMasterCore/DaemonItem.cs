@@ -32,6 +32,7 @@ namespace DaemonMasterCore
         public string ServiceName { get; set; }
 
         public ServiceControllerStatus ServiceState { get; set; }
+        public bool UseLocalSystem { get; set; }
 
         public uint PID { get; set; }
 

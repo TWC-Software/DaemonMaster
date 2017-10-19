@@ -30,6 +30,7 @@ using System.Globalization;
 using System.Resources;
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 
@@ -110,8 +111,6 @@ namespace DaemonMaster
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         #region GUI_Elements
-
-
 
         //Buttons
 
@@ -275,6 +274,15 @@ namespace DaemonMaster
         private void listBoxDaemons_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             EditDaemon();
+        }
+
+        private void ListViewDaemons_OnContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            if (listViewDaemons.SelectedItem == null)
+                return;
+
+            //Only show "Start in session" if the service run under the Local System account
+            MenuItem_StartInSession.IsEnabled = ((DaemonItem)listViewDaemons.SelectedItem).UseLocalSystem;
         }
 
         //MENU

@@ -136,7 +136,7 @@ namespace DaemonMaster
             }
             else
             {
-                textBoxPassword.Password = "***Super_sicheres_Passwort***";
+                textBoxPassword.Password = "placeholder";
                 textBoxUsername.Text = daemon.Username;
             }
 
@@ -422,7 +422,7 @@ namespace DaemonMaster
                         return;
                     }
 
-                    if (textBoxPassword.Password != "***Super_sicheres_Password***")
+                    if (textBoxPassword.Password != "placeholder")
                     {
                         if (!SystemManagement.ValidateUserWin32(textBoxUsername.Text,
                             SecurityManagement.ConvertStringToSecureString(textBoxPassword.Password)))

@@ -32,7 +32,6 @@ namespace DaemonMasterCore
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         #region Security
-        private static byte[] array = new byte[16] { 0x7e, 0x37, 0xa6, 0xde, 0xeb, 0xd7, 0x66, 0xf1, 0x89, 0xae, 0xfd, 0xd2, 0x99, 0xc3, 0xcd, 0x81 };
 
         /// <summary>
         /// Convert the given string to a SecureString
@@ -135,13 +134,7 @@ namespace DaemonMasterCore
             if (encryptedPassword.Length <= 0 || entropy.Length <= 0)
                 return null;
 
-            byte[] entropy2 = new byte[entropy.Length];
-            for (int i = 0; i < entropy.Length; i++)
-            {
-                entropy2[i] = (byte)(array[i] ^ entropy[i]);
-            }
-
-            byte[] decryptedPassword = ProtectedData.Unprotect(encryptedPassword, entropy2, DataProtectionScope.LocalMachine);
+            byte[] decryptedPassword = ProtectedData.Unprotect(encryptedPassword, entropy, DataProtectionScope.LocalMachine);
 
             if (decryptedPassword.Length > 0)
             {
@@ -163,19 +156,12 @@ namespace DaemonMasterCore
         /// <returns></returns>
         public static byte[] CreateRandomEntropy()
         {
-            byte[] entropy = new byte[array.Length];
+            byte[] entropy = new byte[16];
             using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())
             {
                 rng.GetBytes(entropy);
             }
-
-            byte[] entropy2 = new byte[entropy.Length];
-            for (int i = 0; i < entropy.Length; i++)
-            {
-                entropy2[i] = (byte)(entropy[i] ^ array[i]);
-            }
-
-            return entropy2;
+            return entropy;
         }
         #endregion
     }

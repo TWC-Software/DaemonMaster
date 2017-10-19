@@ -128,29 +128,23 @@ namespace DaemonMasterCore
 
             foreach (ServiceController service in sc)
             {
-                try
+                if (service.ServiceName.Contains("DaemonMaster_"))
                 {
-                    if (service.ServiceName.Contains("DaemonMaster_"))
+                    using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\" + service.ServiceName + @"\Parameters", false))
                     {
-                        using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\" + service.ServiceName + @"\Parameters", false))
+                        if (key == null)
+                            throw new Exception("Can't open registry key!");
+
+                        DaemonItem daemonItem = new DaemonItem
                         {
-                            if (key == null)
-                                throw new Exception("Can't open registry key!");
+                            DisplayName = service.DisplayName,
+                            ServiceName = service.ServiceName,
+                            FullPath = (string)key.GetValue("FileDir") + @"/" + (string)key.GetValue("FileName"),
+                            UseLocalSystem = Convert.ToBoolean(key.GetValue("UseLocalSystem")),
+                        };
 
-                            DaemonItem daemonItem = new DaemonItem
-                            {
-                                DisplayName = service.DisplayName,
-                                ServiceName = service.ServiceName,
-                                FullPath = (string)key.GetValue("FileDir") + @"/" + (string)key.GetValue("FileName")
-                            };
-
-                            daemons.Add(daemonItem);
-                        }
+                        daemons.Add(daemonItem);
                     }
-                }
-                catch (Exception)
-                {
-                    continue;
                 }
             }
             return daemons;
