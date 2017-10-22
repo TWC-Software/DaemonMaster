@@ -620,7 +620,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Filter (legacy) ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Filter ähnelt.
         /// </summary>
         public static string label_filter {
             get {

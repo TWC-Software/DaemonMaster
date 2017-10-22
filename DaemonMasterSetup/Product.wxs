@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"><?define DaemonMaster_TargetDir=$(var.DaemonMaster.TargetDir)?>
 
-	<Product Id="E251DE73-4A9A-4C0E-AD37-E4842B383AAC" Name="DaemonMaster" Language="1033" Version="0.2.1.0" Manufacturer="TWC-Software" UpgradeCode="F277FE5A-6E5C-45AB-85FA-5DAD8EAEDD02">
+	<Product Id="9523D498-9485-4540-8E2C-213186049078" Name="DaemonMaster" Language="1033" Version="0.2.2.0" Manufacturer="TWC-Software" UpgradeCode="F277FE5A-6E5C-45AB-85FA-5DAD8EAEDD02">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
 		<!--Set install dir-->

@@ -253,7 +253,7 @@
     <value>Arrêter le service</value>
   </data>
   <data name="label_filter" xml:space="preserve">
-    <value>Mode de filtrage (dépassé)</value>
+    <value>Mode de filtrage</value>
   </data>
   <data name="cannot_load_data_from_registry" xml:space="preserve">
     <value>Impossible de charger les données du Registre !!</value>

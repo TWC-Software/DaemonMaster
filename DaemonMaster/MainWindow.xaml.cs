@@ -26,7 +26,9 @@ using DaemonMasterCore.Win32.PInvoke;
 using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Globalization;
+using System.Linq;
 using System.Resources;
 using System.Threading;
 using System.Windows;
@@ -83,8 +85,7 @@ namespace DaemonMaster
 
             #region Legacy functions
 
-            if (!_config.ActivateLegacyFunctions)
-                groupBoxFilter.IsEnabled = false;
+            //if (!_config.ActivateLegacyFunctions)
             #endregion
 
             //Fragt, wenn der RegKey nicht gesetzt ist, ob dieser gesetzt werden soll
@@ -92,6 +93,7 @@ namespace DaemonMaster
                 this.Close();
 
             _processCollection = RegistryManagement.LoadDaemonItemsFromRegistry();
+            _processCollection.CollectionChanged += ProcessCollectionOnCollectionChanged;
             //Start ListView Updater
             StartListViewUpdateTimer(_config.UpdateInterval);
 
@@ -134,15 +136,7 @@ namespace DaemonMaster
 
         private void buttonFilter_Click(object sender, RoutedEventArgs e)
         {
-
-            foreach (DaemonItem d in _processCollection)
-            {
-                if (d.DisplayName.Contains(textBoxFilter.Text))
-                {
-                    listViewDaemons.SelectedItem = d;
-                    break;
-                }
-            }
+            UpdateListViewFilter();
         }
 
         private void buttonSwitchToSession0_Click(object sender, RoutedEventArgs e)
@@ -326,6 +320,27 @@ namespace DaemonMaster
 
         #region Other
 
+        private void UpdateListViewFilter()
+        {
+            if (String.IsNullOrWhiteSpace(textBoxFilter.Text))
+            {
+                if (Equals(listViewDaemons.ItemsSource, _processCollection) || listViewDaemons.Items.Count <= 0)
+                    return;
+
+                listViewDaemons.Items.Clear();
+                listViewDaemons.ItemsSource = _processCollection;
+            }
+
+            listViewDaemons.ItemsSource = null;
+            listViewDaemons.Items.Clear();
+
+            foreach (var item in _processCollection)
+            {
+                if (item.DisplayName.ToLower().Contains(textBoxFilter.Text.ToLower()))
+                    listViewDaemons.Items.Add(item);
+            }
+        }
+
         private bool AskToEnableInteractiveServices()
         {
             //Wenn der RegKey nicht gestetzt ist, soll der Nutzer gefragt werden
@@ -396,7 +411,7 @@ namespace DaemonMaster
             try
             {
                 ServiceManagement.DeleteService(daemonItem.ServiceName);
-                _processCollection.RemoveAt(listViewDaemons.SelectedIndex);
+                _processCollection.Remove(_processCollection.Single(i => i.ServiceName == daemonItem.ServiceName));
 
                 MessageBox.Show(_resManager.GetString("the_service_deletion_was_successful"),
                     _resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
@@ -581,6 +596,16 @@ namespace DaemonMaster
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             CheckForUpdates();
+        }
+
+        private void ProcessCollectionOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+        {
+            UpdateListViewFilter();
+        }
+
+        private void TextBoxFilter_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdateListViewFilter();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////

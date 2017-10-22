@@ -47,14 +47,11 @@ namespace DaemonMasterCore
 
                 if (!daemon.UseLocalSystem)
                 {
-                    byte[] entropy = SecurityManagement.CreateRandomEntropy();
-                    serviceKey.SetValue("Key", entropy, RegistryValueKind.Binary);
-                    serviceKey.SetValue("Password", SecurityManagement.EncryptPassword(daemon.Password, entropy), RegistryValueKind.Binary);
+                    serviceKey.SetValue("Password", SecurityManagement.EncryptPassword(daemon.Password, null), RegistryValueKind.Binary);
                     serviceKey.SetValue("Username", daemon.Username, RegistryValueKind.String);
                 }
                 else
                 {
-                    serviceKey.DeleteValue("Key", false);
                     serviceKey.DeleteValue("Password", false);
                     serviceKey.DeleteValue("Username", false);
                 }
@@ -105,8 +102,7 @@ namespace DaemonMasterCore
                     daemon.FileExtension = Convert.ToString(parameters.GetValue("FileExtension"));
                     daemon.Parameter = Convert.ToString(parameters.GetValue("Parameter"));
                     daemon.Username = Convert.ToString(parameters.GetValue("Username", String.Empty));
-                    byte[] entropy = (byte[])parameters.GetValue("Key", new byte[0]);
-                    daemon.Password = SecurityManagement.DecryptPassword((byte[])parameters.GetValue("Password", new byte[0]), entropy);
+                    daemon.Password = SecurityManagement.DecryptPassword((byte[])parameters.GetValue("Password", new byte[0]), null);
                     daemon.MaxRestarts = Convert.ToInt32(parameters.GetValue("MaxRestarts", 3));
                     daemon.ProcessKillTime = Convert.ToInt32(parameters.GetValue("ProcessKillTime", 9500));
                     daemon.ProcessRestartDelay = Convert.ToInt32(parameters.GetValue("ProcessRestartDelay", 2000));
