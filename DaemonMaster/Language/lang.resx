@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -468,5 +468,8 @@
   </data>
   <data name="label_shutdown_console_app" xml:space="preserve">
     <value>Use to shutdown:</value>
+  </data>
+  <data name="msg_warning_delete" xml:space="preserve">
+    <value>Are you sure you want permanently delete the service?</value>
   </data>
 </root>

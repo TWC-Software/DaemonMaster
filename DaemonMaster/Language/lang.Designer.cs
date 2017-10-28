@@ -719,6 +719,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Are you sure you want permanently delete the service? ähnelt.
+        /// </summary>
+        public static string msg_warning_delete {
+            get {
+                return ResourceManager.GetString("msg_warning_delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die PID ähnelt.
         /// </summary>
         public static string pid {

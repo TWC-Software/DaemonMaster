@@ -20,10 +20,10 @@
 using DaemonMasterCore.Win32;
 using Newtonsoft.Json;
 using System;
+using System.Drawing;
 using System.IO;
 using System.Management;
 using System.ServiceProcess;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Media;
 
@@ -49,7 +49,7 @@ namespace DaemonMasterCore
                     }
                 }
 
-                using (System.Drawing.Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(fullPath))
+                using (Icon icon = Icon.ExtractAssociatedIcon(fullPath))
                 {
                     return System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
                         icon.Handle,

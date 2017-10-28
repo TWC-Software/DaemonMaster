@@ -39,6 +39,8 @@ namespace DaemonMaster
                 "=> Active Directory Object Picker - Tulpep - MS-PL License \n" +
                 "=> ListView Layout Manager - Jani Giannoudis - CPOL License \n\n" +
                 "Thanks to: \n Pinvoke.net \n stackoverflow.com (for help from the users) \n entwickler-ecke.de (for help from the users)";
+
+            labelVersion.Content = "v" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
         }
     }
 }

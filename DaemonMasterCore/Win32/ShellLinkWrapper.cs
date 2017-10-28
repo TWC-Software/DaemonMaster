@@ -21,6 +21,7 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
 namespace DaemonMasterCore.Win32
@@ -28,6 +29,10 @@ namespace DaemonMasterCore.Win32
     public class ShellLinkWrapper : IDisposable
     {
         private bool _isDisposed = false;
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                             PINVOKE                                                  //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         #region From http://pinvoke.net and https://stackoverflow.com/questions/139010/how-to-resolve-a-lnk-in-c-sharp and me ;)       
 
@@ -126,29 +131,6 @@ namespace DaemonMasterCore.Win32
             void GetClassID(out Guid pClassID);
         }
 
-        [ComImport]
-        [Guid("0000010b-0000-0000-C000-000000000046"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        interface IPersistFile : IPersist
-        {
-            new void GetClassID(out Guid pClassID);
-
-            [PreserveSig]
-            int IsDirty();
-
-            [PreserveSig]
-            void Load([In, MarshalAs(UnmanagedType.LPWStr)] string pszFileName, uint dwMode);
-
-            [PreserveSig]
-            void Save([In, MarshalAs(UnmanagedType.LPWStr)] string pszFileName,
-                [In, MarshalAs(UnmanagedType.Bool)] bool fRemember);
-
-            [PreserveSig]
-            void SaveCompleted([In, MarshalAs(UnmanagedType.LPWStr)] string pszFileName);
-
-            [PreserveSig]
-            void GetCurFile([In, MarshalAs(UnmanagedType.LPWStr)] string ppszFileName);
-        }
-
         [Flags]
         enum SLR_FLAGS
         {
@@ -219,11 +201,20 @@ namespace DaemonMasterCore.Win32
         }
         #endregion
 
-        private const uint STGM_READ = 0;
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                            CONSTANTS                                                 //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private const int STGM_READ = 0;
         private const int MAX_PATH = 260;
         private const int INFOTIPSIZE = 1024;
 
-        //Constructor
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                           CONSTRUCTOR                                                //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         public ShellLinkWrapper(string filePath)
         {
             try
@@ -263,6 +254,39 @@ namespace DaemonMasterCore.Win32
             PersistFile.Load(filePath, STGM_READ);
         }
 
+        public void SaveShortcut()
+        {
+            string shortcutPath = ShortcutPath;
+
+            if (shortcutPath == null)
+                throw new ArgumentException("File path is not valid.");
+
+            PersistFile.Save(ShortcutPath, true);
+        }
+
+        public void SaveShortcut(string shortcutPath)
+        {
+            if (shortcutPath == null)
+                throw new ArgumentException("File path is not valid.");
+
+            PersistFile.Save(ShortcutPath, true);
+        }
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                            PROPERTY'S                                                //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public string ShortcutPath
+        {
+            get
+            {
+                string shortcutPath;
+
+                PersistFile.GetCurFile(out shortcutPath);
+                return shortcutPath;
+            }
+        }
 
         public string FilePath
         {
@@ -271,10 +295,13 @@ namespace DaemonMasterCore.Win32
                 StringBuilder stringBuilder = new StringBuilder(MAX_PATH);
                 WIN32_FIND_DATAW data = new WIN32_FIND_DATAW();
 
-                if (shellLink.GetPath(stringBuilder, stringBuilder.Capacity, out data, 0) > 0)
-                    throw new Win32Exception(Marshal.GetHRForLastWin32Error());
-
+                CheckResult(shellLink.GetPath(stringBuilder, stringBuilder.Capacity, out data, 0));
                 return stringBuilder.ToString();
+            }
+
+            set
+            {
+                CheckResult(shellLink.SetPath(value));
             }
         }
 
@@ -284,10 +311,13 @@ namespace DaemonMasterCore.Win32
             {
                 StringBuilder stringBuilder = new StringBuilder(MAX_PATH);
 
-                if (shellLink.GetWorkingDirectory(stringBuilder, stringBuilder.Capacity) > 0)
-                    throw new Win32Exception(Marshal.GetHRForLastWin32Error());
-
+                CheckResult(shellLink.GetWorkingDirectory(stringBuilder, stringBuilder.Capacity));
                 return stringBuilder.ToString();
+            }
+
+            set
+            {
+                CheckResult(shellLink.SetWorkingDirectory(value));
             }
         }
 
@@ -297,10 +327,13 @@ namespace DaemonMasterCore.Win32
             {
                 StringBuilder stringBuilder = new StringBuilder(INFOTIPSIZE);
 
-                if (shellLink.GetArguments(stringBuilder, stringBuilder.Capacity) > 0)
-                    throw new Win32Exception(Marshal.GetHRForLastWin32Error());
-
+                CheckResult(shellLink.GetArguments(stringBuilder, stringBuilder.Capacity));
                 return stringBuilder.ToString();
+            }
+
+            set
+            {
+                CheckResult(shellLink.SetArguments(value));
             }
         }
 
@@ -310,23 +343,36 @@ namespace DaemonMasterCore.Win32
             {
                 StringBuilder stringBuilder = new StringBuilder(INFOTIPSIZE);
 
-                if (shellLink.GetDescription(stringBuilder, stringBuilder.Capacity) > 0)
-                    throw new Win32Exception(Marshal.GetHRForLastWin32Error());
-
+                CheckResult(shellLink.GetDescription(stringBuilder, stringBuilder.Capacity));
                 return stringBuilder.ToString();
+            }
+
+            set
+            {
+                CheckResult(shellLink.SetDescription(value));
             }
         }
 
-        /// <summary>
-        /// Check if the file is a shortcut (.lnk)
-        /// </summary>
-        /// <param name="shortcutFullPath"></param>
-        /// <returns></returns>
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                             OTHER                                                    //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         public static bool IsShortcut(string shortcutFullPath)
         {
             return String.Equals(Path.GetExtension(shortcutFullPath), ".lnk", StringComparison.OrdinalIgnoreCase);
         }
 
+        private static void CheckResult(int hresult)
+        {
+            if (hresult != 0)
+                throw new Win32Exception(Marshal.GetHRForLastWin32Error());
+        }
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                            DISPOSE                                                   //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         #region Dispose
 

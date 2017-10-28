@@ -47,7 +47,7 @@ namespace DaemonMasterCore
 
                 if (!daemon.UseLocalSystem)
                 {
-                    serviceKey.SetValue("Password", SecurityManagement.EncryptPassword(daemon.Password, null), RegistryValueKind.Binary);
+                    serviceKey.SetValue("Password", SecurityManagement.EncryptPassword(daemon.Password), RegistryValueKind.Binary);
                     serviceKey.SetValue("Username", daemon.Username, RegistryValueKind.String);
                 }
                 else
@@ -102,7 +102,7 @@ namespace DaemonMasterCore
                     daemon.FileExtension = Convert.ToString(parameters.GetValue("FileExtension"));
                     daemon.Parameter = Convert.ToString(parameters.GetValue("Parameter"));
                     daemon.Username = Convert.ToString(parameters.GetValue("Username", String.Empty));
-                    daemon.Password = SecurityManagement.DecryptPassword((byte[])parameters.GetValue("Password", new byte[0]), null);
+                    daemon.Password = SecurityManagement.DecryptPassword((byte[])parameters.GetValue("Password", new byte[0]));
                     daemon.MaxRestarts = Convert.ToInt32(parameters.GetValue("MaxRestarts", 3));
                     daemon.ProcessKillTime = Convert.ToInt32(parameters.GetValue("ProcessKillTime", 9500));
                     daemon.ProcessRestartDelay = Convert.ToInt32(parameters.GetValue("ProcessRestartDelay", 2000));
@@ -136,7 +136,6 @@ namespace DaemonMasterCore
                             DisplayName = service.DisplayName,
                             ServiceName = service.ServiceName,
                             FullPath = (string)key.GetValue("FileDir") + @"/" + (string)key.GetValue("FileName"),
-                            UseLocalSystem = Convert.ToBoolean(key.GetValue("UseLocalSystem")),
                         };
 
                         daemons.Add(daemonItem);
@@ -162,7 +161,7 @@ namespace DaemonMasterCore
 
 
 
-        //�ndert den Regkey so das Interactive Services erlaubt werden (Set NoInteractiveServices to 0)
+        //Set NoInteractiveServices to 0
         public static bool ActivateInteractiveServices()
         {
             try
@@ -183,7 +182,7 @@ namespace DaemonMasterCore
             }
         }
 
-        //�ndert den Regkey so das Interactive Services erlaubt werden (Set NoInteractiveServices to 0)
+        //Check if NoInteractiveServices is 0
         public static bool CheckNoInteractiveServicesRegKey()
         {
             try

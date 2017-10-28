@@ -29,11 +29,12 @@ namespace DaemonMasterCore
 {
     public static class SecurityManagement
     {
+        private static readonly byte[] key = new byte[16] { 0x3f, 0xdd, 0x43, 0x27, 0xd4, 0x36, 0x9b, 0x8c, 0x7a, 0x35, 0x4e, 0xb3, 0xfa, 0xbf, 0x17, 0x86 };
+
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                            Security                                                  //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 
         #region Security
 
@@ -85,8 +86,11 @@ namespace DaemonMasterCore
         /// <param name="password"></param>
         /// <param name="entropy"></param>
         /// <returns></returns>
-        public static unsafe byte[] EncryptPassword(SecureString password, byte[] entropy)
+        public static unsafe byte[] EncryptPassword(SecureString password, byte[] entropy = null)
         {
+            if (entropy == null)
+                entropy = key;
+
             //Source: https://stackoverflow.com/questions/18392538/securestring-to-byte-c-sharp, 17.07.2017
             IntPtr passwordPtr = Marshal.SecureStringToGlobalAllocUnicode(password);
             byte[] bValue = null;
@@ -130,12 +134,15 @@ namespace DaemonMasterCore
         /// <param name="encryptedPassword"></param>
         /// <param name="entropy"></param>
         /// <returns></returns>
-        public static SecureString DecryptPassword(byte[] encryptedPassword, byte[] entropy)
+        public static SecureString DecryptPassword(byte[] encryptedPassword, byte[] entropy = null)
         {
-            if (encryptedPassword == null || entropy == null)
-                throw new ArgumentNullException();
+            if (entropy == null)
+                entropy = key;
 
-            if (encryptedPassword.Length <= 0 || entropy.Length <= 0)
+            if (encryptedPassword == null)
+                throw new ArgumentNullException("No password is given to decrypt.");
+
+            if (encryptedPassword.Length <= 0)
                 return null;
 
             byte[] decryptedPassword = ProtectedData.Unprotect(encryptedPassword, entropy, DataProtectionScope.LocalMachine);

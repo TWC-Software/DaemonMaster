@@ -134,11 +134,6 @@ namespace DaemonMaster
             RemoveDaemon((DaemonItem)listViewDaemons.SelectedItem);
         }
 
-        private void buttonFilter_Click(object sender, RoutedEventArgs e)
-        {
-            UpdateListViewFilter();
-        }
-
         private void buttonSwitchToSession0_Click(object sender, RoutedEventArgs e)
         {
             SwitchToSession0();
@@ -275,8 +270,12 @@ namespace DaemonMaster
             if (listViewDaemons.SelectedItem == null)
                 return;
 
+            //TODO: Optimize...
+            //Load data from registry
+            Daemon daemon = RegistryManagement.LoadDaemonFromRegistry(((DaemonItem)listViewDaemons.SelectedItem).ServiceName);
+
             //Only show "Start in session" if the service run under the Local System account
-            MenuItem_StartInSession.IsEnabled = ((DaemonItem)listViewDaemons.SelectedItem).UseLocalSystem;
+            MenuItem_StartInSession.IsEnabled = daemon.UseLocalSystem;
         }
 
         //MENU
@@ -408,6 +407,14 @@ namespace DaemonMaster
 
         private void RemoveDaemon(DaemonItem daemonItem)
         {
+            MessageBoxResult result;
+
+            result = MessageBox.Show(_resManager.GetString("msg_warning_delete"), _resManager.GetString("question"),
+                MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result != MessageBoxResult.Yes)
+                return;
+
             try
             {
                 ServiceManagement.DeleteService(daemonItem.ServiceName);
@@ -418,8 +425,8 @@ namespace DaemonMaster
             }
             catch (ServiceNotStoppedException)
             {
-                MessageBoxResult result = MessageBox.Show(_resManager.GetString("you_must_stop_the_service_first"),
-                    _resManager.GetString("information"), MessageBoxButton.YesNo, MessageBoxImage.Information);
+                result = MessageBox.Show(_resManager.GetString("you_must_stop_the_service_first"),
+                   _resManager.GetString("information"), MessageBoxButton.YesNo, MessageBoxImage.Information);
 
                 if (result == MessageBoxResult.Yes)
                 {

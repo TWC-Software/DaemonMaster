@@ -136,6 +136,7 @@ namespace DaemonMaster
             }
             else
             {
+                checkBoxUseLocalSystem.IsChecked = false;
                 textBoxPassword.Password = "placeholder";
                 textBoxUsername.Text = daemon.Username;
             }

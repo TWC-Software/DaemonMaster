@@ -23,8 +23,7 @@
 
         <GroupBox x:Name="groupBoxFilter" Header="{x:Static resx:lang.label_filter}" HorizontalAlignment="Left" Height="64" Margin="10,281,0,0" VerticalAlignment="Top" Width="257" Foreground="Black">
             <Grid>
-                <Button x:Name="buttonFilter" Content="{x:Static resx:lang.button_search}" HorizontalAlignment="Left" Margin="160,10,0,0" VerticalAlignment="Top" Width="75" Height="23" Click="buttonFilter_Click"/>
-                <TextBox x:Name="textBoxFilter" HorizontalAlignment="Left" Height="23" Margin="1,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="154" TextChanged="TextBoxFilter_OnTextChanged"/>
+                <TextBox x:Name="textBoxFilter" HorizontalAlignment="Left" Height="23" Margin="1,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="234" TextChanged="TextBoxFilter_OnTextChanged"/>
             </Grid>
         </GroupBox>
 
