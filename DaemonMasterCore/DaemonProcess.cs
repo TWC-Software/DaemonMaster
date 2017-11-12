@@ -17,14 +17,14 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using DaemonMasterCore.Jobs;
-using DaemonMasterCore.Win32;
-using NLog;
 using System;
 using System.Diagnostics;
 using System.Security.Authentication;
 using System.Text.RegularExpressions;
 using System.Threading;
+using DaemonMasterCore.Jobs;
+using DaemonMasterCore.Win32;
+using NLog;
 using NativeMethods = DaemonMasterCore.Win32.PInvoke.NativeMethods;
 
 namespace DaemonMasterCore
@@ -95,13 +95,14 @@ namespace DaemonMasterCore
             {
                 FileName = realPath,
                 Arguments = realArgs,
-                UseShellExecute = false
+                UseShellExecute = false,
+
             };
 
             if (!_daemon.UseLocalSystem)
             {
-                if (!String.IsNullOrWhiteSpace(_daemon.Username) && _daemon.Password != null)
-                    throw new InvalidCredentialException();
+                if (String.IsNullOrWhiteSpace(_daemon.Username) || _daemon.Password == null)
+                    throw new InvalidCredentialException("The given username, password or both are invalid (null?)");
 
                 if (SystemManagement.ValidateUserWin32(_daemon.Username, _daemon.Password))
                 {
@@ -110,7 +111,7 @@ namespace DaemonMasterCore
                 }
                 else
                 {
-                    throw new InvalidCredentialException();
+                    throw new InvalidCredentialException("Password is invalid");
                 }
             }
 

@@ -17,13 +17,6 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using AutoUpdaterDotNET;
-using DaemonMaster.Language;
-using DaemonMasterCore;
-using DaemonMasterCore.Config;
-using DaemonMasterCore.Exceptions;
-using DaemonMasterCore.Win32.PInvoke;
-using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -35,6 +28,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+using AutoUpdaterDotNET;
+using DaemonMaster.Language;
+using DaemonMasterCore;
+using DaemonMasterCore.Config;
+using DaemonMasterCore.Exceptions;
+using DaemonMasterCore.Win32.PInvoke;
+using Microsoft.Win32;
 
 namespace DaemonMaster
 {
@@ -270,12 +270,8 @@ namespace DaemonMaster
             if (listViewDaemons.SelectedItem == null)
                 return;
 
-            //TODO: Optimize...
-            //Load data from registry
-            Daemon daemon = RegistryManagement.LoadDaemonFromRegistry(((DaemonItem)listViewDaemons.SelectedItem).ServiceName);
-
             //Only show "Start in session" if the service run under the Local System account
-            MenuItem_StartInSession.IsEnabled = daemon.UseLocalSystem;
+            MenuItem_StartInSession.IsEnabled = ((DaemonItem)listViewDaemons.SelectedItem).UseLocalSystem;
         }
 
         //MENU
@@ -348,14 +344,12 @@ namespace DaemonMaster
                 MessageBoxResult result = MessageBox.Show(_resManager.GetString("interactive_service_regkey_not_set"), _resManager.GetString("question"), MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
                 {
-                    if (RegistryManagement.ActivateInteractiveServices())
+                    if (RegistryManagement.EnableInteractiveServices(true))
                     {
                         return true;
                     }
-                    else
-                    {
-                        MessageBox.Show(_resManager.GetString("problem_occurred"), _resManager.GetString("error"), MessageBoxButton.OK);
-                    }
+
+                    MessageBox.Show(_resManager.GetString("problem_occurred"), _resManager.GetString("error"), MessageBoxButton.OK);
                 }
 
                 return false;
@@ -407,9 +401,7 @@ namespace DaemonMaster
 
         private void RemoveDaemon(DaemonItem daemonItem)
         {
-            MessageBoxResult result;
-
-            result = MessageBox.Show(_resManager.GetString("msg_warning_delete"), _resManager.GetString("question"),
+            MessageBoxResult result = MessageBox.Show(_resManager.GetString("msg_warning_delete"), _resManager.GetString("question"),
                 MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result != MessageBoxResult.Yes)
@@ -608,6 +600,24 @@ namespace DaemonMaster
         private void ProcessCollectionOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
         {
             UpdateListViewFilter();
+
+            //different kind of changes that may have occurred in collection
+            if (notifyCollectionChangedEventArgs.Action == NotifyCollectionChangedAction.Add)
+            {
+                //your code
+            }
+            if (notifyCollectionChangedEventArgs.Action == NotifyCollectionChangedAction.Replace)
+            {
+                //your code
+            }
+            if (notifyCollectionChangedEventArgs.Action == NotifyCollectionChangedAction.Remove)
+            {
+                //your code
+            }
+            if (notifyCollectionChangedEventArgs.Action == NotifyCollectionChangedAction.Move)
+            {
+                //your code
+            }
         }
 
         private void TextBoxFilter_OnTextChanged(object sender, TextChangedEventArgs e)
@@ -634,8 +644,7 @@ namespace DaemonMaster
         {
             foreach (var daemonItem in _processCollection)
             {
-                daemonItem.ServiceState = ServiceManagement.GetServiceStatus(daemonItem.ServiceName);
-                daemonItem.PID = ServiceManagement.GetPIDByServiceName(daemonItem.ServiceName);
+                daemonItem.UpdateStatus();
             }
 
             //Force refresh of the listview

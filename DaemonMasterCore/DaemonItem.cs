@@ -18,6 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
+using System;
 using System.ServiceProcess;
 using System.Windows.Media;
 
@@ -47,5 +48,25 @@ namespace DaemonMasterCore
         }
 
         public ImageSource Icon => _icon;
+
+        /// <summary>
+        /// Return a bool that indicate that the service run under LocalSystem rights
+        /// </summary>
+        /// <returns>Returns false if parameter not exist</returns>
+        public bool UseLocalSystem => Convert.ToBoolean(RegistryManagement.GetParameterFromRegistry(ServiceName, "UseLocalSystem"));
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                             METHODS                                                  //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        /// <summary>
+        /// Update PID and Status of the DaemonItem
+        /// </summary>
+        public void UpdateStatus()
+        {
+            ServiceState = ServiceManagement.GetServiceStatus(ServiceName);
+            PID = ServiceManagement.GetPIDByServiceName(ServiceName);
+        }
     }
 }

@@ -28,7 +28,7 @@
                     <Label x:Name="labelFilePath" Content="{x:Static resx:lang.label_file_path}" HorizontalAlignment="Left" Margin="10,162,0,0" VerticalAlignment="Top"/>
                     <TextBox x:Name="textBoxParam" Height="23" Width="321" Margin="147,98,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" LostFocus="TextBoxParam_OnLostFocus"/>
                     <Label x:Name="labelParam" Content="{x:Static resx:lang.label_parameters}" HorizontalAlignment="Left" Margin="10,95,0,0" VerticalAlignment="Top"/>
-                    <GroupBox x:Name="groupBoxCustomUsername" Header="{x:Static resx:lang.groupbox_custom_user}" HorizontalAlignment="Left" Height="116" Margin="486,-3,0,0" VerticalAlignment="Top" Width="378">
+                    <GroupBox x:Name="groupBoxCustomUsername" Header="{x:Static resx:lang.groupbox_custom_user}" HorizontalAlignment="Left" Height="116" Margin="486,-3,0,0" VerticalAlignment="Top" Width="378" IsEnabled="False">
                         <Grid HorizontalAlignment="Left" Height="100" Margin="0,0,-2,-6" VerticalAlignment="Top" Width="267">
                             <Label x:Name="labelUsername" Content="{x:Static resx:lang.label_username}" HorizontalAlignment="Left" Margin="4,32,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.258,0.487"/>
                             <Label x:Name="labelPassword" Content="{x:Static resx:lang.label_password}" HorizontalAlignment="Left" Margin="4,63,0,0" VerticalAlignment="Top"/>

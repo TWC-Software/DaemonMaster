@@ -18,11 +18,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
-using DaemonMaster.Language;
-using DaemonMasterCore;
-using DaemonMasterCore.Exceptions;
-using DaemonMasterCore.Win32.PInvoke;
-using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -34,8 +29,13 @@ using System.ServiceProcess;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Data;
+using DaemonMaster.Language;
+using DaemonMasterCore;
 using DaemonMasterCore.Config;
+using DaemonMasterCore.Exceptions;
 using DaemonMasterCore.Win32;
+using DaemonMasterCore.Win32.PInvoke;
+using Microsoft.Win32;
 using Tulpep.ActiveDirectoryObjectPicker;
 
 namespace DaemonMaster
@@ -127,8 +127,8 @@ namespace DaemonMaster
             radioButtonUseCtrlC.IsChecked = _daemon.UseCtrlC;
             radioButtonUseCtrlBreak.IsChecked = !_daemon.UseCtrlC;
 
-
-            if (String.IsNullOrWhiteSpace(daemon.Username) || daemon.UseLocalSystem || daemon.Password == null)
+            // String.IsNullOrWhiteSpace(daemon.Username) || daemon.UseLocalSystem || daemon.Password == null
+            if (true)
             {
                 checkBoxUseLocalSystem.IsChecked = true;
                 textBoxPassword.Password = String.Empty;

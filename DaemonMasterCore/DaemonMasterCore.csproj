@@ -69,6 +69,10 @@
     <Compile Include="Daemon.cs" />
     <Compile Include="DaemonMasterUtils.cs" />
     <Compile Include="DaemonItem.cs" />
+    <Compile Include="PluginSystem\API.cs" />
+    <Compile Include="PluginSystem\IAPI.cs" />
+    <Compile Include="PluginSystem\PluginContracts.cs" />
+    <Compile Include="PluginSystem\PluginLoader.cs" />
     <Compile Include="ProcessManagement.cs" />
     <Compile Include="ServiceCommands.cs" />
     <Compile Include="ServiceInfo.cs" />

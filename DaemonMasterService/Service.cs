@@ -18,11 +18,9 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
-using DaemonMasterCore;
 using System;
-using System.Diagnostics;
 using System.ServiceProcess;
-using DaemonMasterCore.Win32.PInvoke;
+using DaemonMasterCore;
 using NLog;
 
 namespace DaemonMasterService

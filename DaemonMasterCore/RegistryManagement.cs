@@ -17,12 +17,11 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using DaemonMasterCore.Win32.PInvoke;
-using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ServiceProcess;
+using DaemonMasterCore.Win32.PInvoke;
+using Microsoft.Win32;
 
 namespace DaemonMasterCore
 {
@@ -34,9 +33,21 @@ namespace DaemonMasterCore
 
         #region Registry
 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                              CONST                                                   //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        private const string RegPath = @"SYSTEM\CurrentControlSet\Services\";
+        private const string RegPathServiceGroups = @"SYSTEM\CurrentControlSet\Control\ServiceGroupOrder\";
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                             METHODS                                                  //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         public static void SaveInRegistry(Daemon daemon)
         {
-            using (RegistryKey serviceKey = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Services\" + daemon.ServiceName + @"\Parameters"))
+            using (RegistryKey serviceKey = Registry.LocalMachine.CreateSubKey(RegPath + daemon.ServiceName + @"\Parameters"))
             {
                 //Strings
                 serviceKey.SetValue("FileDir", daemon.FileDir, RegistryValueKind.String);
@@ -74,10 +85,10 @@ namespace DaemonMasterCore
         public static Daemon LoadDaemonFromRegistry(string serviceName)
         {
             //Open Regkey folder
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\" + serviceName, false))
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + serviceName, false))
             {
                 if (key == null)
-                    throw new Exception("Can't open registry key!");
+                    throw new Exception("Can't open registry key! (General)");
 
                 Daemon daemon = new Daemon
                 {
@@ -92,10 +103,10 @@ namespace DaemonMasterCore
 
 
                 //Open Parameters SubKey
-                using (RegistryKey parameters = key.OpenSubKey(@"Parameters", false))
+                using (RegistryKey parameters = key.OpenSubKey("Parameters", false))
                 {
                     if (parameters == null)
-                        throw new Exception("Can't open registry key!");
+                        throw new Exception("Can't open registry key! (Parameters)");
 
                     daemon.FileDir = Convert.ToString(parameters.GetValue("FileDir"));
                     daemon.FileName = Convert.ToString(parameters.GetValue("FileName"));
@@ -116,6 +127,14 @@ namespace DaemonMasterCore
             }
         }
 
+        public static object GetParameterFromRegistry(string serviceName, string parameterName)
+        {
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + serviceName + @"\Parameters", false))
+            {
+                return key.GetValue(parameterName, null);
+            }
+        }
+
         public static ObservableCollection<DaemonItem> LoadDaemonItemsFromRegistry()
         {
             ObservableCollection<DaemonItem> daemons = new ObservableCollection<DaemonItem>();
@@ -126,7 +145,7 @@ namespace DaemonMasterCore
             {
                 if (service.ServiceName.Contains("DaemonMaster_"))
                 {
-                    using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\" + service.ServiceName + @"\Parameters", false))
+                    using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + service.ServiceName + @"\Parameters", false))
                     {
                         if (key == null)
                             throw new Exception("Can't open registry key!");
@@ -148,7 +167,7 @@ namespace DaemonMasterCore
         public static string[] GetAllServiceGroups()
         {
             //Open Regkey folder
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\ServiceGroupOrder", false))
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPathServiceGroups, false))
             {
                 if (key == null)
                     throw new Exception("Can't open registry key!");
@@ -162,7 +181,7 @@ namespace DaemonMasterCore
 
 
         //Set NoInteractiveServices to 0
-        public static bool ActivateInteractiveServices()
+        public static bool EnableInteractiveServices(bool enable)
         {
             try
             {
@@ -171,7 +190,7 @@ namespace DaemonMasterCore
                     if (regKey == null)
                         return false;
 
-                    regKey.SetValue("NoInteractiveServices", "0", RegistryValueKind.DWord);
+                    regKey.SetValue("NoInteractiveServices", enable ? "1" : "0", RegistryValueKind.DWord);
                     regKey.Close();
                     return true;
                 }
