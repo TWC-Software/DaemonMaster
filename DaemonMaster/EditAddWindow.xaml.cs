@@ -127,8 +127,8 @@ namespace DaemonMaster
             radioButtonUseCtrlC.IsChecked = _daemon.UseCtrlC;
             radioButtonUseCtrlBreak.IsChecked = !_daemon.UseCtrlC;
 
-            // String.IsNullOrWhiteSpace(daemon.Username) || daemon.UseLocalSystem || daemon.Password == null
-            if (true)
+#if DEBUG
+            if (String.IsNullOrWhiteSpace(daemon.Username) || daemon.UseLocalSystem || daemon.Password == null)
             {
                 checkBoxUseLocalSystem.IsChecked = true;
                 textBoxPassword.Password = String.Empty;
@@ -136,11 +136,13 @@ namespace DaemonMaster
             }
             else
             {
+#endif
                 checkBoxUseLocalSystem.IsChecked = false;
                 textBoxPassword.Password = "placeholder";
                 textBoxUsername.Text = daemon.Username;
+#if DEBUG
             }
-
+#endif
 
             switch (daemon.StartType)
             {
@@ -264,7 +266,7 @@ namespace DaemonMaster
 
         private void buttonOpenADOP_OnClick(object sender, RoutedEventArgs e)
         {
-            DirectoryObjectPickerDialog pickerDialog = new DirectoryObjectPickerDialog()
+            using (DirectoryObjectPickerDialog pickerDialog = new DirectoryObjectPickerDialog()
             {
 
                 AllowedObjectTypes = ObjectTypes.Users,
@@ -273,11 +275,12 @@ namespace DaemonMaster
                 DefaultLocations = Locations.LocalComputer,
                 MultiSelect = false,
                 ShowAdvancedView = true
-            };
-
-            if (pickerDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            })
             {
-                textBoxUsername.Text = pickerDialog.SelectedObject.Name;
+                if (pickerDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    textBoxUsername.Text = pickerDialog.SelectedObject.Name;
+                }
             }
         }
 
@@ -425,8 +428,7 @@ namespace DaemonMaster
 
                     if (textBoxPassword.Password != "placeholder")
                     {
-                        if (!SystemManagement.ValidateUserWin32(textBoxUsername.Text,
-                            SecurityManagement.ConvertStringToSecureString(textBoxPassword.Password)))
+                        if (!SystemManagement.ValidateUserWin32(textBoxUsername.Text, SecurityManagement.ConvertStringToSecureString(textBoxPassword.Password)))
                         {
                             MessageBox.Show(_resManager.GetString("invalid_user", CultureInfo.CurrentUICulture), _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
                             return;
@@ -446,7 +448,7 @@ namespace DaemonMaster
                 }
                 else
                 {
-                    _daemon.Username = String.Empty;
+                    _daemon.Username = null;
                     _daemon.Password = null;
                 }
 

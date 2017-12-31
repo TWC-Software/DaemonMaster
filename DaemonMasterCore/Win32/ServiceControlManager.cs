@@ -17,10 +17,12 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using Microsoft.Win32.SafeHandles;
+using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
+using Microsoft.Win32.SafeHandles;
 
 namespace DaemonMasterCore.Win32
 {
@@ -59,16 +61,29 @@ namespace DaemonMasterCore.Win32
             string tagId,
             StringBuilder dependencies,
             string serviceStartName,
-            string password)
+            SecureString password)
         {
-            ServiceHandle serviceHandle = PInvoke.NativeMethods.CreateService(this, serviceName, displayName, desiredAccess,
-                serviceType, startType, errorControl, binaryPathName, loadOrderGroup, tagId, dependencies,
-                serviceStartName, password);
+            IntPtr passwordHandle = IntPtr.Zero;
 
-            if (serviceHandle.IsInvalid)
-                throw new Win32Exception(Marshal.GetLastWin32Error());
+            try
+            {
+                passwordHandle = Marshal.SecureStringToGlobalAllocUnicode(password);
 
-            return serviceHandle;
+                ServiceHandle serviceHandle = PInvoke.NativeMethods.CreateService(this, serviceName, displayName,
+                    desiredAccess,
+                    serviceType, startType, errorControl, binaryPathName, loadOrderGroup, tagId, dependencies,
+                    serviceStartName, passwordHandle);
+
+                if (serviceHandle.IsInvalid)
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+
+                return serviceHandle;
+            }
+            finally
+            {
+                if (passwordHandle != IntPtr.Zero)
+                    Marshal.ZeroFreeGlobalAllocUnicode(passwordHandle);
+            }
         }
 
         //Open a service and return the ServiceHandle

@@ -343,6 +343,8 @@ namespace DaemonMasterCore.Win32.PInvoke
         [Flags]
         public enum SERVICE_START : uint
         {
+            SERVICE_NO_CHANGE = 0xffffffff,
+
             /// <summary>
             /// A device driver started by the system loader. This value is valid
             /// only for driver services.
@@ -430,6 +432,7 @@ namespace DaemonMasterCore.Win32.PInvoke
             WinNT50 = 3
         }
 
+        [Flags]
         public enum PRIORITY_CLASS
         {
             IDLE_PRIORITY_CLASS = 0x40,
@@ -505,6 +508,26 @@ namespace DaemonMasterCore.Win32.PInvoke
             ExtendedLimitInformation = 9,
             SecurityLimitInformation = 5,
             GroupInformation = 11
+        }
+
+        public enum SECURITY_IMPERSONATION_LEVEL
+        {
+            SecurityAnonymous,
+            SecurityIdentification,
+            SecurityImpersonation,
+            SecurityDelegation
+        }
+
+        public enum TOKEN_TYPE
+        {
+            TokenPrimary = 1,
+            TokenImpersonation
+        }
+
+        public enum LOGON_FLAGS
+        {
+            LOGON_WITH_PROFILE = 0x00000001,
+            LOGON_NETCREDENTIALS_ONLY = 0x00000002
         }
     }
 }

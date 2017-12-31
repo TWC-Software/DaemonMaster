@@ -728,15 +728,6 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die PID ähnelt.
-        /// </summary>
-        public static string pid {
-            get {
-                return ResourceManager.GetString("pid", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Time befor the restart counter will be reset ähnelt.
         /// </summary>
         public static string placeholder_counter_reset_time {
@@ -827,6 +818,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Process PID ähnelt.
+        /// </summary>
+        public static string process_pid {
+            get {
+                return ResourceManager.GetString("process_pid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Question ähnelt.
         /// </summary>
         public static string question {
@@ -859,6 +859,15 @@ namespace DaemonMaster.Language {
         public static string service {
             get {
                 return ResourceManager.GetString("service", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Service PID ähnelt.
+        /// </summary>
+        public static string service_pid {
+            get {
+                return ResourceManager.GetString("service_pid", resourceCulture);
             }
         }
         

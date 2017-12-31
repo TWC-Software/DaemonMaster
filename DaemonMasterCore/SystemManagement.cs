@@ -17,11 +17,11 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using DaemonMasterCore.Win32.PInvoke;
 using System;
 using System.DirectoryServices.AccountManagement;
-using System.Runtime.InteropServices;
 using System.Security;
+using DaemonMasterCore.Win32;
+using DaemonMasterCore.Win32.PInvoke;
 
 namespace DaemonMasterCore
 {
@@ -41,21 +41,9 @@ namespace DaemonMasterCore
             if (String.IsNullOrWhiteSpace(username) || password == null)
                 throw new ArgumentNullException();
 
-            IntPtr tokenHandle = IntPtr.Zero;
-            IntPtr passwordPtr = IntPtr.Zero;
-
-            try
+            using (TokenHandle tokenHandle = TokenHandle.GetTokenFromLogon(username, password, NativeMethods.LOGON_TYP.Interactive))
             {
-                passwordPtr = Marshal.SecureStringToGlobalAllocUnicode(password);
-                return NativeMethods.LogonUser(username, ".", passwordPtr, NativeMethods.LOGON_TYP.Interactive, NativeMethods.LOGON_PROVIDER.Default, out tokenHandle);
-            }
-            finally
-            {
-                if (passwordPtr != IntPtr.Zero)
-                    Marshal.ZeroFreeGlobalAllocUnicode(passwordPtr);
-
-                if (tokenHandle != IntPtr.Zero)
-                    NativeMethods.CloseHandle(tokenHandle);
+                return !tokenHandle.IsInvalid;
             }
         }
     }

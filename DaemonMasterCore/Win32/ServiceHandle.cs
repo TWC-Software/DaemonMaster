@@ -16,11 +16,11 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using Microsoft.Win32.SafeHandles;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text;
+using Microsoft.Win32.SafeHandles;
 
 namespace DaemonMasterCore.Win32
 {
@@ -104,8 +104,7 @@ namespace DaemonMasterCore.Win32
             }
             finally
             {
-                //Gebe Speicher, wenn genutzt, wieder frei
-                if (!buffer.Equals(IntPtr.Zero))
+                if (buffer != IntPtr.Zero)
                     Marshal.FreeHGlobal(buffer);
             }
         }

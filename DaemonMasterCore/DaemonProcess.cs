@@ -45,6 +45,27 @@ namespace DaemonMasterCore
         private string realPath = String.Empty;
         private string realArgs = String.Empty;
 
+        /// <summary>
+        /// Get the process PID (if invalid the property return -1)
+        /// </summary>
+        public int ProcessPID
+        {
+            get
+            {
+                try
+                {
+                    if (IsRunning())
+                        return _process.Id;
+
+                    return -1;
+                }
+                catch (Exception)
+                {
+                    return -1;
+                }
+            }
+        }
+
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                        Constructor + Init                                            //

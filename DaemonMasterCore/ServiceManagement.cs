@@ -17,16 +17,16 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.ServiceProcess;
+using System.Text;
 using DaemonMasterCore.Exceptions;
 using DaemonMasterCore.Win32;
 using NLog;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
 using NativeMethods = DaemonMasterCore.Win32.PInvoke.NativeMethods;
 
 namespace DaemonMasterCore
@@ -188,7 +188,7 @@ namespace DaemonMasterCore
             if (useJobObjectMethod)
             {
 
-                int pid = (int)GetPIDByServiceName(serviceName);
+                int pid = (int)GetServicePID(serviceName);
 
                 if (pid != 0)
                 {
@@ -355,19 +355,22 @@ namespace DaemonMasterCore
         /// Return the PID of the service
         /// </summary>
         /// <param name="serviceName"></param>
-        /// <returns></returns>
-        //https://social.msdn.microsoft.com/Forums/vstudio/en-US/a979351c-800f-41e7-b153-2d53ff6aac29/how-to-get-running-windows-service-process-id-?forum=netfxbcl, 02.08.2017
-        public static uint GetPIDByServiceName(string serviceName)
+        /// <returns>Return the PID of the service</returns>
+        public static int GetServicePID(string serviceName)
         {
-
-            uint processId = 0;
-            string qry = "SELECT PROCESSID FROM WIN32_SERVICE WHERE NAME = '" + serviceName + "'";
-            System.Management.ManagementObjectSearcher searcher = new System.Management.ManagementObjectSearcher(qry);
-            foreach (System.Management.ManagementObject mngntObj in searcher.Get())
+            using (ServiceControlManager serviceControlManager = ServiceControlManager.Connect(NativeMethods.SCM_ACCESS.SC_MANAGER_CONNECT))
             {
-                processId = (uint)mngntObj["PROCESSID"];
+                if (serviceControlManager.IsInvalid)
+                    throw new Win32Exception("Can't connect to the service control manager!");
+
+                using (ServiceHandle serviceHandle = serviceControlManager.OpenService(serviceName, NativeMethods.SERVICE_ACCESS.SERVICE_QUERY_STATUS))
+                {
+                    if (serviceHandle.IsInvalid)
+                        throw new Win32Exception("The service handle is invalid!");
+
+                    return serviceHandle.QueryServiceStatusEx().processID;
+                }
             }
-            return processId;
         }
 
 

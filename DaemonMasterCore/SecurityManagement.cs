@@ -18,8 +18,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Cryptography;
@@ -43,7 +41,7 @@ namespace DaemonMasterCore
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static SecureString ConvertStringToSecureString(string data)
+        public static SecureString ConvertStringToSecureString(this string data)
         {
             SecureString secString = new SecureString();
 
@@ -63,10 +61,10 @@ namespace DaemonMasterCore
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static String ConvertSecureStringToString(SecureString data)
+        public static String ConvertSecureStringToString(this SecureString data)
         {
             if (data == null)
-                return String.Empty;
+                return null;
 
             IntPtr valuePtr = IntPtr.Zero;
             try

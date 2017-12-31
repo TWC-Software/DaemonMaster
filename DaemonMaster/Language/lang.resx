@@ -382,8 +382,8 @@
   <data name="status" xml:space="preserve">
     <value>Status</value>
   </data>
-  <data name="pid" xml:space="preserve">
-    <value>PID</value>
+  <data name="service_pid" xml:space="preserve">
+    <value>Service PID</value>
   </data>
   <data name="enum_stopped" xml:space="preserve">
     <value>Stopped</value>
@@ -471,5 +471,8 @@
   </data>
   <data name="msg_warning_delete" xml:space="preserve">
     <value>Are you sure you want permanently delete the service?</value>
+  </data>
+  <data name="process_pid" xml:space="preserve">
+    <value>Process PID</value>
   </data>
 </root>

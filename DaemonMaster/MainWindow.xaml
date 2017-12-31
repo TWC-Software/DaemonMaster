@@ -7,6 +7,7 @@
         xmlns:LocalWPF="clr-namespace:DaemonMaster.WPF"
         xmlns:resx="clr-namespace:DaemonMaster.Language"
         xmlns:ctrl="clr-namespace:Itenso.Windows.Controls.ListViewLayout;assembly=Itenso.Windows.Controls.ListViewLayout"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="DaemonMaster" Height="383.811" Width="525" Background="White" Foreground="Black" ResizeMode="NoResize" Closing="Window_Closing" Loaded="MainWindow_OnLoaded">
 
@@ -38,20 +39,12 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="{x:Static resx:lang.service}" DisplayMemberBinding="{Binding DisplayName}" Width="120"/>
-                    <GridViewColumn Header="{x:Static resx:lang.pid}" DisplayMemberBinding="{Binding PID}" Width="70"/>
-                    <GridViewColumn Header="{x:Static resx:lang.status}" DisplayMemberBinding="{Binding ServiceState, Converter={StaticResource serviceControllerStatusConverter}}" Width="70"/>
+                    <GridViewColumn Header="{x:Static resx:lang.service}" DisplayMemberBinding="{Binding Path=DisplayName}" Width="120"/>
+                    <GridViewColumn Header="{x:Static resx:lang.service_pid}" DisplayMemberBinding="{Binding Path=ServicePid, TargetNullValue='{x:Static resx:lang.enum_stopped}'}" Width="70"/>
+                    <GridViewColumn Header="{x:Static resx:lang.process_pid}" DisplayMemberBinding="{Binding Path=ProcessPid, TargetNullValue='{x:Static resx:lang.enum_stopped}'}" Width="70"/>
+                    <GridViewColumn Header="{x:Static resx:lang.status}" DisplayMemberBinding="{Binding Path=ServiceState, Converter={StaticResource serviceControllerStatusConverter}}" Width="70"/>
                 </GridView>
             </ListView.View>
-
-            <!--<ListView.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="{Binding Path=Icon}"/>
-                        <TextBlock Text="{Binding Path=DisplayName}" FontSize="17" Margin="5,5,0,0"/>
-                    </StackPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>-->
 
             <!--Defines a context menu-->
             <ListView.ContextMenu>

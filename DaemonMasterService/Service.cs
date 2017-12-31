@@ -21,16 +21,27 @@
 using System;
 using System.ServiceProcess;
 using DaemonMasterCore;
+using Microsoft.Win32;
 using NLog;
 
 namespace DaemonMasterService
 {
     public partial class Service : ServiceBase
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private static string _serviceName = null;
-        private bool startInUserSession = false;
+        private bool _startInUserSession = false;
         private DaemonProcess _daemonProcess = null;
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                              CONST                                                   //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private const string RegPath = @"SYSTEM\CurrentControlSet\Services\";
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                             METHODS                                                  //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public Service(bool enablePause)
         {
@@ -50,7 +61,7 @@ namespace DaemonMasterService
                 switch (arg)
                 {
                     case "-startInUserSession":
-                        startInUserSession = true;
+                        _startInUserSession = true;
                         break;
                 }
             }
@@ -61,31 +72,33 @@ namespace DaemonMasterService
                 _serviceName = DaemonMasterUtils.GetServiceName();
 
                 //Change the filename of the log file to the service name
-                LogManager.Configuration.Variables["logName"] = _serviceName;
+                if (LogManager.Configuration != null)
+                    LogManager.Configuration.Variables["logName"] = _serviceName;
 
                 //create a new DaemonProcess object
-                _daemonProcess = new DaemonProcess(_serviceName, startInUserSession);
+                _daemonProcess = new DaemonProcess(_serviceName, _startInUserSession);
 
 
-                _logger.Info("Starting the process...");
+                Logger.Info("Starting the process...");
                 switch (_daemonProcess.StartProcess())
                 {
                     case DaemonProcessState.Successful:
-                        _logger.Info("The start of the process was successful!");
+                        UpdateInfosInRegistry(_serviceName, _daemonProcess.ProcessPID);
+                        Logger.Info("The start of the process was successful!");
                         break;
 
                     case DaemonProcessState.Unsuccessful:
-                        _logger.Info("The start of the process was unsuccessful!");
+                        Logger.Info("The start of the process was unsuccessful!");
                         break;
 
                     case DaemonProcessState.AlreadyStarted:
-                        _logger.Info("The process is already started!");
+                        Logger.Info("The process is already started!");
                         break;
                 }
             }
             catch (Exception e)
             {
-                _logger.Error(e.ToString);
+                Logger.Error(e.ToString);
                 Stop();
             }
         }
@@ -96,27 +109,30 @@ namespace DaemonMasterService
             switch (_daemonProcess.StopProcess())
             {
                 case DaemonProcessState.Successful:
-                    _logger.Info("The stop of the process was successful!");
+                    Logger.Info("The stop of the process was successful!");
                     break;
 
                 case DaemonProcessState.Unsuccessful:
-                    _logger.Warn("The stop of the process was unsuccessful! Killing the process...");
-                    _logger.Info(_daemonProcess.KillProcess() ? "Successful!" : "Unsuccessful!");
+                    Logger.Warn("The stop of the process was unsuccessful! Killing the process...");
+                    Logger.Info(_daemonProcess.KillProcess() ? "Successful!" : "Unsuccessful!");
                     break;
 
                 case DaemonProcessState.AlreadyStopped:
-                    _logger.Info("The process is already stopped!");
+                    Logger.Info("The process is already stopped!");
                     break;
             }
+
+            UpdateInfosInRegistry(_serviceName, _daemonProcess.ProcessPID);
 
             base.OnStop();
         }
 
         protected override void OnPause()
         {
-            _logger.Info("Suspending process thread...");
-            _logger.Info(_daemonProcess.PauseProcess() ? "Successful!" : "Unsuccessful!");
+            Logger.Info("Suspending process thread...");
+            Logger.Info(_daemonProcess.PauseProcess() ? "Successful!" : "Unsuccessful!");
 
+            UpdateInfosInRegistry(_serviceName, _daemonProcess.ProcessPID);
 
             base.OnPause();
         }
@@ -125,8 +141,10 @@ namespace DaemonMasterService
         {
             base.OnContinue();
 
-            _logger.Info("Resuming suspend process thread...");
-            _logger.Info(_daemonProcess.ResumeProcess() ? "Successful!" : "Unsuccessful!");
+            UpdateInfosInRegistry(_serviceName, _daemonProcess.ProcessPID);
+
+            Logger.Info("Resuming suspend process thread...");
+            Logger.Info(_daemonProcess.ResumeProcess() ? "Successful!" : "Unsuccessful!");
         }
 
         protected override void OnCustomCommand(int command)
@@ -137,6 +155,10 @@ namespace DaemonMasterService
                     _daemonProcess.KillProcess();
                     Stop();
                     break;
+
+                case ServiceCommands.UpdateInfos:
+                    UpdateInfosInRegistry(_serviceName, _daemonProcess.ProcessPID);
+                    break;
             }
         }
 
@@ -144,6 +166,19 @@ namespace DaemonMasterService
         {
             _daemonProcess.Dispose();
             base.Stop();
+        }
+
+        private void UpdateInfosInRegistry(string serviceName, int processPid)
+        {
+            using (RegistryKey processKey = Registry.LocalMachine.CreateSubKey(RegPath + serviceName + @"\Process"))
+            {
+                if (processKey == null)
+                    return;
+
+                processKey.SetValue("ProcessPID", processPid, RegistryValueKind.DWord);
+
+                processKey.Close();
+            }
         }
     }
 }

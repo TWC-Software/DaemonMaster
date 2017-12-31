@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -374,8 +374,5 @@
   </data>
   <data name="data_will_be_overwritten" xml:space="preserve">
     <value>Les données existantes seront écrasées sur la charge!! (dépassé)</value>
-  </data>
-  <data name="pid" xml:space="preserve">
-    <value>PID</value>
   </data>
 </root>

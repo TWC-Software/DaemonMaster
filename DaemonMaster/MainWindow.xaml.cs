@@ -23,6 +23,7 @@ using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Resources;
+using System.ServiceProcess;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -575,7 +576,6 @@ namespace DaemonMaster
 
         private void CheckForUpdates()
         {
-            AutoUpdater.CurrentCulture = CultureInfo.CurrentCulture;
             AutoUpdater.ShowSkipButton = true;
             AutoUpdater.OpenDownloadPage = true;
             AutoUpdater.Start("http://raw.githubusercontent.com/TWC-Software/DaemonMaster/master/AutoUpdater.xml", typeof(MainWindow).Assembly);

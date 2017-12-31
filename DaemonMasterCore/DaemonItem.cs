@@ -21,6 +21,7 @@
 using System;
 using System.ServiceProcess;
 using System.Windows.Media;
+using Microsoft.Win32;
 
 namespace DaemonMasterCore
 {
@@ -34,7 +35,8 @@ namespace DaemonMasterCore
 
         public ServiceControllerStatus ServiceState { get; set; }
 
-        public uint PID { get; set; }
+        public int? ServicePid { get; set; }
+        public int? ProcessPid { get; set; }
 
         public string FullPath
         {
@@ -61,12 +63,47 @@ namespace DaemonMasterCore
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         /// <summary>
-        /// Update PID and Status of the DaemonItem
+        /// Update ServicePID and Status of the DaemonItem
         /// </summary>
         public void UpdateStatus()
         {
-            ServiceState = ServiceManagement.GetServiceStatus(ServiceName);
-            PID = ServiceManagement.GetPIDByServiceName(ServiceName);
+            using (ServiceController serviceController = new ServiceController(ServiceName))
+            {
+                if (serviceController.Status == ServiceControllerStatus.Running)
+                    serviceController.ExecuteCommand((int)ServiceCommands.UpdateInfos);
+
+                ServiceState = serviceController.Status;
+            }
+
+            int servicePid = ServiceManagement.GetServicePID(ServiceName);
+            if (servicePid <= 0)
+            {
+                ServicePid = null;
+            }
+            else
+            {
+                ServicePid = servicePid;
+            }
+
+            using (RegistryKey processKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\" + ServiceName + @"\Process", false))
+            {
+                if (processKey == null)
+                    return;
+
+                int processPid = (int)processKey.GetValue("ProcessPID", -1);
+
+                if (processPid <= 0)
+                {
+                    ProcessPid = null;
+                }
+                else
+                {
+                    ProcessPid = processPid;
+                }
+
+
+                processKey.Close();
+            }
         }
     }
 }

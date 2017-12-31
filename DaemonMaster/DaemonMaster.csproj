@@ -63,8 +63,8 @@
     <Reference Include="ActiveDirectoryObjectPicker">
       <HintPath>..\..\..\..\Documents\Visual Studio 2017\DLLs\ActiveDirectoryObjectPicker.dll</HintPath>
     </Reference>
-    <Reference Include="AutoUpdater.NET, Version=1.4.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Autoupdater.NET.Official.1.4.3\lib\net452\AutoUpdater.NET.dll</HintPath>
+    <Reference Include="AutoUpdater.NET, Version=1.4.6.0, Culture=neutral, PublicKeyToken=942f95247e354701, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autoupdater.NET.Official.1.4.6\lib\net452\AutoUpdater.NET.dll</HintPath>
     </Reference>
     <Reference Include="Itenso.Windows.Controls.ListViewLayout">
       <HintPath>..\..\..\..\Documents\Visual Studio 2017\DLLs\Itenso.Windows.Controls.ListViewLayout.dll</HintPath>
