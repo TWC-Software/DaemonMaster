@@ -32,7 +32,7 @@ namespace DaemonMasterCore
         {
             using (PrincipalContext pc = new PrincipalContext(ContextType.Machine))
             {
-                return pc.ValidateCredentials(username, SecurityManagement.ConvertSecureStringToString(password));
+                return pc.ValidateCredentials(username, password.ConvertSecureStringToString());
             }
         }
 

@@ -17,8 +17,6 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using System;
-
 namespace DaemonMasterCore.Config
 {
     public class Config
@@ -42,5 +40,6 @@ namespace DaemonMasterCore.Config
         }
         public string Language { get; set; } = "windows";
         public bool ActivateLegacyFunctions { get; set; } = false;
+        public bool UseDevService { get; set; } = false;
     }
 }

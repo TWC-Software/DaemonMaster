@@ -27,8 +27,8 @@ namespace DaemonMasterCore
 {
     public class DaemonItem
     {
-        private ImageSource _icon = null;
-        private string _fullPath = null;
+        private ImageSource _icon;
+        private string _fullPath;
 
         public string DisplayName { get; set; }
         public string ServiceName { get; set; }

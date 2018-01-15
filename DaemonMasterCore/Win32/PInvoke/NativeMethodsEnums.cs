@@ -140,7 +140,7 @@ namespace DaemonMasterCore.Win32.PInvoke
             GENERIC_EXECUTE = ACCESS_MASK.STANDARD_RIGHTS_EXECUTE |
                               SC_MANAGER_CONNECT | SC_MANAGER_LOCK,
 
-            GENERIC_ALL = SC_MANAGER_ALL_ACCESS,
+            GENERIC_ALL = SC_MANAGER_ALL_ACCESS
         }
 
         /// <summary>
@@ -263,7 +263,7 @@ namespace DaemonMasterCore.Win32.PInvoke
             /// the Owner and Group members of the service object's security 
             /// descriptor.
             /// </summary>
-            WRITE_OWNER = ACCESS_MASK.WRITE_OWNER,
+            WRITE_OWNER = ACCESS_MASK.WRITE_OWNER
         }
 
         /// <summary>
@@ -334,7 +334,7 @@ namespace DaemonMasterCore.Win32.PInvoke
             /// <summary>
             /// The service can interact with the desktop.
             /// </summary>
-            SERVICE_INTERACTIVE_PROCESS = 0x00000100,
+            SERVICE_INTERACTIVE_PROCESS = 0x00000100
         }
 
         /// <summary>
@@ -375,7 +375,7 @@ namespace DaemonMasterCore.Win32.PInvoke
             /// A service that cannot be started. Attempts to start the service
             /// result in the error code ERROR_SERVICE_DISABLED.
             /// </summary>
-            SERVICE_DISABLED = 0x00000004,
+            SERVICE_DISABLED = 0x00000004
         }
 
         /// <summary>
@@ -410,7 +410,7 @@ namespace DaemonMasterCore.Win32.PInvoke
         [Flags]
         public enum STARTINFO_FLAGS
         {
-            STARTF_USESHOWWINDOW = 0x00000001,
+            STARTF_USESHOWWINDOW = 0x00000001
             //Not complete
         }
 
@@ -455,11 +455,11 @@ namespace DaemonMasterCore.Win32.PInvoke
             SW_SHOWMINNOACTIVE = 7,
             SW_SHOWNA = 8,
             SW_SHOWNOACTIVATE = 4,
-            SW_SHOWNORMAL = 1,
+            SW_SHOWNORMAL = 1
         }
 
         [Flags]
-        public enum ThreadAccess : int
+        public enum ThreadAccess
         {
             TERMINATE = (0x0001),
             SUSPEND_RESUME = (0x0002),
@@ -473,7 +473,7 @@ namespace DaemonMasterCore.Win32.PInvoke
         }
 
         [Flags]
-        public enum CtrlEvent : int
+        public enum CtrlEvent
         {
             CTRL_C_EVENT = (0x0000),
             CTRL_BREAK_EVENT = (0x0001)
@@ -496,7 +496,7 @@ namespace DaemonMasterCore.Win32.PInvoke
             BreakawayOk = 0x00000800,
             SilentBreakawayOk = 0x00001000,
             KillOnJobClose = 0x00002000,
-            SubsetAffinity = 0x00004000,
+            SubsetAffinity = 0x00004000
         }
 
         public enum JobObjectInfoType

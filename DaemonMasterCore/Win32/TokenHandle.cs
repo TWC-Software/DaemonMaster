@@ -18,7 +18,7 @@ namespace DaemonMasterCore.Win32
             return NativeMethods.CloseHandle(handle);
         }
 
-        public static TokenHandle GetTokenFromSessionID(uint sessionID)
+        public static TokenHandle GetTokenFromSessionID(int sessionID)
         {
             TokenHandle currentUserToken;
             if (!NativeMethods.WTSQueryUserToken(sessionID, out currentUserToken))

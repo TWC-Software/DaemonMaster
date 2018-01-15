@@ -56,8 +56,8 @@ namespace DaemonMaster
         private ObservableCollection<string> _dependOnGroupObservableCollection;
         private ObservableCollection<string> _allGroupsObservableCollection;
 
-        private bool _onEditMode = false;
-        private Daemon _daemon = null;
+        private bool _onEditMode;
+        private Daemon _daemon;
 
         private EditAddWindow()
         {
@@ -127,22 +127,22 @@ namespace DaemonMaster
             radioButtonUseCtrlC.IsChecked = _daemon.UseCtrlC;
             radioButtonUseCtrlBreak.IsChecked = !_daemon.UseCtrlC;
 
-#if DEBUG
+            //if DEBUG
             if (String.IsNullOrWhiteSpace(daemon.Username) || daemon.UseLocalSystem || daemon.Password == null)
             {
                 checkBoxUseLocalSystem.IsChecked = true;
                 textBoxPassword.Password = String.Empty;
                 textBoxUsername.Text = String.Empty;
             }
-            else
-            {
-#endif
-                checkBoxUseLocalSystem.IsChecked = false;
-                textBoxPassword.Password = "placeholder";
-                textBoxUsername.Text = daemon.Username;
-#if DEBUG
-            }
-#endif
+            //            else
+            //            {
+            ////#endif
+            //                checkBoxUseLocalSystem.IsChecked = false;
+            //                textBoxPassword.Password = "placeholder";
+            //                textBoxUsername.Text = daemon.Username;
+            //#if DEBUG
+            //            }
+            //#endif
 
             switch (daemon.StartType)
             {
@@ -166,7 +166,7 @@ namespace DaemonMaster
             _dependOnServiceObservableCollection = new ObservableCollection<ServiceInfo>();
             foreach (var dep in daemon.DependOnService)
             {
-                ServiceInfo serviceInfo = new ServiceInfo()
+                ServiceInfo serviceInfo = new ServiceInfo
                 {
                     DisplayName = DaemonMasterUtils.GetDisplayName(dep),
                     ServiceName = dep
@@ -187,7 +187,7 @@ namespace DaemonMaster
             _allServicesObservableCollection = new ObservableCollection<ServiceInfo>();
             foreach (var service in ServiceController.GetServices())
             {
-                ServiceInfo serviceInfo = new ServiceInfo()
+                ServiceInfo serviceInfo = new ServiceInfo
                 {
                     DisplayName = service.DisplayName,
                     ServiceName = service.ServiceName
@@ -266,7 +266,7 @@ namespace DaemonMaster
 
         private void buttonOpenADOP_OnClick(object sender, RoutedEventArgs e)
         {
-            using (DirectoryObjectPickerDialog pickerDialog = new DirectoryObjectPickerDialog()
+            using (DirectoryObjectPickerDialog pickerDialog = new DirectoryObjectPickerDialog
             {
 
                 AllowedObjectTypes = ObjectTypes.Users,
@@ -287,7 +287,7 @@ namespace DaemonMaster
         private void buttonCancel_OnClick(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
-            this.Close();
+            Close();
         }
 
         [Obsolete("Legacy function")]
@@ -329,7 +329,6 @@ namespace DaemonMaster
                 else
                 {
                     MessageBox.Show(_resManager.GetString("invalid_shortcut", CultureInfo.CurrentUICulture), _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
                 }
             }
         }
@@ -404,7 +403,6 @@ namespace DaemonMaster
                     return;
                 }
 
-
                 if (String.IsNullOrWhiteSpace(textBoxDisplayName.Text) ||
                     String.IsNullOrWhiteSpace(textBoxServiceName.Text) ||
                     !int.TryParse(textBoxMaxRestarts.Text, out var maxRestarts) ||
@@ -428,7 +426,7 @@ namespace DaemonMaster
 
                     if (textBoxPassword.Password != "placeholder")
                     {
-                        if (!SystemManagement.ValidateUserWin32(textBoxUsername.Text, SecurityManagement.ConvertStringToSecureString(textBoxPassword.Password)))
+                        if (!SystemManagement.ValidateUserWin32(textBoxUsername.Text, textBoxPassword.Password.ConvertStringToSecureString()))
                         {
                             MessageBox.Show(_resManager.GetString("invalid_user", CultureInfo.CurrentUICulture), _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
                             return;
@@ -529,7 +527,7 @@ namespace DaemonMaster
                             MessageBoxImage.Information);
 
                         DialogResult = true;
-                        this.Close();
+                        Close();
                     }
                     catch (Exception ex)
                     {
@@ -554,7 +552,7 @@ namespace DaemonMaster
                         };
 
                         DialogResult = true;
-                        this.Close();
+                        Close();
                     }
                     catch (Exception ex)
                     {

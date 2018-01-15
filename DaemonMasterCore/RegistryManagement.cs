@@ -117,7 +117,7 @@ namespace DaemonMasterCore
                     daemon.MaxRestarts = Convert.ToInt32(parameters.GetValue("MaxRestarts", 3));
                     daemon.ProcessKillTime = Convert.ToInt32(parameters.GetValue("ProcessKillTime", 9500));
                     daemon.ProcessRestartDelay = Convert.ToInt32(parameters.GetValue("ProcessRestartDelay", 2000));
-                    daemon.CounterResetTime = Convert.ToInt32(parameters.GetValue("CounterResetTime", 2000));
+                    daemon.CounterResetTime = Convert.ToInt32(parameters.GetValue("CounterResetTime", 43200));
                     daemon.UseLocalSystem = Convert.ToBoolean(parameters.GetValue("UseLocalSystem"));
                     daemon.ConsoleApplication = Convert.ToBoolean(parameters.GetValue("ConsoleApplication", false));
                     daemon.UseCtrlC = Convert.ToBoolean(parameters.GetValue("UseCtrlC", false));
@@ -154,7 +154,7 @@ namespace DaemonMasterCore
                         {
                             DisplayName = service.DisplayName,
                             ServiceName = service.ServiceName,
-                            FullPath = (string)key.GetValue("FileDir") + @"/" + (string)key.GetValue("FileName"),
+                            FullPath = (string)key.GetValue("FileDir") + @"/" + (string)key.GetValue("FileName")
                         };
 
                         daemons.Add(daemonItem);

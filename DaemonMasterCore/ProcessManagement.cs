@@ -18,14 +18,14 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
-using DaemonMasterCore.Win32;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using NativeMethods = DaemonMasterCore.Win32.PInvoke.NativeMethods;
+using DaemonMasterCore.Win32;
+using DaemonMasterCore.Win32.PInvoke;
 
 namespace DaemonMasterCore
 {
@@ -51,7 +51,7 @@ namespace DaemonMasterCore
             //securityAttributes.nLength = Marshal.SizeOf(securityAttributes);
 
             //Get user session ID
-            uint currentUserSessionId = NativeMethods.WTSGetActiveConsoleSessionId();
+            int currentUserSessionId = NativeMethods.WTSGetActiveConsoleSessionId();
 
             //Get user token
             using (TokenHandle currentUserToken = TokenHandle.GetTokenFromSessionID(currentUserSessionId))
@@ -66,7 +66,7 @@ namespace DaemonMasterCore
                         null,
                         false,
                         creationFlags,
-                        IntPtr.Zero,
+                        null,
                         fileDir,
                         ref startupInfo,
                         out processInformation))
@@ -87,7 +87,12 @@ namespace DaemonMasterCore
             }
         }
 
-        [Description("Check if the string is quoted, if not it do it here")]
+        ///<summary>
+        /// Check if the string is quoted if not, it do it here
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="arguments"></param>
+        /// <returns></returns>
         private static StringBuilder BuildCommandLineString(string filePath, string arguments)
         {
             StringBuilder stringBuilder = new StringBuilder();

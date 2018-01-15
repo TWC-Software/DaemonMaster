@@ -17,6 +17,7 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
+using System.Reflection;
 using System.Windows;
 
 namespace DaemonMaster
@@ -40,7 +41,7 @@ namespace DaemonMaster
                 "=> ListView Layout Manager - Jani Giannoudis - CPOL License \n\n" +
                 "Thanks to: \n Pinvoke.net \n stackoverflow.com (for help from the users) \n entwickler-ecke.de (for help from the users)";
 
-            labelVersion.Content = "v" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            labelVersion.Content = "v" + Assembly.GetExecutingAssembly().GetName().Version;
         }
     }
 }

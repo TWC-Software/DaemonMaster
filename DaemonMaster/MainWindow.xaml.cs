@@ -20,10 +20,10 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Resources;
-using System.ServiceProcess;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -46,7 +46,7 @@ namespace DaemonMaster
     {
         private Config _config;
 
-        private readonly ObservableCollection<DaemonItem> _processCollection = null;
+        private readonly ObservableCollection<DaemonItem> _processCollection;
         private readonly ResourceManager _resManager = new ResourceManager(typeof(lang));
 
         public MainWindow()
@@ -91,7 +91,7 @@ namespace DaemonMaster
 
             //Fragt, wenn der RegKey nicht gesetzt ist, ob dieser gesetzt werden soll
             if (!AskToEnableInteractiveServices())
-                this.Close();
+                Close();
 
             _processCollection = RegistryManagement.LoadDaemonItemsFromRegistry();
             _processCollection.CollectionChanged += ProcessCollectionOnCollectionChanged;
@@ -587,7 +587,7 @@ namespace DaemonMaster
         //                                          EVENT HANDLER                                               //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
             ConfigManagement.SaveConfig();
         }

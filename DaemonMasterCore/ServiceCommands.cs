@@ -22,6 +22,6 @@ namespace DaemonMasterCore
     public enum ServiceCommands
     {
         KillChildAndStop = 128,
-        UpdateInfos = 129,
+        UpdateInfos = 129
     }
 }

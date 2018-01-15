@@ -78,7 +78,6 @@ namespace DaemonMasterCore.PluginSystem
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
             }
         }
 

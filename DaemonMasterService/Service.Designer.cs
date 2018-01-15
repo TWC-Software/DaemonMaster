@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace DaemonMasterService
 {
     partial class Service
@@ -5,7 +7,7 @@ namespace DaemonMasterService
         /// <summary> 
         /// Erforderliche Designervariable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Verwendete Ressourcen bereinigen.

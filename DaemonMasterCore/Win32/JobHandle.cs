@@ -17,11 +17,11 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using DaemonMasterCore.Win32.PInvoke;
-using Microsoft.Win32.SafeHandles;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using DaemonMasterCore.Win32.PInvoke;
+using Microsoft.Win32.SafeHandles;
 
 namespace DaemonMasterCore.Win32
 {

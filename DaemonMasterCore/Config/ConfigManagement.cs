@@ -17,9 +17,9 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using Newtonsoft.Json;
 using System;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace DaemonMasterCore.Config
 {
@@ -48,7 +48,7 @@ namespace DaemonMasterCore.Config
         {
             using (StreamWriter streamWriter = File.CreateText(ConfigFile))
             {
-                JsonSerializer serializer = new JsonSerializer()
+                JsonSerializer serializer = new JsonSerializer
                 {
                     Formatting = Formatting.Indented
                 };

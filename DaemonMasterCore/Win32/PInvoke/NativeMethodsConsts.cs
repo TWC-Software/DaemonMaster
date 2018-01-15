@@ -17,6 +17,8 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
+using System;
+
 namespace DaemonMasterCore.Win32.PInvoke
 {
     public static partial class NativeMethods
@@ -28,5 +30,8 @@ namespace DaemonMasterCore.Win32.PInvoke
         public const int CREATE_NEW_CONSOLE = 0x00000010;
         public const string SC_GROUP_IDENTIFIER = "+";
 
+        public const int CREATE_NO_WINDOW = 0x08000000;
+        public const int CREATE_UNICODE_ENVIRONMENT = 0x00000400;
+        public static readonly IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
     }
 }

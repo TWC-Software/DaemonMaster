@@ -24,10 +24,12 @@ using System.Diagnostics;
 using System.IO;
 using System.ServiceProcess;
 using System.Text;
+using DaemonMasterCore.Config;
 using DaemonMasterCore.Exceptions;
 using DaemonMasterCore.Win32;
+using DaemonMasterCore.Win32.PInvoke;
 using NLog;
-using NativeMethods = DaemonMasterCore.Win32.PInvoke.NativeMethods;
+using TimeoutException = System.ServiceProcess.TimeoutException;
 
 namespace DaemonMasterCore
 {
@@ -41,6 +43,7 @@ namespace DaemonMasterCore
 
         private static readonly string DaemonMasterServicePath = AppDomain.CurrentDomain.BaseDirectory;
         private const string DaemonMasterServiceFile = "DaemonMasterService.exe";
+        private const string DaemonMasterDevServiceFile = "DMService.exe";
         private const string DaemonMasterServiceParameter = " -service";
 
 
@@ -70,7 +73,7 @@ namespace DaemonMasterCore
                     NativeMethods.SERVICE_TYPE.SERVICE_WIN32_OWN_PROCESS,
                     daemon.StartType,
                     NativeMethods.SERVICE_ERROR_CONTROL.SERVICE_ERROR_NORMAL,
-                    DaemonMasterServicePath + DaemonMasterServiceFile + DaemonMasterServiceParameter,
+                    DaemonMasterServicePath + (ConfigManagement.GetConfig.UseDevService ? DaemonMasterDevServiceFile : DaemonMasterServiceFile) + DaemonMasterServiceParameter,
                     null,
                     null,
                     ConvertDependenciesArraysToDoubleNullTerminatedString(daemon.DependOnService, daemon.DependOnGroup),
@@ -115,7 +118,7 @@ namespace DaemonMasterCore
                     //Check if the service has been started or not
                     scManager.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromMilliseconds(WaitForStatusTimeout));
                 }
-                catch (System.ServiceProcess.TimeoutException)
+                catch (TimeoutException)
                 {
                     return DaemonServiceState.Unsuccessful;
                 }
@@ -147,7 +150,7 @@ namespace DaemonMasterCore
                     //Check if the service has been stopped or not
                     scManager.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromMilliseconds(WaitForStatusTimeout));
                 }
-                catch (System.ServiceProcess.TimeoutException)
+                catch (TimeoutException)
                 {
                     return DaemonServiceState.Unsuccessful;
                 }
@@ -188,37 +191,31 @@ namespace DaemonMasterCore
             if (useJobObjectMethod)
             {
 
-                int pid = (int)GetServicePID(serviceName);
+                int pid = GetServicePID(serviceName);
 
                 if (pid != 0)
                 {
                     Process.GetProcessById(pid).Kill();
                     return DaemonServiceState.Successful;
                 }
-                else
-                {
-                    return DaemonServiceState.AlreadyStopped;
-                }
+                return DaemonServiceState.AlreadyStopped;
             }
-            else
+            using (ServiceController serviceController = new ServiceController(serviceName))
             {
-                using (ServiceController serviceController = new ServiceController(serviceName))
+                if (serviceController.Status == ServiceControllerStatus.Stopped)
+                    return DaemonServiceState.AlreadyStopped;
+
+                //Execute command to kill
+                serviceController.ExecuteCommand((int)ServiceCommands.KillChildAndStop);
+
+                try
                 {
-                    if (serviceController.Status == ServiceControllerStatus.Stopped)
-                        return DaemonServiceState.AlreadyStopped;
-
-                    //Execute command to kill
-                    serviceController.ExecuteCommand((int)ServiceCommands.KillChildAndStop);
-
-                    try
-                    {
-                        serviceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromMilliseconds(WaitForStatusTimeout));
-                        return DaemonServiceState.Successful;
-                    }
-                    catch (System.ServiceProcess.TimeoutException)
-                    {
-                        return DaemonServiceState.Unsuccessful;
-                    }
+                    serviceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromMilliseconds(WaitForStatusTimeout));
+                    return DaemonServiceState.Successful;
+                }
+                catch (TimeoutException)
+                {
+                    return DaemonServiceState.Unsuccessful;
                 }
             }
         }

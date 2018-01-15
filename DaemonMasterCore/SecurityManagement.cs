@@ -47,7 +47,7 @@ namespace DaemonMasterCore
 
             if (data.Length > 0)
             {
-                foreach (char c in data.ToCharArray())
+                foreach (char c in data)
                 {
                     secString.AppendChar(c);
                 }
@@ -151,7 +151,7 @@ namespace DaemonMasterCore
                 SecureString secString = new SecureString();
                 foreach (char c in Encoding.Unicode.GetChars(decryptedPassword))
                 {
-                    secString.AppendChar((char)c);
+                    secString.AppendChar(c);
                 }
 
                 return secString;

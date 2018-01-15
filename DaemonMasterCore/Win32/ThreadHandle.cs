@@ -16,10 +16,11 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using DaemonMasterCore.Win32.PInvoke;
-using Microsoft.Win32.SafeHandles;
+using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using DaemonMasterCore.Win32.PInvoke;
+using Microsoft.Win32.SafeHandles;
 
 namespace DaemonMasterCore.Win32
 {
@@ -34,9 +35,14 @@ namespace DaemonMasterCore.Win32
             return NativeMethods.CloseHandle(handle);
         }
 
+        public void SetHandle(IntPtr handle)
+        {
+            SetHandle(handle);
+        }
+
         public static ThreadHandle OpenThread(NativeMethods.ThreadAccess desiredAccess, bool inheritHandle, int processId)
         {
-            ThreadHandle threadHandle = PInvoke.NativeMethods.OpenThread(desiredAccess, inheritHandle, (uint)processId);
+            ThreadHandle threadHandle = NativeMethods.OpenThread(desiredAccess, inheritHandle, (uint)processId);
 
             if (threadHandle.IsInvalid)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -46,13 +52,13 @@ namespace DaemonMasterCore.Win32
 
         public void PauseThread()
         {
-            if (!PInvoke.NativeMethods.SuspendThread(this))
+            if (!NativeMethods.SuspendThread(this))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
         public void ResumeThread()
         {
-            if (!PInvoke.NativeMethods.ResumeThread(this))
+            if (!NativeMethods.ResumeThread(this))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
     }

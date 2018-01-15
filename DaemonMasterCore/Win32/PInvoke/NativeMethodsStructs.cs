@@ -29,7 +29,8 @@ namespace DaemonMasterCore.Win32.PInvoke
         {
             public int nLength;
             public IntPtr lpSecurityDescriptor;
-            public int bInheritHandle;
+            [MarshalAs(UnmanagedType.Bool)]
+            public bool bInheritHandle;
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]

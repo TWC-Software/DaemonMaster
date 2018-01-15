@@ -93,7 +93,7 @@ namespace DaemonMasterCore.Win32.PInvoke
             out TokenHandle phToken
         );
 
-        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CreateProcessAsUser(
             TokenHandle hToken,
@@ -103,7 +103,7 @@ namespace DaemonMasterCore.Win32.PInvoke
             SECURITY_ATTRIBUTES lpThreadAttributes,
             bool bInheritHandles,
             int dwCreationFlags,
-            IntPtr lpEnvironment,
+            IntPtr? lpEnvironment,
             string lpCurrentDirectory,
             ref STARTUPINFO lpStartupInfo,
             out PROCESS_INFORMATION lpProcessInformation);
@@ -131,16 +131,35 @@ namespace DaemonMasterCore.Win32.PInvoke
         public static extern bool GenerateConsoleCtrlEvent(CtrlEvent dwCtrlEvent, uint dwProcessGroupId);
 
         [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Auto)]
-        public static extern uint WTSGetActiveConsoleSessionId();
+        public static extern int WTSGetActiveConsoleSessionId();
 
         [DllImport(DLLFiles.KERNEL32, CharSet = CharSet.Auto, SetLastError = true)]
         public static extern JobHandle CreateJobObject(SECURITY_ATTRIBUTES lpJobAttributes, string lpName);
 
         [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Auto)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetInformationJobObject(JobHandle hJob, JobObjectInfoType infoType, IntPtr lpJobObjectInfo, uint cbJobObjectInfoLength);
 
         [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Auto)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool AssignProcessToJobObject(JobHandle hJob, SafeProcessHandle hProcess);
+
+        //[DllImport(DLLFiles.KERNEL32, SetLastError = true)]
+        //[return: MarshalAs(UnmanagedType.Bool)]
+        //public static extern bool DuplicateHandle(HandleRef hSourceProcessHandle,
+        //    SafeFileHandle hSourceHandle, HandleRef hTargetProcessHandle, out SafeFileHandle lpTargetHandle,
+        //    uint dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, uint dwOptions);
+
+        //[DllImport(DLLFiles.KERNEL32, SetLastError = true)]
+        //[return: MarshalAs(UnmanagedType.Bool)]
+        //public static extern bool CreatePipe(out SafeFileHandle hReadPipe, out SafeFileHandle hWritePipe,
+        //    SECURITY_ATTRIBUTES lpPipeAttributes, int nSize);
+
+        //[DllImport(DLLFiles.KERNEL32, SetLastError = true)]
+        //public static extern IntPtr GetCurrentProcess();
+
+        //[DllImport(DLLFiles.KERNEL32, CharSet = CharSet.Auto, SetLastError = true)]
+        //public static extern IntPtr GetStdHandle(int whichHandle);
 
 
         //WINSTA
@@ -153,6 +172,6 @@ namespace DaemonMasterCore.Win32.PInvoke
 
         [DllImport(DLLFiles.WTSAPI32, SetLastError = true, CharSet = CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool WTSQueryUserToken(UInt32 sessionId, out TokenHandle Token);
+        public static extern bool WTSQueryUserToken(int sessionId, out TokenHandle token);
     }
 }

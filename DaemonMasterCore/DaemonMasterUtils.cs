@@ -17,15 +17,18 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using DaemonMasterCore.Win32;
-using Newtonsoft.Json;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Management;
 using System.ServiceProcess;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using DaemonMasterCore.Win32;
+using Newtonsoft.Json;
 
 namespace DaemonMasterCore
 {
@@ -51,10 +54,10 @@ namespace DaemonMasterCore
 
                 using (Icon icon = Icon.ExtractAssociatedIcon(fullPath))
                 {
-                    return System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                    return Imaging.CreateBitmapSourceFromHIcon(
                         icon.Handle,
                         Int32Rect.Empty,
-                        System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
+                        BitmapSizeOptions.FromEmptyOptions());
                 }
             }
             catch (Exception)
@@ -74,7 +77,7 @@ namespace DaemonMasterCore
             // the process contains a single service, if there are more than one services hosted
             // in the process you will have to do something else
 
-            int processId = System.Diagnostics.Process.GetCurrentProcess().Id;
+            int processId = Process.GetCurrentProcess().Id;
             String query = "SELECT * FROM Win32_Service where ProcessId = " + processId;
             ManagementObjectSearcher searcher =
                 new ManagementObjectSearcher(query);
@@ -101,7 +104,7 @@ namespace DaemonMasterCore
 
             using (StreamWriter streamWriter = File.CreateText(path))
             {
-                JsonSerializer serializer = new JsonSerializer()
+                JsonSerializer serializer = new JsonSerializer
                 {
                     Formatting = Formatting.Indented
                 };

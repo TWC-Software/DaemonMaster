@@ -20,6 +20,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace DaemonMasterCore.WPF
 {
@@ -57,7 +58,7 @@ namespace DaemonMasterCore.WPF
                 else
                 {
                     base.Text = value;
-                    Foreground = System.Windows.Media.Brushes.Black;
+                    Foreground = Brushes.Black;
                 }
             }
         }
@@ -81,7 +82,7 @@ namespace DaemonMasterCore.WPF
             if (String.IsNullOrWhiteSpace(base.Text))
             {
                 base.Text = _placeholder;
-                Foreground = System.Windows.Media.Brushes.Gray;
+                Foreground = Brushes.Gray;
             }
         }
 
@@ -90,7 +91,7 @@ namespace DaemonMasterCore.WPF
             if (base.Text == _placeholder)
             {
                 base.Text = String.Empty;
-                Foreground = System.Windows.Media.Brushes.Black;
+                Foreground = Brushes.Black;
             }
         }
     }

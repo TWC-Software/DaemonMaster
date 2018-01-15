@@ -28,7 +28,7 @@ namespace DaemonMasterCore.Win32
 {
     public class ShellLinkWrapper : IDisposable
     {
-        private bool _isDisposed = false;
+        private bool _isDisposed;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                             PINVOKE                                                  //

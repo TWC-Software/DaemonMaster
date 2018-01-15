@@ -28,7 +28,7 @@ namespace DaemonMasterCore.Jobs
 {
     public class KillChildProcessJob : IDisposable
     {
-        private bool _isDisposed = false;
+        private bool _isDisposed;
         private JobHandle _jobHandle;
 
         public KillChildProcessJob()

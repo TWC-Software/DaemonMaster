@@ -18,11 +18,11 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
-using DaemonMasterCore;
-using Microsoft.Deployment.WindowsInstaller;
 using System;
 using System.IO;
 using System.Threading;
+using DaemonMasterCore;
+using Microsoft.Deployment.WindowsInstaller;
 
 namespace DaemonMasterCustomActions
 {

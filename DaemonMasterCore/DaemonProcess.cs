@@ -24,8 +24,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using DaemonMasterCore.Jobs;
 using DaemonMasterCore.Win32;
+using DaemonMasterCore.Win32.PInvoke;
 using NLog;
-using NativeMethods = DaemonMasterCore.Win32.PInvoke.NativeMethods;
 
 namespace DaemonMasterCore
 {
@@ -34,12 +34,12 @@ namespace DaemonMasterCore
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private KillChildProcessJob killChildProcessJob = new KillChildProcessJob();
 
-        private readonly Daemon _daemon = null;
-        private readonly Process _process = null;
+        private readonly Daemon _daemon;
+        private readonly Process _process;
 
         //Don't change!!
-        private int _restarts = 0;
-        private DateTime? lastRestartTime = null;
+        private int _restarts;
+        private DateTime lastRestartTime;
 
         //Needed for shortcut support
         private string realPath = String.Empty;
@@ -112,11 +112,11 @@ namespace DaemonMasterCore
         private void InitProcessAsService()
         {
             //Create the start info for the process
-            ProcessStartInfo startInfo = new ProcessStartInfo()
+            ProcessStartInfo startInfo = new ProcessStartInfo
             {
                 FileName = realPath,
                 Arguments = realArgs,
-                UseShellExecute = false,
+                UseShellExecute = false
 
             };
 
@@ -164,6 +164,9 @@ namespace DaemonMasterCore
             {
                 return DaemonProcessState.Successful;
             }
+
+            _restarts = 0;
+            lastRestartTime = DateTime.UtcNow;
 
             if (_process.Start())
             {
@@ -295,13 +298,13 @@ namespace DaemonMasterCore
         {
             #region Counter reset system
 
-            if (_daemon.CounterResetTime != 0 && lastRestartTime.HasValue)
+            if (_daemon.CounterResetTime != 0)
             {
                 //Reset the counter if secondsBetweenCraches is greater than or equal to CounterResetTime 
                 try
                 {
-                    uint secondsBetweenCraches = Convert.ToUInt32(DateTime.UtcNow.Subtract(lastRestartTime.Value).TotalSeconds);
-                    if (secondsBetweenCraches >= _daemon.CounterResetTime)
+                    uint secondsBetweenCrashes = Convert.ToUInt32(DateTime.UtcNow.Subtract(lastRestartTime).TotalSeconds);
+                    if (secondsBetweenCrashes >= _daemon.CounterResetTime)
                     {
                         _restarts = 0;
                     }
@@ -318,6 +321,7 @@ namespace DaemonMasterCore
             if (_restarts < _daemon.MaxRestarts || _daemon.MaxRestarts == -1)
             {
                 Thread.Sleep(_daemon.ProcessRestartDelay);
+                _process.Close();
                 StartProcess();
                 _restarts++;
                 Logger.Warn("Restart process... (restart: {0})", _restarts);
@@ -345,10 +349,7 @@ namespace DaemonMasterCore
             {
                 return NativeMethods.GenerateConsoleCtrlEvent(NativeMethods.CtrlEvent.CTRL_C_EVENT, (uint)_process.Id);
             }
-            else
-            {
-                return NativeMethods.GenerateConsoleCtrlEvent(NativeMethods.CtrlEvent.CTRL_BREAK_EVENT, (uint)_process.Id);
-            }
+            return NativeMethods.GenerateConsoleCtrlEvent(NativeMethods.CtrlEvent.CTRL_BREAK_EVENT, (uint)_process.Id);
         }
 
         public bool IsRunning()
@@ -393,7 +394,7 @@ namespace DaemonMasterCore
 
         #region Dispose
 
-        private bool _disposed = false;
+        private bool _disposed;
 
         //Public implementation of Dispose pattern.
         public void Dispose()

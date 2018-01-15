@@ -17,9 +17,9 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
+using System.ServiceProcess;
 using DaemonMasterCore;
 using NLog;
-using System.ServiceProcess;
 
 namespace DaemonMasterService
 {

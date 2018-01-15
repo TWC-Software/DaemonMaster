@@ -24,6 +24,6 @@ namespace DaemonMasterCore
         AlreadyStopped,
         AlreadyStarted,
         Successful,
-        Unsuccessful,
+        Unsuccessful
     }
 }

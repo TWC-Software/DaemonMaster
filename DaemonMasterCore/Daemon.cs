@@ -18,31 +18,14 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
+using System.Security;
 using DaemonMasterCore.Win32.PInvoke;
 using Newtonsoft.Json;
-using System;
-using System.Security;
 
 namespace DaemonMasterCore
 {
-    public class Daemon
+    public sealed class Daemon
     {
-        //Default parameter
-        public Daemon()
-        {
-            Parameter = String.Empty;
-            Username = String.Empty;
-            Password = null;
-
-            MaxRestarts = 3;
-            ProcessKillTime = 9500;
-            ProcessRestartDelay = 2500;
-            CounterResetTime = 10000;
-
-            ConsoleApplication = false;
-            UseCtrlC = false;
-        }
-
         public override string ToString()
         {
             return DisplayName;
@@ -50,30 +33,29 @@ namespace DaemonMasterCore
 
         public string DisplayName { get; set; }
         public string ServiceName { get; set; }
-        public string Description { get; set; }
+        public string Description { get; set; } = "";
         public string[] DependOnService { get; set; } = new string[0];
         public string[] DependOnGroup { get; set; } = new string[0];
-        public NativeMethods.SERVICE_START StartType { get; set; }
-        public bool DelayedStart { get; set; }
+        public NativeMethods.SERVICE_START StartType { get; set; } = NativeMethods.SERVICE_START.SERVICE_AUTO_START;
+        public bool DelayedStart { get; set; } = false;
 
         public string FileDir { get; set; }
         public string FileName { get; set; }
         public string FileExtension { get; set; }
         public string FullPath => FileDir + @"\" + FileName;
 
-        public string Parameter { get; set; }
-        public bool UseLocalSystem { get; set; }
-        public string Username { get; set; }
+        public string Parameter { get; set; } = "";
+        public bool UseLocalSystem { get; set; } = true;
+        public string Username { get; set; } = "";
 
-        [JsonIgnore]
-        public SecureString Password { get; set; }
+        [JsonIgnore] public SecureString Password { get; set; } = null;
 
-        public int MaxRestarts { get; set; }
-        public int ProcessKillTime { get; set; }
-        public int ProcessRestartDelay { get; set; }
-        public int CounterResetTime { get; set; }
+        public int MaxRestarts { get; set; } = 3;
+        public int ProcessKillTime { get; set; } = 9500;
+        public int ProcessRestartDelay { get; set; } = 2000;
+        public int CounterResetTime { get; set; } = 43200; //12h
 
-        public bool ConsoleApplication { get; set; }
-        public bool UseCtrlC { get; set; }
+        public bool ConsoleApplication { get; set; } = false;
+        public bool UseCtrlC { get; set; } = false;
     }
 }
