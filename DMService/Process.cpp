@@ -45,12 +45,21 @@ void Process::CleanUp()
 	}
 }
 
-void Process::UnregisterWaitHandleDirectly()
+void Process::StopWatchingForExit()
 {
-	if (waitHandle)
+	if(waitHandle)
 	{
-		UnregisterWaitEx(waitHandle, NULL);
+		UnregisterWait(waitHandle);
+		waitHandle = NULL;
 	}
+}
+
+void Process::StartWatchingForExit()
+{
+	if (waitHandle || !processHandle)
+		return;
+
+	RegisterWaitForSingleObject(&waitHandle, processHandle, OnExitedCallback, this, INFINITE, WT_EXECUTEONLYONCE);
 }
 
 bool Process::Start()
@@ -90,24 +99,16 @@ bool Process::StartWithCreateProcess()
 		threadHandle = pi.hThread;
 		processId = pi.dwProcessId;
 
-		RegisterExitCallback();
+		StartWatchingForExit();
 		return true;
 	}
 
 	return false;
 }
 
-
-bool Process::RegisterExitCallback()
-{
-	if (waitHandle || !processHandle)
-		return false;
-
-	return RegisterWaitForSingleObject(&waitHandle, processHandle, OnExitedCallback, this, INFINITE, WT_EXECUTEONLYONCE);
-}
-
 void CALLBACK Process::OnExitedCallback(PVOID params, BOOLEAN timerOrWaitFired)
 {
+	static_cast<Process*>(params)->StopWatchingForExit();
 	static_cast<Process*>(params)->CleanUp();
 	static_cast<Process*>(params)->OnExited();
 }

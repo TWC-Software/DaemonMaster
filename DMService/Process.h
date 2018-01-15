@@ -12,8 +12,8 @@ private:
 
 	bool StartWithCreateProcess();
 	void CleanUp();
-	void UnregisterWaitHandleDirectly();
-	bool RegisterExitCallback();
+	void StopWatchingForExit();
+	void StartWatchingForExit();
 
 	static void CALLBACK OnExitedCallback(PVOID params, BOOLEAN timerOrWaitFired);
 	void OnExited();
