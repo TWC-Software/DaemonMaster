@@ -1,6 +1,6 @@
 #pragma once
-#include"stdafx.h"
-#include "ProcessManager.h"
+#include "CServiceBase.h"
+#include "Process.h"
 
 class Service : public CServiceBase
 {

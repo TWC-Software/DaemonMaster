@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Functions.h"
+#include <filesystem>
 
 inline void Functions::TrimBegin(wstring &s)
 {

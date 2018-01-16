@@ -15,11 +15,7 @@
 * EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED
 * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
 \***************************************************************************/
-
-#pragma once 
-
-#include <windows.h> 
-
+#pragma once
 
 class CServiceBase
 {

@@ -20,6 +20,12 @@ Service::~Service()
 		CloseHandle(m_hStoppedEvent);
 		m_hStoppedEvent = NULL;
 	}
+
+	if(process)
+	{
+		delete process;
+		process = NULL;
+	}
 }
 
 void Service::OnStart(DWORD dwArgc, PWSTR * pszArgv)

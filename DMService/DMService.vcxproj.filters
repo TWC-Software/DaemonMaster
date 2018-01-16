@@ -42,6 +42,9 @@
     <ClInclude Include="ProcessManager.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="HandleData.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

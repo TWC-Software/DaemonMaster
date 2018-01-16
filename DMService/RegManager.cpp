@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "RegManager.h"
-
-//L"SYSTEM\\CurrentControlSet\\Services\\DaemonMaster_1111\\Parameters"
+#include "Functions.h"
 
 // https://msdn.microsoft.com/en-us/magazine/mt808504.aspx
 BOOL RegManager::ReadParametersFromRegistry(const wstring& serviceName, ProcessStartInfo& daemonInfo)
@@ -19,8 +18,13 @@ BOOL RegManager::ReadParametersFromRegistry(const wstring& serviceName, ProcessS
 		daemonInfo.SetFileDir(ReadString(hKey, L"FileDir"));
 		daemonInfo.SetFileName(ReadString(hKey, L"FileName"));
 		daemonInfo.SetFullPath(Functions::CombinePaths(daemonInfo.GetFileDir(), daemonInfo.GetFileName()));
-
 		daemonInfo.SetParameters(ReadString(hKey, L"Parameter"));
+
+		daemonInfo.SetIsConsoleApp(ReadBool(hKey, L"ConsoleApplication"));
+		daemonInfo.SetUseCtrlC(ReadBool(hKey, L"UseCtrlC"));
+
+		daemonInfo.SetMaxRestarts(ReadDWORD(hKey, L"MaxRestarts"));
+		daemonInfo.SetMaxRestartsResetTime(ReadDWORD(hKey, L"CounterResetTime"));
 
 		RegCloseKey(hKey);
 		return true;

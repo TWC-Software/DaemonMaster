@@ -1,29 +1,32 @@
 #pragma once
-#include "stdafx.h"
-#include <filesystem>
-
-using namespace std;
 
 class ProcessStartInfo
 {
 private: 
-wstring sParamaters;
 wstring sFileDir;
 wstring sFileName;
 wstring sFullPath;
+wstring sParamaters;
 
-bool useLocalSystemAccount;
-int maxRestarts;
+bool bUseLocalSystemAccount;
+DWORD dMaxRestarts;
+DWORD dMaxRestartsResetTime = 0;
 
-bool consoleApp;
-bool useCtrlC;
+bool bIsConsoleApp;
+bool bUseCtrlC;
 
 public:
 	ProcessStartInfo()
 	{
-		sParamaters = L"";
 		sFileDir = L"";
 		sFileName = L"";
+		sFullPath = L"";
+		sParamaters = L"";
+		
+		bUseLocalSystemAccount = true;
+		dMaxRestarts = 3;
+		bIsConsoleApp = false;
+		bUseCtrlC = false;
 	}
 
 	wstring GetFileDir() const { return sFileDir; }
@@ -49,5 +52,17 @@ public:
 
 	wstring GetParameters() const { return sParamaters; }
 	void SetParameters(wstring params) { sParamaters = params; }
+
+	bool GetIsConsoleApp() const { return bIsConsoleApp; }
+	void SetIsConsoleApp(bool isConsoleApp) { bIsConsoleApp = isConsoleApp; }
+
+	bool GetUseCtrlC() const { return bUseCtrlC; }
+	void SetUseCtrlC(bool useCtrlC) { bUseCtrlC = useCtrlC; }
+
+	DWORD GetMaxRestarts() const { return dMaxRestarts; }
+	void SetMaxRestarts(DWORD maxRestarts) { dMaxRestarts = maxRestarts; }
+
+	DWORD GetMaxRestartsResetTime() const { return dMaxRestartsResetTime; }
+	void SetMaxRestartsResetTime(DWORD maxRestartsResetTime) { dMaxRestartsResetTime = maxRestartsResetTime; }
 };
 

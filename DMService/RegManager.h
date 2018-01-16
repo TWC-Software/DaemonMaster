@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "ProcessStartInfo.h"
 
 class RegManager
 {

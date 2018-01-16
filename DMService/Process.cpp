@@ -1,29 +1,23 @@
 #include "stdafx.h"
 #include "Process.h"
+#include "HandleData.h"
+#include "ctime"
 
 Process::Process(const ProcessStartInfo& psi)
 {
-	InitializeCriticalSection(&criticalSection);
 	pInfo = psi;
 }
 
 
 Process::~Process()
 {
-	DeleteCriticalSection(&criticalSection);
-
-	if (waitHandle)
-	{
-		//Wait until all callbacks are finished and then return
-		UnregisterWaitEx(waitHandle, INVALID_HANDLE_VALUE);
-		waitHandle = NULL;
-	}
-
 	CleanUp();
 }
 
 void Process::CleanUp()
 {
+	StopWatchingForExit();
+
 	if (processHandle)
 	{
 
@@ -45,25 +39,11 @@ void Process::CleanUp()
 	}
 }
 
-void Process::StopWatchingForExit()
-{
-	if(waitHandle)
-	{
-		UnregisterWait(waitHandle);
-		waitHandle = NULL;
-	}
-}
-
-void Process::StartWatchingForExit()
-{
-	if (waitHandle || !processHandle)
-		return;
-
-	RegisterWaitForSingleObject(&waitHandle, processHandle, OnExitedCallback, this, INFINITE, WT_EXECUTEONLYONCE);
-}
 
 bool Process::Start()
 {
+	CleanUp();
+
 	if (pInfo.GetFullPath().empty())
 		return false;
 
@@ -72,12 +52,50 @@ bool Process::Start()
 
 bool Process::Stop()
 {
-	//TODO: Gracefuly
+	StopWatchingForExit();
+
+	bool result;
+	if(!pInfo.GetIsConsoleApp())
+	{
+		//result = PostMessageW(GetMainWindowHandle(), WM_CLOSE, NULL, NULL);
+		result = SendMessageW(GetMainWindowHandle(), WM_SYSCOMMAND, SC_CLOSE, NULL);
+
+		if (!result)
+		{
+			return Kill();
+		}
+	}
+	else
+	{
+		result = GenerateConsoleCtrlEvent(!pInfo.GetUseCtrlC(), processId);
+
+		if (!result)
+		{
+			return Kill();
+		}
+	}
+
+	if (WaitForSingleObject(processHandle, 10000) == WAIT_TIMEOUT)
+	{
+		return Kill();
+	}
+
+	CleanUp();
+	return true;
+}
+
+bool Process::Kill()
+{
 	if (processHandle)
-		return TerminateProcess(processHandle, 0);
+		if(TerminateProcess(processHandle, 0))
+		{
+			CleanUp();
+			return true;
+		}
 
 	return false;
 }
+
 
 
 bool Process::StartWithCreateProcess()
@@ -99,6 +117,7 @@ bool Process::StartWithCreateProcess()
 		threadHandle = pi.hThread;
 		processId = pi.dwProcessId;
 
+		lastRestart = GetLocalTime();
 		StartWatchingForExit();
 		return true;
 	}
@@ -106,19 +125,96 @@ bool Process::StartWithCreateProcess()
 	return false;
 }
 
+
+
+void Process::StopWatchingForExit()
+{
+	if (waitHandle)
+	{
+		UnregisterWait(waitHandle);
+		waitHandle = NULL;
+	}
+}
+
+void Process::StartWatchingForExit()
+{
+	if (waitHandle || !processHandle)
+		return;
+
+	RegisterWaitForSingleObject(&waitHandle, processHandle, OnExitedCallback, this, INFINITE, WT_EXECUTEONLYONCE);
+}
+
 void CALLBACK Process::OnExitedCallback(PVOID params, BOOLEAN timerOrWaitFired)
 {
-	static_cast<Process*>(params)->StopWatchingForExit();
 	static_cast<Process*>(params)->CleanUp();
 	static_cast<Process*>(params)->OnExited();
 }
 
 void Process::OnExited()
 {
-	EnterCriticalSection(&criticalSection);
+	if(pInfo.GetMaxRestartsResetTime() != 0 && GetTimeDifference(lastRestart, GetLocalTime()) > pInfo.GetMaxRestartsResetTime())
+	{
+		restarts = 0;
+	}
 
-	Start();
-
-	LeaveCriticalSection(&criticalSection);
+	if(pInfo.GetMaxRestarts() > restarts)
+	{
+		lastRestart = GetLocalTime();
+		Start();
+	}
+	else
+	{
+		CleanUp();
+	}
 }
+
+
+
+HWND Process::GetMainWindowHandle()
+{
+	HandleData data;
+	data.pid = processId;
+
+	EnumWindows(EnumWindowsCallback, reinterpret_cast<LPARAM>(&data));
+	return data.bestHandle;
+}
+
+BOOL Process::EnumWindowsCallback(HWND hwnd, LPARAM lParam)
+{
+	HandleData& data = *reinterpret_cast<HandleData*>(lParam);
+
+	DWORD pid;
+	GetWindowThreadProcessId(hwnd, &pid);
+	if(data.pid == pid && IsMainWindow(hwnd))
+	{
+		data.bestHandle = hwnd;
+		//Stop the enumerating
+		return false;
+	}
+
+	//continue
+	return true;
+}
+
+BOOL Process::IsMainWindow(HWND hwnd)
+{
+	return GetWindow(hwnd, GW_OWNER) == NULL || IsWindowVisible(hwnd);
+}
+
+struct tm Process::GetLocalTime()
+{
+	time_t rawTime;
+	struct tm timeInfo;
+
+	time(&rawTime);
+	localtime_s(&timeInfo, &rawTime);
+
+	return timeInfo;
+}
+
+double Process::GetTimeDifference(struct tm time1, struct tm time2)
+{
+	return difftime(mktime(&time1), mktime(&time2));
+}
+
 
