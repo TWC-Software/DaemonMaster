@@ -10,12 +10,13 @@ public:
 		BOOL canStop = TRUE,
 		BOOL canShutdown = TRUE,
 		BOOL canPauseContinue = FALSE);
-	virtual ~Service();
+	 virtual ~Service();
 
 protected:
 
 	virtual void OnStart(DWORD dwArgc, PWSTR *pszArgv);
 	virtual void OnStop();
+	void CleanUp();
 
 	static DWORD WINAPI ServiceThread(LPVOID params);
 	DWORD WINAPI ServiceWorkerThread();

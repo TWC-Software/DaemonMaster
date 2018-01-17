@@ -39,9 +39,6 @@
     <ClInclude Include="ProcessStartInfo.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="ProcessManager.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="HandleData.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
@@ -66,9 +63,6 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="Process.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="ProcessManager.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

@@ -2,17 +2,22 @@
 #include "Process.h"
 #include "HandleData.h"
 #include "ctime"
+#include "WtsApi32.h"
+#include "Functions.h"
 
 Process::Process(const ProcessStartInfo& psi)
 {
+	//Enable SE_TCB_NAME privilege for WTSQueryUserToken
+	Functions::EnablePrivilege(SE_TCB_NAME);
+
 	pInfo = psi;
 }
-
 
 Process::~Process()
 {
 	CleanUp();
 }
+
 
 void Process::CleanUp()
 {
@@ -40,6 +45,11 @@ void Process::CleanUp()
 }
 
 
+void Process::SetStartMode(bool startInUserSession)
+{
+	this->startInUserSession = startInUserSession;
+}
+
 bool Process::Start()
 {
 	CleanUp();
@@ -47,7 +57,14 @@ bool Process::Start()
 	if (pInfo.GetFullPath().empty())
 		return false;
 
-	return StartWithCreateProcess();	
+	if(startInUserSession)
+	{
+		return StartOnActivUserSession();
+	}
+	else
+	{
+		return StartWithCreateProcess();
+	}
 }
 
 bool Process::Stop()
@@ -84,6 +101,7 @@ bool Process::Stop()
 	return true;
 }
 
+
 bool Process::Kill()
 {
 	if (processHandle)
@@ -117,7 +135,7 @@ bool Process::StartWithCreateProcess()
 		threadHandle = pi.hThread;
 		processId = pi.dwProcessId;
 
-		lastRestart = GetLocalTime();
+		time(&lastRestart);
 		StartWatchingForExit();
 		return true;
 	}
@@ -125,6 +143,45 @@ bool Process::StartWithCreateProcess()
 	return false;
 }
 
+bool Process::StartOnActivUserSession()
+{
+	DWORD creationFlags = NORMAL_PRIORITY_CLASS | CREATE_NEW_CONSOLE | CREATE_UNICODE_ENVIRONMENT;
+
+	STARTUPINFOW si;
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	//si.lpDesktop = (LPWSTR) L"WinSta0\Default";
+	si.wShowWindow = true;
+
+	PROCESS_INFORMATION pi;
+	ZeroMemory(&pi, sizeof(pi));
+
+
+	//Get the physical console session (mouse,etc)
+	ULONG sessionId = WTSGetActiveConsoleSessionId();
+
+	HANDLE userToken = NULL;
+	if (!WTSQueryUserToken(sessionId, &userToken))
+		return false;
+
+
+	const BOOL result = CreateProcessAsUserW(userToken, pInfo.GetFullPath().c_str(), _tcsdup(pInfo.GetParameters().c_str()), NULL, NULL, FALSE, creationFlags, NULL, pInfo.GetFileDir().c_str(), &si, &pi);
+
+	CloseHandle(userToken);
+
+	if (result)
+	{
+		processHandle = pi.hProcess;
+		threadHandle = pi.hThread;
+		processId = pi.dwProcessId;
+
+		time(&lastRestart);
+		StartWatchingForExit();
+		return true;
+	}
+
+	return false;
+}
 
 
 void Process::StopWatchingForExit()
@@ -144,6 +201,7 @@ void Process::StartWatchingForExit()
 	RegisterWaitForSingleObject(&waitHandle, processHandle, OnExitedCallback, this, INFINITE, WT_EXECUTEONLYONCE);
 }
 
+
 void CALLBACK Process::OnExitedCallback(PVOID params, BOOLEAN timerOrWaitFired)
 {
 	static_cast<Process*>(params)->CleanUp();
@@ -152,14 +210,16 @@ void CALLBACK Process::OnExitedCallback(PVOID params, BOOLEAN timerOrWaitFired)
 
 void Process::OnExited()
 {
-	if(pInfo.GetMaxRestartsResetTime() != 0 && GetTimeDifference(lastRestart, GetLocalTime()) > pInfo.GetMaxRestartsResetTime())
+	if(pInfo.GetMaxRestartsResetTime() != 0 && difftime(TimeNow(),lastRestart) > pInfo.GetMaxRestartsResetTime())
 	{
 		restarts = 0;
 	}
 
-	if(pInfo.GetMaxRestarts() > restarts)
+	if (pInfo.GetUnlimitedRestarts() || pInfo.GetMaxRestarts() > restarts)
 	{
-		lastRestart = GetLocalTime();
+		restarts++;
+		time(&lastRestart);
+
 		Start();
 	}
 	else
@@ -201,12 +261,19 @@ BOOL Process::IsMainWindow(HWND hwnd)
 	return GetWindow(hwnd, GW_OWNER) == NULL || IsWindowVisible(hwnd);
 }
 
-struct tm Process::GetLocalTime()
+
+time_t Process::TimeNow()
 {
 	time_t rawTime;
+	time(&rawTime);
+	return rawTime;
+}
+
+struct tm Process::GetLocalTime()
+{
+	time_t rawTime = TimeNow();
 	struct tm timeInfo;
 
-	time(&rawTime);
 	localtime_s(&timeInfo, &rawTime);
 
 	return timeInfo;

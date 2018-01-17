@@ -3,20 +3,21 @@
 class ProcessStartInfo
 {
 private: 
-wstring sFileDir;
-wstring sFileName;
-wstring sFullPath;
-wstring sParamaters;
+wstring sFileDir		= L"";
+wstring sFileName		= L"";
+wstring sFullPath		= L"";
+wstring sParamaters		= L"";
 
-bool bUseLocalSystemAccount;
-DWORD dMaxRestarts;
+bool bUseLocalSystemAccount = true;
+bool bUnlimitedRestarts		= false;
+DWORD dMaxRestarts			= 3;
 DWORD dMaxRestartsResetTime = 0;
 
-bool bIsConsoleApp;
-bool bUseCtrlC;
+bool bIsConsoleApp	= false;
+bool bUseCtrlC		= false;
 
 public:
-	ProcessStartInfo()
+	/*ProcessStartInfo()
 	{
 		sFileDir = L"";
 		sFileName = L"";
@@ -27,14 +28,14 @@ public:
 		dMaxRestarts = 3;
 		bIsConsoleApp = false;
 		bUseCtrlC = false;
-	}
+	}*/
 
-	wstring GetFileDir() const { return sFileDir; }
-	void SetFileDir(wstring filePath)
+	const wstring& GetFileDir() const { return sFileDir; }
+	void SetFileDir(const wstring& filePath)
 	{
 		wstring tmp = filePath;
 		
-		for (int i = 0; i < tmp.length(); i++)
+		for (uint16_t i = 0; i < tmp.length(); i++)
 			if (tmp[i] == '\\')
 			{
 				tmp.insert(i, 1, '\\');
@@ -44,14 +45,25 @@ public:
 		sFileDir = tmp;
 	}
 
-	wstring GetFileName() const { return sFileName; }
-	void SetFileName(wstring fileName) { sFileName = fileName; }
+	const wstring& GetFileName() const { return sFileName; }
+	void SetFileName(const wstring& fileName) { sFileName = fileName; }
 
 	const wstring& GetFullPath() const{ return sFullPath; }
-	void SetFullPath(wstring fullPath) { sFullPath = fullPath; }
+	void SetFullPath(const wstring& fullPath) { sFullPath = fullPath; }
 
-	wstring GetParameters() const { return sParamaters; }
-	void SetParameters(wstring params) { sParamaters = params; }
+	const wstring& GetParameters() const { return sParamaters; }
+	void SetParameters(const wstring& params) { sParamaters = params; }
+
+
+	bool GetUnlimitedRestarts() const { return bUnlimitedRestarts; }
+	void SetUnlimitedRestarts(bool unlimitedRestarts) { bUnlimitedRestarts = unlimitedRestarts; }
+
+	const DWORD& GetMaxRestarts() const { return dMaxRestarts; }
+	void SetMaxRestarts(const DWORD& maxRestarts) { dMaxRestarts = maxRestarts; }
+
+	const DWORD& GetMaxRestartsResetTime() const { return dMaxRestartsResetTime; }
+	void SetMaxRestartsResetTime(const DWORD& maxRestartsResetTime) { dMaxRestartsResetTime = maxRestartsResetTime; }
+
 
 	bool GetIsConsoleApp() const { return bIsConsoleApp; }
 	void SetIsConsoleApp(bool isConsoleApp) { bIsConsoleApp = isConsoleApp; }
@@ -59,10 +71,8 @@ public:
 	bool GetUseCtrlC() const { return bUseCtrlC; }
 	void SetUseCtrlC(bool useCtrlC) { bUseCtrlC = useCtrlC; }
 
-	DWORD GetMaxRestarts() const { return dMaxRestarts; }
-	void SetMaxRestarts(DWORD maxRestarts) { dMaxRestarts = maxRestarts; }
 
-	DWORD GetMaxRestartsResetTime() const { return dMaxRestartsResetTime; }
-	void SetMaxRestartsResetTime(DWORD maxRestartsResetTime) { dMaxRestartsResetTime = maxRestartsResetTime; }
+
+
 };
 

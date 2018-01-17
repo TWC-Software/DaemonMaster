@@ -90,10 +90,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <ControlFlowGuard>false</ControlFlowGuard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>wtsapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(TargetPath)" C:\Users\Mike\source\repos\DaemonMaster\DaemonMaster\bin\Debug</Command>
@@ -152,7 +154,6 @@
   <ItemGroup>
     <ClInclude Include="CServiceBase.h" />
     <ClInclude Include="HandleData.h" />
-    <ClInclude Include="ProcessManager.h" />
     <ClInclude Include="ProcessStartInfo.h" />
     <ClInclude Include="Functions.h" />
     <ClInclude Include="Process.h" />
@@ -166,7 +167,6 @@
     <ClCompile Include="DMService.cpp" />
     <ClCompile Include="Functions.cpp" />
     <ClCompile Include="Process.cpp" />
-    <ClCompile Include="ProcessManager.cpp" />
     <ClCompile Include="RegManager.cpp" />
     <ClCompile Include="Service.cpp" />
     <ClCompile Include="stdafx.cpp">

@@ -15,13 +15,18 @@ Service::Service(PWSTR serviceName, BOOL canStop, BOOL canShutdown, BOOL canPaus
 
 Service::~Service()
 {
-	if(m_hStoppedEvent)
+	if (m_hStoppedEvent)
 	{
 		CloseHandle(m_hStoppedEvent);
 		m_hStoppedEvent = NULL;
 	}
 
-	if(process)
+	CleanUp();
+}
+
+void Service::CleanUp()
+{
+	if (process)
 	{
 		delete process;
 		process = NULL;
@@ -30,10 +35,20 @@ Service::~Service()
 
 void Service::OnStart(DWORD dwArgc, PWSTR * pszArgv)
 {
-	BOOL result = RegManager::ReadParametersFromRegistry(pszArgv[0], dm);
-	
-	if(!process)
+	bool result = RegManager::ReadParametersFromRegistry(pszArgv[0], dm);
+	bool startInUserSession = false;
+
+	if (!process)
 		process = new Process(dm);
+
+	//TODO: Not working
+	for(uint16_t i = 0; i < dwArgc; i++)
+	{
+		if(pszArgv[i] == L"-startInUserSession")
+		{
+			process->SetStartMode(true);
+		}
+	}
 
 	process->Start();
 
@@ -47,6 +62,7 @@ void Service::OnStop()
 
 	process->Stop();
 
+	CleanUp();
 
 	/*if(WaitForSingleObject(m_hStoppedEvent, INFINITE) != WAIT_OBJECT_0)
 	{

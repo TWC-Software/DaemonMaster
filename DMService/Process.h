@@ -10,14 +10,17 @@ private:
 	HANDLE waitHandle = NULL;
 	DWORD processId = 0;
 	DWORD restarts = 0;
+	bool startInUserSession = false;
 
-	struct tm lastRestart;
+	time_t lastRestart;
 
 	bool StartWithCreateProcess();
+	bool StartOnActivUserSession();
 	void CleanUp();
 	void StopWatchingForExit();
 	void StartWatchingForExit();
 
+	static time_t TimeNow();
 	static struct tm GetLocalTime();
 	static double GetTimeDifference(struct tm time1, struct tm time2);
 
@@ -37,6 +40,7 @@ public:
 
 	bool Start();
 	bool Stop();
+	void SetStartMode(bool startInUserSession);
 	//void Pause();
 	//void Resume();
 };
