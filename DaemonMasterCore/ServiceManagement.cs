@@ -73,12 +73,12 @@ namespace DaemonMasterCore
                     NativeMethods.SERVICE_TYPE.SERVICE_WIN32_OWN_PROCESS,
                     daemon.StartType,
                     NativeMethods.SERVICE_ERROR_CONTROL.SERVICE_ERROR_NORMAL,
-                    DaemonMasterServicePath + (ConfigManagement.GetConfig.UseDevService ? DaemonMasterDevServiceFile : DaemonMasterServiceFile) + DaemonMasterServiceParameter,
+                    DaemonMasterServicePath + (ConfigManagement.LoadConfig().UseDevService ? DaemonMasterDevServiceFile : DaemonMasterServiceFile) + DaemonMasterServiceParameter,
                     null,
                     null,
                     ConvertDependenciesArraysToDoubleNullTerminatedString(daemon.DependOnService, daemon.DependOnGroup),
-                    null,
-                    null))
+                    daemon.Username,
+                    daemon.Password))
                 {
                     serviceHandle.SetDescription(daemon.Description);
                     serviceHandle.SetDelayedStart(daemon.DelayedStart);
@@ -285,7 +285,7 @@ namespace DaemonMasterCore
                     if (status.currentState != NativeMethods.SERVICE_STATE.SERVICE_STOPPED)
                         throw new ServiceNotStoppedException();
 
-                    serviceHandle.ChangeConfig(daemon.StartType, daemon.DisplayName, ConvertDependenciesArraysToDoubleNullTerminatedString(daemon.DependOnService, daemon.DependOnGroup));
+                    serviceHandle.ChangeConfig(daemon.StartType, daemon.DisplayName, ConvertDependenciesArraysToDoubleNullTerminatedString(daemon.DependOnService, daemon.DependOnGroup), daemon.Username, daemon.Password);
                     serviceHandle.SetDescription(daemon.Description);
                     serviceHandle.SetDelayedStart(daemon.DelayedStart);
                 }

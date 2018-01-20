@@ -19,6 +19,7 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
 using DaemonMasterCore.Win32.PInvoke;
 using Microsoft.Win32.SafeHandles;
@@ -78,11 +79,25 @@ namespace DaemonMasterCore.Win32
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
-        public void ChangeConfig(NativeMethods.SERVICE_START startType, string displayName, StringBuilder dependencies)
+        public void ChangeConfig(NativeMethods.SERVICE_START startType, string displayName, StringBuilder dependencies, string username, SecureString password)
         {
-            if (!NativeMethods.ChangeServiceConfig(this, NativeMethods.SERVICE_TYPE.SERVICE_NO_CHANGE, startType,
-                NativeMethods.SERVICE_ERROR_CONTROL.SERVICE_NO_CHANGE, null, null, null, dependencies, null, null, displayName))
-                throw new Win32Exception(Marshal.GetLastWin32Error());
+            IntPtr passwordHandle = IntPtr.Zero;
+
+            try
+            {
+                if (password != null)
+                    passwordHandle = Marshal.SecureStringToGlobalAllocUnicode(password);
+
+                if (!NativeMethods.ChangeServiceConfig(this, NativeMethods.SERVICE_TYPE.SERVICE_NO_CHANGE, startType,
+                    NativeMethods.SERVICE_ERROR_CONTROL.SERVICE_NO_CHANGE, null, null, null, dependencies, username,
+                    passwordHandle, displayName))
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
+            finally
+            {
+                if (passwordHandle != IntPtr.Zero)
+                    Marshal.ZeroFreeGlobalAllocUnicode(passwordHandle);
+            }
         }
 
         //http://www.pinvoke.net/default.aspx/advapi32.QueryServiceStatusEx

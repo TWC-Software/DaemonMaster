@@ -1,16 +1,33 @@
+//  DaemonMaster: Process
+//  
+//  This file is part of DeamonMaster.
+// 
+//  DeamonMaster is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//   DeamonMaster is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//
+//   You should have received a copy of the GNU General Public License
+//   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
+/////////////////////////////////////////////////////////////////////////////////////////
 #include "stdafx.h"
 #include "Process.h"
 #include "HandleData.h"
 #include "ctime"
 #include "WtsApi32.h"
 #include "Functions.h"
+#include <VersionHelpers.h>
+#include <minwinbase.h>
 
-Process::Process(const ProcessStartInfo& psi)
+Process::Process()
 {
 	//Enable SE_TCB_NAME privilege for WTSQueryUserToken
 	Functions::EnablePrivilege(SE_TCB_NAME);
-
-	pInfo = psi;
 }
 
 Process::~Process()
@@ -42,8 +59,20 @@ void Process::CleanUp()
 		CloseHandle(threadHandle);
 		threadHandle = NULL;
 	}
+
+	if(autoKillJobHandle)
+	{
+		CloseHandle(autoKillJobHandle);
+		autoKillJobHandle = NULL;
+	}
 }
 
+
+void Process::SetProcessStartInfo(const ProcessStartInfo& psi)
+{
+	if(!IsRunning())
+		pInfo = psi;
+}
 
 void Process::SetStartMode(bool startInUserSession)
 {
@@ -69,6 +98,9 @@ bool Process::Start()
 
 bool Process::Stop()
 {
+	if (!IsRunning())
+		return true;
+
 	StopWatchingForExit();
 
 	bool result;
@@ -101,24 +133,24 @@ bool Process::Stop()
 	return true;
 }
 
-
 bool Process::Kill()
 {
-	if (processHandle)
-		if(TerminateProcess(processHandle, 0))
-		{
-			CleanUp();
-			return true;
-		}
+	if (!IsRunning())
+		return true;
+
+	if(TerminateProcess(processHandle, 0))
+	{
+		CleanUp();
+		return true;
+	}
 
 	return false;
 }
 
 
-
 bool Process::StartWithCreateProcess()
 {
-	DWORD creationFlags = NORMAL_PRIORITY_CLASS | CREATE_NEW_CONSOLE | CREATE_UNICODE_ENVIRONMENT;
+	DWORD creationFlags = NORMAL_PRIORITY_CLASS | CREATE_NEW_CONSOLE | CREATE_UNICODE_ENVIRONMENT | CREATE_BREAKAWAY_FROM_JOB;
 
 	STARTUPINFOW si;
 	ZeroMemory(&si, sizeof(si));
@@ -137,6 +169,7 @@ bool Process::StartWithCreateProcess()
 
 		time(&lastRestart);
 		StartWatchingForExit();
+		AssignAutoKillJob();
 		return true;
 	}
 
@@ -145,7 +178,7 @@ bool Process::StartWithCreateProcess()
 
 bool Process::StartOnActivUserSession()
 {
-	DWORD creationFlags = NORMAL_PRIORITY_CLASS | CREATE_NEW_CONSOLE | CREATE_UNICODE_ENVIRONMENT;
+	DWORD creationFlags = NORMAL_PRIORITY_CLASS | CREATE_NEW_CONSOLE | CREATE_UNICODE_ENVIRONMENT | CREATE_BREAKAWAY_FROM_JOB;
 
 	STARTUPINFOW si;
 	ZeroMemory(&si, sizeof(si));
@@ -177,6 +210,7 @@ bool Process::StartOnActivUserSession()
 
 		time(&lastRestart);
 		StartWatchingForExit();
+		AssignAutoKillJob();
 		return true;
 	}
 
@@ -199,6 +233,56 @@ void Process::StartWatchingForExit()
 		return;
 
 	RegisterWaitForSingleObject(&waitHandle, processHandle, OnExitedCallback, this, INFINITE, WT_EXECUTEONLYONCE);
+}
+
+bool Process::AssignAutoKillJob()
+{
+	if (!IsRunning())
+		return false;
+
+	BOOL processInJob;
+	if (!IsProcessInJob(processHandle, NULL, &processInJob))
+	{
+		//FAILED
+		return false;
+	}
+
+	if(processInJob && !IsWindows8OrGreater())
+	{
+		//Only one job is in windows 7 and lower allowed
+		return false;
+	}
+
+	autoKillJobHandle = CreateJobObjectW(NULL, L"AutoKillJob");
+	if(!autoKillJobHandle)
+	{
+		//FAILED
+		return false;
+	}
+
+	JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli;
+	ZeroMemory(&jeli, sizeof(JOBOBJECT_EXTENDED_LIMIT_INFORMATION));
+
+	jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+	if(!SetInformationJobObject(autoKillJobHandle, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli)))
+	{
+		CloseHandle(autoKillJobHandle);
+		return false;
+	}
+
+	if(!AssignProcessToJobObject(autoKillJobHandle, processHandle))
+	{
+		CloseHandle(autoKillJobHandle);
+		return false;
+	}
+
+	return true;
+}
+
+
+bool Process::IsRunning() const
+{
+	return processHandle != NULL && processHandle != INVALID_HANDLE_VALUE;
 }
 
 
@@ -230,7 +314,7 @@ void Process::OnExited()
 
 
 
-HWND Process::GetMainWindowHandle()
+HWND Process::GetMainWindowHandle() const
 {
 	HandleData data;
 	data.pid = processId;

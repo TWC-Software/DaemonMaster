@@ -26,7 +26,7 @@ namespace DaemonMasterCore.Win32.PInvoke
 {
     public static partial class NativeMethods
     {
-        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern ServiceHandle CreateService
         (
             ServiceControlManager hSCManager,
@@ -45,40 +45,40 @@ namespace DaemonMasterCore.Win32.PInvoke
         );
 
 
-        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern ServiceControlManager OpenSCManager(string machineName, string databaseName, SCM_ACCESS dwAccess);
 
-        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern ServiceHandle OpenService(ServiceControlManager hSCManager, string lpServiceName, SERVICE_ACCESS dwDesiredAccess);
 
-        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CloseServiceHandle(IntPtr hSCManager);
 
-        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool StartService(ServiceHandle hService, uint dwNumServiceArgs, string[] lpServiceArgVectors);
 
-        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ControlService(ServiceHandle hService, SERVICE_CONTROL dwControl, ref SERVICE_STATUS lpServiceStatus);
 
-        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool DeleteService(ServiceHandle hService);
 
-        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport(DLLFiles.ADVAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern bool QueryServiceStatusEx(ServiceHandle hService, uint infoLevel, IntPtr buffer, int bufferSize, out int bytesNeeded);
 
-        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool ChangeServiceConfig(ServiceHandle hService, SERVICE_TYPE dwServiceType, SERVICE_START dwStartType, SERVICE_ERROR_CONTROL dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, string lpdwTagId, StringBuilder lpDependencies, string lpServiceStartName, string lpPassword, string lpDisplayName);
+        public static extern bool ChangeServiceConfig(ServiceHandle hService, SERVICE_TYPE dwServiceType, SERVICE_START dwStartType, SERVICE_ERROR_CONTROL dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, string lpdwTagId, StringBuilder lpDependencies, string lpServiceStartName, IntPtr lpPassword, string lpDisplayName);
 
-        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ChangeServiceConfig2(ServiceHandle hService, INFO_LEVEL dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_DESCRIPTION lpInfo);
 
-        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ChangeServiceConfig2(ServiceHandle hService, INFO_LEVEL dwInfoLevel, [MarshalAs(UnmanagedType.Struct)] ref SERVICE_CONFIG_DELAYED_AUTO_START_INFO lpInfo);
 
@@ -111,36 +111,36 @@ namespace DaemonMasterCore.Win32.PInvoke
 
         //KERNEL 32
 
-        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CloseHandle(IntPtr handle);
 
-        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern ThreadHandle OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, uint dwThreadId);
 
-        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SuspendThread(ThreadHandle hThread);
 
-        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ResumeThread(ThreadHandle hThread);
 
-        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool GenerateConsoleCtrlEvent(CtrlEvent dwCtrlEvent, uint dwProcessGroupId);
 
-        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern int WTSGetActiveConsoleSessionId();
 
-        [DllImport(DLLFiles.KERNEL32, CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport(DLLFiles.KERNEL32, CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern JobHandle CreateJobObject(SECURITY_ATTRIBUTES lpJobAttributes, string lpName);
 
-        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetInformationJobObject(JobHandle hJob, JobObjectInfoType infoType, IntPtr lpJobObjectInfo, uint cbJobObjectInfoLength);
 
-        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool AssignProcessToJobObject(JobHandle hJob, SafeProcessHandle hProcess);
 
@@ -158,19 +158,19 @@ namespace DaemonMasterCore.Win32.PInvoke
         //[DllImport(DLLFiles.KERNEL32, SetLastError = true)]
         //public static extern IntPtr GetCurrentProcess();
 
-        //[DllImport(DLLFiles.KERNEL32, CharSet = CharSet.Auto, SetLastError = true)]
+        //[DllImport(DLLFiles.KERNEL32, CharSet = CharSet.Unicode, SetLastError = true)]
         //public static extern IntPtr GetStdHandle(int whichHandle);
 
 
         //WINSTA
 
-        [DllImport(DLLFiles.WINSTA, SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport(DLLFiles.WINSTA, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern void WinStationSwitchToServicesSession();
 
 
         //WTSAPI32
 
-        [DllImport(DLLFiles.WTSAPI32, SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport(DLLFiles.WTSAPI32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool WTSQueryUserToken(int sessionId, out TokenHandle token);
     }

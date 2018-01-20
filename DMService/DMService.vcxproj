@@ -153,6 +153,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CServiceBase.h" />
+    <ClInclude Include="DMService.h" />
     <ClInclude Include="HandleData.h" />
     <ClInclude Include="ProcessStartInfo.h" />
     <ClInclude Include="Functions.h" />

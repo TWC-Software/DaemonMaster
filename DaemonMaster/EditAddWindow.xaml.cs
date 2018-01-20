@@ -72,6 +72,8 @@ namespace DaemonMaster
                 buttonLoadShortcut.IsEnabled = false;
             #endregion
 
+            groupBoxCustomUsername.IsEnabled = _config.UseExperimentalFunctions;
+
             textBoxFilePath.IsReadOnly = true;
             _daemon = new Daemon();
         }
@@ -127,22 +129,19 @@ namespace DaemonMaster
             radioButtonUseCtrlC.IsChecked = _daemon.UseCtrlC;
             radioButtonUseCtrlBreak.IsChecked = !_daemon.UseCtrlC;
 
-            //if DEBUG
             if (String.IsNullOrWhiteSpace(daemon.Username) || daemon.UseLocalSystem || daemon.Password == null)
             {
                 checkBoxUseLocalSystem.IsChecked = true;
                 textBoxPassword.Password = String.Empty;
                 textBoxUsername.Text = String.Empty;
             }
-            //            else
-            //            {
-            ////#endif
-            //                checkBoxUseLocalSystem.IsChecked = false;
-            //                textBoxPassword.Password = "placeholder";
-            //                textBoxUsername.Text = daemon.Username;
-            //#if DEBUG
-            //            }
-            //#endif
+            else
+            {
+                checkBoxUseLocalSystem.IsChecked = false;
+                textBoxPassword.Password = "placeholder";
+                textBoxUsername.Text = daemon.Username;
+            }
+
 
             switch (daemon.StartType)
             {
@@ -426,7 +425,7 @@ namespace DaemonMaster
 
                     if (textBoxPassword.Password != "placeholder")
                     {
-                        if (!SystemManagement.ValidateUserWin32(textBoxUsername.Text, textBoxPassword.Password.ConvertStringToSecureString()))
+                        if (!SystemManagement.ValidateUserWin32(textBoxUsername.Text, textBoxPassword.SecurePassword))
                         {
                             MessageBox.Show(_resManager.GetString("invalid_user", CultureInfo.CurrentUICulture), _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
                             return;
