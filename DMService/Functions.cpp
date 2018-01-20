@@ -18,6 +18,7 @@
 #include "stdafx.h"
 #include "Functions.h"
 #include <filesystem>
+#include "TlHelp32.h"
 
 inline void Functions::TrimBegin(wstring &s)
 {
@@ -131,4 +132,42 @@ bool Functions::SetPrivilege(
 	}
 
 	return TRUE;
+}
+
+void Functions::KillAllServices()
+{
+	//TODO
+}
+
+void Functions::KillAllChildProcesses(DWORD parentPid)
+{
+	PROCESSENTRY32W processEntry32;
+	processEntry32.dwSize = sizeof(PROCESSENTRY32W);
+
+	HANDLE handleSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+	BOOL bContinue = Process32FirstW(handleSnapShot, &processEntry32);
+	while(bContinue)
+	{
+		if (parentPid == processEntry32.th32ParentProcessID)
+		{
+			KillProcessWithId(processEntry32.th32ProcessID);
+		}
+
+		bContinue = Process32NextW(handleSnapShot, &processEntry32);
+	}
+
+	CloseHandle(handleSnapShot);
+}
+
+void Functions::KillProcessWithId(DWORD pid)
+{
+	HANDLE processHandle = OpenProcess(PROCESS_TERMINATE, false, pid);
+
+	if(processHandle)
+	{
+		TerminateProcess(processHandle, 0);
+		CloseHandle(processHandle);
+		processHandle = NULL;
+	}
 }

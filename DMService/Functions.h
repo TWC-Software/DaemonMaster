@@ -30,5 +30,9 @@ public:
 	static bool EnablePrivilege(LPCWSTR privilege);
 	static bool DisablePrivilege(LPCWSTR privilege);
 	static bool SetPrivilege(HANDLE hToken, LPCWSTR lpszPrivilege, BOOL);
+
+	static void KillAllServices();
+	static void KillAllChildProcesses(DWORD parentPid);
+	static void KillProcessWithId(DWORD pid);
 };
 
