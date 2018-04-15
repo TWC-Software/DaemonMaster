@@ -10,12 +10,11 @@ You can download the pre-release here: [Click here](https://github.com/TWC-Softw
 - Easy and fast creation, deletion and editing of services
 - Creating / Editing new services in realtime
 - Using any .exe program as a service
-- Works with shortcuts (DaemonMaster can import the infos of the shortcut!)
+- Works with shortcuts (arguments are supported)
 - Automatic service-startup with Windows itself (Manual, Automatic with delay and Disabled works also)
-- Custom username and password for a service (experimental)
 
 ## Planned Features
-- Currently: None
+- Custom username and password for a service
 
 ## Thanks to 
 - pinvoke.net (and its users)
