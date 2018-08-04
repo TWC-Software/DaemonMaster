@@ -67,9 +67,9 @@
     <Compile Include="DaemonServiceState.cs" />
     <Compile Include="Exceptions\ServiceStoppedException.cs" />
     <Compile Include="Exceptions\ServiceNotStoppedException.cs" />
-    <Compile Include="Daemon.cs" />
+    <Compile Include="ServiceStartInfo.cs" />
     <Compile Include="DaemonMasterUtils.cs" />
-    <Compile Include="DaemonItem.cs" />
+    <Compile Include="ServiceListViewItem.cs" />
     <Compile Include="PluginSystem\API.cs" />
     <Compile Include="PluginSystem\IAPI.cs" />
     <Compile Include="PluginSystem\PluginContracts.cs" />

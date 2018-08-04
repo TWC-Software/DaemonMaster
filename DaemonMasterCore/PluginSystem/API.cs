@@ -27,8 +27,8 @@ namespace DaemonMasterCore.PluginSystem
         public event OnServiceAddedEventHandler OnServiceAddedEvent;
         public event OnServiceDeletedEventHandler OnServiceDeletedEvent;
 
-        private ObservableCollection<DaemonItem> _daemonItems;
-        public ObservableCollection<DaemonItem> DaemonItems
+        private ObservableCollection<ServiceListViewItem> _daemonItems;
+        public ObservableCollection<ServiceListViewItem> DaemonItems
         {
             get
             {
@@ -36,7 +36,7 @@ namespace DaemonMasterCore.PluginSystem
             }
         }
 
-        public API(ref DaemonItem daemonItems)
+        public API(ref ServiceListViewItem serviceListViewItems)
         {
 
         }

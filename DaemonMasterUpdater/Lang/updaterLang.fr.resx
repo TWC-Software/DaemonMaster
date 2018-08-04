@@ -97,6 +97,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="close_app_for_update" xml:space="preserve">
+    <value>Vous voulez fermer l'application pour terminer la mise à jour?</value>
+  </data>
   <data name="error" xml:space="preserve">
     <value>Erreur!</value>
   </data>
@@ -105,8 +108,5 @@
   </data>
   <data name="question" xml:space="preserve">
     <value>Question</value>
-  </data>
-  <data name="close_app_for_update" xml:space="preserve">
-    <value>Vous voulez fermer l'application pour terminer la mise à jour?</value>
   </data>
 </root>

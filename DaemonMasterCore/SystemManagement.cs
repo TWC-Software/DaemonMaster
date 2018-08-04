@@ -18,7 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.DirectoryServices.AccountManagement;
+using System.ComponentModel;
 using System.Security;
 using DaemonMasterCore.Win32;
 using DaemonMasterCore.Win32.PInvoke;
@@ -27,23 +27,21 @@ namespace DaemonMasterCore
 {
     public static class SystemManagement
     {
-        [Obsolete]
-        public static bool ValidateUser(string username, SecureString password)
-        {
-            using (PrincipalContext pc = new PrincipalContext(ContextType.Machine))
-            {
-                return pc.ValidateCredentials(username, password.ConvertSecureStringToString());
-            }
-        }
-
         public static bool ValidateUserWin32(string username, SecureString password)
         {
             if (String.IsNullOrWhiteSpace(username) || password == null)
                 throw new ArgumentNullException();
 
-            using (TokenHandle tokenHandle = TokenHandle.GetTokenFromLogon(username, password, NativeMethods.LOGON_TYP.Interactive))
+            try
             {
-                return !tokenHandle.IsInvalid;
+                using (TokenHandle tokenHandle = TokenHandle.GetTokenFromLogon(username, password, NativeMethods.LOGON_TYP.Interactive))
+                {
+                    return !tokenHandle.IsInvalid;
+                }
+            }
+            catch (Win32Exception)
+            {
+                return false;
             }
         }
     }

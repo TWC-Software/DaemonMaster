@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: Daemon
+//  DaemonMaster: ServiceStartInfo
 //  
 //  This file is part of DeamonMaster.
 // 
@@ -18,13 +18,14 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
+using System;
 using System.Security;
 using DaemonMasterCore.Win32.PInvoke;
 using Newtonsoft.Json;
 
 namespace DaemonMasterCore
 {
-    public sealed class Daemon
+    public sealed class ServiceStartInfo
     {
         public override string ToString()
         {
@@ -33,7 +34,7 @@ namespace DaemonMasterCore
 
         public string DisplayName { get; set; }
         public string ServiceName { get; set; }
-        public string Description { get; set; } = "";
+        public string Description { get; set; } = String.Empty;
         public string[] DependOnService { get; set; } = new string[0];
         public string[] DependOnGroup { get; set; } = new string[0];
         public NativeMethods.SERVICE_START StartType { get; set; } = NativeMethods.SERVICE_START.SERVICE_AUTO_START;
@@ -44,9 +45,9 @@ namespace DaemonMasterCore
         public string FileExtension { get; set; }
         public string FullPath => FileDir + @"\" + FileName;
 
-        public string Parameter { get; set; } = "";
+        public string Parameter { get; set; } = String.Empty;
         public bool UseLocalSystem { get; set; } = true;
-        public string Username { get; set; } = "";
+        public string Username { get; set; } = null;
 
         [JsonIgnore] public SecureString Password { get; set; } = null;
 

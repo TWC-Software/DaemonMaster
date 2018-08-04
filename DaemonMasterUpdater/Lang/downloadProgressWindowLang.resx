@@ -97,19 +97,19 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="titel" xml:space="preserve">
-    <value>Download in progress...</value>
+  <data name="button_cancel" xml:space="preserve">
+    <value>Cancel</value>
   </data>
   <data name="label_download" xml:space="preserve">
     <value>Download progress:</value>
-  </data>
-  <data name="button_cancel" xml:space="preserve">
-    <value>Cancel</value>
   </data>
   <data name="msg_file_not_found" xml:space="preserve">
     <value>File not found!</value>
   </data>
   <data name="msg_titel_error" xml:space="preserve">
     <value>Error</value>
+  </data>
+  <data name="titel" xml:space="preserve">
+    <value>Download in progress...</value>
   </data>
 </root>

@@ -117,14 +117,86 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="test" xml:space="preserve">
-    <value>TEST ENG</value>
+  <data name="add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="all_processes_will_be_killed" xml:space="preserve">
+    <value>All processes will be killed on shutdown (except services)! Are you sure?</value>
+  </data>
+  <data name="button_add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="button_cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="button_check_for_updates" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="button_credits" xml:space="preserve">
+    <value>Credits</value>
+  </data>
+  <data name="button_delete_service" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="button_edit_service" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="button_export" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="button_file" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="button_help" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="button_import" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="button_kill_service" xml:space="preserve">
+    <value>Kill Service</value>
+  </data>
+  <data name="button_load_shortcut" xml:space="preserve">
+    <value>Load data from shortcut (legacy)</value>
+  </data>
+  <data name="button_remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="button_save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="button_search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="button_search_file" xml:space="preserve">
+    <value>Search file</value>
+  </data>
+  <data name="button_start" xml:space="preserve">
+    <value>Start (in session)</value>
+  </data>
+  <data name="button_start_service" xml:space="preserve">
+    <value>Start Service</value>
+  </data>
+  <data name="button_stop_service" xml:space="preserve">
+    <value>Stop Service</value>
+  </data>
+  <data name="button_switch_to_session_0" xml:space="preserve">
+    <value>Switch to Session 0</value>
   </data>
   <data name="cannot_delete_deamonfile" xml:space="preserve">
     <value>Cannot delete Daemon file!\n</value>
   </data>
   <data name="cannot_delete_regkeys" xml:space="preserve">
     <value>Cannot delete registery-keys!\n</value>
+  </data>
+  <data name="cannot_export_daemon" xml:space="preserve">
+    <value>Cannot export daemon :(</value>
+  </data>
+  <data name="cannot_import_daemon" xml:space="preserve">
+    <value>Cannot import daemon :(</value>
+  </data>
+  <data name="cannot_load_data_from_registry" xml:space="preserve">
+    <value>Cannot load data from registry!</value>
   </data>
   <data name="cannot_load_deamonfile" xml:space="preserve">
     <value>Cannot load Daemon file!\n</value>
@@ -144,8 +216,45 @@
   <data name="cannot_stop_the_service_already_stopped" xml:space="preserve">
     <value>The service was already stopped!</value>
   </data>
+  <data name="checkbox_is_console_app" xml:space="preserve">
+    <value>Is console application</value>
+  </data>
+  <data name="checkbox_use_local_system_account" xml:space="preserve">
+    <value>Use Local System account</value>
+  </data>
+  <data name="currently_unavailable" xml:space="preserve">
+    <value>Currently unavailable :(</value>
+  </data>
   <data name="data_cannot_be_saved" xml:space="preserve">
-    <value>Data cannot be saved!\n</value>
+    <value>Data cannot be saved!</value>
+  </data>
+  <data name="data_will_be_overwritten" xml:space="preserve">
+    <value>Existing data will be overwritten on load!
+</value>
+  </data>
+  <data name="do_you_to_use_the_data_of_the_shortcut" xml:space="preserve">
+    <value>Do you want to use the data of the shortcut? All existing data will be overwritten!</value>
+  </data>
+  <data name="enum_continue_pending" xml:space="preserve">
+    <value>Continue pending</value>
+  </data>
+  <data name="enum_paused" xml:space="preserve">
+    <value>Paused</value>
+  </data>
+  <data name="enum_pause_pending" xml:space="preserve">
+    <value>Pause pending</value>
+  </data>
+  <data name="enum_running" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="enum_start_pending" xml:space="preserve">
+    <value>Start pending</value>
+  </data>
+  <data name="enum_stopped" xml:space="preserve">
+    <value>Stopped</value>
+  </data>
+  <data name="enum_stop_pending" xml:space="preserve">
+    <value>Stop pending</value>
   </data>
   <data name="error" xml:space="preserve">
     <value>Error</value>
@@ -156,6 +265,12 @@
   <data name="failed_start_UI0detect_service" xml:space="preserve">
     <value>Failed to start UI0Detect service!</value>
   </data>
+  <data name="failed_to_set_interServ" xml:space="preserve">
+    <value>Failed to enable interactive services!</value>
+  </data>
+  <data name="groupbox_custom_user" xml:space="preserve">
+    <value>Custom User (experimental)</value>
+  </data>
   <data name="information" xml:space="preserve">
     <value>Information</value>
   </data>
@@ -165,17 +280,116 @@
   <data name="invalid_path" xml:space="preserve">
     <value>Path to file is invalid or file was deleted!</value>
   </data>
+  <data name="invalid_shortcut" xml:space="preserve">
+    <value>Invalid shortcut</value>
+  </data>
+  <data name="login_failed" xml:space="preserve">
+    <value>The username or the password is incorrect!</value>
+  </data>
   <data name="invalid_values" xml:space="preserve">
     <value>Invalid values</value>
+  </data>
+  <data name="label_counter_reset_time" xml:space="preserve">
+    <value>Max. restarts reset time:</value>
+  </data>
+  <data name="label_depend_on_group" xml:space="preserve">
+    <value>Depend on (Group):</value>
+  </data>
+  <data name="label_depend_on_service" xml:space="preserve">
+    <value>Depend on (Service):</value>
+  </data>
+  <data name="label_description" xml:space="preserve">
+    <value>Description:</value>
+  </data>
+  <data name="label_display_name" xml:space="preserve">
+    <value>Display name:</value>
+  </data>
+  <data name="label_file_path" xml:space="preserve">
+    <value>File path:</value>
+  </data>
+  <data name="label_filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="label_max_restarts" xml:space="preserve">
+    <value>Max Restarts:</value>
+  </data>
+  <data name="label_parameters" xml:space="preserve">
+    <value>Parameter(s):</value>
+  </data>
+  <data name="label_password" xml:space="preserve">
+    <value>Password:</value>
+  </data>
+  <data name="label_process_kill_time" xml:space="preserve">
+    <value>Kill time:</value>
+  </data>
+  <data name="label_process_restart_delay" xml:space="preserve">
+    <value>Restart delay:</value>
+  </data>
+  <data name="label_service_name" xml:space="preserve">
+    <value>Service name:</value>
+  </data>
+  <data name="label_shutdown_console_app" xml:space="preserve">
+    <value>Use to shutdown:</value>
+  </data>
+  <data name="label_start_type" xml:space="preserve">
+    <value>Start type:</value>
+  </data>
+  <data name="label_username" xml:space="preserve">
+    <value>Username:</value>
   </data>
   <data name="max_limit_reached" xml:space="preserve">
     <value>Max limit reached</value>
   </data>
+  <data name="msg_warning_delete" xml:space="preserve">
+    <value>Are you sure you want permanently delete the service?</value>
+  </data>
+  <data name="placeholder_counter_reset_time" xml:space="preserve">
+    <value>Time befor the restart counter will be reset</value>
+  </data>
+  <data name="placeholder_description" xml:space="preserve">
+    <value>&lt;Please enter a description&gt;</value>
+  </data>
+  <data name="placeholder_display_name" xml:space="preserve">
+    <value>&lt;Please enter a display name&gt;</value>
+  </data>
+  <data name="placeholder_file_path" xml:space="preserve">
+    <value>&lt;Click on "Search file" to locate the .exe, etc&gt;</value>
+  </data>
+  <data name="placeholder_max_restarts" xml:space="preserve">
+    <value>unlimited restarts =&gt; -1</value>
+  </data>
+  <data name="placeholder_process_kill_time" xml:space="preserve">
+    <value>0 =&gt; ...</value>
+  </data>
+  <data name="placeholder_process_restart_delay" xml:space="preserve">
+    <value>Time between crash and restart</value>
+  </data>
+  <data name="placeholder_service_name" xml:space="preserve">
+    <value>&lt;Please enter a Name&gt;</value>
+  </data>
+  <data name="placeholder_username" xml:space="preserve">
+    <value>&lt;Enter Service Username&gt;</value>
+  </data>
   <data name="problem_occurred" xml:space="preserve">
     <value>Problem occurred</value>
   </data>
+  <data name="process_pid" xml:space="preserve">
+    <value>Process PID</value>
+  </data>
   <data name="question" xml:space="preserve">
     <value>Question</value>
+  </data>
+  <data name="radiobutton_use_ctrlbreak" xml:space="preserve">
+    <value>Use Ctrl+Break</value>
+  </data>
+  <data name="radiobutton_use_ctrlc" xml:space="preserve">
+    <value>Use Ctrl+C</value>
+  </data>
+  <data name="service" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="service_pid" xml:space="preserve">
+    <value>Service PID</value>
   </data>
   <data name="service_start_was_successful" xml:space="preserve">
     <value>Service successfully started!</value>
@@ -183,11 +397,56 @@
   <data name="service_stop_was_successful" xml:space="preserve">
     <value>Service successfully stopped!</value>
   </data>
-  <data name="title" xml:space="preserve">
-    <value>DeamonMaster Version 0.2.0.0</value>
+  <data name="starttype_automatic" xml:space="preserve">
+    <value>Automatic</value>
+  </data>
+  <data name="starttype_automatic_with_delay" xml:space="preserve">
+    <value>Automatic with delay</value>
+  </data>
+  <data name="starttype_disabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="starttype_manual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="start_was_successful" xml:space="preserve">
+    <value>Start was successful!</value>
+  </data>
+  <data name="start_was_unsuccessful" xml:space="preserve">
+    <value>Start was unsuccessful!</value>
+  </data>
+  <data name="status" xml:space="preserve">
+    <value>Status</value>
   </data>
   <data name="success" xml:space="preserve">
     <value>Success</value>
+  </data>
+  <data name="switch_to_session_0" xml:space="preserve">
+    <value>Switch to Session 0</value>
+  </data>
+  <data name="tabitem_advanced" xml:space="preserve">
+    <value>Advanced</value>
+  </data>
+  <data name="tabitem_dependencies" xml:space="preserve">
+    <value>Dependencies</value>
+  </data>
+  <data name="tabitem_general" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="test" xml:space="preserve">
+    <value>TEST ENG</value>
+  </data>
+  <data name="the_process_killing_was_successful" xml:space="preserve">
+    <value>The process killing was successful!</value>
+  </data>
+  <data name="the_process_killing_was_unsuccessful" xml:space="preserve">
+    <value>The service killing was unsuccessful</value>
+  </data>
+  <data name="the_selected_process_does_not_exist" xml:space="preserve">
+    <value>The selected process does not exist!</value>
+  </data>
+  <data name="the_selected_process_is_already_started" xml:space="preserve">
+    <value>The selected process is already started!</value>
   </data>
   <data name="the_service_deletion_was_successful" xml:space="preserve">
     <value>Service deletion was successful!</value>
@@ -201,285 +460,26 @@
   <data name="the_service_installation_was_unsuccessful" xml:space="preserve">
     <value>Service-installation was not succesful!</value>
   </data>
+  <data name="title" xml:space="preserve">
+    <value>DeamonMaster Version 0.2.0.0</value>
+  </data>
   <data name="warning" xml:space="preserve">
     <value>WARNING</value>
   </data>
-  <data name="windows10_mouse_keyboard" xml:space="preserve">
-    <value>WARNING: In Windows 10 you can't use your mouse or keyboard!</value>
-  </data>
-  <data name="currently_unavailable" xml:space="preserve">
-    <value>Currently unavailable :(</value>
-  </data>
-  <data name="button_switch_to_session_0" xml:space="preserve">
-    <value>Switch to Session 0</value>
-  </data>
-  <data name="button_add" xml:space="preserve">
-    <value>Add</value>
-  </data>
-  <data name="button_delete_service" xml:space="preserve">
-    <value>Delete</value>
-  </data>
-  <data name="button_edit_service" xml:space="preserve">
-    <value>Edit</value>
-  </data>
-  <data name="button_credits" xml:space="preserve">
-    <value>Credits</value>
-  </data>
-  <data name="button_export" xml:space="preserve">
-    <value>Export</value>
-  </data>
-  <data name="button_file" xml:space="preserve">
-    <value>File</value>
-  </data>
-  <data name="button_import" xml:space="preserve">
-    <value>Import</value>
-  </data>
-  <data name="button_save" xml:space="preserve">
-    <value>Save</value>
-  </data>
-  <data name="button_search" xml:space="preserve">
-    <value>Search</value>
-  </data>
-  <data name="button_start_service" xml:space="preserve">
-    <value>Start Service</value>
-  </data>
-  <data name="button_stop_service" xml:space="preserve">
-    <value>Stop Service</value>
-  </data>
-  <data name="label_filter" xml:space="preserve">
-    <value>Filter</value>
-  </data>
-  <data name="cannot_load_data_from_registry" xml:space="preserve">
-    <value>Cannot load data from registry!</value>
-  </data>
-  <data name="add" xml:space="preserve">
-    <value>Add</value>
-  </data>
-  <data name="switch_to_session_0" xml:space="preserve">
-    <value>Switch to Session 0</value>
-  </data>
-  <data name="you_must_stop_the_service_first" xml:space="preserve">
-    <value>You must stop the service first. Do you want stop the service now ?</value>
-  </data>
-  <data name="button_help" xml:space="preserve">
-    <value>Help</value>
-  </data>
-  <data name="button_check_for_updates" xml:space="preserve">
-    <value>Check for updates</value>
-  </data>
-  <data name="do_you_to_use_the_data_of_the_shortcut" xml:space="preserve">
-    <value>Do you want to use the data of the shortcut? All existing data will be overwritten!</value>
-  </data>
-  <data name="button_start" xml:space="preserve">
-    <value>Start (in session)</value>
-  </data>
-  <data name="the_selected_process_does_not_exist" xml:space="preserve">
-    <value>The selected process does not exist!</value>
-  </data>
-  <data name="the_process_killing_was_successful" xml:space="preserve">
-    <value>The process killing was successful!</value>
-  </data>
-  <data name="start_was_successful" xml:space="preserve">
-    <value>Start was successful!</value>
-  </data>
-  <data name="start_was_unsuccessful" xml:space="preserve">
-    <value>Start was unsuccessful!</value>
-  </data>
-  <data name="the_selected_process_is_already_started" xml:space="preserve">
-    <value>The selected process is already started!</value>
-  </data>
-  <data name="all_processes_will_be_killed" xml:space="preserve">
-    <value>All processes will be killed on shutdown (except services)! Are you sure?</value>
-  </data>
-  <data name="invalid_user" xml:space="preserve">
-    <value>The given username or/and password was incorrect!</value>
-  </data>
-  <data name="label_display_name" xml:space="preserve">
-    <value>Display name:</value>
-  </data>
-  <data name="label_service_name" xml:space="preserve">
-    <value>Service name:</value>
-  </data>
-  <data name="label_description" xml:space="preserve">
-    <value>Description:</value>
-  </data>
-  <data name="label_parameters" xml:space="preserve">
-    <value>Parameter(s):</value>
-  </data>
-  <data name="label_start_type" xml:space="preserve">
-    <value>Start type:</value>
-  </data>
-  <data name="starttype_automatic" xml:space="preserve">
-    <value>Automatic</value>
-  </data>
-  <data name="starttype_automatic_with_delay" xml:space="preserve">
-    <value>Automatic with delay</value>
-  </data>
-  <data name="starttype_manual" xml:space="preserve">
-    <value>Manual</value>
-  </data>
-  <data name="starttype_disabled" xml:space="preserve">
-    <value>Disabled</value>
-  </data>
-  <data name="label_file_path" xml:space="preserve">
-    <value>File path:</value>
-  </data>
-  <data name="button_search_file" xml:space="preserve">
-    <value>Search file</value>
-  </data>
-  <data name="groupbox_custom_user" xml:space="preserve">
-    <value>Custom User (experimental)</value>
-  </data>
-  <data name="checkbox_use_local_system_account" xml:space="preserve">
-    <value>Use Local System account</value>
-  </data>
-  <data name="label_username" xml:space="preserve">
-    <value>Username:</value>
-  </data>
-  <data name="label_password" xml:space="preserve">
-    <value>Password:</value>
-  </data>
-  <data name="placeholder_username" xml:space="preserve">
-    <value>&lt;Enter Service Username&gt;</value>
-  </data>
-  <data name="placeholder_description" xml:space="preserve">
-    <value>&lt;Please enter a description&gt;</value>
-  </data>
-  <data name="placeholder_service_name" xml:space="preserve">
-    <value>&lt;Please enter a Name&gt;</value>
-  </data>
-  <data name="placeholder_display_name" xml:space="preserve">
-    <value>&lt;Please enter a display name&gt;</value>
-  </data>
-  <data name="placeholder_file_path" xml:space="preserve">
-    <value>&lt;Click on "Search file" to locate the .exe, etc&gt;</value>
-  </data>
-  <data name="tabitem_general" xml:space="preserve">
-    <value>General</value>
-  </data>
-  <data name="window_edit_add" xml:space="preserve">
-    <value>Edit / Add a Process</value>
-  </data>
   <data name="warning_file_access" xml:space="preserve">
     <value>WARNING: The user must have acces to the programm folder and the file path!</value>
-  </data>
-  <data name="button_cancel" xml:space="preserve">
-    <value>Cancel</value>
-  </data>
-  <data name="invalid_shortcut" xml:space="preserve">
-    <value>Invalid shortcut</value>
-  </data>
-  <data name="button_load_shortcut" xml:space="preserve">
-    <value>Load data from shortcut (legacy)</value>
-  </data>
-  <data name="data_will_be_overwritten" xml:space="preserve">
-    <value>Existing data will be overwritten on load!
-</value>
-  </data>
-  <data name="service" xml:space="preserve">
-    <value>Service</value>
-  </data>
-  <data name="status" xml:space="preserve">
-    <value>Status</value>
-  </data>
-  <data name="service_pid" xml:space="preserve">
-    <value>Service PID</value>
-  </data>
-  <data name="enum_stopped" xml:space="preserve">
-    <value>Stopped</value>
-  </data>
-  <data name="enum_start_pending" xml:space="preserve">
-    <value>Start pending</value>
-  </data>
-  <data name="enum_stop_pending" xml:space="preserve">
-    <value>Stop pending</value>
-  </data>
-  <data name="enum_running" xml:space="preserve">
-    <value>Running</value>
-  </data>
-  <data name="enum_continue_pending" xml:space="preserve">
-    <value>Continue pending</value>
-  </data>
-  <data name="enum_pause_pending" xml:space="preserve">
-    <value>Pause pending</value>
-  </data>
-  <data name="enum_paused" xml:space="preserve">
-    <value>Paused</value>
-  </data>
-  <data name="button_kill_service" xml:space="preserve">
-    <value>Kill Service</value>
-  </data>
-  <data name="the_process_killing_was_unsuccessful" xml:space="preserve">
-    <value>The service killing was unsuccessful</value>
-  </data>
-  <data name="cannot_import_daemon" xml:space="preserve">
-    <value>Cannot import daemon :(</value>
-  </data>
-  <data name="cannot_export_daemon" xml:space="preserve">
-    <value>Cannot export daemon :(</value>
-  </data>
-  <data name="label_max_restarts" xml:space="preserve">
-    <value>Max Restarts:</value>
-  </data>
-  <data name="placeholder_max_restarts" xml:space="preserve">
-    <value>unlimited restarts =&gt; -1</value>
-  </data>
-  <data name="label_process_kill_time" xml:space="preserve">
-    <value>Kill time:</value>
-  </data>
-  <data name="placeholder_process_kill_time" xml:space="preserve">
-    <value>0 =&gt; ...</value>
-  </data>
-  <data name="label_process_restart_delay" xml:space="preserve">
-    <value>Restart delay:</value>
-  </data>
-  <data name="placeholder_process_restart_delay" xml:space="preserve">
-    <value>Time between crash and restart</value>
-  </data>
-  <data name="label_counter_reset_time" xml:space="preserve">
-    <value>Max. restarts reset time:</value>
-  </data>
-  <data name="placeholder_counter_reset_time" xml:space="preserve">
-    <value>Time befor the restart counter will be reset</value>
-  </data>
-  <data name="label_depend_on_service" xml:space="preserve">
-    <value>Depend on (Service):</value>
-  </data>
-  <data name="button_remove" xml:space="preserve">
-    <value>Remove</value>
-  </data>
-  <data name="tabitem_advanced" xml:space="preserve">
-    <value>Advanced</value>
-  </data>
-  <data name="checkbox_is_console_app" xml:space="preserve">
-    <value>Is console application</value>
-  </data>
-  <data name="tabitem_dependencies" xml:space="preserve">
-    <value>Dependencies</value>
-  </data>
-  <data name="label_depend_on_group" xml:space="preserve">
-    <value>Depend on (Group):</value>
-  </data>
-  <data name="radiobutton_use_ctrlc" xml:space="preserve">
-    <value>Use Ctrl+C</value>
-  </data>
-  <data name="radiobutton_use_ctrlbreak" xml:space="preserve">
-    <value>Use Ctrl+Break</value>
-  </data>
-  <data name="label_shutdown_console_app" xml:space="preserve">
-    <value>Use to shutdown:</value>
-  </data>
-  <data name="msg_warning_delete" xml:space="preserve">
-    <value>Are you sure you want permanently delete the service?</value>
-  </data>
-  <data name="process_pid" xml:space="preserve">
-    <value>Process PID</value>
   </data>
   <data name="windows10_1803_switch_session0" xml:space="preserve">
     <value>In Windows 10 1803 or later it is no longer possible to go into the session 0 desktop!
 </value>
   </data>
-  <data name="failed_to_set_interServ" xml:space="preserve">
-    <value>Failed to enable interactive services!</value>
+  <data name="windows10_mouse_keyboard" xml:space="preserve">
+    <value>WARNING: In Windows 10 you can't use your mouse or keyboard!</value>
+  </data>
+  <data name="window_edit_add" xml:space="preserve">
+    <value>Edit / Add a Process</value>
+  </data>
+  <data name="you_must_stop_the_service_first" xml:space="preserve">
+    <value>You must stop the service first. Do you want stop the service now ?</value>
   </data>
 </root>

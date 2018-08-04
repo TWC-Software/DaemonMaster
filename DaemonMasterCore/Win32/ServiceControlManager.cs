@@ -71,6 +71,7 @@ namespace DaemonMasterCore.Win32
                 if (password != null)
                     passwordHandle = Marshal.SecureStringToGlobalAllocUnicode(password);
 
+
                 ServiceHandle serviceHandle = NativeMethods.CreateService(this, serviceName, displayName,
                     desiredAccess,
                     serviceType, startType, errorControl, binaryPathName, loadOrderGroup, tagId, dependencies,

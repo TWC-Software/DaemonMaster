@@ -385,7 +385,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Data cannot be saved!\n ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Data cannot be saved! ähnelt.
         /// </summary>
         public static string data_cannot_be_saved {
             get {
@@ -557,15 +557,6 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die The given username or/and password was incorrect! ähnelt.
-        /// </summary>
-        public static string invalid_user {
-            get {
-                return ResourceManager.GetString("invalid_user", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Invalid values ähnelt.
         /// </summary>
         public static string invalid_values {
@@ -715,6 +706,15 @@ namespace DaemonMaster.Language {
         public static string label_username {
             get {
                 return ResourceManager.GetString("label_username", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die The username or the password is incorrect! ähnelt.
+        /// </summary>
+        public static string login_failed {
+            get {
+                return ResourceManager.GetString("login_failed", resourceCulture);
             }
         }
         

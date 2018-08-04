@@ -89,8 +89,7 @@ namespace DaemonMasterCore.Win32
                     passwordHandle = Marshal.SecureStringToGlobalAllocUnicode(password);
 
                 if (!NativeMethods.ChangeServiceConfig(this, NativeMethods.SERVICE_TYPE.SERVICE_NO_CHANGE, startType,
-                    NativeMethods.SERVICE_ERROR_CONTROL.SERVICE_NO_CHANGE, null, null, null, dependencies, username,
-                    passwordHandle, displayName))
+                    NativeMethods.SERVICE_ERROR_CONTROL.SERVICE_NO_CHANGE, null, null, null, dependencies, username, passwordHandle, displayName))
                     throw new Win32Exception(Marshal.GetLastWin32Error());
             }
             finally

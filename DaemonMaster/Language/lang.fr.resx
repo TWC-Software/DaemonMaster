@@ -117,11 +117,74 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="add" xml:space="preserve">
+    <value>Ajouter</value>
+  </data>
+  <data name="all_processes_will_be_killed" xml:space="preserve">
+    <value>Tous les processus seront tués lors de l'arrêt (sauf les services)! Êtes-vous sûr?!</value>
+  </data>
+  <data name="button_add" xml:space="preserve">
+    <value>Ajouter</value>
+  </data>
+  <data name="button_cancel" xml:space="preserve">
+    <value>Annuler !</value>
+  </data>
+  <data name="button_check_for_updates" xml:space="preserve">
+    <value>Vérifier l'existence de mises à jour </value>
+  </data>
+  <data name="button_credits" xml:space="preserve">
+    <value>Générique</value>
+  </data>
+  <data name="button_delete_service" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="button_edit_service" xml:space="preserve">
+    <value>Modifier</value>
+  </data>
+  <data name="button_export" xml:space="preserve">
+    <value>Exporter</value>
+  </data>
+  <data name="button_file" xml:space="preserve">
+    <value>Fichier</value>
+  </data>
+  <data name="button_help" xml:space="preserve">
+    <value>Aider</value>
+  </data>
+  <data name="button_import" xml:space="preserve">
+    <value>Importer</value>
+  </data>
+  <data name="button_load_shortcut" xml:space="preserve">
+    <value>Chargez les données à partir du raccourci!</value>
+  </data>
+  <data name="button_save" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="button_search" xml:space="preserve">
+    <value>Chercher</value>
+  </data>
+  <data name="button_search_file" xml:space="preserve">
+    <value>Rechercher des Tags du fichier</value>
+  </data>
+  <data name="button_start" xml:space="preserve">
+    <value>Commencer !</value>
+  </data>
+  <data name="button_start_service" xml:space="preserve">
+    <value>Enclencher le service</value>
+  </data>
+  <data name="button_stop_service" xml:space="preserve">
+    <value>Arrêter le service</value>
+  </data>
+  <data name="button_switch_to_session_0" xml:space="preserve">
+    <value>Passer à la Session 0</value>
+  </data>
   <data name="cannot_delete_deamonfile" xml:space="preserve">
     <value>Impossible de supprimer le fichier Deamon ! \n !</value>
   </data>
   <data name="cannot_delete_regkeys" xml:space="preserve">
     <value>Impossible de supprimer les clés de la base de Registre ! \n !</value>
+  </data>
+  <data name="cannot_load_data_from_registry" xml:space="preserve">
+    <value>Impossible de charger les données du Registre !!</value>
   </data>
   <data name="cannot_load_deamonfile" xml:space="preserve">
     <value>Impossible de charger le fichier Daemon ! \n !</value>
@@ -141,8 +204,20 @@
   <data name="cannot_stop_the_service_already_stopped" xml:space="preserve">
     <value>Le service était déjà arrêté !!</value>
   </data>
+  <data name="checkbox_use_local_system_account" xml:space="preserve">
+    <value>Utilisez le compte Système local!</value>
+  </data>
+  <data name="currently_unavailable" xml:space="preserve">
+    <value>Actuellement indisponible :)</value>
+  </data>
   <data name="data_cannot_be_saved" xml:space="preserve">
-    <value>Impossible d’enregistrer les données ! \n !</value>
+    <value>Impossible d’enregistrer les données !!</value>
+  </data>
+  <data name="data_will_be_overwritten" xml:space="preserve">
+    <value>Les données existantes seront écrasées sur la charge!! (dépassé)</value>
+  </data>
+  <data name="do_you_to_use_the_data_of_the_shortcut" xml:space="preserve">
+    <value>Voulez-vous utiliser les données du raccourci? Toutes les données existantes seront écrasées !!</value>
   </data>
   <data name="error" xml:space="preserve">
     <value>Erreur!</value>
@@ -153,6 +228,9 @@
   <data name="failed_start_UI0detect_service" xml:space="preserve">
     <value>Le démarrage du service de UI0Detect à échoué !!</value>
   </data>
+  <data name="groupbox_custom_user" xml:space="preserve">
+    <value>Utilisateur personnalisé (expérimental)!</value>
+  </data>
   <data name="information" xml:space="preserve">
     <value>Informations !</value>
   </data>
@@ -162,11 +240,59 @@
   <data name="invalid_path" xml:space="preserve">
     <value>Chemin d’accès au fichier n’est pas valide ou le fichier a été supprimé !!</value>
   </data>
+  <data name="invalid_shortcut" xml:space="preserve">
+    <value>Raccourci invalide!</value>
+  </data>
+  <data name="login_failed" xml:space="preserve">
+    <value>Le nom d'utilisateur ou le mot de passe était incorrects !!</value>
+  </data>
   <data name="invalid_values" xml:space="preserve">
     <value>Valeurs invalides</value>
   </data>
+  <data name="label_description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="label_display_name" xml:space="preserve">
+    <value>Nom d’affichage</value>
+  </data>
+  <data name="label_file_path" xml:space="preserve">
+    <value>Chemin d'accès</value>
+  </data>
+  <data name="label_filter" xml:space="preserve">
+    <value>Mode de filtrage</value>
+  </data>
+  <data name="label_parameters" xml:space="preserve">
+    <value>Paramètre(s)</value>
+  </data>
+  <data name="label_password" xml:space="preserve">
+    <value>Mot de passe</value>
+  </data>
+  <data name="label_service_name" xml:space="preserve">
+    <value>Nom service</value>
+  </data>
+  <data name="label_start_type" xml:space="preserve">
+    <value>Début</value>
+  </data>
+  <data name="label_username" xml:space="preserve">
+    <value>Nom d'utilisateur</value>
+  </data>
   <data name="max_limit_reached" xml:space="preserve">
     <value>Limite atteinte</value>
+  </data>
+  <data name="placeholder_description" xml:space="preserve">
+    <value>&lt;Ajouter une description&gt; !</value>
+  </data>
+  <data name="placeholder_display_name" xml:space="preserve">
+    <value>&lt;Ajouter le nom d'affichage&gt; !</value>
+  </data>
+  <data name="placeholder_file_path" xml:space="preserve">
+    <value>&lt;Cliquez sur "Cherchez le fichier" pour localizer le .exe, etc&gt; !</value>
+  </data>
+  <data name="placeholder_service_name" xml:space="preserve">
+    <value>&lt;Ajouter un nom&gt; !</value>
+  </data>
+  <data name="placeholder_username" xml:space="preserve">
+    <value>&lt;Ajouter le nom du service&gt; !</value>
   </data>
   <data name="problem_occurred" xml:space="preserve">
     <value>Un problème est survenu lors de l'execution de l'action.</value>
@@ -180,11 +306,44 @@
   <data name="service_stop_was_successful" xml:space="preserve">
     <value>Service arrêté avec succès !!</value>
   </data>
+  <data name="starttype_automatic" xml:space="preserve">
+    <value>Automatique</value>
+  </data>
+  <data name="starttype_automatic_with_delay" xml:space="preserve">
+    <value>Automatique avec retard!</value>
+  </data>
+  <data name="starttype_disabled" xml:space="preserve">
+    <value>Désactivé</value>
+  </data>
+  <data name="starttype_manual" xml:space="preserve">
+    <value>Manuelle</value>
+  </data>
+  <data name="start_was_successful" xml:space="preserve">
+    <value>Le début a été couronné de succès!</value>
+  </data>
+  <data name="start_was_unsuccessful" xml:space="preserve">
+    <value>Le début a échoué !!</value>
+  </data>
   <data name="success" xml:space="preserve">
     <value>Réussi!</value>
   </data>
+  <data name="switch_to_session_0" xml:space="preserve">
+    <value>Passer à la Session 0</value>
+  </data>
+  <data name="tabitem_general" xml:space="preserve">
+    <value>Données générales</value>
+  </data>
   <data name="test" xml:space="preserve">
     <value>TEST FR</value>
+  </data>
+  <data name="the_process_killing_was_successful" xml:space="preserve">
+    <value>L' arrêt du processus a été couronné de succès!</value>
+  </data>
+  <data name="the_selected_process_does_not_exist" xml:space="preserve">
+    <value>Le processus sélectionné n'existe pas !!</value>
+  </data>
+  <data name="the_selected_process_is_already_started" xml:space="preserve">
+    <value>Le processus sélectionné est déjà lancé!</value>
   </data>
   <data name="the_service_deletion_was_successful" xml:space="preserve">
     <value>Suppression de service a réussi !!</value>
@@ -198,181 +357,22 @@
   <data name="the_service_installation_was_unsuccessful" xml:space="preserve">
     <value>Installation du service n’a pas réussi !!</value>
   </data>
-  <data name="warning" xml:space="preserve">
-    <value>ATTENTION!</value>
-  </data>
-  <data name="windows10_mouse_keyboard" xml:space="preserve">
-    <value>ATTENTION! : Dans Windows 10 vous ne pouvez pas utiliser votre souris ou votre clavier !!</value>
-  </data>
-  <data name="currently_unavailable" xml:space="preserve">
-    <value>Actuellement indisponible :)</value>
-  </data>
-  <data name="switch_to_session_0" xml:space="preserve">
-    <value>Passer à la Session 0</value>
-  </data>
-  <data name="add" xml:space="preserve">
-    <value>Ajouter</value>
-  </data>
   <data name="title" xml:space="preserve">
     <value>DeamonMaster, Version 0.2.0.0 !</value>
   </data>
-  <data name="button_switch_to_session_0" xml:space="preserve">
-    <value>Passer à la Session 0</value>
-  </data>
-  <data name="button_add" xml:space="preserve">
-    <value>Ajouter</value>
-  </data>
-  <data name="button_delete_service" xml:space="preserve">
-    <value>Supprimer</value>
-  </data>
-  <data name="button_edit_service" xml:space="preserve">
-    <value>Modifier</value>
-  </data>
-  <data name="button_credits" xml:space="preserve">
-    <value>Générique</value>
-  </data>
-  <data name="button_export" xml:space="preserve">
-    <value>Exporter</value>
-  </data>
-  <data name="button_file" xml:space="preserve">
-    <value>Fichier</value>
-  </data>
-  <data name="button_import" xml:space="preserve">
-    <value>Importer</value>
-  </data>
-  <data name="button_save" xml:space="preserve">
-    <value>Enregistrer</value>
-  </data>
-  <data name="button_search" xml:space="preserve">
-    <value>Chercher</value>
-  </data>
-  <data name="button_start_service" xml:space="preserve">
-    <value>Enclencher le service</value>
-  </data>
-  <data name="button_stop_service" xml:space="preserve">
-    <value>Arrêter le service</value>
-  </data>
-  <data name="label_filter" xml:space="preserve">
-    <value>Mode de filtrage</value>
-  </data>
-  <data name="cannot_load_data_from_registry" xml:space="preserve">
-    <value>Impossible de charger les données du Registre !!</value>
-  </data>
-  <data name="you_must_stop_the_service_first" xml:space="preserve">
-    <value>Vous devez arrêter le service tout d’abord. Voulez-vous arrêter le service maintenant ? !</value>
-  </data>
-  <data name="button_help" xml:space="preserve">
-    <value>Aider</value>
-  </data>
-  <data name="button_check_for_updates" xml:space="preserve">
-    <value>Vérifier l'existence de mises à jour </value>
-  </data>
-  <data name="do_you_to_use_the_data_of_the_shortcut" xml:space="preserve">
-    <value>Voulez-vous utiliser les données du raccourci? Toutes les données existantes seront écrasées !!</value>
-  </data>
-  <data name="button_start" xml:space="preserve">
-    <value>Commencer !</value>
-  </data>
-  <data name="the_selected_process_does_not_exist" xml:space="preserve">
-    <value>Le processus sélectionné n'existe pas !!</value>
-  </data>
-  <data name="the_process_killing_was_successful" xml:space="preserve">
-    <value>L' arrêt du processus a été couronné de succès!</value>
-  </data>
-  <data name="start_was_successful" xml:space="preserve">
-    <value>Le début a été couronné de succès!</value>
-  </data>
-  <data name="start_was_unsuccessful" xml:space="preserve">
-    <value>Le début a échoué !!</value>
-  </data>
-  <data name="the_selected_process_is_already_started" xml:space="preserve">
-    <value>Le processus sélectionné est déjà lancé!</value>
-  </data>
-  <data name="all_processes_will_be_killed" xml:space="preserve">
-    <value>Tous les processus seront tués lors de l'arrêt (sauf les services)! Êtes-vous sûr?!</value>
-  </data>
-  <data name="invalid_user" xml:space="preserve">
-    <value>Le nom d'utilisateur et / ou le mot de passe donnés étaient incorrects !!</value>
-  </data>
-  <data name="label_display_name" xml:space="preserve">
-    <value>Nom d’affichage</value>
-  </data>
-  <data name="label_service_name" xml:space="preserve">
-    <value>Nom service</value>
-  </data>
-  <data name="label_description" xml:space="preserve">
-    <value>Description</value>
-  </data>
-  <data name="label_parameters" xml:space="preserve">
-    <value>Paramètre(s)</value>
-  </data>
-  <data name="label_start_type" xml:space="preserve">
-    <value>Début</value>
-  </data>
-  <data name="starttype_automatic" xml:space="preserve">
-    <value>Automatique</value>
-  </data>
-  <data name="starttype_automatic_with_delay" xml:space="preserve">
-    <value>Automatique avec retard!</value>
-  </data>
-  <data name="starttype_manual" xml:space="preserve">
-    <value>Manuelle</value>
-  </data>
-  <data name="starttype_disabled" xml:space="preserve">
-    <value>Désactivé</value>
-  </data>
-  <data name="label_file_path" xml:space="preserve">
-    <value>Chemin d'accès</value>
-  </data>
-  <data name="button_search_file" xml:space="preserve">
-    <value>Rechercher des Tags du fichier</value>
-  </data>
-  <data name="groupbox_custom_user" xml:space="preserve">
-    <value>Utilisateur personnalisé (expérimental)!</value>
-  </data>
-  <data name="checkbox_use_local_system_account" xml:space="preserve">
-    <value>Utilisez le compte Système local!</value>
-  </data>
-  <data name="label_username" xml:space="preserve">
-    <value>Nom d'utilisateur</value>
-  </data>
-  <data name="label_password" xml:space="preserve">
-    <value>Mot de passe</value>
-  </data>
-  <data name="placeholder_username" xml:space="preserve">
-    <value>&lt;Ajouter le nom du service&gt; !</value>
-  </data>
-  <data name="placeholder_description" xml:space="preserve">
-    <value>&lt;Ajouter une description&gt; !</value>
-  </data>
-  <data name="placeholder_service_name" xml:space="preserve">
-    <value>&lt;Ajouter un nom&gt; !</value>
-  </data>
-  <data name="placeholder_display_name" xml:space="preserve">
-    <value>&lt;Ajouter le nom d'affichage&gt; !</value>
-  </data>
-  <data name="placeholder_file_path" xml:space="preserve">
-    <value>&lt;Cliquez sur "Cherchez le fichier" pour localizer le .exe, etc&gt; !</value>
-  </data>
-  <data name="tabitem_general" xml:space="preserve">
-    <value>Données générales</value>
-  </data>
-  <data name="window_edit_add" xml:space="preserve">
-    <value>Modifier / Ajouter un processus!</value>
+  <data name="warning" xml:space="preserve">
+    <value>ATTENTION!</value>
   </data>
   <data name="warning_file_access" xml:space="preserve">
     <value>AVERTISSEMENT: L'utilisateur doit avoir accès au dossier programme et au chemin du fichier !!</value>
   </data>
-  <data name="button_cancel" xml:space="preserve">
-    <value>Annuler !</value>
+  <data name="windows10_mouse_keyboard" xml:space="preserve">
+    <value>ATTENTION! : Dans Windows 10 vous ne pouvez pas utiliser votre souris ou votre clavier !!</value>
   </data>
-  <data name="invalid_shortcut" xml:space="preserve">
-    <value>Raccourci invalide!</value>
+  <data name="window_edit_add" xml:space="preserve">
+    <value>Modifier / Ajouter un processus!</value>
   </data>
-  <data name="button_load_shortcut" xml:space="preserve">
-    <value>Chargez les données à partir du raccourci!</value>
-  </data>
-  <data name="data_will_be_overwritten" xml:space="preserve">
-    <value>Les données existantes seront écrasées sur la charge!! (dépassé)</value>
+  <data name="you_must_stop_the_service_first" xml:space="preserve">
+    <value>Vous devez arrêter le service tout d’abord. Voulez-vous arrêter le service maintenant ? !</value>
   </data>
 </root>

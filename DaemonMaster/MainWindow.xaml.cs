@@ -34,7 +34,6 @@ using DaemonMasterCore;
 using DaemonMasterCore.Config;
 using DaemonMasterCore.Exceptions;
 using DaemonMasterCore.Win32.PInvoke;
-using Microsoft.Win32;
 
 namespace DaemonMaster
 {
@@ -45,7 +44,7 @@ namespace DaemonMaster
     {
         private Config _config;
 
-        private readonly ObservableCollection<DaemonItem> _processCollection;
+        private readonly ObservableCollection<ServiceListViewItem> _processCollection;
         private readonly ResourceManager _resManager = new ResourceManager(typeof(lang));
 
         public MainWindow()
@@ -116,7 +115,7 @@ namespace DaemonMaster
             if (listViewDaemons.SelectedItem == null)
                 return;
 
-            RemoveDaemon((DaemonItem)listViewDaemons.SelectedItem);
+            RemoveDaemon((ServiceListViewItem)listViewDaemons.SelectedItem);
         }
 
         private void buttonSwitchToSession0_Click(object sender, RoutedEventArgs e)
@@ -130,7 +129,7 @@ namespace DaemonMaster
             if (listViewDaemons.SelectedItem == null)
                 return;
 
-            StartService((DaemonItem)listViewDaemons.SelectedItem);
+            StartService((ServiceListViewItem)listViewDaemons.SelectedItem);
         }
 
         private void MenuItem_Stop_OnClick(object sender, RoutedEventArgs e)
@@ -138,7 +137,7 @@ namespace DaemonMaster
             if (listViewDaemons.SelectedItem == null)
                 return;
 
-            StopService((DaemonItem)listViewDaemons.SelectedItem);
+            StopService((ServiceListViewItem)listViewDaemons.SelectedItem);
         }
 
         private void MenuItem_Kill_OnClick(object sender, RoutedEventArgs e)
@@ -146,7 +145,7 @@ namespace DaemonMaster
             if (listViewDaemons.SelectedItem == null)
                 return;
 
-            KillService((DaemonItem)listViewDaemons.SelectedItem);
+            KillService((ServiceListViewItem)listViewDaemons.SelectedItem);
         }
 
         private void MenuItem_Delete_OnClick(object sender, RoutedEventArgs e)
@@ -154,64 +153,7 @@ namespace DaemonMaster
             if (listViewDaemons.SelectedItem == null)
                 return;
 
-            RemoveDaemon((DaemonItem)listViewDaemons.SelectedItem);
-        }
-
-        private void MenuItem_Export_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (listViewDaemons.SelectedItem == null)
-                return;
-
-            SaveFileDialog saveFileDialog = new SaveFileDialog
-            {
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
-                Filter = "DMDF (*.dmdf)|*.dmdf|" +
-                         "All files (*.*)|*.*",
-                DefaultExt = "dmdf",
-                AddExtension = true,
-                CheckFileExists = false,
-                CheckPathExists = true
-            };
-
-            try
-            {
-                if (saveFileDialog.ShowDialog() == true)
-                {
-                    DaemonMasterUtils.ExportItem(((DaemonItem)listViewDaemons.SelectedItem).ServiceName, saveFileDialog.FileName);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(_resManager.GetString("cannot_export_daemon") + "\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void MenuItem_Import_OnClick(object sender, RoutedEventArgs e)
-        {
-
-            OpenFileDialog openFileDialog = new OpenFileDialog
-            {
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
-                Filter = "DMDF (*.dmdf)|*.dmdf|" +
-                         "All files (*.*)|*.*",
-                AddExtension = true,
-                CheckFileExists = true,
-                CheckPathExists = true,
-                DereferenceLinks = true,
-                Multiselect = false
-            };
-
-            try
-            {
-                if (openFileDialog.ShowDialog() == true)
-                {
-                    ImportDaemon(DaemonMasterUtils.ImportItem(openFileDialog.FileName));
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(_resManager.GetString("cannot_import_daemon") + "\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            RemoveDaemon((ServiceListViewItem)listViewDaemons.SelectedItem);
         }
 
         private void MenuItem_StartInSession_OnClick(object sender, RoutedEventArgs e)
@@ -219,11 +161,11 @@ namespace DaemonMaster
             if (listViewDaemons.SelectedItem == null)
                 return;
 
-            DaemonItem daemonItem = (DaemonItem)listViewDaemons.SelectedItem;
+            ServiceListViewItem serviceListViewItem = (ServiceListViewItem)listViewDaemons.SelectedItem;
 
             try
             {
-                switch (ServiceManagement.StartService(daemonItem.ServiceName, true))
+                switch (ServiceManagement.StartService(serviceListViewItem.ServiceName, true))
                 {
                     case DaemonServiceState.Unsuccessful:
                         MessageBox.Show(_resManager.GetString("start_was_unsuccessful"),
@@ -256,7 +198,7 @@ namespace DaemonMaster
                 return;
 
             //Only show "Start in session" if the service run under the Local System account
-            MenuItem_StartInSession.IsEnabled = ((DaemonItem)listViewDaemons.SelectedItem).UseLocalSystem;
+            MenuItem_StartInSession.IsEnabled = ((ServiceListViewItem)listViewDaemons.SelectedItem).UseLocalSystem;
         }
 
         //MENU
@@ -271,7 +213,7 @@ namespace DaemonMaster
             if (listViewDaemons.SelectedItem == null)
                 return;
 
-            RemoveDaemon((DaemonItem)listViewDaemons.SelectedItem);
+            RemoveDaemon((ServiceListViewItem)listViewDaemons.SelectedItem);
         }
 
         private void MenuItem_EditDaemon_OnClick(object sender, RoutedEventArgs e)
@@ -356,15 +298,16 @@ namespace DaemonMaster
             {
                 try
                 {
-                    EditAddWindow addProcessWindow = EditAddWindow.OpenEditAddWindowWithDefaultValues(); // Neues Event Im EditAddWindow Fenster
-                    var dialogResult = addProcessWindow.ShowDialog(); // Fenster geht auf, Code geht erst weiter wenn Fenster geschlossen ist
+                    ServiceEditWindow serviceEditWindow = new ServiceEditWindow(null);
+                    var dialogResult = serviceEditWindow.ShowDialog(); // Fenster geht auf, Code geht erst weiter wenn Fenster geschlossen ist
                     if (dialogResult.HasValue && dialogResult.Value)
                     {
-                        _processCollection.Add(addProcessWindow.DaemonItem);
+                        _processCollection.Add(ServiceListViewItem.CreateItemFromInfo(serviceEditWindow.GetServiceStartInfo()));
                     }
                 }
                 catch (Exception ex)
                 {
+                    //TODO: WTF message
                     MessageBox.Show(_resManager.GetString("cannot_load_data_from_registry") + "\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
@@ -374,24 +317,7 @@ namespace DaemonMaster
             }
         }
 
-        private void ImportDaemon(Daemon daemon)
-        {
-            try
-            {
-                EditAddWindow addProcessWindow = EditAddWindow.OpenEditAddWindowForImporting(daemon); // Neues Event Im EditAddWindow Fenster
-                var dialogResult = addProcessWindow.ShowDialog(); // Fenster geht auf, Code geht erst weiter wenn Fesnter geschlossen ist
-                if (dialogResult.HasValue && dialogResult.Value)
-                {
-                    _processCollection.Add(addProcessWindow.DaemonItem);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(_resManager.GetString("cannot_load_data_from_registry") + "\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void RemoveDaemon(DaemonItem daemonItem)
+        private void RemoveDaemon(ServiceListViewItem serviceListViewItem)
         {
             MessageBoxResult result = MessageBox.Show(_resManager.GetString("msg_warning_delete"), _resManager.GetString("question"),
                 MessageBoxButton.YesNo, MessageBoxImage.Question);
@@ -401,8 +327,8 @@ namespace DaemonMaster
 
             try
             {
-                ServiceManagement.DeleteService(daemonItem.ServiceName);
-                _processCollection.Remove(_processCollection.Single(i => i.ServiceName == daemonItem.ServiceName));
+                ServiceManagement.DeleteService(serviceListViewItem.ServiceName);
+                _processCollection.Remove(_processCollection.Single(i => i.ServiceName == serviceListViewItem.ServiceName));
 
                 MessageBox.Show(_resManager.GetString("the_service_deletion_was_successful"),
                     _resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
@@ -414,7 +340,7 @@ namespace DaemonMaster
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    StopService(daemonItem);
+                    StopService(serviceListViewItem);
                 }
             }
             catch (Exception ex)
@@ -428,16 +354,16 @@ namespace DaemonMaster
             if (listViewDaemons.SelectedItem == null)
                 return;
 
-            DaemonItem daemonItem = (DaemonItem)listViewDaemons.SelectedItem;
+            ServiceListViewItem serviceListViewItem = (ServiceListViewItem)listViewDaemons.SelectedItem;
 
-            if (ServiceManagement.IsServiceRunning(daemonItem.ServiceName))
+            if (ServiceManagement.IsServiceRunning(serviceListViewItem.ServiceName))
             {
                 MessageBoxResult result = MessageBox.Show(_resManager.GetString("you_must_stop_the_service_first"),
                     _resManager.GetString("information"), MessageBoxButton.YesNo, MessageBoxImage.Information);
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    StopService(daemonItem);
+                    StopService(serviceListViewItem);
                 }
                 else
                 {
@@ -447,11 +373,15 @@ namespace DaemonMaster
 
             try
             {
-                EditAddWindow addProcessWindow = EditAddWindow.OpenEditAddWindowForEditing(daemonItem);
-                var dialogResult = addProcessWindow.ShowDialog();
+                //Open service edit window with the data from registry
+                ServiceEditWindow serviceEditWindow = new ServiceEditWindow(RegistryManagement.LoadServiceStartInfosFromRegistry(serviceListViewItem.ServiceName));
+                //stops until windows has been closed
+                var dialogResult = serviceEditWindow.ShowDialog();
+                //Check result
                 if (dialogResult.HasValue && dialogResult.Value)
                 {
-                    _processCollection[_processCollection.IndexOf(addProcessWindow.OldDaemonItem)] = addProcessWindow.DaemonItem;
+                    //Update daemonInfo
+                    _processCollection[_processCollection.IndexOf(serviceListViewItem)] = ServiceListViewItem.CreateItemFromInfo(serviceEditWindow.GetServiceStartInfo());
                 }
             }
             catch (Exception ex)
@@ -460,11 +390,11 @@ namespace DaemonMaster
             }
         }
 
-        private void StartService(DaemonItem daemonItem)
+        private void StartService(ServiceListViewItem serviceListViewItem)
         {
             try
             {
-                switch (ServiceManagement.StartService(daemonItem.ServiceName))
+                switch (ServiceManagement.StartService(serviceListViewItem.ServiceName))
                 {
                     case DaemonServiceState.Unsuccessful:
                         MessageBox.Show(_resManager.GetString("cannot_start_the_service"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
@@ -485,11 +415,11 @@ namespace DaemonMaster
             }
         }
 
-        private void StopService(DaemonItem daemonItem)
+        private void StopService(ServiceListViewItem serviceListViewItem)
         {
             try
             {
-                switch (ServiceManagement.StopService(daemonItem.ServiceName))
+                switch (ServiceManagement.StopService(serviceListViewItem.ServiceName))
                 {
                     case DaemonServiceState.Unsuccessful:
                         MessageBox.Show(_resManager.GetString("cannot_stop_the_service"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
@@ -510,11 +440,11 @@ namespace DaemonMaster
             }
         }
 
-        private void KillService(DaemonItem daemonItem)
+        private void KillService(ServiceListViewItem serviceListViewItem)
         {
             try
             {
-                switch (ServiceManagement.KillService(daemonItem.ServiceName))
+                switch (ServiceManagement.KillService(serviceListViewItem.ServiceName))
                 {
                     case DaemonServiceState.AlreadyStopped:
                         MessageBox.Show(_resManager.GetString("cannot_stop_the_service_already_stopped"),

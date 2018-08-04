@@ -100,16 +100,16 @@
   <data name="cancel" xml:space="preserve">
     <value>Abbrechen</value>
   </data>
+  <data name="label_description" xml:space="preserve">
+    <value>{0} {1} ist verfügbar. Wollen Sie diese Version jetzt installieren?</value>
+  </data>
+  <data name="label_update" xml:space="preserve">
+    <value>Eine neue Version von {0} ist verfügbar!</value>
+  </data>
   <data name="update" xml:space="preserve">
     <value>Aktualisieren</value>
   </data>
   <data name="window_titel" xml:space="preserve">
     <value>Aktualisierung verfügbar!</value>
-  </data>
-  <data name="label_update" xml:space="preserve">
-    <value>Eine neue Version von {0} ist verfügbar!</value>
-  </data>
-  <data name="label_description" xml:space="preserve">
-    <value>{0} {1} ist verfügbar. Wollen Sie diese Version jetzt installieren?</value>
   </data>
 </root>

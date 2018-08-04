@@ -30,6 +30,6 @@ namespace DaemonMasterCore.PluginSystem
         event OnServiceAddedEventHandler OnServiceAddedEvent;
         event OnServiceDeletedEventHandler OnServiceDeletedEvent;
 
-        ObservableCollection<DaemonItem> DaemonItems { get; }
+        ObservableCollection<ServiceListViewItem> DaemonItems { get; }
     }
 }

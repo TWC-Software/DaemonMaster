@@ -100,7 +100,7 @@ namespace DaemonMasterCore
 
         public static void ExportItem(string serviceName, string path)
         {
-            Daemon daemon = RegistryManagement.LoadDaemonFromRegistry(serviceName);
+            ServiceStartInfo serviceStartInfo = RegistryManagement.LoadServiceStartInfosFromRegistry(serviceName);
 
             using (StreamWriter streamWriter = File.CreateText(path))
             {
@@ -108,11 +108,11 @@ namespace DaemonMasterCore
                 {
                     Formatting = Formatting.Indented
                 };
-                serializer.Serialize(streamWriter, daemon);
+                serializer.Serialize(streamWriter, serviceStartInfo);
             }
         }
 
-        public static Daemon ImportItem(string path)
+        public static ServiceStartInfo ImportItem(string path)
         {
             if (!File.Exists(path))
                 throw new FileNotFoundException();
@@ -120,8 +120,8 @@ namespace DaemonMasterCore
             using (StreamReader streamReader = File.OpenText(path))
             {
                 JsonSerializer serializer = new JsonSerializer();
-                Daemon daemon = (Daemon)serializer.Deserialize(streamReader, typeof(Daemon));
-                return daemon;
+                ServiceStartInfo serviceStartInfo = (ServiceStartInfo)serializer.Deserialize(streamReader, typeof(ServiceStartInfo));
+                return serviceStartInfo;
             }
         }
     }

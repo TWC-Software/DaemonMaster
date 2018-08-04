@@ -55,8 +55,8 @@ namespace DaemonMasterCore
         /// <summary>
         /// Create an interactiv service under the "Local System" account with UI0Detect as dependencie
         /// </summary>
-        /// <param name="daemon"></param>
-        public static void CreateInteractiveService(Daemon daemon)
+        /// <param name="serviceStartInfo"></param>
+        public static void CreateInteractiveService(ServiceStartInfo serviceStartInfo)
         {
             if (!Directory.Exists(DaemonMasterServicePath) ||
                 !File.Exists(DaemonMasterServicePath + DaemonMasterServiceFile))
@@ -66,22 +66,22 @@ namespace DaemonMasterCore
                 ServiceControlManager.Connect(NativeMethods.SCM_ACCESS.SC_MANAGER_CREATE_SERVICE))
             {
                 using (ServiceHandle serviceHandle = scm.CreateService(
-                    daemon.ServiceName,
-                    daemon.DisplayName,
+                    serviceStartInfo.ServiceName,
+                    serviceStartInfo.DisplayName,
                     NativeMethods.SERVICE_ACCESS.SERVICE_ALL_ACCESS,
                     NativeMethods.SERVICE_TYPE.SERVICE_INTERACTIVE_PROCESS |
                     NativeMethods.SERVICE_TYPE.SERVICE_WIN32_OWN_PROCESS,
-                    daemon.StartType,
+                    serviceStartInfo.StartType,
                     NativeMethods.SERVICE_ERROR_CONTROL.SERVICE_ERROR_NORMAL,
                     DaemonMasterServicePath + (ConfigManagement.LoadConfig().UseDevService ? DaemonMasterDevServiceFile : DaemonMasterServiceFile) + DaemonMasterServiceParameter,
                     null,
                     null,
-                    ConvertDependenciesArraysToDoubleNullTerminatedString(daemon.DependOnService, daemon.DependOnGroup),
-                    daemon.Username,
-                    daemon.Password))
+                    ConvertDependenciesArraysToDoubleNullTerminatedString(serviceStartInfo.DependOnService, serviceStartInfo.DependOnGroup),
+                    serviceStartInfo.Username,
+                    serviceStartInfo.Password))
                 {
-                    serviceHandle.SetDescription(daemon.Description);
-                    serviceHandle.SetDelayedStart(daemon.DelayedStart);
+                    serviceHandle.SetDescription(serviceStartInfo.Description);
+                    serviceHandle.SetDelayedStart(serviceStartInfo.DelayedStart);
                 }
             }
         }
@@ -271,23 +271,23 @@ namespace DaemonMasterCore
         /// <summary>
         /// Change the service config
         /// </summary>
-        /// <param name="daemon"></param>
+        /// <param name="serviceStartInfo"></param>
         /// <returns></returns>
-        public static void ChangeServiceConfig(Daemon daemon)
+        public static void ChangeServiceConfig(ServiceStartInfo serviceStartInfo)
         {
             using (ServiceControlManager scm =
                 ServiceControlManager.Connect(NativeMethods.SCM_ACCESS.SC_MANAGER_CONNECT))
             {
-                using (ServiceHandle serviceHandle = scm.OpenService(daemon.ServiceName, NativeMethods.SERVICE_ACCESS.SERVICE_QUERY_STATUS | NativeMethods.SERVICE_ACCESS.SERVICE_CHANGE_CONFIG | NativeMethods.SERVICE_ACCESS.SERVICE_QUERY_CONFIG))
+                using (ServiceHandle serviceHandle = scm.OpenService(serviceStartInfo.ServiceName, NativeMethods.SERVICE_ACCESS.SERVICE_QUERY_STATUS | NativeMethods.SERVICE_ACCESS.SERVICE_CHANGE_CONFIG | NativeMethods.SERVICE_ACCESS.SERVICE_QUERY_CONFIG))
                 {
                     NativeMethods.SERVICE_STATUS_PROCESS status = serviceHandle.QueryServiceStatusEx();
 
                     if (status.currentState != NativeMethods.SERVICE_STATE.SERVICE_STOPPED)
                         throw new ServiceNotStoppedException();
 
-                    serviceHandle.ChangeConfig(daemon.StartType, daemon.DisplayName, ConvertDependenciesArraysToDoubleNullTerminatedString(daemon.DependOnService, daemon.DependOnGroup), daemon.Username, daemon.Password);
-                    serviceHandle.SetDescription(daemon.Description);
-                    serviceHandle.SetDelayedStart(daemon.DelayedStart);
+                    serviceHandle.ChangeConfig(serviceStartInfo.StartType, serviceStartInfo.DisplayName, ConvertDependenciesArraysToDoubleNullTerminatedString(serviceStartInfo.DependOnService, serviceStartInfo.DependOnGroup), serviceStartInfo.Username, serviceStartInfo.Password);
+                    serviceHandle.SetDescription(serviceStartInfo.Description);
+                    serviceHandle.SetDelayedStart(serviceStartInfo.DelayedStart);
                 }
             }
         }

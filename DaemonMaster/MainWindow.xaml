@@ -55,9 +55,6 @@
                     <Separator/>
                     <MenuItem Name="MenuItem_StartInSession" Header="{x:Static resx:lang.button_start}" Click="MenuItem_StartInSession_OnClick"/>
                     <Separator/>
-                    <MenuItem Name="MenuItem_Export" Header="{x:Static resx:lang.button_export}" Click="MenuItem_Export_OnClick"/>
-                    <MenuItem Name="MenuItem_Import" Header="{x:Static resx:lang.button_import}" Click="MenuItem_Import_OnClick"/>
-                    <Separator/>
                     <MenuItem Name="MenuItem_DeleteService" Header="{x:Static resx:lang.button_delete_service}" Click="MenuItem_Delete_OnClick"/>
                 </ContextMenu>
             </ListView.ContextMenu>
@@ -65,8 +62,6 @@
         
         <Menu x:Name="menu" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="519">
             <MenuItem Header="{x:Static resx:lang.button_file}">
-                <MenuItem Header="{x:Static resx:lang.button_export}" Click="MenuItem_Export_OnClick"/>
-                <MenuItem Header="{x:Static resx:lang.button_import}" Click="MenuItem_Import_OnClick"/>
             </MenuItem>
             <MenuItem Header="{x:Static resx:lang.button_edit_service}">
                 <MenuItem Header="{x:Static resx:lang.button_add}" Click="MenuItem_AddDaemon_OnClick"/>

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: DaemonItem
+//  DaemonMaster: serviceItem
 //  
 //  This file is part of DeamonMaster.
 // 
@@ -25,7 +25,7 @@ using Microsoft.Win32;
 
 namespace DaemonMasterCore
 {
-    public class DaemonItem
+    public class ServiceListViewItem
     {
         private ImageSource _icon;
         private string _fullPath;
@@ -57,13 +57,25 @@ namespace DaemonMasterCore
         /// <returns>Returns false if parameter not exist</returns>
         public bool UseLocalSystem => Convert.ToBoolean(RegistryManagement.GetParameterFromRegistry(ServiceName, "UseLocalSystem"));
 
+        //Create the Item with the ServiceStartInfos
+        public static ServiceListViewItem CreateItemFromInfo(ServiceStartInfo startInfo)
+        {
+            ServiceListViewItem item = new ServiceListViewItem()
+            {
+                DisplayName = startInfo.DisplayName,
+                ServiceName = startInfo.ServiceName,
+                FullPath = startInfo.FullPath,
+            };
+
+            return item;
+        }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                             METHODS                                                  //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         /// <summary>
-        /// Update ServicePID and Status of the DaemonItem
+        /// Update ServicePID and Status of the serviceItem
         /// </summary>
         public void UpdateStatus()
         {

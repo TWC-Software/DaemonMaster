@@ -31,6 +31,7 @@ namespace DaemonMaster
         {
             InitializeComponent();
 
+            textBoxCredits.IsReadOnly = true;
             textBoxCredits.Text =
                 "The program \"DeamonMaster\" was originally created by MCPC10 (Main Developer) and Stuffi3000 \n\n GUI: Stuffi3000, MCPC10 \n Code: MCPC10 \n Icon: Stuffi3000 \n\n" +
                 "Used Librarys: \n" +

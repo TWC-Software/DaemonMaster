@@ -54,7 +54,7 @@ namespace DaemonMasterCore
             int currentUserSessionId = NativeMethods.WTSGetActiveConsoleSessionId();
 
             //Get user token
-            using (TokenHandle currentUserToken = TokenHandle.GetTokenFromSessionID(currentUserSessionId))
+            using (TokenHandle currentUserToken = TokenHandle.GetTokenFromSessionId(currentUserSessionId))
             {
                 try
                 {

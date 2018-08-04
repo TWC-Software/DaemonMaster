@@ -116,7 +116,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="EditAddWindow.xaml">
+    <Page Include="ServiceEditWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -128,8 +128,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="EditAddWindow.xaml.cs">
-      <DependentUpon>EditAddWindow.xaml</DependentUpon>
+    <Compile Include="ServiceEditWindow.xaml.cs">
+      <DependentUpon>ServiceEditWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

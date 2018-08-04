@@ -34,7 +34,7 @@ namespace DaemonMasterCore
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private KillChildProcessJob killChildProcessJob = new KillChildProcessJob();
 
-        private readonly Daemon _daemon;
+        private readonly ServiceStartInfo _serviceStartInfo;
         private readonly Process _process;
 
         //Don't change!!
@@ -75,23 +75,23 @@ namespace DaemonMasterCore
 
         public DaemonProcess(string serviceName, bool startInUserSessionAsService = false)
         {
-            _daemon = RegistryManagement.LoadDaemonFromRegistry(serviceName);
+            _serviceStartInfo = RegistryManagement.LoadServiceStartInfosFromRegistry(serviceName);
 
             //If it's a shortcut load the infos from them
-            if (ShellLinkWrapper.IsShortcut(_daemon.FullPath))
+            if (ShellLinkWrapper.IsShortcut(_serviceStartInfo.FullPath))
             {
                 Logger.Info("Found shortcut, reading data...");
 
-                using (ShellLinkWrapper shellLinkWrapper = new ShellLinkWrapper(_daemon.FullPath))
+                using (ShellLinkWrapper shellLinkWrapper = new ShellLinkWrapper(_serviceStartInfo.FullPath))
                 {
                     realPath = shellLinkWrapper.FilePath;
-                    realArgs = FormattingAndJoinArguments(shellLinkWrapper.Arguments, _daemon.Parameter);
+                    realArgs = FormattingAndJoinArguments(shellLinkWrapper.Arguments, _serviceStartInfo.Parameter);
                 }
             }
             else
             {
-                realPath = _daemon.FullPath;
-                realArgs = _daemon.Parameter;
+                realPath = _serviceStartInfo.FullPath;
+                realArgs = _serviceStartInfo.Parameter;
             }
 
             Logger.Info("File path:" + realPath);
@@ -120,15 +120,15 @@ namespace DaemonMasterCore
 
             };
 
-            if (!_daemon.UseLocalSystem)
+            if (!_serviceStartInfo.UseLocalSystem)
             {
-                if (String.IsNullOrWhiteSpace(_daemon.Username) || _daemon.Password == null)
+                if (String.IsNullOrWhiteSpace(_serviceStartInfo.Username) || _serviceStartInfo.Password == null)
                     throw new InvalidCredentialException("The given username, password or both are invalid (null?)");
 
-                if (SystemManagement.ValidateUserWin32(_daemon.Username, _daemon.Password))
+                if (SystemManagement.ValidateUserWin32(_serviceStartInfo.Username, _serviceStartInfo.Password))
                 {
-                    startInfo.UserName = _daemon.Username;
-                    startInfo.Password = _daemon.Password;
+                    startInfo.UserName = _serviceStartInfo.Username;
+                    startInfo.Password = _serviceStartInfo.Password;
                 }
                 else
                 {
@@ -197,10 +197,10 @@ namespace DaemonMasterCore
                 else
                 {
                     //If console app then send Ctrl-C or Ctrl-Break command
-                    if (_daemon.ConsoleApplication)
+                    if (_serviceStartInfo.ConsoleApplication)
                     {
                         Logger.Warn("Send Ctrl-C / Ctrl-Break command...");
-                        CloseConsoleApplication(_daemon.UseCtrlC);
+                        CloseConsoleApplication(_serviceStartInfo.UseCtrlC);
                     }
                     else
                     {
@@ -212,7 +212,7 @@ namespace DaemonMasterCore
                 }
 
                 //Wait for a defined time
-                if (_process.WaitForExit(_daemon.ProcessKillTime))
+                if (_process.WaitForExit(_serviceStartInfo.ProcessKillTime))
                 {
                     _process.Close();
                     return DaemonProcessState.Successful;
@@ -298,13 +298,13 @@ namespace DaemonMasterCore
         {
             #region Counter reset system
 
-            if (_daemon.CounterResetTime != 0)
+            if (_serviceStartInfo.CounterResetTime != 0)
             {
                 //Reset the counter if secondsBetweenCraches is greater than or equal to CounterResetTime 
                 try
                 {
                     uint secondsBetweenCrashes = Convert.ToUInt32(DateTime.UtcNow.Subtract(lastRestartTime).TotalSeconds);
-                    if (secondsBetweenCrashes >= _daemon.CounterResetTime)
+                    if (secondsBetweenCrashes >= _serviceStartInfo.CounterResetTime)
                     {
                         _restarts = 0;
                     }
@@ -318,9 +318,9 @@ namespace DaemonMasterCore
             #endregion
 
             //restart the process if _restarts < MaxRestarts or MaxRestarts = -1
-            if (_restarts < _daemon.MaxRestarts || _daemon.MaxRestarts == -1)
+            if (_restarts < _serviceStartInfo.MaxRestarts || _serviceStartInfo.MaxRestarts == -1)
             {
-                Thread.Sleep(_daemon.ProcessRestartDelay);
+                Thread.Sleep(_serviceStartInfo.ProcessRestartDelay);
                 _process.Close();
                 StartProcess();
                 _restarts++;
@@ -372,7 +372,7 @@ namespace DaemonMasterCore
             }
         }
 
-        public Daemon GetDaemon => _daemon;
+        public ServiceStartInfo GetServiceStartInfo => _serviceStartInfo;
 
         private string FormattingAndJoinArguments(string shortcutArgs, string userArgs)
         {
