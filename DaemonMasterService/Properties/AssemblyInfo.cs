@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("TWC-Software")]
 [assembly: AssemblyProduct("DaemonMasterService")]
-[assembly: AssemblyCopyright("Copyright ©  2017 Mike Cremer / Stephan André")]
+[assembly: AssemblyCopyright("Copyright © 2017-2018 Mike Cremer / Stephan André")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCompany("TWC-Software")]
 [assembly: AssemblyProduct("DaemonMasterCustomActions")]
-[assembly: AssemblyCopyright("Copyright ©  2017 Mike Cremer / Stephan André")]
+[assembly: AssemblyCopyright("Copyright ©  2017-2018 Mike Cremer / Stephan André")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

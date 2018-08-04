@@ -63,14 +63,11 @@
     <Reference Include="ActiveDirectoryObjectPicker">
       <HintPath>..\..\..\..\Documents\Visual Studio 2017\DLLs\ActiveDirectoryObjectPicker.dll</HintPath>
     </Reference>
-    <Reference Include="AutoUpdater.NET, Version=1.4.6.0, Culture=neutral, PublicKeyToken=942f95247e354701, processorArchitecture=MSIL">
-      <HintPath>..\packages\Autoupdater.NET.Official.1.4.6\lib\net452\AutoUpdater.NET.dll</HintPath>
-    </Reference>
     <Reference Include="Itenso.Windows.Controls.ListViewLayout">
       <HintPath>..\..\..\..\Documents\Visual Studio 2017\DLLs\Itenso.Windows.Controls.ListViewLayout.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -92,10 +89,10 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
+    <Page Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </ApplicationDefinition>
+    </Page>
     <Compile Include="CreditsWindow.xaml.cs">
       <DependentUpon>CreditsWindow.xaml</DependentUpon>
     </Compile>
@@ -206,6 +203,10 @@
     <ProjectReference Include="..\DaemonMasterService\DaemonMasterService.csproj">
       <Project>{227ba4d7-56ac-40ba-a73c-0b28ac8c99f8}</Project>
       <Name>DaemonMasterService</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DaemonMasterUpdater\DaemonMasterUpdater.csproj">
+      <Project>{11288e0f-a7de-43ee-8bd9-93b955dcdbba}</Project>
+      <Name>DaemonMasterUpdater</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

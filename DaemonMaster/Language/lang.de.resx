@@ -474,4 +474,10 @@
   <data name="process_pid" xml:space="preserve">
     <value>Prozess PID</value>
   </data>
+  <data name="windows10_1803_switch_session0" xml:space="preserve">
+    <value>Ab Windows 10 1803 ist es nicht mehr möglich in den Session 0 Desktop zu gelangen!</value>
+  </data>
+  <data name="failed_to_set_interServ" xml:space="preserve">
+    <value>Fehler beim aktivieren der Interaktiven Dienste!</value>
+  </data>
 </root>

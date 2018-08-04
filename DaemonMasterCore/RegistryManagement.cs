@@ -190,7 +190,7 @@ namespace DaemonMasterCore
                     if (regKey == null)
                         return false;
 
-                    regKey.SetValue("NoInteractiveServices", enable ? "1" : "0", RegistryValueKind.DWord);
+                    regKey.SetValue("NoInteractiveServices", enable ? 0 : 1, RegistryValueKind.DWord);
                     regKey.Close();
                     return true;
                 }

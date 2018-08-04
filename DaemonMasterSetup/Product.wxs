@@ -1,8 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+
+<!-- Define automatic the version -->
+<?define ProductVersion=!(bind.FileVersion.DaemonMaster.exe) ?>
+<!-- Define CompanyName and ProductName-->
+<?define ProductName="DaemonMaster" ?>
+<?define CompanyName="TWC-Software" ?>
+<!-- Define the upgrade code (NEVER CHANGE THIS CODE!)-->
+<?define UpgradeCode="F277FE5A-6E5C-45AB-85FA-5DAD8EAEDD02"?>
+
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"><?define DaemonMaster_TargetDir=$(var.DaemonMaster.TargetDir)?>
 
-	<Product Id="9523D498-9485-4540-8E2C-213186049078" Name="DaemonMaster" Language="1033" Version="0.2.2.0" Manufacturer="TWC-Software" UpgradeCode="F277FE5A-6E5C-45AB-85FA-5DAD8EAEDD02">
+	<Product Id="C1735A19-353A-4576-8D58-2FA641C7C397" Name="$(var.ProductName)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.CompanyName)" UpgradeCode="$(var.UpgradeCode)">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+	  <Condition Message="[ProductName] is only supported on Windows 7, Windows Server 2008 R2, or higher.">
+	    <![CDATA[Installed OR (VersionNT >= 601)]]>
+	  </Condition>
 
 		<!--Set install dir-->
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
@@ -20,7 +34,7 @@
 		<!--<WixVariable Id="WixUIBannerBmp" Value="Images\installer_top-banner.bmp" />
 		<WixVariable Id="WixUIDialogBmp" Value="Images\installer_background.bmp" />-->
 
-		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="no"/>
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="yes" />
 		<!--Output only one file-->
 		<MediaTemplate EmbedCab="yes" />
 
@@ -90,9 +104,9 @@
 			<Component Id="ActiveDirectoryObjectPicker.dll" Guid="3D80951D-4529-48FC-B5D0-12092460B122">
 				<File Id="ActiveDirectoryObjectPicker.dll" Name="ActiveDirectoryObjectPicker.dll" Source="$(var.DaemonMaster_TargetDir)ActiveDirectoryObjectPicker.dll" />
 			</Component>
-			<Component Id="AutoUpdater.NET.dll" Guid="3E42D217-4DAE-4E74-B01B-C44ADE1FE8CC">
+      <!--<Component Id="AutoUpdater.NET.dll" Guid="3E42D217-4DAE-4E74-B01B-C44ADE1FE8CC">
 				<File Id="AutoUpdater.NET.dll" Name="AutoUpdater.NET.dll" Source="$(var.DaemonMaster_TargetDir)AutoUpdater.NET.dll" />
-			</Component>
+			</Component>-->
 			<Component Id="Newtonsoft.Json.dll" Guid="AE9F419F-0A04-4633-849D-DF2DD72C7544">
 				<File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.DaemonMaster_TargetDir)Newtonsoft.Json.dll" />
 			</Component>
@@ -101,6 +115,9 @@
 			</Component>
 			<Component Id="Itenso.Windows.Controls.ListViewLayout.dll" Guid="CE027854-AA63-4E4F-A065-0BAE04896A96">
 				<File Id="Itenso.Windows.Controls.ListViewLayout.dll" Name="Itenso.Windows.Controls.ListViewLayout.dll" Source="$(var.DaemonMaster_TargetDir)Itenso.Windows.Controls.ListViewLayout.dll" />
+			</Component>
+			<Component Id="DaemonMasterUpdater.dll" Guid="4fa0271c-a5f3-4e41-9d77-18d4024a1173">
+			  <File Id="DaemonMasterUpdater.dll" Name="DaemonMasterUpdater.dll" Source="$(var.DaemonMaster_TargetDir)DaemonMasterUpdater.dll" />
 			</Component>
 		</ComponentGroup>
 	</Fragment>
@@ -129,10 +146,13 @@
 			<Component Id="de_DaemonMaster.resources.dll" Guid="786CB35D-45AE-4C1D-A125-00F63D525624">
 				<File Id="de_DaemonMaster.resources.dll" Name="DaemonMaster.resources.dll" Source="$(var.DaemonMaster_TargetDir)de\DaemonMaster.resources.dll" />
 			</Component>
-			<Component Id="de_AutoUpdater.NET.resources.dll" Guid="7199C7DF-9D51-4815-ACB7-1C64214AEE70">
+		  <!--<Component Id="de_AutoUpdater.NET.resources.dll" Guid="7199C7DF-9D51-4815-ACB7-1C64214AEE70">
 				<File Id="de_AutoUpdater.NET.resources.dll" Name="AutoUpdater.NET.resources.dll" Source="$(var.DaemonMaster_TargetDir)de\AutoUpdater.NET.resources.dll" />
+			</Component>-->
+			<Component Id="de_DaemonMasterUpdater.resources.dll" Guid="60a388a7-041c-43aa-ab72-a2ae5e25641b">
+			  <File Id="de_DaemonMasterUpdater.resources.dll" Name="DaemonMasterUpdater.resources.dll" Source="$(var.DaemonMaster_TargetDir)de\DaemonMasterUpdater.resources.dll" />
 			</Component>
-		</ComponentGroup>
+    </ComponentGroup>
 	</Fragment>
 
 	<!--French translations files-->
@@ -141,9 +161,12 @@
 			<Component Id="fr_DaemonMaster.resources.dll" Guid="0CB23218-6A69-40C1-9A21-61EC14D65BD5">
 				<File Id="fr_DaemonMaster.resources.dll" Name="DaemonMaster.resources.dll" Source="$(var.DaemonMaster_TargetDir)fr\DaemonMaster.resources.dll" />
 			</Component>
-			<Component Id="fr_AutoUpdater.NET.resources.dll" Guid="F2D053FA-49BB-4693-8F0A-E422040A053E">
+			<!--<Component Id="fr_AutoUpdater.NET.resources.dll" Guid="F2D053FA-49BB-4693-8F0A-E422040A053E">
 				<File Id="fr_AutoUpdater.NET.resources.dll" Name="AutoUpdater.NET.resources.dll" Source="$(var.DaemonMaster_TargetDir)fr\AutoUpdater.NET.resources.dll" />
+			</Component>-->
+			<Component Id="fr_DaemonMasterUpdater.resources.dll" Guid="44fa932c-edf9-4e31-848b-be0a9c5a5a3b">
+			  <File Id="fr_DaemonMasterUpdater.resources.dll" Name="DaemonMasterUpdater.resources.dll" Source="$(var.DaemonMaster_TargetDir)fr\DaemonMasterUpdater.resources.dll" />
 			</Component>
-		</ComponentGroup>
+    </ComponentGroup>
 	</Fragment>
 </Wix>

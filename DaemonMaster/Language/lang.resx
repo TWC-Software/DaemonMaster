@@ -475,4 +475,11 @@
   <data name="process_pid" xml:space="preserve">
     <value>Process PID</value>
   </data>
+  <data name="windows10_1803_switch_session0" xml:space="preserve">
+    <value>In Windows 10 1803 or later it is no longer possible to go into the session 0 desktop!
+</value>
+  </data>
+  <data name="failed_to_set_interServ" xml:space="preserve">
+    <value>Failed to enable interactive services!</value>
+  </data>
 </root>

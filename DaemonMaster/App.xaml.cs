@@ -18,6 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
+using System;
 using System.Windows;
 
 namespace DaemonMaster
@@ -27,5 +28,17 @@ namespace DaemonMaster
     /// </summary>
     public partial class App : Application
     {
+        App()
+        {
+            InitializeComponent();
+        }
+
+        [STAThread]
+        public static void Main()
+        {
+            App app = new App();
+            MainWindow mainWindow = new MainWindow();
+            app.Run(mainWindow);
+        }
     }
 }

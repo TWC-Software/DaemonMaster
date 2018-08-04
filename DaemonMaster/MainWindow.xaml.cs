@@ -29,7 +29,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
-using AutoUpdaterDotNET;
 using DaemonMaster.Language;
 using DaemonMasterCore;
 using DaemonMasterCore.Config;
@@ -84,29 +83,14 @@ namespace DaemonMaster
             //Initialize GUI
             InitializeComponent();
 
-            #region Legacy functions
-
-            //if (!_config.ActivateLegacyFunctions)
-            #endregion
-
-            //Fragt, wenn der RegKey nicht gesetzt ist, ob dieser gesetzt werden soll
-            if (!AskToEnableInteractiveServices())
-                Close();
 
             _processCollection = RegistryManagement.LoadDaemonItemsFromRegistry();
             _processCollection.CollectionChanged += ProcessCollectionOnCollectionChanged;
-            //Start ListView Updater
+            //Start ListView updater
             StartListViewUpdateTimer(_config.UpdateInterval);
 
-            //Aktualisiert die Liste zum start
+            //Update the list at the beginning
             listViewDaemons.ItemsSource = _processCollection;
-
-            if (!ServiceManagement.CheckUI0DetectService())
-            {
-                MessageBox.Show(_resManager.GetString("error_ui0service", CultureInfo.CurrentUICulture),
-                    _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -339,24 +323,31 @@ namespace DaemonMaster
 
         private bool AskToEnableInteractiveServices()
         {
-            //Wenn der RegKey nicht gestetzt ist, soll der Nutzer gefragt werden
-            if (!RegistryManagement.CheckNoInteractiveServicesRegKey())
+            try
             {
-                MessageBoxResult result = MessageBox.Show(_resManager.GetString("interactive_service_regkey_not_set"), _resManager.GetString("question"), MessageBoxButton.YesNo, MessageBoxImage.Question);
-                if (result == MessageBoxResult.Yes)
+                //Wenn der RegKey nicht gestetzt ist, soll der Nutzer gefragt werden
+                if (!RegistryManagement.CheckNoInteractiveServicesRegKey())
                 {
-                    if (RegistryManagement.EnableInteractiveServices(true))
+                    MessageBoxResult result = MessageBox.Show(_resManager.GetString("interactive_service_regkey_not_set"), _resManager.GetString("question"), MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (result == MessageBoxResult.Yes)
                     {
+                        if (!RegistryManagement.EnableInteractiveServices(true))
+                        {
+                            MessageBox.Show(_resManager.GetString("problem_occurred"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                            return false;
+                        }
+
                         return true;
                     }
-
-                    MessageBox.Show(_resManager.GetString("problem_occurred"), _resManager.GetString("error"), MessageBoxButton.OK);
                 }
 
                 return false;
             }
-
-            return true;
+            catch (Exception ex)
+            {
+                MessageBox.Show(_resManager.GetString("failed_to_set_interServ") + "\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
         }
 
         private void AddDaemon()
@@ -549,6 +540,15 @@ namespace DaemonMaster
 
         private void SwitchToSession0()
         {
+            if (Environment.OSVersion.Version.Major == 10 && Environment.OSVersion.Version.Build >= 17134)
+            {
+                MessageBox.Show(_resManager.GetString("windows10_1803_switch_session0", CultureInfo.CurrentUICulture),
+                    _resManager.GetString("warning", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
+
             if (ServiceManagement.CheckUI0DetectService())
             {
                 //if its Windows 10 then showing a warning message
@@ -576,9 +576,7 @@ namespace DaemonMaster
 
         private void CheckForUpdates()
         {
-            AutoUpdater.ShowSkipButton = true;
-            AutoUpdater.OpenDownloadPage = true;
-            AutoUpdater.Start("http://raw.githubusercontent.com/TWC-Software/DaemonMaster/master/AutoUpdater.xml", typeof(MainWindow).Assembly);
+            _ = DaemonMasterUpdater.Updater.StartAsync("https://github.com/TWC-Software/DaemonMaster");
         }
 
         #endregion
@@ -594,6 +592,20 @@ namespace DaemonMaster
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
+            //If Windows 10 1803 installed don't ask for start the UI0Detect service
+            if (Environment.OSVersion.Version.Major == 10 && Environment.OSVersion.Version.Build < 17134)
+            {
+                //If Windows 10 1803 installed don't ask for UI0Detect registry key change
+                AskToEnableInteractiveServices();
+
+                if (!ServiceManagement.CheckUI0DetectService())
+                {
+                    MessageBox.Show(_resManager.GetString("error_ui0service", CultureInfo.CurrentUICulture),
+                        _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
+            }
+
             CheckForUpdates();
         }
 
