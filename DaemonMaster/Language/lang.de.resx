@@ -483,4 +483,7 @@
   <data name="failed_to_create_a_new_service" xml:space="preserve">
     <value>Der erstellen eines neuen Dienstes ist fehlgeschlagen!</value>
   </data>
+  <data name="invalid_pw_user" xml:space="preserve">
+    <value>Das Passwort oder der Nutzername dürfen nicht leer sein!</value>
+  </data>
 </root>

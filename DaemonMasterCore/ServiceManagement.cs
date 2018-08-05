@@ -65,12 +65,18 @@ namespace DaemonMasterCore
             using (ServiceControlManager scm =
                 ServiceControlManager.Connect(NativeMethods.SCM_ACCESS.SC_MANAGER_CREATE_SERVICE))
             {
+                //Create the service type 
+                uint serviceType = (uint)NativeMethods.SERVICE_TYPE.SERVICE_WIN32_OWN_PROCESS;
+                if (serviceStartInfo.Username == null && DaemonMasterUtils.IsSupportedWindows10VersionOrLower()) //if the user is set to LocalSystem and the system version is lower than windows 10 1803
+                {
+                    serviceType |= (uint)NativeMethods.SERVICE_TYPE.SERVICE_INTERACTIVE_PROCESS;
+                }
+
                 using (ServiceHandle serviceHandle = scm.CreateService(
                     serviceStartInfo.ServiceName,
                     serviceStartInfo.DisplayName,
                     NativeMethods.SERVICE_ACCESS.SERVICE_ALL_ACCESS,
-                    NativeMethods.SERVICE_TYPE.SERVICE_INTERACTIVE_PROCESS |
-                    NativeMethods.SERVICE_TYPE.SERVICE_WIN32_OWN_PROCESS,
+                    serviceType,
                     serviceStartInfo.StartType,
                     NativeMethods.SERVICE_ERROR_CONTROL.SERVICE_ERROR_NORMAL,
                     DaemonMasterServicePath + (ConfigManagement.LoadConfig().UseDevService ? DaemonMasterDevServiceFile : DaemonMasterServiceFile) + DaemonMasterServiceParameter,
@@ -285,7 +291,13 @@ namespace DaemonMasterCore
                     if (status.currentState != NativeMethods.SERVICE_STATE.SERVICE_STOPPED)
                         throw new ServiceNotStoppedException();
 
-                    serviceHandle.ChangeConfig(serviceStartInfo.StartType, serviceStartInfo.DisplayName, ConvertDependenciesArraysToDoubleNullTerminatedString(serviceStartInfo.DependOnService, serviceStartInfo.DependOnGroup), serviceStartInfo.Username, serviceStartInfo.Password);
+                    uint serviceType = (uint)NativeMethods.SERVICE_TYPE.SERVICE_WIN32_OWN_PROCESS;
+                    if (serviceStartInfo.UseLocalSystem && DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
+                    {
+                        serviceType |= (uint)NativeMethods.SERVICE_TYPE.SERVICE_INTERACTIVE_PROCESS;
+                    }
+
+                    serviceHandle.ChangeConfig(serviceType, serviceStartInfo.StartType, serviceStartInfo.DisplayName, ConvertDependenciesArraysToDoubleNullTerminatedString(serviceStartInfo.DependOnService, serviceStartInfo.DependOnGroup), serviceStartInfo.Username, serviceStartInfo.Password);
                     serviceHandle.SetDescription(serviceStartInfo.Description);
                     serviceHandle.SetDelayedStart(serviceStartInfo.DelayedStart);
                 }

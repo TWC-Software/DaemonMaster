@@ -451,7 +451,7 @@ namespace DaemonMaster
 
         private void SwitchToSession0()
         {
-            if (Environment.OSVersion.Version.Major == 10 && Environment.OSVersion.Version.Build >= 17134)
+            if (DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
             {
                 MessageBox.Show(_resManager.GetString("windows10_1803_switch_session0", CultureInfo.CurrentUICulture),
                     _resManager.GetString("warning", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
@@ -463,7 +463,7 @@ namespace DaemonMaster
             if (ServiceManagement.CheckUI0DetectService())
             {
                 //if its Windows 10 then showing a warning message
-                if (Environment.OSVersion.Version.Major == 10)
+                if (DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
                 {
                     MessageBoxResult result =
                         MessageBox.Show(_resManager.GetString("windows10_mouse_keyboard", CultureInfo.CurrentUICulture),
@@ -504,7 +504,7 @@ namespace DaemonMaster
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             //If Windows 10 1803 installed don't ask for start the UI0Detect service
-            if (Environment.OSVersion.Version.Major == 10 && Environment.OSVersion.Version.Build < 17134)
+            if (DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
             {
                 //If Windows 10 1803 installed don't ask for UI0Detect registry key change
                 AskToEnableInteractiveServices();

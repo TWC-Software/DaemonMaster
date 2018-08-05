@@ -557,6 +557,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die The username or the password cannot be empty! ähnelt.
+        /// </summary>
+        public static string invalid_pw_user {
+            get {
+                return ResourceManager.GetString("invalid_pw_user", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Invalid shortcut ähnelt.
         /// </summary>
         public static string invalid_shortcut {

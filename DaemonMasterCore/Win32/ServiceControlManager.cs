@@ -54,7 +54,7 @@ namespace DaemonMasterCore.Win32
             string serviceName,
             string displayName,
             NativeMethods.SERVICE_ACCESS desiredAccess,
-            NativeMethods.SERVICE_TYPE serviceType,
+            uint serviceType,
             NativeMethods.SERVICE_START startType,
             NativeMethods.SERVICE_ERROR_CONTROL errorControl,
             string binaryPathName,

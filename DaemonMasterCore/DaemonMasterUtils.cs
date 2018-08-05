@@ -95,5 +95,10 @@ namespace DaemonMasterCore
                 return sc.DisplayName;
             }
         }
+
+        public static bool IsSupportedWindows10VersionOrLower()
+        {
+            return Environment.OSVersion.Version.Major < 10 || (Environment.OSVersion.Version.Major == 10 && Environment.OSVersion.Version.Build < 17134);
+        }
     }
 }

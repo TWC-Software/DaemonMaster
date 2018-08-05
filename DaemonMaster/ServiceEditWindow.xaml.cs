@@ -43,7 +43,7 @@ namespace DaemonMaster
     /// </summary>
     public partial class ServiceEditWindow : Window
     {
-        private const string PLACEHOLDER_PASSWORD = "****placeholder****";
+        private const string PLACEHOLDER_PASSWORD = "88301CEB-1E6E-435C-A355-D055F9F8D430";
 
         private readonly ResourceManager _resManager = new ResourceManager(typeof(lang));
 
@@ -71,7 +71,7 @@ namespace DaemonMaster
             LoadServiceInfos();
         }
 
-        private void LoadServiceInfos()
+        private void LoadServiceInfos(bool isImportedService = false)
         {
             #region GeneralTab
 
@@ -111,16 +111,17 @@ namespace DaemonMaster
 
             #region CustomUser
 
-            checkBoxUseLocalSystem.IsChecked = _tempServiceConfig.UseLocalSystem;
-            if (String.IsNullOrWhiteSpace(_tempServiceConfig.Username) || _tempServiceConfig.UseLocalSystem)
+            if (String.IsNullOrWhiteSpace(_tempServiceConfig.Username) || _tempServiceConfig.Username == "LocalSystem")
             {
                 textBoxUsername.Text = String.Empty;
                 textBoxPassword.Password = String.Empty;
+                checkBoxUseLocalSystem.IsChecked = true;
             }
             else
             {
                 textBoxUsername.Text = _tempServiceConfig.Username;
-                textBoxPassword.Password = PLACEHOLDER_PASSWORD;
+                textBoxPassword.Password = isImportedService ? String.Empty : PLACEHOLDER_PASSWORD; //Reset password field when it is an imported service
+                checkBoxUseLocalSystem.IsChecked = false;
             }
 
             #endregion
@@ -401,7 +402,7 @@ namespace DaemonMaster
                 String.Equals(textBoxPassword.Password, PLACEHOLDER_PASSWORD) && //Nothing has changed (null safe)
                 String.Equals(textBoxUsername.Text, _tempServiceConfig.Username)) //Nothing has changed (null safe)
                 {
-                    _tempServiceConfig.Username = null;
+                    _tempServiceConfig.Username = _tempServiceConfig.UseLocalSystem ? "LocalSystem" : null; //Write "LocalSystem" as username when "UseLocalSystem" or null (nothing change in Win32 API)
                     _tempServiceConfig.Password = null;
                 }
                 else
@@ -410,7 +411,7 @@ namespace DaemonMaster
                     if (String.IsNullOrWhiteSpace(textBoxUsername.Text) ||
                         String.IsNullOrWhiteSpace(textBoxPassword.Password))
                     {
-                        MessageBox.Show(_resManager.GetString("invalid_values", CultureInfo.CurrentUICulture),
+                        MessageBox.Show(_resManager.GetString("invalid_pw_user", CultureInfo.CurrentUICulture),
                             _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
                             MessageBoxImage.Error);
                         return;
@@ -566,7 +567,7 @@ namespace DaemonMaster
                         }
 
                         _tempServiceConfig = serviceStartInfo;
-                        LoadServiceInfos();
+                        LoadServiceInfos(true);
                     }
                 }
             }

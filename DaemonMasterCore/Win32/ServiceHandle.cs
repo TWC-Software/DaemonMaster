@@ -79,7 +79,7 @@ namespace DaemonMasterCore.Win32
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
-        public void ChangeConfig(NativeMethods.SERVICE_START startType, string displayName, StringBuilder dependencies, string username, SecureString password)
+        public void ChangeConfig(uint serviceType, NativeMethods.SERVICE_START startType, string displayName, StringBuilder dependencies, string username, SecureString password)
         {
             IntPtr passwordHandle = IntPtr.Zero;
 
@@ -88,7 +88,7 @@ namespace DaemonMasterCore.Win32
                 if (password != null)
                     passwordHandle = Marshal.SecureStringToGlobalAllocUnicode(password);
 
-                if (!NativeMethods.ChangeServiceConfig(this, NativeMethods.SERVICE_TYPE.SERVICE_NO_CHANGE, startType,
+                if (!NativeMethods.ChangeServiceConfig(this, serviceType, startType,
                     NativeMethods.SERVICE_ERROR_CONTROL.SERVICE_NO_CHANGE, null, null, null, dependencies, username, passwordHandle, displayName))
                     throw new Win32Exception(Marshal.GetLastWin32Error());
             }

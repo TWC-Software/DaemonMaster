@@ -485,4 +485,7 @@
   <data name="failed_to_create_a_new_service" xml:space="preserve">
     <value>Failed to create a new service!</value>
   </data>
+  <data name="invalid_pw_user" xml:space="preserve">
+    <value>The username or the password cannot be empty!</value>
+  </data>
 </root>

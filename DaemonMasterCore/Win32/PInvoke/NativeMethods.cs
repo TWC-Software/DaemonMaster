@@ -33,7 +33,7 @@ namespace DaemonMasterCore.Win32.PInvoke
             string lpServiceName,
             string lpDisplayName,
             SERVICE_ACCESS dwDesiredAccess,
-            SERVICE_TYPE dwServiceType,
+            uint dwServiceType,
             SERVICE_START dwStartType,
             SERVICE_ERROR_CONTROL dwErrorControl,
             string lpBinaryPathName,
@@ -72,7 +72,7 @@ namespace DaemonMasterCore.Win32.PInvoke
 
         [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool ChangeServiceConfig(ServiceHandle hService, SERVICE_TYPE dwServiceType, SERVICE_START dwStartType, SERVICE_ERROR_CONTROL dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, string lpdwTagId, StringBuilder lpDependencies, string lpServiceStartName, IntPtr lpPassword, string lpDisplayName);
+        public static extern bool ChangeServiceConfig(ServiceHandle hService, uint dwServiceType, SERVICE_START dwStartType, SERVICE_ERROR_CONTROL dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, string lpdwTagId, StringBuilder lpDependencies, string lpServiceStartName, IntPtr lpPassword, string lpDisplayName);
 
         [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -143,23 +143,6 @@ namespace DaemonMasterCore.Win32.PInvoke
         [DllImport(DLLFiles.KERNEL32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool AssignProcessToJobObject(JobHandle hJob, SafeProcessHandle hProcess);
-
-        //[DllImport(DLLFiles.KERNEL32, SetLastError = true)]
-        //[return: MarshalAs(UnmanagedType.Bool)]
-        //public static extern bool DuplicateHandle(HandleRef hSourceProcessHandle,
-        //    SafeFileHandle hSourceHandle, HandleRef hTargetProcessHandle, out SafeFileHandle lpTargetHandle,
-        //    uint dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, uint dwOptions);
-
-        //[DllImport(DLLFiles.KERNEL32, SetLastError = true)]
-        //[return: MarshalAs(UnmanagedType.Bool)]
-        //public static extern bool CreatePipe(out SafeFileHandle hReadPipe, out SafeFileHandle hWritePipe,
-        //    SECURITY_ATTRIBUTES lpPipeAttributes, int nSize);
-
-        //[DllImport(DLLFiles.KERNEL32, SetLastError = true)]
-        //public static extern IntPtr GetCurrentProcess();
-
-        //[DllImport(DLLFiles.KERNEL32, CharSet = CharSet.Unicode, SetLastError = true)]
-        //public static extern IntPtr GetStdHandle(int whichHandle);
 
 
         //WINSTA
