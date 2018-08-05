@@ -503,6 +503,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Failed to create a new service! ähnelt.
+        /// </summary>
+        public static string failed_to_create_a_new_service {
+            get {
+                return ResourceManager.GetString("failed_to_create_a_new_service", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Failed to enable interactive services! ähnelt.
         /// </summary>
         public static string failed_to_set_interServ {

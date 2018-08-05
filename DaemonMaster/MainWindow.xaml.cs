@@ -24,7 +24,6 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Resources;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -42,53 +41,27 @@ namespace DaemonMaster
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Config _config;
-
+        private readonly Config _config;
         private readonly ObservableCollection<ServiceListViewItem> _processCollection;
         private readonly ResourceManager _resManager = new ResourceManager(typeof(lang));
 
         public MainWindow()
         {
-            //Load and apply config
-            _config = ConfigManagement.LoadConfig();
-
-            #region Chose language
-
-            //Set the language of the threads
-            CultureInfo cultureInfo;
-            if (String.IsNullOrWhiteSpace(_config.Language) || _config.Language == "windows")
-            {
-                cultureInfo = CultureInfo.CurrentCulture;
-            }
-            else
-            {
-                try
-                {
-                    cultureInfo = new CultureInfo(_config.Language);
-                }
-                catch (Exception)
-                {
-                    cultureInfo = CultureInfo.CurrentCulture;
-                }
-            }
-
-            Thread.CurrentThread.CurrentCulture = cultureInfo;
-            Thread.CurrentThread.CurrentUICulture = cultureInfo;
-            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
-
-            #endregion
-
             //Initialize GUI
             InitializeComponent();
 
+            //Get the configuration
+            _config = ConfigManagement.GetConfig;
 
+
+            //Fill the list and subs to the event
             _processCollection = RegistryManagement.LoadDaemonItemsFromRegistry();
             _processCollection.CollectionChanged += ProcessCollectionOnCollectionChanged;
+
             //Start ListView updater
             StartListViewUpdateTimer(_config.UpdateInterval);
 
-            //Update the list at the beginning
+            //Show the list in the list view
             listViewDaemons.ItemsSource = _processCollection;
         }
 
@@ -294,12 +267,12 @@ namespace DaemonMaster
 
         private void AddDaemon()
         {
-            if (listViewDaemons.Items.Count <= 256)
+            if (listViewDaemons.Items.Count <= 128)
             {
                 try
                 {
                     ServiceEditWindow serviceEditWindow = new ServiceEditWindow(null);
-                    var dialogResult = serviceEditWindow.ShowDialog(); // Fenster geht auf, Code geht erst weiter wenn Fenster geschlossen ist
+                    var dialogResult = serviceEditWindow.ShowDialog(); //Wait until the window is closed
                     if (dialogResult.HasValue && dialogResult.Value)
                     {
                         _processCollection.Add(ServiceListViewItem.CreateItemFromInfo(serviceEditWindow.GetServiceStartInfo()));
@@ -307,8 +280,7 @@ namespace DaemonMaster
                 }
                 catch (Exception ex)
                 {
-                    //TODO: WTF message
-                    MessageBox.Show(_resManager.GetString("cannot_load_data_from_registry") + "\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(_resManager.GetString("failed_to_create_a_new_service") + "\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             else
@@ -380,8 +352,17 @@ namespace DaemonMaster
                 //Check result
                 if (dialogResult.HasValue && dialogResult.Value)
                 {
-                    //Update daemonInfo
-                    _processCollection[_processCollection.IndexOf(serviceListViewItem)] = ServiceListViewItem.CreateItemFromInfo(serviceEditWindow.GetServiceStartInfo());
+                    ServiceStartInfo serviceStartInfo = serviceEditWindow.GetServiceStartInfo();
+                    if (String.Equals(serviceStartInfo.ServiceName, serviceListViewItem.ServiceName))
+                    {
+                        //Update serviceListViewItem
+                        _processCollection[_processCollection.IndexOf(serviceListViewItem)] = ServiceListViewItem.CreateItemFromInfo(serviceStartInfo);
+                    }
+                    else
+                    {
+                        //Create new daemon (Import as happend with a diffrent service name => create new service with that name)
+                        _processCollection.Add(ServiceListViewItem.CreateItemFromInfo(serviceStartInfo));
+                    }
                 }
             }
             catch (Exception ex)

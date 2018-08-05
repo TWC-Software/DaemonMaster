@@ -482,4 +482,7 @@
   <data name="you_must_stop_the_service_first" xml:space="preserve">
     <value>You must stop the service first. Do you want stop the service now ?</value>
   </data>
+  <data name="failed_to_create_a_new_service" xml:space="preserve">
+    <value>Failed to create a new service!</value>
+  </data>
 </root>

@@ -33,6 +33,7 @@ using DaemonMaster.Language;
 using DaemonMasterCore;
 using DaemonMasterCore.Win32.PInvoke;
 using Microsoft.Win32;
+using Newtonsoft.Json;
 using Tulpep.ActiveDirectoryObjectPicker;
 
 namespace DaemonMaster
@@ -51,8 +52,8 @@ namespace DaemonMaster
         private ObservableCollection<string> _dependOnGroupObservableCollection;
         private ObservableCollection<string> _allGroupsObservableCollection;
 
-        private readonly ServiceStartInfo _tempServiceConfig;
-        private readonly bool _createNewService = false;
+        private ServiceStartInfo _tempServiceConfig;
+        private bool _createNewService = false;
 
         public ServiceEditWindow(ServiceStartInfo daemon)
         {
@@ -275,6 +276,16 @@ namespace DaemonMaster
         {
             DialogResult = false;
             Close();
+        }
+
+        private void buttonImport_Click(object sender, RoutedEventArgs e)
+        {
+            ImportConfiguration();
+        }
+
+        private void buttonExport_Click(object sender, RoutedEventArgs e)
+        {
+            ExportConfiguration();
         }
 
         #endregion
@@ -537,7 +548,26 @@ namespace DaemonMaster
             {
                 if (openFileDialog.ShowDialog() == true)
                 {
-                    //TODO
+                    using (StreamReader streamReader = File.OpenText(openFileDialog.FileName))
+                    {
+                        JsonSerializer serializer = new JsonSerializer();
+                        ServiceStartInfo serviceStartInfo = (ServiceStartInfo)serializer.Deserialize(streamReader, typeof(ServiceStartInfo));
+
+                        if (!String.Equals(serviceStartInfo.ServiceName, _tempServiceConfig.ServiceName))
+                        {
+                            _createNewService = true;
+                        }
+                        else
+                        {
+                            //Ask for overwritte the data
+                            MessageBoxResult result = MessageBox.Show(_resManager.GetString("data_will_be_overwritten"), _resManager.GetString("warning"), MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                            if (result != MessageBoxResult.Yes)
+                                return;
+                        }
+
+                        _tempServiceConfig = serviceStartInfo;
+                        LoadServiceInfos();
+                    }
                 }
             }
             catch (Exception ex)
@@ -563,7 +593,14 @@ namespace DaemonMaster
             {
                 if (saveFileDialog.ShowDialog() == true)
                 {
-                    //TODO
+                    using (StreamWriter streamWriter = File.CreateText(saveFileDialog.FileName))
+                    {
+                        JsonSerializer serializer = new JsonSerializer
+                        {
+                            Formatting = Formatting.Indented
+                        };
+                        serializer.Serialize(streamWriter, _tempServiceConfig);
+                    }
                 }
             }
             catch (Exception ex)
@@ -571,6 +608,7 @@ namespace DaemonMaster
                 MessageBox.Show(_resManager.GetString("cannot_export_daemon") + "\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
         #endregion
     }
 }

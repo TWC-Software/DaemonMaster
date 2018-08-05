@@ -480,4 +480,7 @@
   <data name="you_must_stop_the_service_first" xml:space="preserve">
     <value>Der Dienst muss zuerst gestoppt werden. Soll dieser jetzt gestoppt werden?</value>
   </data>
+  <data name="failed_to_create_a_new_service" xml:space="preserve">
+    <value>Der erstellen eines neuen Dienstes ist fehlgeschlagen!</value>
+  </data>
 </root>

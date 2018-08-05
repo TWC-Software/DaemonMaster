@@ -20,7 +20,6 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Management;
 using System.ServiceProcess;
 using System.Windows;
@@ -28,14 +27,13 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using DaemonMasterCore.Win32;
-using Newtonsoft.Json;
 
 namespace DaemonMasterCore
 {
     public static class DaemonMasterUtils
     {
         /// <summary>
-        /// GIve the icon of an .exe or file
+        /// Give the icon of an .exe or file
         /// </summary>
         /// <param name="fullPath"></param>
         /// <returns></returns>
@@ -95,33 +93,6 @@ namespace DaemonMasterCore
             using (ServiceController sc = new ServiceController(serviceName))
             {
                 return sc.DisplayName;
-            }
-        }
-
-        public static void ExportItem(string serviceName, string path)
-        {
-            ServiceStartInfo serviceStartInfo = RegistryManagement.LoadServiceStartInfosFromRegistry(serviceName);
-
-            using (StreamWriter streamWriter = File.CreateText(path))
-            {
-                JsonSerializer serializer = new JsonSerializer
-                {
-                    Formatting = Formatting.Indented
-                };
-                serializer.Serialize(streamWriter, serviceStartInfo);
-            }
-        }
-
-        public static ServiceStartInfo ImportItem(string path)
-        {
-            if (!File.Exists(path))
-                throw new FileNotFoundException();
-
-            using (StreamReader streamReader = File.OpenText(path))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                ServiceStartInfo serviceStartInfo = (ServiceStartInfo)serializer.Deserialize(streamReader, typeof(ServiceStartInfo));
-                return serviceStartInfo;
             }
         }
     }

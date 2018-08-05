@@ -19,7 +19,10 @@
 
 
 using System;
+using System.Globalization;
+using System.Threading;
 using System.Windows;
+using DaemonMasterCore.Config;
 
 namespace DaemonMaster
 {
@@ -36,6 +39,42 @@ namespace DaemonMaster
         [STAThread]
         public static void Main()
         {
+            //Load and apply config
+            Config config = ConfigManagement.LoadConfig();
+
+
+            #region Chose language
+
+            //Set the language of the threads
+            CultureInfo cultureInfo;
+            if (String.IsNullOrWhiteSpace(config.Language) || config.Language == "windows")
+            {
+                cultureInfo = CultureInfo.CurrentCulture;
+            }
+            else
+            {
+                try
+                {
+                    cultureInfo = new CultureInfo(config.Language);
+                }
+                catch (Exception)
+                {
+                    cultureInfo = CultureInfo.CurrentCulture;
+                }
+            }
+
+            Thread.CurrentThread.CurrentCulture = cultureInfo;
+            Thread.CurrentThread.CurrentUICulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
+            #endregion
+
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //                                             START                                                    //
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
             App app = new App();
             MainWindow mainWindow = new MainWindow();
             app.Run(mainWindow);
