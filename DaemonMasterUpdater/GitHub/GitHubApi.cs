@@ -60,7 +60,7 @@ namespace DaemonMasterUpdater.GitHub
         public static async Task<GitHubRelease> GitHubGetLastReleaseAsync(string repoUrl, string accessToken = null, bool acceptPrerelease = false)
         {
             var repoUri = new Uri(repoUrl);
-            var userAgent = new ProductInfoHeaderValue("DaemonMaster", Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            var userAgent = new ProductInfoHeaderValue(Updater.AppName + "_Updater", Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
             if (repoUri.Segments.Length != 3)
             {

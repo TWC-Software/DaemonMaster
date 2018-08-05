@@ -19,6 +19,7 @@
 
 using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Resources;
 using System.Windows;
@@ -32,6 +33,7 @@ namespace DaemonMasterUpdater
     public partial class UpdateWindow : Window
     {
         private readonly ResourceManager _resManager = new ResourceManager(typeof(updaterWindowLang));
+        static readonly Uri SomeBaseUri = new Uri("http://canbeanything");
 
         public UpdateWindow()
         {
@@ -53,10 +55,30 @@ namespace DaemonMasterUpdater
 
         private bool OpenDownloadProgressWindow()
         {
-            var downloadWindow = new DownloadProgressWindow(new Uri(Updater.LastGitHubRelease.Assets.First().FileUrl), null);
-            downloadWindow.ShowDialog();
+            try
+            {
+                string downloadUrl = Updater.LastGitHubRelease.Assets.First(x => GetFileNameFromUrl(x.FileUrl).Contains(Updater.AppName + "_Setup_" + Updater.LastGitHubRelease.Version)).FileUrl;
+                if (string.IsNullOrWhiteSpace(downloadUrl))
+                    return false;
 
-            return downloadWindow.DialogResult.HasValue && downloadWindow.DialogResult.Value;
+                var downloadWindow = new DownloadProgressWindow(new Uri(downloadUrl), null);
+                downloadWindow.ShowDialog();
+
+                return downloadWindow.DialogResult.HasValue && downloadWindow.DialogResult.Value;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+        }
+
+        static string GetFileNameFromUrl(string url)
+        {
+            if (!Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
+                uri = new Uri(SomeBaseUri, url);
+
+            return Path.GetFileName(uri.LocalPath);
         }
 
     }

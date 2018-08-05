@@ -112,4 +112,7 @@
   <data name="window_titel" xml:space="preserve">
     <value>Aktualisierung verfügbar!</value>
   </data>
+  <data name="error" xml:space="preserve">
+    <value>Fehler!</value>
+  </data>
 </root>
