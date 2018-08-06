@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Security.AccessControl;
 using System.ServiceProcess;
 using DaemonMasterCore.Win32.PInvoke;
 using Microsoft.Win32;
@@ -45,30 +46,66 @@ namespace DaemonMasterCore
         //                                             METHODS                                                  //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        public static void GiveUserPermissionToRegKey(string regPath, string username, RegistryRights rights)
+        {
+
+        }
+
+
+
+
+
         public static void SaveInRegistry(ServiceStartInfo serviceStartInfo)
         {
-            using (RegistryKey serviceKey = Registry.LocalMachine.CreateSubKey(RegPath + serviceStartInfo.ServiceName + @"\Parameters"))
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(RegPath + serviceStartInfo.ServiceName))
             {
-                //Strings
-                serviceKey.SetValue("FileDir", serviceStartInfo.FileDir, RegistryValueKind.String);
-                serviceKey.SetValue("FileName", serviceStartInfo.FileName, RegistryValueKind.String);
-                serviceKey.SetValue("FileExtension", serviceStartInfo.FileExtension, RegistryValueKind.String);
-                serviceKey.SetValue("Parameter", serviceStartInfo.Parameter, RegistryValueKind.String);
 
-                //Ints
-                serviceKey.SetValue("MaxRestarts", serviceStartInfo.MaxRestarts, RegistryValueKind.DWord);
-                serviceKey.SetValue("ProcessKillTime", serviceStartInfo.ProcessKillTime, RegistryValueKind.DWord);
-                serviceKey.SetValue("ProcessRestartDelay", serviceStartInfo.ProcessRestartDelay, RegistryValueKind.DWord);
-                serviceKey.SetValue("CounterResetTime", serviceStartInfo.CounterResetTime, RegistryValueKind.DWord);
+                //Open Parameters SubKey
+                using (RegistryKey parameters = key.CreateSubKey("Parameters"))
+                {
+                    //Strings
+                    parameters.SetValue("FileDir", serviceStartInfo.FileDir, RegistryValueKind.String);
+                    parameters.SetValue("FileName", serviceStartInfo.FileName, RegistryValueKind.String);
+                    parameters.SetValue("FileExtension", serviceStartInfo.FileExtension, RegistryValueKind.String);
+                    parameters.SetValue("Parameter", serviceStartInfo.Parameter, RegistryValueKind.String);
 
-                //Bools
-                serviceKey.SetValue("UseLocalSystem", serviceStartInfo.UseLocalSystem, RegistryValueKind.DWord);
-                serviceKey.SetValue("ConsoleApplication", serviceStartInfo.ConsoleApplication, RegistryValueKind.DWord);
-                serviceKey.SetValue("UseCtrlC", serviceStartInfo.UseCtrlC, RegistryValueKind.DWord);
+                    //Ints
+                    parameters.SetValue("MaxRestarts", serviceStartInfo.MaxRestarts, RegistryValueKind.DWord);
+                    parameters.SetValue("ProcessKillTime", serviceStartInfo.ProcessKillTime, RegistryValueKind.DWord);
+                    parameters.SetValue("ProcessRestartDelay", serviceStartInfo.ProcessRestartDelay, RegistryValueKind.DWord);
+                    parameters.SetValue("CounterResetTime", serviceStartInfo.CounterResetTime, RegistryValueKind.DWord);
 
-                serviceKey.Close();
+                    //Bools
+                    parameters.SetValue("UseLocalSystem", serviceStartInfo.UseLocalSystem, RegistryValueKind.DWord);
+                    parameters.SetValue("ConsoleApplication", serviceStartInfo.ConsoleApplication, RegistryValueKind.DWord);
+                    parameters.SetValue("UseCtrlC", serviceStartInfo.UseCtrlC, RegistryValueKind.DWord);
+                    parameters.SetValue("CanInteractWithDesktop", serviceStartInfo.CanInteractWithDesktop, RegistryValueKind.DWord);
+
+                    parameters.Close();
+                }
+
+                //Create an give the user the permission to write to this key (needed for save the PID of the process)
+
+                //TODO: Need registry permission to write PID (logs folder the same)
+                using (RegistryKey processInfo = key.CreateSubKey("Process"))
+                {
+                    //Create a new RegistrySecurity object
+                    RegistrySecurity rs = new RegistrySecurity();
+
+                    ////Add access rule for user (only when it is not LocalSystem)
+                    if (!serviceStartInfo.UseLocalSystem)
+                    {
+                        //TODO: not the best method to do that
+                        string username = Environment.MachineName + "\\" + DaemonMasterUtils.GetLoginFromUsername(serviceStartInfo.Username);
+                        rs.AddAccessRule(new RegistryAccessRule(username, RegistryRights.QueryValues | RegistryRights.SetValue, InheritanceFlags.None, PropagationFlags.None, AccessControlType.Allow));
+                    }
+
+                    processInfo.SetAccessControl(rs);
+                    processInfo.Close();
+                }
             }
         }
+
 
         public static ServiceStartInfo LoadServiceStartInfosFromRegistry(string serviceName)
         {
@@ -108,6 +145,7 @@ namespace DaemonMasterCore
                     serviceStartInfo.UseLocalSystem = Convert.ToBoolean(parameters.GetValue("UseLocalSystem"));
                     serviceStartInfo.ConsoleApplication = Convert.ToBoolean(parameters.GetValue("ConsoleApplication", false));
                     serviceStartInfo.UseCtrlC = Convert.ToBoolean(parameters.GetValue("UseCtrlC", false));
+                    serviceStartInfo.CanInteractWithDesktop = Convert.ToBoolean(parameters.GetValue("CanInteractWithDesktop", false));
 
                     return serviceStartInfo;
                 }
@@ -135,7 +173,10 @@ namespace DaemonMasterCore
                     using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + service.ServiceName + @"\Parameters", false))
                     {
                         if (key == null)
-                            throw new Exception("Can't open registry key!");
+                        {
+                            continue;
+                            //TODO: Message, etc 
+                        }
 
                         ServiceListViewItem serviceListViewItem = new ServiceListViewItem
                         {

@@ -68,6 +68,7 @@
                     <RadioButton x:Name="radioButtonUseCtrlC" Content="{x:Static resx:lang.radiobutton_use_ctrlc}" HorizontalAlignment="Left" Margin="387,159,0,0" VerticalAlignment="Top" IsEnabled="{Binding ElementName=checkBoxIsConsoleApp, Path=IsChecked}"/>
                     <RadioButton x:Name="radioButtonUseCtrlBreak" Content="{x:Static resx:lang.radiobutton_use_ctrlbreak}" HorizontalAlignment="Left" Margin="387,139,0,0" VerticalAlignment="Top" IsChecked="True" IsEnabled="{Binding ElementName=checkBoxIsConsoleApp, Path=IsChecked}"/>
                     <Label x:Name="labelShutdownConsoleApp" Content="{x:Static resx:lang.label_shutdown_console_app}" HorizontalAlignment="Left" Margin="239,133,0,0" VerticalAlignment="Top" IsEnabled="{Binding ElementName=checkBoxIsConsoleApp, Path=IsChecked}"/>
+                    <CheckBox x:Name="checkBoxInteractDesk" Content="{x:Static resx:lang.interact_with_desktop}" Margin="10,168,608,54" IsEnabled="{Binding Path=CanInteractWithDesktop}"/>
                 </Grid>
             </TabItem>
             <TabItem Header="{x:Static resx:lang.tabitem_dependencies}">

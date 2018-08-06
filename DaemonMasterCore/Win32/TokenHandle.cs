@@ -31,7 +31,7 @@ namespace DaemonMasterCore.Win32
             try
             {
                 passwordHandle = Marshal.SecureStringToGlobalAllocUnicode(password);
-                if (!NativeMethods.LogonUser(GetLogin(username), GetDomain(username), passwordHandle, logonTyp, NativeMethods.LOGON_PROVIDER.Default, out var token))
+                if (!NativeMethods.LogonUser(DaemonMasterUtils.GetLoginFromUsername(username), DaemonMasterUtils.GetDomainFromUsername(username), passwordHandle, logonTyp, NativeMethods.LOGON_PROVIDER.Default, out var token))
                     throw new Win32Exception(Marshal.GetLastWin32Error());
 
                 return token;
@@ -41,18 +41,6 @@ namespace DaemonMasterCore.Win32
                 if (passwordHandle != IntPtr.Zero)
                     Marshal.ZeroFreeGlobalAllocUnicode(passwordHandle);
             }
-        }
-
-        private static string GetDomain(string s)
-        {
-            int stop = s.IndexOf("\\", StringComparison.Ordinal);
-            return (stop > -1) ? s.Substring(0, stop) : string.Empty;
-        }
-
-        private static string GetLogin(string s)
-        {
-            int stop = s.IndexOf("\\", StringComparison.Ordinal);
-            return (stop > -1) ? s.Substring(stop + 1, s.Length - stop - 1) : string.Empty;
         }
     }
 }

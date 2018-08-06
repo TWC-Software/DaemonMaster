@@ -19,7 +19,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Security.Authentication;
 using System.Text.RegularExpressions;
 using System.Threading;
 using DaemonMasterCore.Jobs;
@@ -119,22 +118,6 @@ namespace DaemonMasterCore
                 UseShellExecute = false
 
             };
-
-            if (!_serviceStartInfo.UseLocalSystem)
-            {
-                if (String.IsNullOrWhiteSpace(_serviceStartInfo.Username) || _serviceStartInfo.Password == null)
-                    throw new InvalidCredentialException("The given username, password or both are invalid (null?)");
-
-                if (SystemManagement.ValidateUserWin32(_serviceStartInfo.Username, _serviceStartInfo.Password))
-                {
-                    startInfo.UserName = _serviceStartInfo.Username;
-                    startInfo.Password = _serviceStartInfo.Password;
-                }
-                else
-                {
-                    throw new InvalidCredentialException("Password is invalid");
-                }
-            }
 
             _process.StartInfo = startInfo;
             //Enable raising events for auto restart

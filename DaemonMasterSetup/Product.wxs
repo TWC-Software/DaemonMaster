@@ -70,6 +70,7 @@
 				<Directory Id="INSTALLFOLDER" Name="DaemonMaster">
 					<Directory Id="de" Name="de" />
 					<Directory Id="fr" Name="fr" />
+				  <Directory Id="logs" Name="logs" />
 				</Directory>
 			</Directory>
 

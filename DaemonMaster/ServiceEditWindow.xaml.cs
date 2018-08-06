@@ -55,6 +55,10 @@ namespace DaemonMaster
         private ServiceStartInfo _tempServiceConfig;
         private bool _createNewService = false;
 
+        //WPF
+        public bool CanInteractWithDesktop => !(checkBoxUseLocalSystem.IsChecked ?? true);
+
+
         public ServiceEditWindow(ServiceStartInfo daemon)
         {
             InitializeComponent();
@@ -134,9 +138,20 @@ namespace DaemonMaster
             textBoxProcessRestartDelay.Text = _tempServiceConfig.ProcessRestartDelay.ToString();
             textBoxCounterResetTime.Text = _tempServiceConfig.CounterResetTime.ToString();
 
-            checkBoxIsConsoleApp.IsChecked = this._tempServiceConfig.ConsoleApplication;
-            radioButtonUseCtrlC.IsChecked = this._tempServiceConfig.UseCtrlC;
-            radioButtonUseCtrlBreak.IsChecked = !this._tempServiceConfig.UseCtrlC;
+            checkBoxIsConsoleApp.IsChecked = _tempServiceConfig.ConsoleApplication;
+            radioButtonUseCtrlC.IsChecked = _tempServiceConfig.UseCtrlC;
+            radioButtonUseCtrlBreak.IsChecked = !_tempServiceConfig.UseCtrlC;
+
+            if (DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
+            {
+                checkBoxInteractDesk.IsChecked = false;
+                checkBoxInteractDesk.IsEnabled = false;
+            }
+            else
+            {
+                checkBoxInteractDesk.IsChecked = _tempServiceConfig.CanInteractWithDesktop;
+            }
+
 
             #endregion
 
@@ -262,13 +277,14 @@ namespace DaemonMaster
                 DefaultObjectTypes = ObjectTypes.Users,
                 AllowedLocations = Locations.LocalComputer,
                 DefaultLocations = Locations.LocalComputer,
+                TargetComputer = Name,
                 MultiSelect = false,
                 ShowAdvancedView = true
             })
             {
                 if (pickerDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    textBoxUsername.Text = ".\\" + pickerDialog.SelectedObject.Name;  // ".\\" = Local computer
+                    textBoxUsername.Text = ".\\" + pickerDialog.SelectedObject.Name;  // ".\\" = Local computer Environment.MachineName 
                 }
             }
         }
@@ -459,6 +475,8 @@ namespace DaemonMaster
                 _tempServiceConfig.UseCtrlC = _tempServiceConfig.ConsoleApplication &&
                                              (radioButtonUseCtrlC.IsChecked ?? true) &&
                                              !(radioButtonUseCtrlBreak.IsChecked ?? false);
+
+                _tempServiceConfig.CanInteractWithDesktop = (bool)checkBoxInteractDesk.IsChecked;
 
                 switch (comboBoxStartType.SelectedIndex)
                 {

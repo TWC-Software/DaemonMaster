@@ -39,6 +39,7 @@ namespace DaemonMasterCore
         public string[] DependOnGroup { get; set; } = new string[0];
         public NativeMethods.SERVICE_START StartType { get; set; } = NativeMethods.SERVICE_START.SERVICE_AUTO_START;
         public bool DelayedStart { get; set; } = false;
+        public bool CanInteractWithDesktop { get; set; } = false;
 
         public string FileDir { get; set; }
         public string FileName { get; set; }

@@ -486,4 +486,7 @@
   <data name="invalid_pw_user" xml:space="preserve">
     <value>Das Passwort oder der Nutzername dürfen nicht leer sein!</value>
   </data>
+  <data name="interact_with_desktop" xml:space="preserve">
+    <value>Der Dienst kann mit dem Desktop interagieren</value>
+  </data>
 </root>

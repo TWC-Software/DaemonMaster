@@ -539,6 +539,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Services can interact with the desktop ähnelt.
+        /// </summary>
+        public static string interact_with_desktop {
+            get {
+                return ResourceManager.GetString("interact_with_desktop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Interactive processes are being blocked by a registery-key. Would you like to turn it off? (The Application cannot run without interactive processes!) ähnelt.
         /// </summary>
         public static string interactive_service_regkey_not_set {

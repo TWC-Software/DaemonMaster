@@ -67,7 +67,7 @@ namespace DaemonMasterCore
             {
                 //Create the service type 
                 uint serviceType = (uint)NativeMethods.SERVICE_TYPE.SERVICE_WIN32_OWN_PROCESS;
-                if (serviceStartInfo.Username == null && DaemonMasterUtils.IsSupportedWindows10VersionOrLower()) //if the user is set to LocalSystem and the system version is lower than windows 10 1803
+                if (serviceStartInfo.CanInteractWithDesktop && serviceStartInfo.Username == null && DaemonMasterUtils.IsSupportedWindows10VersionOrLower()) //if the user is set to LocalSystem and the system version is lower than windows 10 1803
                 {
                     serviceType |= (uint)NativeMethods.SERVICE_TYPE.SERVICE_INTERACTIVE_PROCESS;
                 }
@@ -292,7 +292,7 @@ namespace DaemonMasterCore
                         throw new ServiceNotStoppedException();
 
                     uint serviceType = (uint)NativeMethods.SERVICE_TYPE.SERVICE_WIN32_OWN_PROCESS;
-                    if (serviceStartInfo.UseLocalSystem && DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
+                    if (serviceStartInfo.CanInteractWithDesktop && serviceStartInfo.UseLocalSystem && DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
                     {
                         serviceType |= (uint)NativeMethods.SERVICE_TYPE.SERVICE_INTERACTIVE_PROCESS;
                     }

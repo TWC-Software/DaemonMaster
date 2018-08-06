@@ -100,5 +100,18 @@ namespace DaemonMasterCore
         {
             return Environment.OSVersion.Version.Major < 10 || (Environment.OSVersion.Version.Major == 10 && Environment.OSVersion.Version.Build < 17134);
         }
+
+        public static string GetLoginFromUsername(string s)
+        {
+            int stop = s.IndexOf("\\", StringComparison.Ordinal);
+            return (stop > -1) ? s.Substring(stop + 1, s.Length - stop - 1) : string.Empty;
+        }
+
+        public static string GetDomainFromUsername(string s)
+        {
+            int stop = s.IndexOf("\\", StringComparison.Ordinal);
+            return (stop > -1) ? s.Substring(0, stop) : string.Empty;
+        }
+
     }
 }
