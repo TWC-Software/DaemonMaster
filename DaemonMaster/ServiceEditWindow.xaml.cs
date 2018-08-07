@@ -55,10 +55,6 @@ namespace DaemonMaster
         private ServiceStartInfo _tempServiceConfig;
         private bool _createNewService = false;
 
-        //WPF
-        public bool CanInteractWithDesktop => !(checkBoxUseLocalSystem.IsChecked ?? true);
-
-
         public ServiceEditWindow(ServiceStartInfo daemon)
         {
             InitializeComponent();
@@ -142,16 +138,16 @@ namespace DaemonMaster
             radioButtonUseCtrlC.IsChecked = _tempServiceConfig.UseCtrlC;
             radioButtonUseCtrlBreak.IsChecked = !_tempServiceConfig.UseCtrlC;
 
-            if (DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
+            //Hide check box interact with desktop on not supported systems (windows 10 1803+)
+            if (!DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
             {
                 checkBoxInteractDesk.IsChecked = false;
-                checkBoxInteractDesk.IsEnabled = false;
+                checkBoxInteractDesk.Visibility = Visibility.Hidden;
             }
             else
             {
                 checkBoxInteractDesk.IsChecked = _tempServiceConfig.CanInteractWithDesktop;
             }
-
 
             #endregion
 
@@ -277,7 +273,6 @@ namespace DaemonMaster
                 DefaultObjectTypes = ObjectTypes.Users,
                 AllowedLocations = Locations.LocalComputer,
                 DefaultLocations = Locations.LocalComputer,
-                TargetComputer = Name,
                 MultiSelect = false,
                 ShowAdvancedView = true
             })
@@ -476,7 +471,7 @@ namespace DaemonMaster
                                              (radioButtonUseCtrlC.IsChecked ?? true) &&
                                              !(radioButtonUseCtrlBreak.IsChecked ?? false);
 
-                _tempServiceConfig.CanInteractWithDesktop = (bool)checkBoxInteractDesk.IsChecked;
+                _tempServiceConfig.CanInteractWithDesktop = checkBoxInteractDesk.IsChecked ?? false;
 
                 switch (comboBoxStartType.SelectedIndex)
                 {

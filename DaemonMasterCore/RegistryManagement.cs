@@ -20,6 +20,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Security.AccessControl;
+using System.Security.Principal;
 using System.ServiceProcess;
 using DaemonMasterCore.Win32.PInvoke;
 using Microsoft.Win32;
@@ -45,15 +46,6 @@ namespace DaemonMasterCore
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                             METHODS                                                  //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public static void GiveUserPermissionToRegKey(string regPath, string username, RegistryRights rights)
-        {
-
-        }
-
-
-
-
 
         public static void SaveInRegistry(ServiceStartInfo serviceStartInfo)
         {
@@ -84,18 +76,21 @@ namespace DaemonMasterCore
                     parameters.Close();
                 }
 
-                //Create an give the user the permission to write to this key (needed for save the PID of the process)
-
-                //TODO: Need registry permission to write PID (logs folder the same)
+                //Create an give the user the permission to write to this key (needed for save the PID of the process if it's not the LocalSystem account)
                 using (RegistryKey processInfo = key.CreateSubKey("Process"))
                 {
                     //Create a new RegistrySecurity object
                     RegistrySecurity rs = new RegistrySecurity();
 
                     ////Add access rule for user (only when it is not LocalSystem)
-                    if (!serviceStartInfo.UseLocalSystem)
+                    bool isLocalSystem = serviceStartInfo.UseLocalSystem || String.IsNullOrWhiteSpace(serviceStartInfo.Username) || serviceStartInfo.Username == "LocalSystem";
+                    if (isLocalSystem)
                     {
-                        //TODO: not the best method to do that
+                        string localSystem = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null).Translate(typeof(NTAccount)).Value;
+                        rs.AddAccessRule(new RegistryAccessRule(localSystem, RegistryRights.QueryValues | RegistryRights.SetValue, InheritanceFlags.None, PropagationFlags.None, AccessControlType.Allow));
+                    }
+                    else
+                    {
                         string username = Environment.MachineName + "\\" + DaemonMasterUtils.GetLoginFromUsername(serviceStartInfo.Username);
                         rs.AddAccessRule(new RegistryAccessRule(username, RegistryRights.QueryValues | RegistryRights.SetValue, InheritanceFlags.None, PropagationFlags.None, AccessControlType.Allow));
                     }

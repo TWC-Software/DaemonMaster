@@ -104,13 +104,13 @@ namespace DaemonMasterCore
         public static string GetLoginFromUsername(string s)
         {
             int stop = s.IndexOf("\\", StringComparison.Ordinal);
-            return (stop > -1) ? s.Substring(stop + 1, s.Length - stop - 1) : string.Empty;
+            return (stop > -1) ? s.Substring(stop + 1, s.Length - stop - 1) : String.Empty;
         }
 
         public static string GetDomainFromUsername(string s)
         {
             int stop = s.IndexOf("\\", StringComparison.Ordinal);
-            return (stop > -1) ? s.Substring(0, stop) : string.Empty;
+            return (stop > -1) ? s.Substring(0, stop) : String.Empty;
         }
 
     }
