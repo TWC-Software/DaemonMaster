@@ -24,7 +24,6 @@ using System.Diagnostics;
 using System.IO;
 using System.ServiceProcess;
 using System.Text;
-using DaemonMasterCore.Config;
 using DaemonMasterCore.Exceptions;
 using DaemonMasterCore.Win32;
 using DaemonMasterCore.Win32.PInvoke;
@@ -46,7 +45,6 @@ namespace DaemonMasterCore
         private const string DaemonMasterDevServiceFile = "DMService.exe";
         private const string DaemonMasterServiceParameter = " -service";
 
-
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                            Service                                                   //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,10 +56,6 @@ namespace DaemonMasterCore
         /// <param name="serviceStartInfo"></param>
         public static void CreateInteractiveService(ServiceStartInfo serviceStartInfo)
         {
-            if (!Directory.Exists(DaemonMasterServicePath) ||
-                !File.Exists(DaemonMasterServicePath + DaemonMasterServiceFile))
-                throw new IOException("Can't find the DaemonMasterService file!");
-
             using (ServiceControlManager scm =
                 ServiceControlManager.Connect(NativeMethods.SCM_ACCESS.SC_MANAGER_CREATE_SERVICE))
             {
@@ -79,7 +73,7 @@ namespace DaemonMasterCore
                     serviceType,
                     serviceStartInfo.StartType,
                     NativeMethods.SERVICE_ERROR_CONTROL.SERVICE_ERROR_NORMAL,
-                    DaemonMasterServicePath + (ConfigManagement.LoadConfig().UseDevService ? DaemonMasterDevServiceFile : DaemonMasterServiceFile) + DaemonMasterServiceParameter,
+                    GetServiceExePath() + DaemonMasterServiceParameter,
                     null,
                     null,
                     ConvertDependenciesArraysToDoubleNullTerminatedString(serviceStartInfo.DependOnService, serviceStartInfo.DependOnGroup),
@@ -382,6 +376,18 @@ namespace DaemonMasterCore
             }
         }
 
+        /// <summary>
+        /// Return the service exe path (FileNotFoundException)
+        /// </summary>
+        /// <returns>service exe path</returns>
+        public static string GetServiceExePath()
+        {
+            if (!Directory.Exists(DaemonMasterServicePath) || !File.Exists(DaemonMasterServicePath + DaemonMasterServiceFile))
+                throw new FileNotFoundException("Can't find the daemon master service exe!");
+
+            return DaemonMasterServicePath + DaemonMasterServiceFile;
+        }
+
 
         /// <summary>
         /// Join service dependencies and group dependencies string arrays and add double null termination to them
@@ -405,6 +411,7 @@ namespace DaemonMasterCore
 
             return stringBuilder;
         }
+
 
 
         #endregion

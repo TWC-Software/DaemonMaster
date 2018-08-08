@@ -170,7 +170,7 @@ namespace DaemonMasterService
 
         private void UpdateInfosInRegistry(string serviceName, int processPid)
         {
-            using (RegistryKey processKey = Registry.LocalMachine.CreateSubKey(RegPath + serviceName + @"\Process"))
+            using (RegistryKey processKey = Registry.LocalMachine.CreateSubKey(RegPath + serviceName + @"\ProcessInfo"))
             {
                 if (processKey == null)
                     return;

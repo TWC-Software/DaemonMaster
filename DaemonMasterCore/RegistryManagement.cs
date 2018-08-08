@@ -19,9 +19,9 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Security.AccessControl;
 using System.Security.Principal;
-using System.ServiceProcess;
 using DaemonMasterCore.Win32.PInvoke;
 using Microsoft.Win32;
 
@@ -77,7 +77,7 @@ namespace DaemonMasterCore
                 }
 
                 //Create an give the user the permission to write to this key (needed for save the PID of the process if it's not the LocalSystem account)
-                using (RegistryKey processInfo = key.CreateSubKey("Process"))
+                using (RegistryKey processInfo = key.CreateSubKey("ProcessInfo"))
                 {
                     //Create a new RegistrySecurity object
                     RegistrySecurity rs = new RegistrySecurity();
@@ -159,31 +159,46 @@ namespace DaemonMasterCore
         {
             ObservableCollection<ServiceListViewItem> daemons = new ObservableCollection<ServiceListViewItem>();
 
-            ServiceController[] sc = ServiceController.GetServices();
-
-            foreach (ServiceController service in sc)
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath, false))
             {
-                if (service.ServiceName.Contains("DaemonMaster_"))
+                foreach (var subKeyName in key.GetSubKeyNames())
                 {
-                    using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + service.ServiceName + @"\Parameters", false))
+                    using (RegistryKey subKey = key.OpenSubKey(subKeyName, false))
                     {
-                        if (key == null)
-                        {
+                        //if the sub key is invalid skip this service
+                        if (subKey == null)
                             continue;
-                            //TODO: Message, etc 
-                        }
 
-                        ServiceListViewItem serviceListViewItem = new ServiceListViewItem
+                        //Get the exe path of the service to determine later if its a service from DaemonMaster
+                        string serviceExePath = Convert.ToString(subKey.GetValue("ImagePath") ?? String.Empty);
+
+                        //If the serviceExePath is invalid skip this service
+                        if (String.IsNullOrWhiteSpace(serviceExePath))
+                            continue;
+
+                        if (serviceExePath.Contains(ServiceManagement.GetServiceExePath()))
                         {
-                            DisplayName = service.DisplayName,
-                            ServiceName = service.ServiceName,
-                            FullPath = (string)key.GetValue("FileDir") + @"/" + (string)key.GetValue("FileName")
-                        };
+                            ServiceListViewItem serviceListViewItem = new ServiceListViewItem
+                            {
+                                ServiceName = Path.GetFileName(subKey.Name),
+                                DisplayName = Convert.ToString(subKey.GetValue("DisplayName"))
+                            };
 
-                        daemons.Add(serviceListViewItem);
+                            using (RegistryKey parmSubKey = subKey.OpenSubKey("Parameters", false))
+                            {
+                                //If the parameters sub key invalid, skip this service
+                                if (parmSubKey == null)
+                                    continue;
+
+                                serviceListViewItem.FullPath = Convert.ToString(parmSubKey.GetValue("FileDir")) + @"/" + Convert.ToString(parmSubKey.GetValue("FileName"));
+                            }
+
+                            daemons.Add(serviceListViewItem);
+                        }
                     }
                 }
             }
+
             return daemons;
         }
 
