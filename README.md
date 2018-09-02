@@ -30,8 +30,7 @@ You can download the pre-release here: [Click here](https://github.com/TWC-Softw
 
 ## Copyright 
 - MCPC10,
-- stuffi3000,
-- rocky20798
+- stuffi3000
 
 ## License 
 GPL 3.0
