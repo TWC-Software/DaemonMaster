@@ -31,6 +31,7 @@ using System.Windows;
 using System.Windows.Data;
 using DaemonMaster.Language;
 using DaemonMasterCore;
+using DaemonMasterCore.Win32;
 using DaemonMasterCore.Win32.PInvoke;
 using Microsoft.Win32;
 using Newtonsoft.Json;
@@ -516,13 +517,29 @@ namespace DaemonMaster
         {
             try
             {
+
+#if DEBUG
+                using (LsaHandle lsaWrapper = new LsaHandle())
+                {
+                    if (true)    //TODO: check privileges
+                    {
+                        MessageBoxResult result = MessageBox.Show(_resManager.GetString("logon_as_a_service", CultureInfo.CurrentUICulture), _resManager.GetString("question", CultureInfo.CurrentUICulture), MessageBoxButton.OKCancel, MessageBoxImage.Question);
+                        if (result != MessageBoxResult.OK)
+                            return;
+
+                        //Give the account the right to start as service
+                        // lsaWrapper.AddPrivileges(_tempServiceConfig.Username, "SeServiceLogonRight");
+                    }
+                }
+#endif
+
                 if (_createNewService)
                 {
                     ServiceManagement.CreateInteractiveService(_tempServiceConfig);
 
                     MessageBox.Show(
                         _resManager.GetString("the_service_installation_was_successful", CultureInfo.CurrentUICulture),
-                        _resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
+                        _resManager.GetString("success", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {

@@ -33,5 +33,11 @@ namespace DaemonMasterCore.Win32.PInvoke
         public const int CREATE_NO_WINDOW = 0x08000000;
         public const int CREATE_UNICODE_ENVIRONMENT = 0x00000400;
         public static readonly IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
+
+        //NTSTATUS
+        public const uint STATUS_SUCCESS = 0x00000000;
+        public const uint STATUS_ACCESS_DENIED = 0xc0000022;
+        public const uint STATUS_INSUFFICIENT_RESOURCES = 0xc000009a;
+        public const uint STATUS_NO_MEMORY = 0xc0000017;
     }
 }

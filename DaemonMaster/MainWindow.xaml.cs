@@ -32,6 +32,7 @@ using DaemonMaster.Language;
 using DaemonMasterCore;
 using DaemonMasterCore.Config;
 using DaemonMasterCore.Exceptions;
+using DaemonMasterCore.Win32;
 using DaemonMasterCore.Win32.PInvoke;
 
 namespace DaemonMaster
@@ -63,6 +64,15 @@ namespace DaemonMaster
 
             //Show the list in the list view
             listViewDaemons.ItemsSource = _processCollection;
+
+#if DEBUG
+            LsaHandle lsaHandle = new LsaHandle();
+            NativeMethods.LSA_UNICODE_STRING[] test = lsaHandle.EnumeratePrivileges("Mike");
+            lsaHandle.AddPrivileges("Mike", new[] { "SeServiceLogonRight" });
+            NativeMethods.LSA_UNICODE_STRING[] test2 = lsaHandle.EnumeratePrivileges("Mike");
+            lsaHandle.RemovePrivileges("Mike", new[] { "SeServiceLogonRight" });
+            NativeMethods.LSA_UNICODE_STRING[] test3 = lsaHandle.EnumeratePrivileges("Mike");
+#endif
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////

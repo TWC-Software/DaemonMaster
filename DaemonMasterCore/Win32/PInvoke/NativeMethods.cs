@@ -108,6 +108,58 @@ namespace DaemonMasterCore.Win32.PInvoke
             ref STARTUPINFO lpStartupInfo,
             out PROCESS_INFORMATION lpProcessInformation);
 
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern uint LsaOpenPolicy(
+            LSA_UNICODE_STRING[] SystemName,
+            ref LSA_OBJECT_ATTRIBUTES ObjectAttributes,
+            int AccessMask,
+            ref IntPtr PolicyHandle
+        );
+
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern uint LsaAddAccountRights(
+            LsaHandle PolicyHandle,
+            IntPtr AccountSid,
+            LSA_UNICODE_STRING[] UserRights,
+            uint CountOfRights
+        );
+
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern uint LsaRemoveAccountRights(
+            LsaHandle PolicyHandle,
+            IntPtr AccountSid,
+            bool AllRights,
+            LSA_UNICODE_STRING[] UserRights,
+            uint CountOfRights
+        );
+
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern uint LsaEnumerateAccountRights(
+            LsaHandle PolicyHandle,
+            IntPtr AccountSid,
+            ref IntPtr UserRights,
+            out uint CountOfRights
+        );
+
+        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern uint LsaLookupNames2(
+            LsaHandle PolicyHandle,
+            uint Flags,
+            uint Count,
+            LSA_UNICODE_STRING[] Names,
+            ref IntPtr ReferencedDomains,
+            ref IntPtr Sids
+        );
+
+        [DllImport(DLLFiles.ADVAPI32)]
+        public static extern int LsaNtStatusToWinError(uint NTSTATUS);
+
+        [DllImport(DLLFiles.ADVAPI32)]
+        public static extern uint LsaClose(IntPtr PolicyHandle);
+
+        [DllImport(DLLFiles.ADVAPI32)]
+        public static extern uint LsaFreeMemory(IntPtr Buffer);
+
 
         //KERNEL 32
 

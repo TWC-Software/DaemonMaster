@@ -529,5 +529,26 @@ namespace DaemonMasterCore.Win32.PInvoke
             LOGON_WITH_PROFILE = 0x00000001,
             LOGON_NETCREDENTIALS_ONLY = 0x00000002
         }
+
+        public enum SidNameUse
+        {
+            User = 1,
+            Group = 2,
+            Domain = 3,
+            Alias = 4,
+            KnownGroup = 5,
+            DeletedAccount = 6,
+            Invalid = 7,
+            Unknown = 8,
+            Computer = 9
+        }
+
+        public enum ACCESS
+        {
+            POLICY_READ = 0x20006,
+            POLICY_ALL_ACCESS = 0x00F0FFF,
+            POLICY_EXECUTE = 0X20801,
+            POLICY_WRITE = 0X207F8
+        }
     }
 }

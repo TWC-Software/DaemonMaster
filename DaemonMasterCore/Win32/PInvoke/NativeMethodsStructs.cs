@@ -138,5 +138,47 @@ namespace DaemonMasterCore.Win32.PInvoke
             public UIntPtr PeakProcessMemoryUsed;
             public UIntPtr PeakJobMemoryUsed;
         }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct LSA_OBJECT_ATTRIBUTES
+        {
+            public int Length;
+            public IntPtr RootDirectory;
+            public IntPtr ObjectName;
+            public int Attributes;
+            public IntPtr SecurityDescriptor;
+            public IntPtr SecurityQualityOfService;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        public struct LSA_UNICODE_STRING
+        {
+            public ushort Length;
+            public ushort MaximumLength;
+            [MarshalAs(UnmanagedType.LPWStr)] public string Buffer;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct LSA_TRUST_INFORMATION
+        {
+            public NativeMethods.LSA_UNICODE_STRING Name;
+            public IntPtr Sid;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct LSA_TRANSLATED_SID2
+        {
+            public NativeMethods.SidNameUse Use;
+            public IntPtr Sid;
+            public int DomainIndex;
+            uint Flags;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct LSA_REFERENCED_DOMAIN_LIST
+        {
+            public uint Entries;
+            public LSA_TRUST_INFORMATION Domains;
+        }
     }
 }

@@ -746,6 +746,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die The account need the right to start as a service. Do you want to give them the right? ähnelt.
+        /// </summary>
+        public static string logon_as_a_service {
+            get {
+                return ResourceManager.GetString("logon_as_a_service", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Max limit reached ähnelt.
         /// </summary>
         public static string max_limit_reached {
