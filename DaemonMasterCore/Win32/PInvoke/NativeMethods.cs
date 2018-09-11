@@ -141,16 +141,6 @@ namespace DaemonMasterCore.Win32.PInvoke
             out uint CountOfRights
         );
 
-        [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
-        public static extern uint LsaLookupNames2(
-            LsaHandle PolicyHandle,
-            uint Flags,
-            uint Count,
-            LSA_UNICODE_STRING[] Names,
-            ref IntPtr ReferencedDomains,
-            ref IntPtr Sids
-        );
-
         [DllImport(DLLFiles.ADVAPI32)]
         public static extern int LsaNtStatusToWinError(uint NTSTATUS);
 

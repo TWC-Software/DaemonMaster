@@ -24,6 +24,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Security.Principal;
 using DaemonMasterCore.Win32.PInvoke;
 using Microsoft.Win32.SafeHandles;
 
@@ -78,7 +79,11 @@ namespace DaemonMasterCore.Win32
         /// <param name="privilege"></param>
         public void AddPrivileges(string account, string[] privilege)
         {
-            IntPtr pSid = GetSidInformation(account);
+            if (String.IsNullOrWhiteSpace(account) || privilege == null)
+                return;
+
+
+            IntPtr pSid = new Sid(account).Pointer;
 
             NativeMethods.LSA_UNICODE_STRING[] privileges = new NativeMethods.LSA_UNICODE_STRING[privilege.Length];
             for (int i = 0; i < privilege.Length; i++)
@@ -100,7 +105,11 @@ namespace DaemonMasterCore.Win32
         /// <param name="removeAllRights">Remove all privileges</param>
         public void RemovePrivileges(string account, string[] privilege, bool removeAllRights = false)
         {
-            IntPtr pSid = GetSidInformation(account);
+            if (String.IsNullOrWhiteSpace(account) || privilege == null)
+                return;
+
+
+            IntPtr pSid = new Sid(account).Pointer;
 
             NativeMethods.LSA_UNICODE_STRING[] privileges = new NativeMethods.LSA_UNICODE_STRING[privilege.Length];
             for (int i = 0; i < privilege.Length; i++)
@@ -121,7 +130,11 @@ namespace DaemonMasterCore.Win32
         /// <returns></returns>
         public NativeMethods.LSA_UNICODE_STRING[] EnumeratePrivileges(string account)
         {
-            IntPtr pSid = GetSidInformation(account);
+            if (String.IsNullOrWhiteSpace(account))
+                throw new ArgumentException("String is empty or null!");
+
+
+            IntPtr pSid = new Sid(account).Pointer;
             IntPtr rightsPtr = IntPtr.Zero;
 
             try
@@ -149,33 +162,6 @@ namespace DaemonMasterCore.Win32
         }
 
         // helper functions
-        private IntPtr GetSidInformation(string account)
-        {
-            NativeMethods.LSA_UNICODE_STRING[] names = new NativeMethods.LSA_UNICODE_STRING[1];
-            NativeMethods.LSA_TRANSLATED_SID2 lts;
-            IntPtr tsids = IntPtr.Zero;
-            IntPtr tdom = IntPtr.Zero;
-            names[0] = InitLsaString(account);
-            lts.Sid = IntPtr.Zero;
-
-            try
-            {
-                uint ret = NativeMethods.LsaLookupNames2(this, 0, 1, names, ref tdom, ref tsids);
-                if (ret != NativeMethods.STATUS_SUCCESS)
-                    throw new Win32Exception(NativeMethods.LsaNtStatusToWinError(ret));
-
-                lts = (NativeMethods.LSA_TRANSLATED_SID2)Marshal.PtrToStructure(tsids, typeof(NativeMethods.LSA_TRANSLATED_SID2));
-                return lts.Sid;
-            }
-            finally
-            {
-                if (tsids != IntPtr.Zero)
-                    NativeMethods.LsaFreeMemory(tsids);
-
-                if (tdom != IntPtr.Zero)
-                    NativeMethods.LsaFreeMemory(tdom);
-            }
-        }
 
         /// <summary>
         /// Create an new LsaString from a string
@@ -184,16 +170,58 @@ namespace DaemonMasterCore.Win32
         /// <returns></returns>
         private static NativeMethods.LSA_UNICODE_STRING InitLsaString(string s)
         {
+            if (String.IsNullOrWhiteSpace(s))
+                throw new ArgumentException("String is empty or null!");
+
             // Unicode strings max. 32KB
             if (s.Length > 0x7ffe)
                 throw new ArgumentException("String is too long");
 
-            NativeMethods.LSA_UNICODE_STRING lus = new NativeMethods.LSA_UNICODE_STRING();
-            lus.Buffer = s;
-            lus.Length = (ushort)(s.Length * sizeof(char));
-            lus.MaximumLength = (ushort)((lus.Length + 1) * sizeof(char));
+            NativeMethods.LSA_UNICODE_STRING lus = new NativeMethods.LSA_UNICODE_STRING
+            {
+                Buffer = s,
+                Length = (ushort)(s.Length * sizeof(char)),
+                MaximumLength = (ushort)((s.Length + 1) * sizeof(char))
+            };
 
             return lus;
+        }
+    }
+
+    /// <summary>
+    /// Class that read the Sid infos and give them as pointer
+    /// </summary>
+    sealed class Sid : IDisposable
+    {
+        public IntPtr Pointer { get; private set; } = IntPtr.Zero;
+
+        public Sid(string account)
+        {
+            SecurityIdentifier sid = (SecurityIdentifier)(new NTAccount(account)).Translate(typeof(SecurityIdentifier));
+            Byte[] buffer = new Byte[sid.BinaryLength];
+            sid.GetBinaryForm(buffer, 0);
+
+            Pointer = Marshal.AllocHGlobal(buffer.Length);
+            Marshal.Copy(buffer, 0, Pointer, buffer.Length);
+        }
+
+        public void Dispose()
+        {
+            ReleaseUnmanagedResources();
+            GC.SuppressFinalize(this);
+        }
+
+        private void ReleaseUnmanagedResources()
+        {
+            if (Pointer != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(Pointer);
+            }
+        }
+
+        ~Sid()
+        {
+            ReleaseUnmanagedResources();
         }
     }
 }
