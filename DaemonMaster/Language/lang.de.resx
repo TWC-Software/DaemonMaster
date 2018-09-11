@@ -490,6 +490,6 @@
     <value>Der Dienst kann mit dem Desktop interagieren</value>
   </data>
   <data name="logon_as_a_service" xml:space="preserve">
-    <value>Der Benutzer benötigt das Recht zum starten als Dienst. Wollen sie diesem diese Rechte geben?</value>
+    <value>Der Benutzer benötigt das Recht zum starten als Dienst. Wollen sie diesem diese Rechte geben? (SIE MÜSSEN DAS RECHT MANUEL ENTFERNEN!)</value>
   </data>
 </root>

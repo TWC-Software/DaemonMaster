@@ -517,21 +517,24 @@ namespace DaemonMaster
         {
             try
             {
-
-#if DEBUG
-                using (LsaHandle lsaWrapper = new LsaHandle())
+                //Only Check that right if its not the local system
+                if (!_tempServiceConfig.UseLocalSystem)
                 {
-                    if (true)    //TODO: check privileges
+                    using (LsaPolicyHandle lsaWrapper = new LsaPolicyHandle())
                     {
-                        MessageBoxResult result = MessageBox.Show(_resManager.GetString("logon_as_a_service", CultureInfo.CurrentUICulture), _resManager.GetString("question", CultureInfo.CurrentUICulture), MessageBoxButton.OKCancel, MessageBoxImage.Question);
-                        if (result != MessageBoxResult.OK)
-                            return;
+                        string username = _tempServiceConfig.Username ?? Convert.ToString(RegistryManagement.GetParameterFromRegistry(_tempServiceConfig.ServiceName, "ObjectName", String.Empty)); //if username is "null" get them from the registry
+                        bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(username).Any(x => x.Buffer == "SeServiceLogonRight");
+                        if (!hasRightToStartAsService)
+                        {
+                            MessageBoxResult result = MessageBox.Show(_resManager.GetString("logon_as_a_service", CultureInfo.CurrentUICulture), _resManager.GetString("question", CultureInfo.CurrentUICulture), MessageBoxButton.YesNo, MessageBoxImage.Question);
+                            if (result != MessageBoxResult.OK)
+                                return;
 
-                        //Give the account the right to start as service
-                        // lsaWrapper.AddPrivileges(_tempServiceConfig.Username, "SeServiceLogonRight");
+                            //Give the account the right to start as service
+                            lsaWrapper.AddPrivileges(username, new[] { "SeServiceLogonRight" });
+                        }
                     }
                 }
-#endif
 
                 if (_createNewService)
                 {

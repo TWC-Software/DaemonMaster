@@ -110,7 +110,8 @@ namespace DaemonMasterCore
         public static string GetDomainFromUsername(string s)
         {
             int stop = s.IndexOf("\\", StringComparison.Ordinal);
-            return (stop > -1) ? s.Substring(0, stop) : String.Empty;
+            string domainName = (stop > -1) ? s.Substring(0, stop) : String.Empty; //when nothing is there make the string empty
+            return (domainName != ".") ? domainName : String.Empty; // "." stands also for local domain so make it empty
         }
 
     }

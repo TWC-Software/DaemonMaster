@@ -492,6 +492,6 @@
     <value>Services can interact with the desktop</value>
   </data>
   <data name="logon_as_a_service" xml:space="preserve">
-    <value>The account need the right to start as a service. Do you want to give them the right?</value>
+    <value>The account need the right to start as a service. Do you want to give them the right? (YOU MUST MANUALLY REMOVE THAT RIGHT!)</value>
   </data>
 </root>

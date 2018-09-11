@@ -118,7 +118,7 @@ namespace DaemonMasterCore.Win32.PInvoke
 
         [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern uint LsaAddAccountRights(
-            LsaHandle PolicyHandle,
+            LsaPolicyHandle PolicyHandle,
             IntPtr AccountSid,
             LSA_UNICODE_STRING[] UserRights,
             uint CountOfRights
@@ -126,7 +126,7 @@ namespace DaemonMasterCore.Win32.PInvoke
 
         [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern uint LsaRemoveAccountRights(
-            LsaHandle PolicyHandle,
+            LsaPolicyHandle PolicyHandle,
             IntPtr AccountSid,
             bool AllRights,
             LSA_UNICODE_STRING[] UserRights,
@@ -135,7 +135,7 @@ namespace DaemonMasterCore.Win32.PInvoke
 
         [DllImport(DLLFiles.ADVAPI32, CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern uint LsaEnumerateAccountRights(
-            LsaHandle PolicyHandle,
+            LsaPolicyHandle PolicyHandle,
             IntPtr AccountSid,
             ref IntPtr UserRights,
             out uint CountOfRights

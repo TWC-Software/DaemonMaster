@@ -147,9 +147,9 @@ namespace DaemonMasterCore
             }
         }
 
-        public static object GetParameterFromRegistry(string serviceName, string parameterName)
+        public static object GetParameterFromRegistry(string serviceName, string parameterName, string subkey = "\\Parameters")
         {
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + serviceName + @"\Parameters", false))
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + serviceName + subkey, false))
             {
                 return key.GetValue(parameterName, null);
             }

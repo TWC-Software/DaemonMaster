@@ -37,13 +37,13 @@ namespace DaemonMasterCore.Win32
     /// This class is used to grant/remove/emumerate Lsa account rights.
     /// to a user.
     /// </summary>
-    public class LsaHandle : SafeHandleZeroOrMinusOneIsInvalid
+    public class LsaPolicyHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
         /// <summary>
         /// Open an new lsa policy instance
         /// </summary>
         /// <param name="systemName">null = local system</param>
-        public LsaHandle(string systemName = null) : base(true)
+        public LsaPolicyHandle(string systemName = null) : base(true)
         {
             NativeMethods.LSA_OBJECT_ATTRIBUTES lsaAttr;
             lsaAttr.RootDirectory = IntPtr.Zero;
@@ -79,10 +79,6 @@ namespace DaemonMasterCore.Win32
         /// <param name="privilege"></param>
         public void AddPrivileges(string account, string[] privilege)
         {
-            if (String.IsNullOrWhiteSpace(account) || privilege == null)
-                return;
-
-
             IntPtr pSid = new Sid(account).Pointer;
 
             NativeMethods.LSA_UNICODE_STRING[] privileges = new NativeMethods.LSA_UNICODE_STRING[privilege.Length];
@@ -105,10 +101,6 @@ namespace DaemonMasterCore.Win32
         /// <param name="removeAllRights">Remove all privileges</param>
         public void RemovePrivileges(string account, string[] privilege, bool removeAllRights = false)
         {
-            if (String.IsNullOrWhiteSpace(account) || privilege == null)
-                return;
-
-
             IntPtr pSid = new Sid(account).Pointer;
 
             NativeMethods.LSA_UNICODE_STRING[] privileges = new NativeMethods.LSA_UNICODE_STRING[privilege.Length];
@@ -130,10 +122,6 @@ namespace DaemonMasterCore.Win32
         /// <returns></returns>
         public NativeMethods.LSA_UNICODE_STRING[] EnumeratePrivileges(string account)
         {
-            if (String.IsNullOrWhiteSpace(account))
-                throw new ArgumentException("String is empty or null!");
-
-
             IntPtr pSid = new Sid(account).Pointer;
             IntPtr rightsPtr = IntPtr.Zero;
 
@@ -170,9 +158,6 @@ namespace DaemonMasterCore.Win32
         /// <returns></returns>
         private static NativeMethods.LSA_UNICODE_STRING InitLsaString(string s)
         {
-            if (String.IsNullOrWhiteSpace(s))
-                throw new ArgumentException("String is empty or null!");
-
             // Unicode strings max. 32KB
             if (s.Length > 0x7ffe)
                 throw new ArgumentException("String is too long");
@@ -197,7 +182,19 @@ namespace DaemonMasterCore.Win32
 
         public Sid(string account)
         {
-            SecurityIdentifier sid = (SecurityIdentifier)(new NTAccount(account)).Translate(typeof(SecurityIdentifier));
+            if (String.IsNullOrWhiteSpace(account))
+                throw new ArgumentException("String is empty or null!");
+
+            SecurityIdentifier sid;
+            if (account == "LocalSystem")
+            {
+                sid = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
+            }
+            else
+            {
+                sid = (SecurityIdentifier)(new NTAccount(DaemonMasterUtils.GetDomainFromUsername(account), DaemonMasterUtils.GetLoginFromUsername(account))).Translate(typeof(SecurityIdentifier));
+            }
+
             Byte[] buffer = new Byte[sid.BinaryLength];
             sid.GetBinaryForm(buffer, 0);
 

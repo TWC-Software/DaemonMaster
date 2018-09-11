@@ -746,7 +746,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die The account need the right to start as a service. Do you want to give them the right? ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die The account need the right to start as a service. Do you want to give them the right? (YOU MUST MANUALLY REMOVE THAT RIGHT!) ähnelt.
         /// </summary>
         public static string logon_as_a_service {
             get {
