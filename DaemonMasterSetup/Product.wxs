@@ -11,7 +11,7 @@
 
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"><?define DaemonMaster_TargetDir=$(var.DaemonMaster.TargetDir)?>
 
-	<Product Id="C1735A19-353A-4576-8D58-2FA641C7C397" Name="$(var.ProductName)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.CompanyName)" UpgradeCode="$(var.UpgradeCode)">
+	<Product Id="2323B4E1-30CC-4027-BC3E-6E588EA96F43" Name="$(var.ProductName)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.CompanyName)" UpgradeCode="$(var.UpgradeCode)">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
 	  <Condition Message="[ProductName] is only supported on Windows 7, Windows Server 2008 R2, or higher.">

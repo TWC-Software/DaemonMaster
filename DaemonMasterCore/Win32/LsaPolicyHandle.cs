@@ -79,18 +79,19 @@ namespace DaemonMasterCore.Win32
         /// <param name="privilege"></param>
         public void AddPrivileges(string account, string[] privilege)
         {
-            IntPtr pSid = new Sid(account).Pointer;
-
             NativeMethods.LSA_UNICODE_STRING[] privileges = new NativeMethods.LSA_UNICODE_STRING[privilege.Length];
             for (int i = 0; i < privilege.Length; i++)
             {
                 privileges[i] = InitLsaString(privilege[i]);
             }
 
-            //Add account rights
-            uint ret = NativeMethods.LsaAddAccountRights(this, pSid, privileges, (uint)privilege.Length);
-            if (ret != NativeMethods.STATUS_SUCCESS)
-                throw new Win32Exception(NativeMethods.LsaNtStatusToWinError(ret));
+            using (Sid sid = new Sid(account))
+            {
+                //Add account rights
+                uint ret = NativeMethods.LsaAddAccountRights(this, sid.Pointer, privileges, (uint)privilege.Length);
+                if (ret != NativeMethods.STATUS_SUCCESS)
+                    throw new Win32Exception(NativeMethods.LsaNtStatusToWinError(ret));
+            }
         }
 
         /// <summary>
@@ -101,18 +102,19 @@ namespace DaemonMasterCore.Win32
         /// <param name="removeAllRights">Remove all privileges</param>
         public void RemovePrivileges(string account, string[] privilege, bool removeAllRights = false)
         {
-            IntPtr pSid = new Sid(account).Pointer;
-
             NativeMethods.LSA_UNICODE_STRING[] privileges = new NativeMethods.LSA_UNICODE_STRING[privilege.Length];
             for (int i = 0; i < privilege.Length; i++)
             {
                 privileges[i] = InitLsaString(privilege[i]);
             }
 
-            //Remove account rights
-            uint ret = NativeMethods.LsaRemoveAccountRights(this, pSid, removeAllRights, privileges, (uint)privilege.Length);
-            if (ret != NativeMethods.STATUS_SUCCESS)
-                throw new Win32Exception(NativeMethods.LsaNtStatusToWinError(ret));
+            using (Sid sid = new Sid(account))
+            {
+                //Remove account rights
+                uint ret = NativeMethods.LsaRemoveAccountRights(this, sid.Pointer, removeAllRights, privileges, (uint)privilege.Length);
+                if (ret != NativeMethods.STATUS_SUCCESS)
+                    throw new Win32Exception(NativeMethods.LsaNtStatusToWinError(ret));
+            }
         }
 
         /// <summary>
@@ -122,22 +124,25 @@ namespace DaemonMasterCore.Win32
         /// <returns></returns>
         public NativeMethods.LSA_UNICODE_STRING[] EnumeratePrivileges(string account)
         {
-            IntPtr pSid = new Sid(account).Pointer;
             IntPtr rightsPtr = IntPtr.Zero;
+            uint countOfRights = 0;
 
             try
             {
-                //Remove account rights
-                uint ret = NativeMethods.LsaEnumerateAccountRights(this, pSid, ref rightsPtr, out uint countOfRights);
-                if (ret != NativeMethods.STATUS_SUCCESS)
-                    throw new Win32Exception(NativeMethods.LsaNtStatusToWinError(ret));
+                using (Sid sid = new Sid(account))
+                {
+                    //Enumerate account rights
+                    uint ret = NativeMethods.LsaEnumerateAccountRights(this, sid.Pointer, ref rightsPtr, out countOfRights);
+                    if (ret != NativeMethods.STATUS_SUCCESS)
+                        throw new Win32Exception(NativeMethods.LsaNtStatusToWinError(ret));
+                }
 
                 NativeMethods.LSA_UNICODE_STRING[] privileges = new NativeMethods.LSA_UNICODE_STRING[countOfRights];
-                IntPtr ptr = rightsPtr;
+                IntPtr tempPtr = rightsPtr;
                 for (int i = 0; i < countOfRights; i++)
                 {
-                    privileges[i] = (NativeMethods.LSA_UNICODE_STRING)Marshal.PtrToStructure(ptr, typeof(NativeMethods.LSA_UNICODE_STRING));
-                    ptr = ptr + Marshal.SizeOf(typeof(NativeMethods.LSA_UNICODE_STRING));
+                    privileges[i] = (NativeMethods.LSA_UNICODE_STRING)Marshal.PtrToStructure(tempPtr, typeof(NativeMethods.LSA_UNICODE_STRING));
+                    tempPtr = tempPtr + Marshal.SizeOf(typeof(NativeMethods.LSA_UNICODE_STRING));
                 }
 
                 return privileges;
@@ -160,7 +165,7 @@ namespace DaemonMasterCore.Win32
         {
             // Unicode strings max. 32KB
             if (s.Length > 0x7ffe)
-                throw new ArgumentException("String is too long");
+                throw new ArgumentException("InitLsaString - String to long!");
 
             NativeMethods.LSA_UNICODE_STRING lus = new NativeMethods.LSA_UNICODE_STRING
             {

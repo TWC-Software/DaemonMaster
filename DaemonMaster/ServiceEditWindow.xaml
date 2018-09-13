@@ -49,7 +49,7 @@
                         <ComboBoxItem Content="{x:Static resx:lang.starttype_disabled}"/>
                     </ComboBox>
                     <Label x:Name="labelStarttyp" Content="{x:Static resx:lang.label_start_type}" HorizontalAlignment="Left" Margin="10,126,0,0" VerticalAlignment="Top"/>
-                    <Label x:Name="labelWarningPasswords" Content="{x:Static resx:lang.warning_file_access}" HorizontalAlignment="Left" Margin="271,214,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="labelWarningPasswords" Content="{x:Static resx:lang.warning_file_access}" HorizontalAlignment="Left" Margin="271,213,0,0" VerticalAlignment="Top"/>
                     <Button x:Name="buttonImport" Content="{x:Static resx:lang.button_import}" Margin="530,126,210,90" Click="buttonImport_Click"/>
                     <Button x:Name="buttonExport" Content="{x:Static resx:lang.button_export}" Margin="679,126,61,90" Click="buttonExport_Click"/>
                 </Grid>

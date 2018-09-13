@@ -40,7 +40,6 @@ namespace DaemonMasterCore.Config
         }
         public string Language { get; set; } = "windows";
         public bool ActivateLegacyFunctions { get; set; } = false;
-        public bool UseDevService { get; set; } = false;
         public bool UseExperimentalFunctions { get; set; } = false;
     }
 }
