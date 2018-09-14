@@ -170,14 +170,24 @@ namespace DaemonMasterService
 
         private void UpdateInfosInRegistry(string serviceName, int processPid)
         {
-            using (RegistryKey processKey = Registry.LocalMachine.CreateSubKey(RegPath + serviceName + @"\ProcessInfo"))
+            try
             {
-                if (processKey == null)
-                    return;
+                using (RegistryKey processKey = Registry.LocalMachine.OpenSubKey(RegPath + serviceName + @"\ProcessInfo", true))
+                {
+                    if (processKey == null)
+                        return;
 
-                processKey.SetValue("ProcessPID", processPid, RegistryValueKind.DWord);
+                    processKey.SetValue("ProcessPid", processPid, RegistryValueKind.DWord);
 
-                processKey.Close();
+                    processKey.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                //Log error
+                Logger.Error(ex, ex.Message);
+
+                //do nothing other, so that the service can run even when this key is not set (not necessary key)
             }
         }
     }

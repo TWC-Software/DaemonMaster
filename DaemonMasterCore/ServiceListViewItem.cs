@@ -97,12 +97,12 @@ namespace DaemonMasterCore
                 ServicePid = servicePid;
             }
 
-            using (RegistryKey processKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\" + ServiceName + @"\Process", false))
+            using (RegistryKey processKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\" + ServiceName + @"\ProcessInfo", false))
             {
                 if (processKey == null)
                     return;
 
-                int processPid = (int)processKey.GetValue("ProcessPID", -1);
+                int processPid = (int)processKey.GetValue("ProcessPid", -1);
 
                 if (processPid <= 0)
                 {

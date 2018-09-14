@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////////////////////////////////////////////
+﻿/////////////////////////////////////////////////////////////////////////////////////////
 //  DaemonMaster: RegistryManagement
 //  
 //  This file is part of DeamonMaster.
@@ -76,26 +76,37 @@ namespace DaemonMasterCore
                     parameters.Close();
                 }
 
+
                 //Create an give the user the permission to write to this key (needed for save the PID of the process if it's not the LocalSystem account)
                 using (RegistryKey processInfo = key.CreateSubKey("ProcessInfo"))
                 {
+                    #region Setting permissions
+
                     //Create a new RegistrySecurity object
                     RegistrySecurity rs = new RegistrySecurity();
+
+                    //  Author: Nick Sarabyn - https://stackoverflow.com/questions/3282656/setting-inheritance-and-propagation-flags-with-set-acl-and-powershell
+                    //  ╔═════════════╦═════════════╦═════════════════════════════════╦══════════════════════════╦══════════════════╦═════════════════════════╦═══════════════╦═════════════╗
+                    //  ║             ║ folder only ║ folder, sub - folders and files ║ folder and sub - folders ║ folder and files ║ sub - folders and files ║ sub - folders ║    files    ║
+                    //  ╠═════════════╬═════════════╬═════════════════════════════════╬══════════════════════════╬══════════════════╬═════════════════════════╬═══════════════╬═════════════╣
+                    //  ║ Propagation ║ none        ║ none                            ║ none                     ║ none             ║ InheritOnly             ║ InheritOnly   ║ InheritOnly ║
+                    //  ║ Inheritance ║ none        ║ Container|Object                ║ Container                ║ Object           ║ Container|Object        ║ Container     ║ Object      ║
+                    //  ╚═════════════╩═════════════╩═════════════════════════════════╩══════════════════════════╩══════════════════╩═════════════════════════╩═══════════════╩═════════════╝
 
                     ////Add access rule for user (only when it is not LocalSystem)
                     bool isLocalSystem = serviceStartInfo.UseLocalSystem || String.IsNullOrWhiteSpace(serviceStartInfo.Username) || serviceStartInfo.Username == "LocalSystem";
                     if (isLocalSystem)
                     {
-                        string localSystem = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null).Translate(typeof(NTAccount)).Value;
-                        rs.AddAccessRule(new RegistryAccessRule(localSystem, RegistryRights.QueryValues | RegistryRights.SetValue, InheritanceFlags.None, PropagationFlags.None, AccessControlType.Allow));
+                        rs.AddAccessRule(new RegistryAccessRule((NTAccount)new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null).Translate(typeof(NTAccount)), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
                     }
                     else
                     {
-                        string username = Environment.MachineName + "\\" + DaemonMasterUtils.GetLoginFromUsername(serviceStartInfo.Username);
-                        rs.AddAccessRule(new RegistryAccessRule(username, RegistryRights.QueryValues | RegistryRights.SetValue, InheritanceFlags.None, PropagationFlags.None, AccessControlType.Allow));
+                        rs.AddAccessRule(new RegistryAccessRule(new NTAccount(DaemonMasterUtils.GetDomainFromUsername(serviceStartInfo.Username), DaemonMasterUtils.GetLoginFromUsername(serviceStartInfo.Username)), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
                     }
 
                     processInfo.SetAccessControl(rs);
+                    #endregion
+
                     processInfo.Close();
                 }
             }

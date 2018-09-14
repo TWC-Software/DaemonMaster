@@ -85,10 +85,10 @@ namespace DaemonMasterCore.Win32
                 privileges[i] = InitLsaString(privilege[i]);
             }
 
-            using (Sid sid = new Sid(account))
+            using (Win32Sid win32Sid = new Win32Sid(account))
             {
                 //Add account rights
-                uint ret = NativeMethods.LsaAddAccountRights(this, sid.Pointer, privileges, (uint)privilege.Length);
+                uint ret = NativeMethods.LsaAddAccountRights(this, win32Sid.Pointer, privileges, (uint)privilege.Length);
                 if (ret != NativeMethods.STATUS_SUCCESS)
                     throw new Win32Exception(NativeMethods.LsaNtStatusToWinError(ret));
             }
@@ -108,10 +108,10 @@ namespace DaemonMasterCore.Win32
                 privileges[i] = InitLsaString(privilege[i]);
             }
 
-            using (Sid sid = new Sid(account))
+            using (Win32Sid win32Sid = new Win32Sid(account))
             {
                 //Remove account rights
-                uint ret = NativeMethods.LsaRemoveAccountRights(this, sid.Pointer, removeAllRights, privileges, (uint)privilege.Length);
+                uint ret = NativeMethods.LsaRemoveAccountRights(this, win32Sid.Pointer, removeAllRights, privileges, (uint)privilege.Length);
                 if (ret != NativeMethods.STATUS_SUCCESS)
                     throw new Win32Exception(NativeMethods.LsaNtStatusToWinError(ret));
             }
@@ -129,10 +129,10 @@ namespace DaemonMasterCore.Win32
 
             try
             {
-                using (Sid sid = new Sid(account))
+                using (Win32Sid win32Sid = new Win32Sid(account))
                 {
                     //Enumerate account rights
-                    uint ret = NativeMethods.LsaEnumerateAccountRights(this, sid.Pointer, ref rightsPtr, out countOfRights);
+                    uint ret = NativeMethods.LsaEnumerateAccountRights(this, win32Sid.Pointer, ref rightsPtr, out countOfRights);
                     if (ret != NativeMethods.STATUS_SUCCESS)
                         throw new Win32Exception(NativeMethods.LsaNtStatusToWinError(ret));
                 }
@@ -179,13 +179,13 @@ namespace DaemonMasterCore.Win32
     }
 
     /// <summary>
-    /// Class that read the Sid infos and give them as pointer
+    /// Class that read the Win32Sid infos and give them as pointer
     /// </summary>
-    sealed class Sid : IDisposable
+    sealed class Win32Sid : IDisposable
     {
         public IntPtr Pointer { get; private set; } = IntPtr.Zero;
 
-        public Sid(string account)
+        public Win32Sid(string account)
         {
             if (String.IsNullOrWhiteSpace(account))
                 throw new ArgumentException("String is empty or null!");
@@ -221,7 +221,7 @@ namespace DaemonMasterCore.Win32
             }
         }
 
-        ~Sid()
+        ~Win32Sid()
         {
             ReleaseUnmanagedResources();
         }
