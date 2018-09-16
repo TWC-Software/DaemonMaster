@@ -44,11 +44,5 @@ namespace DaemonMasterCore
                 return false;
             }
         }
-
-        public static bool GiveUserPermissionToFolder(string username, string folder)
-        {
-            throw new NotImplementedException();
-        }
-
     }
 }

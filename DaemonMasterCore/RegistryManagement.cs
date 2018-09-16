@@ -51,7 +51,6 @@ namespace DaemonMasterCore
         {
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(RegPath + serviceStartInfo.ServiceName))
             {
-
                 //Open Parameters SubKey
                 using (RegistryKey parameters = key.CreateSubKey("Parameters"))
                 {
@@ -118,8 +117,6 @@ namespace DaemonMasterCore
             //Open Regkey folder
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + serviceName, false))
             {
-                if (key == null)
-                    throw new Exception("Can't open registry key! (General)");
 
                 ServiceStartInfo serviceStartInfo = new ServiceStartInfo
                 {
@@ -127,8 +124,8 @@ namespace DaemonMasterCore
                     DisplayName = Convert.ToString(key.GetValue("DisplayName")),
                     Username = Convert.ToString(key.GetValue("ObjectName", null)),
                     Description = Convert.ToString(key.GetValue("Description", String.Empty)),
-                    DependOnService = (string[])key.GetValue("DependOnService", new string[0]),
-                    DependOnGroup = (string[])key.GetValue("DependOnGroup", new string[0]),
+                    DependOnService = (string[])key.GetValue("DependOnService", Array.Empty<string>()),
+                    DependOnGroup = (string[])key.GetValue("DependOnGroup", Array.Empty<string>()),
                     DelayedStart = Convert.ToBoolean(key.GetValue("DelayedAutostart", false)),
                     StartType = (NativeMethods.SERVICE_START)Convert.ToUInt32(key.GetValue("Start", 2))
                 };
@@ -137,9 +134,6 @@ namespace DaemonMasterCore
                 //Open Parameters SubKey
                 using (RegistryKey parameters = key.OpenSubKey("Parameters", false))
                 {
-                    if (parameters == null)
-                        throw new Exception("Can't open registry key! (Parameters)");
-
                     serviceStartInfo.FileDir = Convert.ToString(parameters.GetValue("FileDir"));
                     serviceStartInfo.FileName = Convert.ToString(parameters.GetValue("FileName"));
                     serviceStartInfo.FileExtension = Convert.ToString(parameters.GetValue("FileExtension"));
@@ -218,9 +212,6 @@ namespace DaemonMasterCore
             //Open Regkey folder
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPathServiceGroups, false))
             {
-                if (key == null)
-                    throw new Exception("Can't open registry key!");
-
                 return (string[])key.GetValue("List", String.Empty);
             }
         }
@@ -248,7 +239,7 @@ namespace DaemonMasterCore
                     return true;
                 }
             }
-            catch (Exception)
+            catch
             {
                 return false;
             }
@@ -268,7 +259,7 @@ namespace DaemonMasterCore
                     return regKey != null && !Convert.ToBoolean(regKey.GetValue("NoInteractiveServices"));
                 }
             }
-            catch (Exception)
+            catch
             {
                 return false;
             }

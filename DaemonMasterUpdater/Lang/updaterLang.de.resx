@@ -109,4 +109,10 @@
   <data name="question" xml:space="preserve">
     <value>Frage</value>
   </data>
+  <data name="warning_process_will_be_killed" xml:space="preserve">
+    <value>WARNUNG: Der Prozess wird jetzt beendet!</value>
+  </data>
+  <data name="warning" xml:space="preserve">
+    <value>Warnung</value>
+  </data>
 </root>

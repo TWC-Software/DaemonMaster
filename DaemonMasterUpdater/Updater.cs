@@ -191,7 +191,11 @@ namespace DaemonMasterUpdater
                     {
                         if (!process.WaitForExit(TimeSpan.FromSeconds(10).Milliseconds)) //Wait 10 seconds before the process get killed
                         {
-                            process.Kill(); //TODO: Warning the user that the app will be killed now
+                            result = MessageBox.Show(_resManager.GetString("warning_process_will_be_killed", CultureInfo.CurrentUICulture), _resManager.GetString("warning"), MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                            if (result == MessageBoxResult.Cancel)
+                                return;
+
+                            process.Kill();
                         }
                     }
                 }

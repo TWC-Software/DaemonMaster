@@ -62,7 +62,6 @@ namespace DaemonMaster
 
             _tempServiceConfig = daemon ?? new ServiceStartInfo();
 
-            //TODO: Check name
             //Create a new service when the service name is empty
             if (String.IsNullOrWhiteSpace(_tempServiceConfig.ServiceName))
             {

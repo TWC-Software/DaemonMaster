@@ -95,5 +95,23 @@ namespace DaemonMasterUpdater.Lang {
                 return ResourceManager.GetString("question", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Warning ähnelt.
+        /// </summary>
+        public static string warning {
+            get {
+                return ResourceManager.GetString("warning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die WARNING: The process will be killed now! ähnelt.
+        /// </summary>
+        public static string warning_process_will_be_killed {
+            get {
+                return ResourceManager.GetString("warning_process_will_be_killed", resourceCulture);
+            }
+        }
     }
 }
