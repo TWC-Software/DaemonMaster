@@ -12,9 +12,10 @@ You can download the pre-release here: [Click here](https://github.com/TWC-Softw
 - Using any .exe program as a service
 - Works with shortcuts (arguments are supported)
 - Automatic service-startup with Windows itself (Manual, Automatic with delay and Disabled works also)
+- Custom username and password for a service
 
 ## Planned Features
-- Custom username and password for a service
+- Command line parameters
 
 ## Thanks to 
 - pinvoke.net (and its users)
