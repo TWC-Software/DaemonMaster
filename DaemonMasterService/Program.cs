@@ -17,8 +17,14 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
+using System;
+using System.IO;
+using System.Linq;
+using System.Security;
 using System.ServiceProcess;
+using CommandLine;
 using DaemonMasterCore;
+using Newtonsoft.Json;
 using NLog;
 
 namespace DaemonMasterService
@@ -32,48 +38,101 @@ namespace DaemonMasterService
         /// </summary>
         static void Main(string[] args)
         {
-            if (args.Length <= 0)
-                return;
+            Parser.Default.ParseArguments<GeneralOptions, ServiceOptions, InstallOptions>(args)
+               .MapResult(
+                   (GeneralOptions opts) => RunOptionsAndReturnExitCode(opts),
+                   (ServiceOptions opts) => RunServiceAndReturnExitCode(opts),
+                   (InstallOptions opts) => RunInstallAndReturnExitCode(opts),
+                   errs => 1);
+        }
 
-            switch (args[0])
+        private static int RunServiceAndReturnExitCode(ServiceOptions opts)
+        {
+            return StartService(opts.EnablePause);
+        }
+
+        private static int RunOptionsAndReturnExitCode(GeneralOptions option)
+        {
+            int result = 0;
+
+            if (option.KillAllServices)
+                if (ServiceManagement.KillAllServices())
+                    result = 1;
+
+            if (option.DeleteAllServices)
+                if (ServiceManagement.DeleteAllServices())
+                    result = 1;
+
+            return result;
+        }
+
+        private static int RunInstallAndReturnExitCode(InstallOptions opts)
+        {
+            if (!String.IsNullOrWhiteSpace(opts.DmdfFile) && File.Exists(opts.DmdfFile))
             {
-                case "-console":
-                    break;
-
-                case "-service":
-                    if (args.Length > 1 && args[1] == "-enablePause")
-                    {
-                        StartService(true);
-                    }
-                    else
-                    {
-                        StartService(false);
-                    }
-                    break;
-
-                case "-deleteAllServices":
-                    _logger.Info("Delete services...");
-                    ServiceManagement.DeleteAllServices();
-                    _logger.Info("Success!");
-                    break;
-
-                case "-killAllServices":
-                    _logger.Info("Killing services...");
-                    ServiceManagement.KillAllServices();
-                    _logger.Info("Success!");
-                    break;
+                return InstallDmdf(opts.DmdfFile, opts.Password.ConvertStringToSecureString());
+            }
+            else
+            {
+                throw new NotImplementedException("Comming soon...");
             }
         }
 
-        private static void StartService(bool enablePause)
+        private static int InstallDmdf(string path, SecureString pw)
         {
+            try
+            {
+                using (StreamReader streamReader = File.OpenText(path))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    ServiceStartInfo serviceStartInfo = (ServiceStartInfo)serializer.Deserialize(streamReader, typeof(ServiceStartInfo));
 
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[]
+                    //Check if the service already exist
+                    if (ServiceController.GetServices().Any(service => String.Equals(serviceStartInfo.ServiceName, service.ServiceName)))
+                        throw new ArgumentException("A service with the same name already exist.");
+
+                    //Check if the password is valid when not the local system account is used
+                    if (!serviceStartInfo.UseLocalSystem)
+                    {
+                        if (pw != null && pw.Length > 0)
+                        {
+                            serviceStartInfo.Password = pw; //Set password
+                        }
+                        else
+                        {
+                            throw new ArgumentException("You must give a password with the --pw parameter when you will use a custom user account.");
+                        }
+                    }
+
+                    ServiceManagement.CreateInteractiveService(serviceStartInfo);
+
+                    return 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Failed to install the DMDF service:\n" + ex.Message);
+                return 1;
+            }
+        }
+
+        private static int StartService(bool enablePause)
+        {
+            var servicesToRun = new ServiceBase[]
             {
                 new Service(enablePause)
             };
-            ServiceBase.Run(ServicesToRun);
+
+            try
+            {
+                ServiceBase.Run(servicesToRun);
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Failed to start the service: \n" + ex.Message);
+                return 1;
+            }
         }
     }
 }

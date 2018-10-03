@@ -223,48 +223,75 @@ namespace DaemonMasterCore
         /// <summary>
         /// Delete all stopped services 
         /// </summary>
-        public static void DeleteAllServices()
+        public static bool DeleteAllServices()
         {
-            foreach (var daemon in RegistryManagement.LoadDaemonItemsFromRegistry())
+            try
             {
-                try
+                foreach (var daemon in RegistryManagement.LoadDaemonItemsFromRegistry())
                 {
-                    _logger.Info("Delete '" + daemon.DisplayName + "'...");
-                    DeleteService(daemon.ServiceName);
-                    _logger.Info("Success");
+                    _logger.Info("Delete services...");
+
+                    try
+                    {
+                        _logger.Info("Delete '" + daemon.DisplayName + "'...");
+                        DeleteService(daemon.ServiceName);
+                        _logger.Info("Success");
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Error("Failed to delete: " + daemon.DisplayName + "\n" + e.Message);
+                        return false;
+                    }
                 }
-                catch (Exception e)
-                {
-                    _logger.Error("Failed to delete: " + daemon.DisplayName + "\n" + e.Message);
-                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Failed to delete all services:\n" + ex.Message);
+                return false;
             }
         }
 
         /// <summary>
         /// Kill all services
         /// </summary>
-        public static void KillAllServices()
+        public static bool KillAllServices()
         {
-            foreach (var daemon in RegistryManagement.LoadDaemonItemsFromRegistry())
+            try
             {
-                try
+                foreach (var daemon in RegistryManagement.LoadDaemonItemsFromRegistry())
                 {
-                    _logger.Info("Killing '" + daemon.DisplayName + "'...");
-                    switch (KillService(daemon.ServiceName))
-                    {
-                        case DaemonServiceState.AlreadyStopped:
-                            _logger.Warn("Already stopped");
-                            break;
+                    _logger.Info("Killing services...");
 
-                        case DaemonServiceState.Successful:
-                            _logger.Info("Success");
-                            break;
+                    try
+                    {
+                        _logger.Info("Killing '" + daemon.DisplayName + "'...");
+                        switch (KillService(daemon.ServiceName))
+                        {
+                            case DaemonServiceState.AlreadyStopped:
+                                _logger.Warn("Already stopped");
+                                break;
+
+                            case DaemonServiceState.Successful:
+                                _logger.Info("Success");
+                                break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error("Failed to kill: " + daemon.DisplayName + "\n" + ex.Message);
+                        return false;
                     }
                 }
-                catch (Exception e)
-                {
-                    _logger.Error("Failed to kill: " + daemon.DisplayName + "\n" + e.Message);
-                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Failed to kill all services:\n" + ex.Message);
+                return false;
             }
         }
 

@@ -90,7 +90,7 @@ namespace DaemonMasterCore.PluginSystem
                 {
                     plugin.Init(api);
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
                     //TODO: log
                     plugins.Remove(plugin);
@@ -107,7 +107,7 @@ namespace DaemonMasterCore.PluginSystem
                     //TODO: Log
                     plugin.UnLoad();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     //TODO: Log
                 }

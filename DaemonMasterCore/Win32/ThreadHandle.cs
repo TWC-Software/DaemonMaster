@@ -16,7 +16,6 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using DaemonMasterCore.Win32.PInvoke;
@@ -33,11 +32,6 @@ namespace DaemonMasterCore.Win32
         protected override bool ReleaseHandle()
         {
             return NativeMethods.CloseHandle(handle);
-        }
-
-        public void SetHandle(IntPtr handle)
-        {
-            SetHandle(handle);
         }
 
         public static ThreadHandle OpenThread(NativeMethods.ThreadAccess desiredAccess, bool inheritHandle, int processId)
