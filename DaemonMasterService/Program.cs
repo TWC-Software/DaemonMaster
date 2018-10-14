@@ -55,6 +55,14 @@ namespace DaemonMasterService
         {
             int result = 0;
 
+            //Check Admin right
+            if (!SystemManagement.IsElevated())
+            {
+                _logger.Error("You must start the programm with admin rights.");
+                return 1;
+            }
+
+
             if (option.KillAllServices)
                 if (ServiceManagement.KillAllServices())
                     result = 1;
@@ -68,9 +76,17 @@ namespace DaemonMasterService
 
         private static int RunInstallAndReturnExitCode(InstallOptions opts)
         {
+            //Check Admin right
+            if (!SystemManagement.IsElevated())
+            {
+                _logger.Error("You must start the programm with admin rights.");
+                return 1;
+            }
+
+
             if (!String.IsNullOrWhiteSpace(opts.DmdfFile) && File.Exists(opts.DmdfFile))
             {
-                return InstallDmdf(opts.DmdfFile, opts.Password.ConvertStringToSecureString());
+                return InstallDmdf(opts.DmdfFile, opts.Password?.ConvertStringToSecureString());
             }
             else
             {
@@ -111,7 +127,7 @@ namespace DaemonMasterService
             }
             catch (Exception ex)
             {
-                _logger.Error("Failed to install the DMDF service:\n" + ex.Message);
+                _logger.Error(ex.Message);
                 return 1;
             }
         }

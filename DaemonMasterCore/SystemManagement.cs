@@ -20,6 +20,7 @@
 using System;
 using System.ComponentModel;
 using System.Security;
+using System.Security.Principal;
 using DaemonMasterCore.Win32;
 using DaemonMasterCore.Win32.PInvoke;
 
@@ -42,6 +43,15 @@ namespace DaemonMasterCore
             catch (Win32Exception)
             {
                 return false;
+            }
+        }
+
+        public static bool IsElevated()
+        {
+            using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+            {
+                WindowsPrincipal principal = new WindowsPrincipal(identity);
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
         }
     }
