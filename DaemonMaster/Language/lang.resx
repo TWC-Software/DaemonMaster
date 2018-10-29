@@ -494,4 +494,7 @@
   <data name="logon_as_a_service" xml:space="preserve">
     <value>The account need the right to start as a service. Do you want to give them the right? (YOU MUST MANUALLY REMOVE THAT RIGHT!)</value>
   </data>
+  <data name="extern_domain_user_error" xml:space="preserve">
+    <value>DaemonMaster only supports local user!</value>
+  </data>
 </root>

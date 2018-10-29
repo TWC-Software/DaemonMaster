@@ -190,15 +190,8 @@ namespace DaemonMasterCore.Win32
             if (String.IsNullOrWhiteSpace(account))
                 throw new ArgumentException("String is empty or null!");
 
-            SecurityIdentifier sid;
-            if (account == "LocalSystem")
-            {
-                sid = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
-            }
-            else
-            {
-                sid = (SecurityIdentifier)(new NTAccount(DaemonMasterUtils.GetDomainFromUsername(account), DaemonMasterUtils.GetLoginFromUsername(account))).Translate(typeof(SecurityIdentifier));
-            }
+
+            var sid = (SecurityIdentifier)new NTAccount(account).Translate(typeof(SecurityIdentifier));
 
             Byte[] buffer = new Byte[sid.BinaryLength];
             sid.GetBinaryForm(buffer, 0);

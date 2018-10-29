@@ -50,14 +50,14 @@ namespace DaemonMasterService
         public string FullPath { get; set; }
 
 
-        [Option("username", SetName = "normalInstaller", Required = false, HelpText = "", Default = "")]
+        [Option("username", SetName = "normalInstaller", Required = false, HelpText = "Only local users (Exampel: '.\\Alfred')", Default = null)]
         public string Username { get; set; }
 
 
         [Option("maxRestarts", SetName = "normalInstaller", Required = false, HelpText = "", Default = 3)]
         public int MaxRestarts { get; set; }
 
-        [Option("startType", SetName = "normalInstaller", Required = false, HelpText = "", Default = 1)]
+        [Option("startType", SetName = "normalInstaller", Required = true, HelpText = "", Default = 3)]
         public int StartType { get; set; }
 
         [Option("processKillTime", SetName = "normalInstaller", Required = false, HelpText = "", Default = 9500)]
@@ -69,16 +69,13 @@ namespace DaemonMasterService
         [Option("counterResetTime", SetName = "normalInstaller", Required = false, HelpText = "", Default = 43200)]
         public int CounterResetTime { get; set; }
 
-        [Option("delayedStart", SetName = "normalInstaller", Required = false, HelpText = "", Default = false)]
-        public bool DelayedStart { get; set; }
-
         [Option("consoleApp", SetName = "normalInstaller", Required = false, HelpText = "", Default = false)]
         public bool ConsoleApplication { get; set; }
 
         [Option("ctrlC", SetName = "normalInstaller", Required = false, HelpText = "", Default = false)]
         public bool UseCtrlC { get; set; }
 
-        [Option("canInteractWithDesktop", SetName = "normalInstaller", Required = false, HelpText = "", Default = false)]
+        [Option("canInteractWithDesktop", SetName = "normalInstaller", Required = false, HelpText = "Can only be used with supported windows versions and also NOT with a custom user.", Default = false)]
         public bool CanInteractWithDesktop { get; set; }
 
 

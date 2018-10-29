@@ -114,5 +114,15 @@ namespace DaemonMasterCore
             return (domainName != ".") ? domainName : String.Empty; // "." stands also for local domain so make it empty
         }
 
+        public static bool IsLocalDomain(string s)
+        {
+            string domainName = GetDomainFromUsername(s);
+
+            if (domainName == String.Empty || domainName == ".")
+                return true;
+
+            return false;
+        }
+
     }
 }

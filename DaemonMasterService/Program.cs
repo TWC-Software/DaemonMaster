@@ -24,14 +24,14 @@ using System.Security;
 using System.ServiceProcess;
 using CommandLine;
 using DaemonMasterCore;
-using Newtonsoft.Json;
+using DaemonMasterCore.Win32.PInvoke;
 using NLog;
 
 namespace DaemonMasterService
 {
     static class Program
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Der Haupteinstiegspunkt für die Anwendung.
@@ -58,7 +58,7 @@ namespace DaemonMasterService
             //Check Admin right
             if (!SystemManagement.IsElevated())
             {
-                _logger.Error("You must start the programm with admin rights.");
+                Logger.Error("You must start the programm with admin rights.");
                 return 1;
             }
 
@@ -79,55 +79,123 @@ namespace DaemonMasterService
             //Check Admin right
             if (!SystemManagement.IsElevated())
             {
-                _logger.Error("You must start the programm with admin rights.");
+                Logger.Error("You must start the programm with admin rights.");
                 return 1;
             }
 
 
             if (!String.IsNullOrWhiteSpace(opts.DmdfFile) && File.Exists(opts.DmdfFile))
             {
-                return InstallDmdf(opts.DmdfFile, opts.Password?.ConvertStringToSecureString());
+                return InstallNewServiceDmdf(opts.DmdfFile, opts.Password.ConvertStringToSecureString());
             }
-            else
-            {
-                throw new NotImplementedException("Comming soon...");
-            }
+
+            return InstallNewService(opts);
         }
 
-        private static int InstallDmdf(string path, SecureString pw)
+        private static int InstallNewService(InstallOptions opts)
         {
             try
             {
-                using (StreamReader streamReader = File.OpenText(path))
+                if (opts.CanInteractWithDesktop && !DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
                 {
-                    JsonSerializer serializer = new JsonSerializer();
-                    ServiceStartInfo serviceStartInfo = (ServiceStartInfo)serializer.Deserialize(streamReader, typeof(ServiceStartInfo));
-
-                    //Check if the service already exist
-                    if (ServiceController.GetServices().Any(service => String.Equals(serviceStartInfo.ServiceName, service.ServiceName)))
-                        throw new ArgumentException("A service with the same name already exist.");
-
-                    //Check if the password is valid when not the local system account is used
-                    if (!serviceStartInfo.UseLocalSystem)
-                    {
-                        if (pw != null && pw.Length > 0)
-                        {
-                            serviceStartInfo.Password = pw; //Set password
-                        }
-                        else
-                        {
-                            throw new ArgumentException("You must give a password with the --pw parameter when you will use a custom user account.");
-                        }
-                    }
-
-                    ServiceManagement.CreateInteractiveService(serviceStartInfo);
-
-                    return 0;
+                    Logger.Error("CanInteractWithDesktop is not supported in this windows version.");
+                    return 1;
                 }
+                if (opts.CanInteractWithDesktop && !String.IsNullOrWhiteSpace(opts.Username))
+                {
+                    Logger.Error("CanInteractWithDesktop is not supported with custom user.");
+                    return 1;
+                }
+
+
+                ServiceStartInfo serviceStartInfo = new ServiceStartInfo
+                {
+                    FullPath = opts.FullPath,
+                    ServiceName = opts.ServiceName,
+                    DisplayName = opts.DisplayName,
+                    Description = opts.Description,
+                    Parameter = opts.Arguments,
+                    Username = opts.Username,
+                    Password = opts.Password.ConvertStringToSecureString(),
+                    CanInteractWithDesktop = opts.CanInteractWithDesktop,
+                    UseLocalSystem = String.IsNullOrWhiteSpace(opts.Username),
+                    MaxRestarts = opts.MaxRestarts,
+                    ProcessKillTime = opts.ProcessKillTime,
+                    ProcessRestartDelay = opts.ProcessRestartDelay,
+                    CounterResetTime = opts.CounterResetTime,
+                    ConsoleApplication = opts.ConsoleApplication,
+                    UseCtrlC = opts.UseCtrlC
+                };
+
+                //Set the start type
+                switch (opts.StartType)
+                {
+                    case 0:
+                        serviceStartInfo.StartType = NativeMethods.SERVICE_START.SERVICE_DISABLED;
+                        serviceStartInfo.DelayedStart = false;
+                        break;
+
+                    case 1:
+                        serviceStartInfo.StartType = NativeMethods.SERVICE_START.SERVICE_DEMAND_START;
+                        serviceStartInfo.DelayedStart = false;
+                        break;
+
+                    case 2:
+                        serviceStartInfo.StartType = NativeMethods.SERVICE_START.SERVICE_AUTO_START;
+                        serviceStartInfo.DelayedStart = false;
+                        break;
+
+                    case 4:
+                        serviceStartInfo.StartType = NativeMethods.SERVICE_START.SERVICE_AUTO_START;
+                        serviceStartInfo.DelayedStart = true;
+                        break;
+
+                    default:
+                        Logger.Error("The StartType can only be between 0-4 (0 = Disabled / 1 = Demand start / 2 = Auto start / 4 = Delayed auto start).");
+                        return 1;
+
+                }
+
+                ServiceManagement.CreateInteractiveService(serviceStartInfo);
+
+                return 0;
             }
             catch (Exception ex)
             {
-                _logger.Error(ex.Message);
+                Logger.Error(ex.Message);
+                return 1;
+            }
+        }
+
+        private static int InstallNewServiceDmdf(string path, SecureString pw)
+        {
+            try
+            {
+                ServiceStartInfo serviceStartInfo = SystemManagement.ParseDmdfFile(path);
+
+                //Check if the service already exist
+                if (ServiceController.GetServices().Any(service => String.Equals(serviceStartInfo.ServiceName, service.ServiceName)))
+                    throw new ArgumentException("A service with the same name already exist.");
+
+                //Check if the password is valid when not the local system account is used
+                if (!serviceStartInfo.UseLocalSystem)
+                {
+                    if (pw != null && pw.Length > 0)
+                    {
+                        serviceStartInfo.Password = pw; //Set password
+                    }
+                    else
+                    {
+                        throw new ArgumentException("You must give a password with the --pw parameter when you will use a custom user account.");
+                    }
+                }
+
+                ServiceManagement.CreateInteractiveService(serviceStartInfo);
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex.Message);
                 return 1;
             }
         }
@@ -146,7 +214,7 @@ namespace DaemonMasterService
             }
             catch (Exception ex)
             {
-                _logger.Error("Failed to start the service: \n" + ex.Message);
+                Logger.Error("Failed to start the service: \n" + ex.Message);
                 return 1;
             }
         }

@@ -20,16 +20,11 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace DaemonMasterCore
 {
     public static class SecurityManagement
     {
-        private static readonly byte[] key = new byte[16] { 0x3f, 0xdd, 0x43, 0x27, 0xd4, 0x36, 0x9b, 0x8c, 0x7a, 0x35, 0x4e, 0xb3, 0xfa, 0xbf, 0x17, 0x86 };
-
-
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                            Security                                                  //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,6 +38,9 @@ namespace DaemonMasterCore
         /// <returns></returns>
         public static SecureString ConvertStringToSecureString(this string data)
         {
+            if (String.IsNullOrWhiteSpace(data))
+                return null;
+
             SecureString secString = new SecureString();
 
             if (data.Length > 0)
@@ -76,101 +74,6 @@ namespace DaemonMasterCore
             {
                 Marshal.ZeroFreeGlobalAllocUnicode(valuePtr);
             }
-        }
-
-        /// <summary>
-        ///  Using DPAPI to encrypt the given SecureString
-        /// </summary>
-        /// <param name="password"></param>
-        /// <param name="entropy"></param>
-        /// <returns></returns>
-        public static unsafe byte[] EncryptPassword(SecureString password, byte[] entropy = null)
-        {
-            if (entropy == null)
-                entropy = key;
-
-            //Source: https://stackoverflow.com/questions/18392538/securestring-to-byte-c-sharp, 17.07.2017
-            IntPtr passwordPtr = Marshal.SecureStringToGlobalAllocUnicode(password);
-            byte[] bValue = null;
-            try
-            {
-                byte* byteArray = (byte*)passwordPtr.ToPointer();
-
-                // Find the end of the string
-                byte* pEnd = byteArray;
-                char c = '\0';
-                do
-                {
-                    byte b1 = *pEnd++;
-                    byte b2 = *pEnd++;
-                    c = '\0';
-                    c = (char)(b1 << 8);
-                    c += (char)b2;
-                } while (c != '\0');
-
-                // Length is effectively the difference here (note we're 2 past end) 
-                int length = (int)((pEnd - byteArray) - 2);
-                bValue = new byte[length];
-                for (int i = 0; i < length; ++i)
-                {
-                    // Work with data in byte array as necessary, via pointers, here
-                    bValue[i] = *(byteArray + i);
-                }
-
-                return ProtectedData.Protect(bValue, entropy, DataProtectionScope.LocalMachine);
-            }
-            finally
-            {
-                // This will completely remove the data from memory
-                Marshal.ZeroFreeGlobalAllocUnicode(passwordPtr);
-            }
-        }
-
-        /// <summary>
-        ///  Using DPAPI to decrypt the given SecureString
-        /// </summary>
-        /// <param name="encryptedPassword"></param>
-        /// <param name="entropy"></param>
-        /// <returns></returns>
-        public static SecureString DecryptPassword(byte[] encryptedPassword, byte[] entropy = null)
-        {
-            if (entropy == null)
-                entropy = key;
-
-            if (encryptedPassword == null)
-                throw new ArgumentNullException("No password is given to decrypt.");
-
-            if (encryptedPassword.Length <= 0)
-                return null;
-
-            byte[] decryptedPassword = ProtectedData.Unprotect(encryptedPassword, entropy, DataProtectionScope.LocalMachine);
-
-            if (decryptedPassword.Length > 0)
-            {
-
-                SecureString secString = new SecureString();
-                foreach (char c in Encoding.Unicode.GetChars(decryptedPassword))
-                {
-                    secString.AppendChar(c);
-                }
-
-                return secString;
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Create a random entropy
-        /// </summary>
-        /// <returns></returns>
-        public static byte[] CreateRandomEntropy()
-        {
-            byte[] entropy = new byte[16];
-            using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())
-            {
-                rng.GetBytes(entropy);
-            }
-            return entropy;
         }
         #endregion
     }

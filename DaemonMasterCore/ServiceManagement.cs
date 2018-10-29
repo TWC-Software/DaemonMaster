@@ -42,7 +42,6 @@ namespace DaemonMasterCore
 
         private static readonly string DaemonMasterServicePath = AppDomain.CurrentDomain.BaseDirectory;
         private const string DaemonMasterServiceFile = "DaemonMasterService.exe";
-        private const string DaemonMasterDevServiceFile = "DMService.exe";
         private const string DaemonMasterServiceParameter = " -service";
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,7 +76,7 @@ namespace DaemonMasterCore
                     null,
                     null,
                     ConvertDependenciesArraysToDoubleNullTerminatedString(serviceStartInfo.DependOnService, serviceStartInfo.DependOnGroup),
-                    serviceStartInfo.Username,
+                    serviceStartInfo.Username, //Only local user
                     serviceStartInfo.Password))
                 {
                     serviceHandle.SetDescription(serviceStartInfo.Description);
@@ -318,7 +317,7 @@ namespace DaemonMasterCore
                         serviceType |= (uint)NativeMethods.SERVICE_TYPE.SERVICE_INTERACTIVE_PROCESS;
                     }
 
-                    serviceHandle.ChangeConfig(serviceType, serviceStartInfo.StartType, serviceStartInfo.DisplayName, ConvertDependenciesArraysToDoubleNullTerminatedString(serviceStartInfo.DependOnService, serviceStartInfo.DependOnGroup), serviceStartInfo.Username, serviceStartInfo.Password);
+                    serviceHandle.ChangeConfig(serviceType, serviceStartInfo.StartType, serviceStartInfo.DisplayName, ConvertDependenciesArraysToDoubleNullTerminatedString(serviceStartInfo.DependOnService, serviceStartInfo.DependOnGroup), ".\\" + serviceStartInfo.Username, serviceStartInfo.Password); //Only local user
                     serviceHandle.SetDescription(serviceStartInfo.Description);
                     serviceHandle.SetDelayedStart(serviceStartInfo.DelayedStart);
                 }

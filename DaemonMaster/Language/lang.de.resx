@@ -492,4 +492,7 @@
   <data name="logon_as_a_service" xml:space="preserve">
     <value>Der Benutzer benötigt das Recht zum starten als Dienst. Wollen Sie diesem dieses Recht geben? (SIE MÜSSEN DAS RECHT MANUEL ENTFERNEN!)</value>
   </data>
+  <data name="extern_domain_user_error" xml:space="preserve">
+    <value>DaemonMaster unterstützt nur locale Nutzer!</value>
+  </data>
 </root>

@@ -19,16 +19,18 @@
 
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Security;
 using System.Security.Principal;
 using DaemonMasterCore.Win32;
 using DaemonMasterCore.Win32.PInvoke;
+using Newtonsoft.Json;
 
 namespace DaemonMasterCore
 {
     public static class SystemManagement
     {
-        public static bool ValidateUserWin32(string username, SecureString password)
+        public static bool ValidateUser(string username, SecureString password)
         {
             if (String.IsNullOrWhiteSpace(username) || password == null)
                 throw new ArgumentNullException();
@@ -52,6 +54,15 @@ namespace DaemonMasterCore
             {
                 WindowsPrincipal principal = new WindowsPrincipal(identity);
                 return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
+        }
+
+        public static ServiceStartInfo ParseDmdfFile(string path)
+        {
+            using (StreamReader streamReader = File.OpenText(path))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                return (ServiceStartInfo)serializer.Deserialize(streamReader, typeof(ServiceStartInfo));
             }
         }
     }

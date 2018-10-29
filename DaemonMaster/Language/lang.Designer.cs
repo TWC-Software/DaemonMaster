@@ -494,6 +494,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die DaemonMaster only supports local user! ähnelt.
+        /// </summary>
+        public static string extern_domain_user_error {
+            get {
+                return ResourceManager.GetString("extern_domain_user_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Failed to start UI0Detect service! ähnelt.
         /// </summary>
         public static string failed_start_UI0detect_service {

@@ -93,14 +93,13 @@ namespace DaemonMasterCore
                     //  ╚═════════════╩═════════════╩═════════════════════════════════╩══════════════════════════╩══════════════════╩═════════════════════════╩═══════════════╩═════════════╝
 
                     ////Add access rule for user (only when it is not LocalSystem)
-                    bool isLocalSystem = serviceStartInfo.UseLocalSystem || String.IsNullOrWhiteSpace(serviceStartInfo.Username) || serviceStartInfo.Username == "LocalSystem";
-                    if (isLocalSystem)
+                    if (serviceStartInfo.UseLocalSystem)
                     {
                         rs.AddAccessRule(new RegistryAccessRule((NTAccount)new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null).Translate(typeof(NTAccount)), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
                     }
                     else
                     {
-                        rs.AddAccessRule(new RegistryAccessRule(new NTAccount(DaemonMasterUtils.GetDomainFromUsername(serviceStartInfo.Username), DaemonMasterUtils.GetLoginFromUsername(serviceStartInfo.Username)), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
+                        rs.AddAccessRule(new RegistryAccessRule(new NTAccount(serviceStartInfo.Username), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
                     }
 
                     processInfo.SetAccessControl(rs);

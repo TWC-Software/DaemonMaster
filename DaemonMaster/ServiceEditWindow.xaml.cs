@@ -44,6 +44,8 @@ namespace DaemonMaster
     /// </summary>
     public partial class ServiceEditWindow : Window
     {
+        public ServiceStartInfo GetServiceStartInfo() => _tempServiceConfig;
+
         private const string PLACEHOLDER_PASSWORD = "88301CEB-1E6E-435C-A355-D055F9F8D430";
 
         private readonly ResourceManager _resManager = new ResourceManager(typeof(lang));
@@ -54,7 +56,7 @@ namespace DaemonMaster
         private ObservableCollection<string> _allGroupsObservableCollection;
 
         private ServiceStartInfo _tempServiceConfig;
-        private bool _createNewService = false;
+        private bool _createNewService;
 
         public ServiceEditWindow(ServiceStartInfo daemon)
         {
@@ -64,23 +66,21 @@ namespace DaemonMaster
 
             //Create a new service when the service name is empty
             if (String.IsNullOrWhiteSpace(_tempServiceConfig.ServiceName))
-            {
                 _createNewService = true;
-            }
 
+            //Show the information on the UI
             LoadServiceInfos();
         }
 
-        private void LoadServiceInfos(bool isImportedService = false)
+        private void LoadServiceInfos()
         {
             #region GeneralTab
 
             //Set to readonly when it has already a servicename
             if (!String.IsNullOrWhiteSpace(_tempServiceConfig.ServiceName))
-            {
                 textBoxServiceName.Text = _tempServiceConfig.ServiceName.Substring(13);
-                textBoxServiceName.IsReadOnly = true;
-            }
+
+            textBoxServiceName.IsReadOnly = !_createNewService;
 
             textBoxDisplayName.Text = _tempServiceConfig.DisplayName;
 
@@ -111,7 +111,7 @@ namespace DaemonMaster
 
             #region CustomUser
 
-            if (String.IsNullOrWhiteSpace(_tempServiceConfig.Username) || _tempServiceConfig.Username == "LocalSystem")
+            if (_tempServiceConfig.UseLocalSystem)
             {
                 textBoxUsername.Text = String.Empty;
                 textBoxPassword.Password = String.Empty;
@@ -120,7 +120,7 @@ namespace DaemonMaster
             else
             {
                 textBoxUsername.Text = _tempServiceConfig.Username;
-                textBoxPassword.Password = isImportedService ? String.Empty : PLACEHOLDER_PASSWORD; //Reset password field when it is an imported service
+                textBoxPassword.Password = _createNewService ? String.Empty : PLACEHOLDER_PASSWORD;
                 checkBoxUseLocalSystem.IsChecked = false;
             }
 
@@ -142,7 +142,7 @@ namespace DaemonMaster
             if (!DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
             {
                 checkBoxInteractDesk.IsChecked = false;
-                checkBoxInteractDesk.Visibility = Visibility.Hidden;
+                checkBoxInteractDesk.IsEnabled = false;
             }
             else
             {
@@ -223,8 +223,6 @@ namespace DaemonMaster
             #endregion
         }
 
-        public ServiceStartInfo GetServiceStartInfo() => _tempServiceConfig;
-
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                          GUI ELEMENTS                                                //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -279,7 +277,7 @@ namespace DaemonMaster
             {
                 if (pickerDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    textBoxUsername.Text = ".\\" + pickerDialog.SelectedObject.Name;  // ".\\" = Local computer Environment.MachineName 
+                    textBoxUsername.Text = pickerDialog.SelectedObject.Name;  // ".\\" = Local computer
                 }
             }
         }
@@ -413,8 +411,8 @@ namespace DaemonMaster
                 String.Equals(textBoxPassword.Password, PLACEHOLDER_PASSWORD) && //Nothing has changed (null safe)
                 String.Equals(textBoxUsername.Text, _tempServiceConfig.Username)) //Nothing has changed (null safe)
                 {
-                    _tempServiceConfig.Username = _tempServiceConfig.UseLocalSystem ? "LocalSystem" : null; //Write "LocalSystem" as username when "UseLocalSystem" or null (nothing change in Win32 API)
-                    _tempServiceConfig.Password = null;
+                    _tempServiceConfig.Username = null; //null (nothing change in Win32 API)
+                    _tempServiceConfig.Password = null; //null (nothing change in Win32 API)
                 }
                 else
                 {
@@ -428,8 +426,17 @@ namespace DaemonMaster
                         return;
                     }
 
+                    //When its not a local user...
+                    if (!DaemonMasterUtils.IsLocalDomain(textBoxUsername.Text))
+                    {
+                        MessageBox.Show(_resManager.GetString("extern_domain_user_error", CultureInfo.CurrentUICulture),
+                            _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+                        return;
+                    }
+
                     //Password or username is not correct
-                    if (!SystemManagement.ValidateUserWin32(textBoxUsername.Text, textBoxPassword.SecurePassword))
+                    if (!SystemManagement.ValidateUser(textBoxUsername.Text, textBoxPassword.SecurePassword))
                     {
                         MessageBox.Show(_resManager.GetString("login_failed", CultureInfo.CurrentUICulture),
                             _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
@@ -443,16 +450,12 @@ namespace DaemonMaster
 
                 #endregion
 
-                string fileDir = Path.GetDirectoryName(textBoxFilePath.Text);
-                string fileName = Path.GetFileName(textBoxFilePath.Text);
-                string fileExtension = Path.GetExtension(textBoxFilePath.Text);
-
                 _tempServiceConfig.DisplayName = textBoxDisplayName.Text;
                 _tempServiceConfig.ServiceName = "DaemonMaster_" + textBoxServiceName.Text;
 
-                _tempServiceConfig.FileDir = fileDir;
-                _tempServiceConfig.FileName = fileName;
-                _tempServiceConfig.FileExtension = fileExtension;
+                _tempServiceConfig.FileDir = Path.GetDirectoryName(textBoxFilePath.Text);
+                _tempServiceConfig.FileName = Path.GetFileName(textBoxFilePath.Text);
+                _tempServiceConfig.FileExtension = Path.GetExtension(textBoxFilePath.Text);
 
                 _tempServiceConfig.Parameter = textBoxParam.Text;
                 _tempServiceConfig.Description = textBoxDescription.Text;
@@ -521,8 +524,7 @@ namespace DaemonMaster
                 {
                     using (LsaPolicyHandle lsaWrapper = new LsaPolicyHandle())
                     {
-                        string username = _tempServiceConfig.Username ?? Convert.ToString(RegistryManagement.GetParameterFromRegistry(_tempServiceConfig.ServiceName, "ObjectName", String.Empty)); //if username is "null" get them from the registry
-                        bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(username).Any(x => x.Buffer == "SeServiceLogonRight");
+                        bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(_tempServiceConfig.Username).Any(x => x.Buffer == "SeServiceLogonRight");
                         if (!hasRightToStartAsService)
                         {
                             MessageBoxResult result = MessageBox.Show(_resManager.GetString("logon_as_a_service", CultureInfo.CurrentUICulture), _resManager.GetString("question", CultureInfo.CurrentUICulture), MessageBoxButton.YesNo, MessageBoxImage.Question);
@@ -530,7 +532,7 @@ namespace DaemonMaster
                                 return;
 
                             //Give the account the right to start as service
-                            lsaWrapper.AddPrivileges(username, new[] { "SeServiceLogonRight" });
+                            lsaWrapper.AddPrivileges(_tempServiceConfig.Username, new[] { "SeServiceLogonRight" });
                         }
                     }
                 }
@@ -568,7 +570,7 @@ namespace DaemonMaster
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
-                Filter = "DMDF (*.dmdf)|*.dmdf|" +
+                Filter = "DaemonMaster Config (*.dmdf)|*.dmdf|" +
                          "All files (*.*)|*.*",
                 AddExtension = true,
                 CheckFileExists = true,
@@ -581,26 +583,10 @@ namespace DaemonMaster
             {
                 if (openFileDialog.ShowDialog() == true)
                 {
-                    using (StreamReader streamReader = File.OpenText(openFileDialog.FileName))
-                    {
-                        JsonSerializer serializer = new JsonSerializer();
-                        ServiceStartInfo serviceStartInfo = (ServiceStartInfo)serializer.Deserialize(streamReader, typeof(ServiceStartInfo));
+                    _createNewService = true;
+                    _tempServiceConfig = SystemManagement.ParseDmdfFile(openFileDialog.FileName);
 
-                        if (!String.Equals(serviceStartInfo.ServiceName, _tempServiceConfig.ServiceName))
-                        {
-                            _createNewService = true;
-                        }
-                        else
-                        {
-                            //Ask for overwritte the data
-                            MessageBoxResult result = MessageBox.Show(_resManager.GetString("data_will_be_overwritten"), _resManager.GetString("warning"), MessageBoxButton.YesNo, MessageBoxImage.Warning);
-                            if (result != MessageBoxResult.Yes)
-                                return;
-                        }
-
-                        _tempServiceConfig = serviceStartInfo;
-                        LoadServiceInfos(true);
-                    }
+                    LoadServiceInfos();
                 }
             }
             catch (Exception ex)
@@ -614,7 +600,7 @@ namespace DaemonMaster
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
-                Filter = "DMDF (*.dmdf)|*.dmdf|" +
+                Filter = "DaemonMaster Config (*.dmdf)|*.dmdf|" +
                          "All files (*.*)|*.*",
                 DefaultExt = "dmdf",
                 AddExtension = true,

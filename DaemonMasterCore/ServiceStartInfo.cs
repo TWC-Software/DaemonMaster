@@ -19,6 +19,7 @@
 
 
 using System;
+using System.IO;
 using System.Security;
 using DaemonMasterCore.Win32.PInvoke;
 using Newtonsoft.Json;
@@ -35,8 +36,8 @@ namespace DaemonMasterCore
         public string DisplayName { get; set; }
         public string ServiceName { get; set; }
         public string Description { get; set; } = String.Empty;
-        public string[] DependOnService { get; set; } = new string[0];
-        public string[] DependOnGroup { get; set; } = new string[0];
+        public string[] DependOnService { get; set; } = Array.Empty<string>();
+        public string[] DependOnGroup { get; set; } = Array.Empty<string>();
         public NativeMethods.SERVICE_START StartType { get; set; } = NativeMethods.SERVICE_START.SERVICE_AUTO_START;
         public bool DelayedStart { get; set; } = false;
         public bool CanInteractWithDesktop { get; set; } = false;
@@ -44,7 +45,17 @@ namespace DaemonMasterCore
         public string FileDir { get; set; }
         public string FileName { get; set; }
         public string FileExtension { get; set; }
-        public string FullPath => FileDir + @"\" + FileName;
+
+        public string FullPath
+        {
+            set
+            {
+                FileName = Path.GetFileName(value);
+                FileDir = Path.GetDirectoryName(value);
+                FileExtension = Path.GetExtension(value);
+            }
+            get { return FileDir + @"\" + FileName; }
+        }
 
         public string Parameter { get; set; } = String.Empty;
         public bool UseLocalSystem { get; set; } = true;
