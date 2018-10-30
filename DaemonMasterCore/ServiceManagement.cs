@@ -50,7 +50,7 @@ namespace DaemonMasterCore
 
         #region Service
         /// <summary>
-        /// Create an interactiv service under the "Local System" account with UI0Detect as dependencie
+        /// Create an (interactive) service
         /// </summary>
         /// <param name="serviceStartInfo"></param>
         public static void CreateInteractiveService(ServiceStartInfo serviceStartInfo)
@@ -76,7 +76,7 @@ namespace DaemonMasterCore
                     null,
                     null,
                     ConvertDependenciesArraysToDoubleNullTerminatedString(serviceStartInfo.DependOnService, serviceStartInfo.DependOnGroup),
-                    serviceStartInfo.Username, //Only local user
+                    serviceStartInfo.Username,
                     serviceStartInfo.Password))
                 {
                     serviceHandle.SetDescription(serviceStartInfo.Description);
@@ -317,7 +317,7 @@ namespace DaemonMasterCore
                         serviceType |= (uint)NativeMethods.SERVICE_TYPE.SERVICE_INTERACTIVE_PROCESS;
                     }
 
-                    serviceHandle.ChangeConfig(serviceType, serviceStartInfo.StartType, serviceStartInfo.DisplayName, ConvertDependenciesArraysToDoubleNullTerminatedString(serviceStartInfo.DependOnService, serviceStartInfo.DependOnGroup), ".\\" + serviceStartInfo.Username, serviceStartInfo.Password); //Only local user
+                    serviceHandle.ChangeConfig(serviceType, serviceStartInfo.StartType, serviceStartInfo.DisplayName, ConvertDependenciesArraysToDoubleNullTerminatedString(serviceStartInfo.DependOnService, serviceStartInfo.DependOnGroup), serviceStartInfo.Username, serviceStartInfo.Password);
                     serviceHandle.SetDescription(serviceStartInfo.Description);
                     serviceHandle.SetDelayedStart(serviceStartInfo.DelayedStart);
                 }

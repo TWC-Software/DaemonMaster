@@ -99,7 +99,7 @@ namespace DaemonMasterCore
                     }
                     else
                     {
-                        rs.AddAccessRule(new RegistryAccessRule(new NTAccount(serviceStartInfo.Username), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
+                        rs.AddAccessRule(new RegistryAccessRule(new NTAccount(DaemonMasterUtils.GetDomainFromUsername(serviceStartInfo.Username), DaemonMasterUtils.GetLoginFromUsername(serviceStartInfo.Username)), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
                     }
 
                     processInfo.SetAccessControl(rs);

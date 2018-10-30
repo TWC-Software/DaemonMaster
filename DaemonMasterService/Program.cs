@@ -38,11 +38,13 @@ namespace DaemonMasterService
         /// </summary>
         static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<GeneralOptions, ServiceOptions, InstallOptions>(args)
+            Parser.Default.ParseArguments<GeneralOptions, ServiceOptions, EditOptions, InstallOptions, InstallDmdfOptions>(args)
                .MapResult(
                    (GeneralOptions opts) => RunOptionsAndReturnExitCode(opts),
                    (ServiceOptions opts) => RunServiceAndReturnExitCode(opts),
+                   (EditOptions opts) => RunEditReturnExitCode(opts),
                    (InstallOptions opts) => RunInstallAndReturnExitCode(opts),
+                   (InstallDmdfOptions opts) => RunInstallDmdfAndReturnExitCode(opts),
                    errs => 1);
         }
 
@@ -74,6 +76,18 @@ namespace DaemonMasterService
             return result;
         }
 
+        private static int RunEditReturnExitCode(EditOptions opts)
+        {
+            //Check Admin right
+            if (!SystemManagement.IsElevated())
+            {
+                Logger.Error("You must start the programm with admin rights.");
+                return 1;
+            }
+
+            return InstallEditService(opts, opts.ServiceName, editMode: true);
+        }
+
         private static int RunInstallAndReturnExitCode(InstallOptions opts)
         {
             //Check Admin right
@@ -83,19 +97,34 @@ namespace DaemonMasterService
                 return 1;
             }
 
-
-            if (!String.IsNullOrWhiteSpace(opts.DmdfFile) && File.Exists(opts.DmdfFile))
-            {
-                return InstallNewServiceDmdf(opts.DmdfFile, opts.Password.ConvertStringToSecureString());
-            }
-
-            return InstallNewService(opts);
+            return InstallEditService(opts, opts.ServiceName, editMode: false);
         }
 
-        private static int InstallNewService(InstallOptions opts)
+        private static int RunInstallDmdfAndReturnExitCode(InstallDmdfOptions opts)
+        {
+            //Check Admin right
+            if (!SystemManagement.IsElevated())
+            {
+                Logger.Error("You must start the programm with admin rights.");
+                return 1;
+            }
+
+            if (!String.IsNullOrWhiteSpace(opts.Path) && File.Exists(opts.Path))
+            {
+                Logger.Error("Invalid or no path defined.");
+                return 1;
+            }
+
+            return InstallNewServiceDmdf(opts.Path, opts.Password.ConvertStringToSecureString());
+        }
+
+
+        private static int InstallEditService(CommonEditInstallOptions opts, string serviceName, bool editMode)
         {
             try
             {
+                SecureString pw = opts.Password?.ConvertStringToSecureString();
+
                 if (opts.CanInteractWithDesktop && !DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
                 {
                     Logger.Error("CanInteractWithDesktop is not supported in this windows version.");
@@ -106,19 +135,22 @@ namespace DaemonMasterService
                     Logger.Error("CanInteractWithDesktop is not supported with custom user.");
                     return 1;
                 }
+                if ((String.IsNullOrWhiteSpace(opts.Username) && pw != null) || (!String.IsNullOrWhiteSpace(opts.Username) && pw == null))
+                {
+                    Logger.Error("Password/username parameter is missing!");
+                    return 1;
+                }
 
 
                 ServiceStartInfo serviceStartInfo = new ServiceStartInfo
                 {
                     FullPath = opts.FullPath,
-                    ServiceName = opts.ServiceName,
+                    ServiceName = serviceName,
                     DisplayName = opts.DisplayName,
                     Description = opts.Description,
                     Parameter = opts.Arguments,
-                    Username = opts.Username,
-                    Password = opts.Password.ConvertStringToSecureString(),
                     CanInteractWithDesktop = opts.CanInteractWithDesktop,
-                    UseLocalSystem = String.IsNullOrWhiteSpace(opts.Username),
+                    UseLocalSystem = String.IsNullOrWhiteSpace(opts.Username) && pw == null,
                     MaxRestarts = opts.MaxRestarts,
                     ProcessKillTime = opts.ProcessKillTime,
                     ProcessRestartDelay = opts.ProcessRestartDelay,
@@ -126,6 +158,24 @@ namespace DaemonMasterService
                     ConsoleApplication = opts.ConsoleApplication,
                     UseCtrlC = opts.UseCtrlC
                 };
+
+                //Custom user
+                if (serviceStartInfo.UseLocalSystem)
+                {
+                    serviceStartInfo.Username = editMode ? "LocalSystem" : null; //Null stand in edit mode for no change so "LocalSystem" must be used there
+                    serviceStartInfo.Password = null;
+                }
+                else
+                {
+                    if (!SystemManagement.ValidateUser(opts.Username, pw))
+                    {
+                        Logger.Error("Failed to validate the given password/username.");
+                        return 1;
+                    }
+
+                    serviceStartInfo.Username = opts.Username;
+                    serviceStartInfo.Password = pw;
+                }
 
                 //Set the start type
                 switch (opts.StartType)
@@ -156,8 +206,16 @@ namespace DaemonMasterService
 
                 }
 
-                ServiceManagement.CreateInteractiveService(serviceStartInfo);
+                if (editMode)
+                {
+                    ServiceManagement.ChangeServiceConfig(serviceStartInfo);
+                }
+                else
+                {
+                    ServiceManagement.CreateInteractiveService(serviceStartInfo);
+                }
 
+                Logger.Info("Successful!");
                 return 0;
             }
             catch (Exception ex)
@@ -191,6 +249,8 @@ namespace DaemonMasterService
                 }
 
                 ServiceManagement.CreateInteractiveService(serviceStartInfo);
+
+                Logger.Info("Successful!");
                 return 0;
             }
             catch (Exception ex)

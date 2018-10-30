@@ -183,7 +183,7 @@ namespace DaemonMasterCore.Win32
     /// </summary>
     sealed class Win32Sid : IDisposable
     {
-        public IntPtr Pointer { get; private set; } = IntPtr.Zero;
+        public IntPtr Pointer { get; private set; }
 
         public Win32Sid(string account)
         {
@@ -191,7 +191,7 @@ namespace DaemonMasterCore.Win32
                 throw new ArgumentException("String is empty or null!");
 
 
-            var sid = (SecurityIdentifier)new NTAccount(account).Translate(typeof(SecurityIdentifier));
+            var sid = (SecurityIdentifier)new NTAccount(DaemonMasterUtils.GetDomainFromUsername(account), DaemonMasterUtils.GetLoginFromUsername(account)).Translate(typeof(SecurityIdentifier));
 
             Byte[] buffer = new Byte[sid.BinaryLength];
             sid.GetBinaryForm(buffer, 0);

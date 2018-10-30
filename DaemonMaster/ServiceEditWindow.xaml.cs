@@ -25,6 +25,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Resources;
+using System.Security;
 using System.ServiceProcess;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -277,7 +278,7 @@ namespace DaemonMaster
             {
                 if (pickerDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    textBoxUsername.Text = pickerDialog.SelectedObject.Name;  // ".\\" = Local computer
+                    textBoxUsername.Text = ".\\" + pickerDialog.SelectedObject.Name;  // ".\\" = Local computer
                 }
             }
         }
@@ -407,12 +408,12 @@ namespace DaemonMaster
 
                 _tempServiceConfig.UseLocalSystem = checkBoxUseLocalSystem.IsChecked ?? true;
 
-                if (_tempServiceConfig.UseLocalSystem ||
-                String.Equals(textBoxPassword.Password, PLACEHOLDER_PASSWORD) && //Nothing has changed (null safe)
-                String.Equals(textBoxUsername.Text, _tempServiceConfig.Username)) //Nothing has changed (null safe)
+                if (_tempServiceConfig.UseLocalSystem || // => LocalSystem is null
+                    String.Equals(textBoxPassword.Password, PLACEHOLDER_PASSWORD) && //Nothing has changed (null safe)
+                    String.Equals(textBoxUsername.Text, _tempServiceConfig.Username)) //Nothing has changed (null safe)
                 {
-                    _tempServiceConfig.Username = null; //null (nothing change in Win32 API)
-                    _tempServiceConfig.Password = null; //null (nothing change in Win32 API)
+                    _tempServiceConfig.Username = _tempServiceConfig.UseLocalSystem && !_createNewService ? "LocalSystem" : null;
+                    _tempServiceConfig.Password = new SecureString();
                 }
                 else
                 {
@@ -453,9 +454,7 @@ namespace DaemonMaster
                 _tempServiceConfig.DisplayName = textBoxDisplayName.Text;
                 _tempServiceConfig.ServiceName = "DaemonMaster_" + textBoxServiceName.Text;
 
-                _tempServiceConfig.FileDir = Path.GetDirectoryName(textBoxFilePath.Text);
-                _tempServiceConfig.FileName = Path.GetFileName(textBoxFilePath.Text);
-                _tempServiceConfig.FileExtension = Path.GetExtension(textBoxFilePath.Text);
+                _tempServiceConfig.FullPath = textBoxFilePath.Text;
 
                 _tempServiceConfig.Parameter = textBoxParam.Text;
                 _tempServiceConfig.Description = textBoxDescription.Text;

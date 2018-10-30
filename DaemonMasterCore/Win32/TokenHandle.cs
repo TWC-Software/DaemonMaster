@@ -26,7 +26,7 @@ namespace DaemonMasterCore.Win32
         }
 
         /// <summary>
-        /// Logon and return the token (only local users)
+        /// Logon and return the token
         /// </summary>
         /// <param name="username"></param>
         /// <param name="password"></param>
@@ -38,7 +38,7 @@ namespace DaemonMasterCore.Win32
             try
             {
                 passwordHandle = Marshal.SecureStringToGlobalAllocUnicode(password);
-                if (!NativeMethods.LogonUser(username, ".", passwordHandle, logonTyp, NativeMethods.LOGON_PROVIDER.Default, out var token))
+                if (!NativeMethods.LogonUser(DaemonMasterUtils.GetLoginFromUsername(username), DaemonMasterUtils.GetDomainFromUsername(username), passwordHandle, logonTyp, NativeMethods.LOGON_PROVIDER.Default, out var token))
                     throw new Win32Exception(Marshal.GetLastWin32Error());
 
                 return token;
