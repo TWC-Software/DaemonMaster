@@ -18,8 +18,8 @@ You can download the pre-release here: [Click here](https://github.com/TWC-Softw
 - Command line parameters
 
 ## Thanks to 
-# - Advanced Installer (for the open source license) 
-# - JetBrains (for the open source license) 
+- **Advanced Installer (for the open source license)** 
+- **JetBrains (for the open source license)**
 - pinvoke.net (and its users)
 - stackoverflow.com (for help from the users)
 - entwickler-ecke.de (for help from the users)
