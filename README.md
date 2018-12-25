@@ -37,3 +37,9 @@ You can download the pre-release here: [Click here](https://github.com/TWC-Softw
 
 ## License 
 GPL 3.0
+
+## Screenshots
+![Main window](https://user-images.githubusercontent.com/8211507/50426834-40662d00-0898-11e9-9c39-4895a96f3885.PNG)
+![Edit/Add window tab 1](https://user-images.githubusercontent.com/8211507/50426835-40662d00-0898-11e9-8085-f6f72bb4e175.PNG)
+![Edit/Add window tab 2](https://user-images.githubusercontent.com/8211507/50426837-40662d00-0898-11e9-8f7c-f6bba54dfaad.PNG)
+![Edit/Add window tab 3](https://user-images.githubusercontent.com/8211507/50426836-40662d00-0898-11e9-96f2-659fa1b30c3e.PNG)
