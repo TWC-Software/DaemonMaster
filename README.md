@@ -18,6 +18,8 @@ You can download the pre-release here: [Click here](https://github.com/TWC-Softw
 - Command line parameters
 
 ## Thanks to 
+# - Advanced Installer (for the open source license) 
+# - JetBrains (for the open source license) 
 - pinvoke.net (and its users)
 - stackoverflow.com (for help from the users)
 - entwickler-ecke.de (for help from the users)
@@ -25,9 +27,9 @@ You can download the pre-release here: [Click here](https://github.com/TWC-Softw
 ## Used Librarys
 - Newtonsoft.Json - James Newton - King - MIT License
 - NLog - Jaroslaw Kowalski, Kim Christensen, Julian Verdurmen - BSD 3 clause "New" or "Revised" License
-- AutoUpdater.NET - RBSoft - MIT License
 - Active Directory Object Picker - Tulpep - MS-PL License
 - ListView Layout Manager - Jani Giannoudis - CPOL License
+- Command Line Parser Library for CLR and NetStandard - Giacomo Stelluti Scala & Contributors - MIT License
 
 ## Copyright 
 - MCPC10,
