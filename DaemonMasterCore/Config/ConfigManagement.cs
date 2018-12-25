@@ -36,7 +36,7 @@ namespace DaemonMasterCore.Config
 
             using (StreamReader streamReader = File.OpenText(ConfigFile))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 _config = (Config)serializer.Deserialize(streamReader, typeof(Config));
                 return _config;
             }
@@ -48,7 +48,7 @@ namespace DaemonMasterCore.Config
         {
             using (StreamWriter streamWriter = File.CreateText(ConfigFile))
             {
-                JsonSerializer serializer = new JsonSerializer
+                var serializer = new JsonSerializer
                 {
                     Formatting = Formatting.Indented
                 };

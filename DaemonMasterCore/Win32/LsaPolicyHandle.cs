@@ -24,8 +24,9 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Security.Principal;
-using DaemonMasterCore.Win32.PInvoke;
+using DaemonMasterCore.Win32.PInvoke.Advapi32;
+using DaemonMasterCore.Win32.PInvoke.Core;
+using DaemonMasterCore.Win32.PInvoke.Kernel32;
 using Microsoft.Win32.SafeHandles;
 
 namespace DaemonMasterCore.Win32
@@ -33,64 +34,69 @@ namespace DaemonMasterCore.Win32
     using System.ComponentModel;
     using System.Runtime.InteropServices;
 
+    /// <inheritdoc />
     /// <summary>
     /// This class is used to grant/remove/emumerate Lsa account rights.
     /// to a user.
     /// </summary>
     public class LsaPolicyHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
+        /// <inheritdoc />
         /// <summary>
-        /// Open an new lsa policy instance
+        /// Initializes a new instance of the <see cref="T:DaemonMasterCore.Win32.LsaPolicyHandle" /> class.
         /// </summary>
-        /// <param name="systemName">null = local system</param>
-        public LsaPolicyHandle(string systemName = null) : base(true)
+        private LsaPolicyHandle() : base(ownsHandle: true)
         {
-            NativeMethods.LSA_OBJECT_ATTRIBUTES lsaAttr;
-            lsaAttr.RootDirectory = IntPtr.Zero;
-            lsaAttr.ObjectName = IntPtr.Zero;
-            lsaAttr.Attributes = 0;
-            lsaAttr.SecurityDescriptor = IntPtr.Zero;
-            lsaAttr.SecurityQualityOfService = IntPtr.Zero;
-            lsaAttr.Length = Marshal.SizeOf(typeof(NativeMethods.LSA_OBJECT_ATTRIBUTES));
+        }
 
+        /// <summary>
+        /// Opens a new policy handle.
+        /// </summary>
+        /// <param name="systemName">Name of the system. (nothing = local system)</param>
+        /// <returns></returns>
+        /// <exception cref="Win32Exception"></exception>
+        public static LsaPolicyHandle OpenPolicyHandle()
+        {
+            LsaObjectAttributes lsaObjectAttributes;
+            lsaObjectAttributes.RootDirectory = IntPtr.Zero;
+            lsaObjectAttributes.ObjectName = IntPtr.Zero;
+            lsaObjectAttributes.Attributes = 0;
+            lsaObjectAttributes.SecurityDescriptor = IntPtr.Zero;
+            lsaObjectAttributes.SecurityQualityOfService = IntPtr.Zero;
+            lsaObjectAttributes.Length = (uint)Marshal.SizeOf(typeof(LsaObjectAttributes));
 
-            NativeMethods.LSA_UNICODE_STRING[] system = null;
-            if (systemName != null)
-            {
-                system = new NativeMethods.LSA_UNICODE_STRING[1];
-                system[0] = InitLsaString(systemName);
-            }
+            //Create a new LSA policy handle
+            NtStatus ret = Advapi32.LsaOpenPolicy(systemName: null, ref lsaObjectAttributes, Kernel32.AccessMask.PolicySpecificRights.PolicyAllAccess, out LsaPolicyHandle policyHandle); //systemName = null (Local System)
+            if (ret != NtStatus.Success)
+                throw new Win32Exception(Advapi32.LsaNtStatusToWinError(ret));
 
-            //Create a LSA policy handel
-            uint ret = NativeMethods.LsaOpenPolicy(system, ref lsaAttr, (int)NativeMethods.ACCESS.POLICY_ALL_ACCESS, ref handle);
-            if (ret != NativeMethods.STATUS_SUCCESS)
-                throw new Win32Exception(NativeMethods.LsaNtStatusToWinError(ret));
+            return policyHandle;
         }
 
         protected override bool ReleaseHandle()
         {
-            return NativeMethods.LsaClose(handle) == NativeMethods.STATUS_SUCCESS;
+            return Advapi32.LsaClose(handle) == NtStatus.Success;
         }
 
         /// <summary>
         /// Add privileges to the given account
         /// </summary>
-        /// <param name="account">Account name like "Olaf"</param>
+        /// <param name="account">Account name like "Olaf" xD</param>
         /// <param name="privilege"></param>
         public void AddPrivileges(string account, string[] privilege)
         {
-            NativeMethods.LSA_UNICODE_STRING[] privileges = new NativeMethods.LSA_UNICODE_STRING[privilege.Length];
-            for (int i = 0; i < privilege.Length; i++)
+            var privileges = new Advapi32.LsaUnicodeString[privilege.Length];
+            for (var i = 0; i < privilege.Length; i++)
             {
-                privileges[i] = InitLsaString(privilege[i]);
+                privileges[i] = privilege[i].ToLsaString();
             }
 
-            using (Win32Sid win32Sid = new Win32Sid(account))
+            using (var win32Sid = new Win32Sid(account))
             {
                 //Add account rights
-                uint ret = NativeMethods.LsaAddAccountRights(this, win32Sid.Pointer, privileges, (uint)privilege.Length);
-                if (ret != NativeMethods.STATUS_SUCCESS)
-                    throw new Win32Exception(NativeMethods.LsaNtStatusToWinError(ret));
+                NtStatus ret = Advapi32.LsaAddAccountRights(this, win32Sid.Pointer, privileges, (uint)privilege.Length);
+                if (ret != NtStatus.Success)
+                    throw new Win32Exception(Advapi32.LsaNtStatusToWinError(ret));
             }
         }
 
@@ -102,18 +108,18 @@ namespace DaemonMasterCore.Win32
         /// <param name="removeAllRights">Remove all privileges</param>
         public void RemovePrivileges(string account, string[] privilege, bool removeAllRights = false)
         {
-            NativeMethods.LSA_UNICODE_STRING[] privileges = new NativeMethods.LSA_UNICODE_STRING[privilege.Length];
-            for (int i = 0; i < privilege.Length; i++)
+            var privileges = new Advapi32.LsaUnicodeString[privilege.Length];
+            for (var i = 0; i < privilege.Length; i++)
             {
-                privileges[i] = InitLsaString(privilege[i]);
+                privileges[i] = privilege[i].ToLsaString();
             }
 
-            using (Win32Sid win32Sid = new Win32Sid(account))
+            using (var win32Sid = new Win32Sid(account))
             {
                 //Remove account rights
-                uint ret = NativeMethods.LsaRemoveAccountRights(this, win32Sid.Pointer, removeAllRights, privileges, (uint)privilege.Length);
-                if (ret != NativeMethods.STATUS_SUCCESS)
-                    throw new Win32Exception(NativeMethods.LsaNtStatusToWinError(ret));
+                NtStatus ret = Advapi32.LsaRemoveAccountRights(this, win32Sid.Pointer, removeAllRights, privileges, (uint)privilege.Length);
+                if (ret != NtStatus.Success)
+                    throw new Win32Exception(Advapi32.LsaNtStatusToWinError(ret));
             }
         }
 
@@ -122,27 +128,28 @@ namespace DaemonMasterCore.Win32
         /// </summary>
         /// <param name="account">Account name like "Olaf"</param>
         /// <returns></returns>
-        public NativeMethods.LSA_UNICODE_STRING[] EnumeratePrivileges(string account)
+        public Advapi32.LsaUnicodeString[] EnumeratePrivileges(string account)
         {
             IntPtr rightsPtr = IntPtr.Zero;
-            uint countOfRights = 0;
 
             try
             {
-                using (Win32Sid win32Sid = new Win32Sid(account))
+                uint countOfRights;
+
+                using (var win32Sid = new Win32Sid(account))
                 {
                     //Enumerate account rights
-                    uint ret = NativeMethods.LsaEnumerateAccountRights(this, win32Sid.Pointer, ref rightsPtr, out countOfRights);
-                    if (ret != NativeMethods.STATUS_SUCCESS)
-                        throw new Win32Exception(NativeMethods.LsaNtStatusToWinError(ret));
+                    NtStatus ret = Advapi32.LsaEnumerateAccountRights(this, win32Sid.Pointer, out rightsPtr, out countOfRights);
+                    if (ret != NtStatus.Success)
+                        throw new Win32Exception(Advapi32.LsaNtStatusToWinError(ret));
                 }
 
-                NativeMethods.LSA_UNICODE_STRING[] privileges = new NativeMethods.LSA_UNICODE_STRING[countOfRights];
+                var privileges = new Advapi32.LsaUnicodeString[countOfRights];
                 IntPtr tempPtr = rightsPtr;
-                for (int i = 0; i < countOfRights; i++)
+                for (var i = 0; i < countOfRights; i++)
                 {
-                    privileges[i] = (NativeMethods.LSA_UNICODE_STRING)Marshal.PtrToStructure(tempPtr, typeof(NativeMethods.LSA_UNICODE_STRING));
-                    tempPtr = tempPtr + Marshal.SizeOf(typeof(NativeMethods.LSA_UNICODE_STRING));
+                    privileges[i] = (Advapi32.LsaUnicodeString)Marshal.PtrToStructure(tempPtr, typeof(Advapi32.LsaUnicodeString));
+                    tempPtr = tempPtr + Marshal.SizeOf<Advapi32.LsaUnicodeString>();
                 }
 
                 return privileges;
@@ -150,73 +157,8 @@ namespace DaemonMasterCore.Win32
             finally
             {
                 if (rightsPtr != IntPtr.Zero)
-                    NativeMethods.LsaFreeMemory(rightsPtr);
+                    Advapi32.LsaFreeMemory(rightsPtr);
             }
-        }
-
-        // helper functions
-
-        /// <summary>
-        /// Create an new LsaString from a string
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        private static NativeMethods.LSA_UNICODE_STRING InitLsaString(string s)
-        {
-            // Unicode strings max. 32KB
-            if (s.Length > 0x7ffe)
-                throw new ArgumentException("InitLsaString - String to long!");
-
-            NativeMethods.LSA_UNICODE_STRING lus = new NativeMethods.LSA_UNICODE_STRING
-            {
-                Buffer = s,
-                Length = (ushort)(s.Length * sizeof(char)),
-                MaximumLength = (ushort)((s.Length + 1) * sizeof(char))
-            };
-
-            return lus;
-        }
-    }
-
-    /// <summary>
-    /// Class that read the Win32Sid infos and give them as pointer
-    /// </summary>
-    sealed class Win32Sid : IDisposable
-    {
-        public IntPtr Pointer { get; private set; }
-
-        public Win32Sid(string account)
-        {
-            if (String.IsNullOrWhiteSpace(account))
-                throw new ArgumentException("String is empty or null!");
-
-
-            var sid = (SecurityIdentifier)new NTAccount(DaemonMasterUtils.GetDomainFromUsername(account), DaemonMasterUtils.GetLoginFromUsername(account)).Translate(typeof(SecurityIdentifier));
-
-            Byte[] buffer = new Byte[sid.BinaryLength];
-            sid.GetBinaryForm(buffer, 0);
-
-            Pointer = Marshal.AllocHGlobal(buffer.Length);
-            Marshal.Copy(buffer, 0, Pointer, buffer.Length);
-        }
-
-        public void Dispose()
-        {
-            ReleaseUnmanagedResources();
-            GC.SuppressFinalize(this);
-        }
-
-        private void ReleaseUnmanagedResources()
-        {
-            if (Pointer != IntPtr.Zero)
-            {
-                Marshal.FreeHGlobal(Pointer);
-            }
-        }
-
-        ~Win32Sid()
-        {
-            ReleaseUnmanagedResources();
         }
     }
 }

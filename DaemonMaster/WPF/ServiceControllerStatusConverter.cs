@@ -38,7 +38,7 @@ namespace DaemonMaster.WPF
                     return _resManager.GetString("enum_stop_pending");
 
                 default:
-                    return String.Empty;
+                    return string.Empty;
             }
         }
 

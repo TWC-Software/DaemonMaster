@@ -40,6 +40,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -110,6 +111,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>lang.fr.resx</DependentUpon>
     </Compile>
+    <Compile Include="ServiceListViewItem.cs" />
+    <Compile Include="WPF\InvertBooleanConverter.cs" />
+    <Compile Include="WPF\PlaceholderTextBox.cs" />
     <Compile Include="WPF\ServiceControllerStatusConverter.cs" />
     <Page Include="CreditsWindow.xaml">
       <SubType>Designer</SubType>

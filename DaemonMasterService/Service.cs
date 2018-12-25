@@ -19,8 +19,11 @@
 
 
 using System;
+using System.Management;
 using System.ServiceProcess;
+using System.Timers;
 using DaemonMasterCore;
+using DaemonMasterCore.Config;
 using Microsoft.Win32;
 using NLog;
 
@@ -31,7 +34,11 @@ namespace DaemonMasterService
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private static string _serviceName;
         private bool _startInUserSession;
-        private DaemonProcess _daemonProcess;
+        private DmProcess _dmProcess;
+        private Timer _updateTimer;
+        private Config _config;
+
+        uint _oldProcessPid;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                              CONST                                                   //
@@ -43,143 +50,112 @@ namespace DaemonMasterService
         //                                             METHODS                                                  //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public Service(bool enablePause)
+        public Service()
         {
             InitializeComponent();
-
-            CanPauseAndContinue = enablePause;
-            CanHandlePowerEvent = false;
         }
 
         protected override void OnStart(string[] args)
         {
             base.OnStart(args);
 
+            //Get the config
+            _config = ConfigManagement.GetConfig;
+
             //Read args
-            foreach (var arg in args)
+            foreach (string arg in args)
             {
-                switch (arg)
-                {
-                    case "-startInUserSession":
-                        _startInUserSession = true;
-                        break;
-                }
+                if (arg == "-startInUserSession") _startInUserSession = true;
             }
+
+            //Get the service name
+            _serviceName = GetServiceName();
 
             try
             {
-                //Get the name of the service
-                _serviceName = DaemonMasterUtils.GetServiceName();
+                //Create a Timer to update the actual status of the service
+                _updateTimer = new Timer(_config.UpdateInterval);
+                _updateTimer.Elapsed += UpdateTimerOnElapsed;
+                _updateTimer.Enabled = true;
+
 
                 //Change the filename of the log file to the service name
                 if (LogManager.Configuration != null)
                     LogManager.Configuration.Variables["logName"] = _serviceName;
 
-                //create a new DaemonProcess object
-                _daemonProcess = new DaemonProcess(_serviceName, _startInUserSession);
-
+                //Create a new DmProcess instance with reg data
+                _dmProcess = new DmProcess(RegistryManagement.LoadServiceStartInfosFromRegistry(_serviceName));
+                _dmProcess.MaxRestartsReached += DmProcessOnMaxRestartsReached;
+                _dmProcess.UpdateProcessPid += DmProcessOnUpdateProcessPid;
 
                 Logger.Info("Starting the process...");
-                switch (_daemonProcess.StartProcess())
+                if (_startInUserSession)
                 {
-                    case DaemonProcessState.Successful:
-                        UpdateInfosInRegistry(_serviceName, _daemonProcess.ProcessPID);
-                        Logger.Info("The start of the process was successful!");
-                        break;
-
-                    case DaemonProcessState.Unsuccessful:
-                        Logger.Info("The start of the process was unsuccessful!");
-                        break;
-
-                    case DaemonProcessState.AlreadyStarted:
-                        Logger.Info("The process is already started!");
-                        break;
+                    _dmProcess.StartInUserSession();
+                }
+                else
+                {
+                    _dmProcess.StartInServiceSession();
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Logger.Error(e.ToString);
+                Logger.Error(ex, ex.Message);
                 Stop();
             }
         }
 
         protected override void OnStop()
         {
-            //Stop the process and give feedback in logs 
-            switch (_daemonProcess.StopProcess())
+            try
             {
-                case DaemonProcessState.Successful:
-                    Logger.Info("The stop of the process was successful!");
-                    break;
-
-                case DaemonProcessState.Unsuccessful:
-                    Logger.Warn("The stop of the process was unsuccessful! Killing the process...");
-                    Logger.Info(_daemonProcess.KillProcess() ? "Successful!" : "Unsuccessful!");
-                    break;
-
-                case DaemonProcessState.AlreadyStopped:
-                    Logger.Info("The process is already stopped!");
-                    break;
+                _dmProcess.StopProcess();
             }
-
-            UpdateInfosInRegistry(_serviceName, _daemonProcess.ProcessPID);
+            catch (Exception ex)
+            {
+                Logger.Error(ex, ex.Message);
+                Stop();
+            }
 
             base.OnStop();
         }
 
-        protected override void OnPause()
+
+        private void DmProcessOnMaxRestartsReached(object sender, EventArgs e)
         {
-            Logger.Info("Suspending process thread...");
-            Logger.Info(_daemonProcess.PauseProcess() ? "Successful!" : "Unsuccessful!");
-
-            UpdateInfosInRegistry(_serviceName, _daemonProcess.ProcessPID);
-
-            base.OnPause();
+            Stop();
         }
 
-        protected override void OnContinue()
+        private void DmProcessOnUpdateProcessPid(object sender, EventArgs e)
         {
-            base.OnContinue();
-
-            UpdateInfosInRegistry(_serviceName, _daemonProcess.ProcessPID);
-
-            Logger.Info("Resuming suspend process thread...");
-            Logger.Info(_daemonProcess.ResumeProcess() ? "Successful!" : "Unsuccessful!");
+            UpdateProcessPid();
         }
 
-        protected override void OnCustomCommand(int command)
+        private void UpdateTimerOnElapsed(object sender, ElapsedEventArgs e)
         {
-            switch ((ServiceCommands)command)
-            {
-                case ServiceCommands.KillChildAndStop:
-                    _daemonProcess.KillProcess();
-                    Stop();
-                    break;
-
-                case ServiceCommands.UpdateInfos:
-                    UpdateInfosInRegistry(_serviceName, _daemonProcess.ProcessPID);
-                    break;
-            }
+            UpdateProcessPid();
         }
 
-        private new void Stop()
-        {
-            _daemonProcess.Dispose();
-            base.Stop();
-        }
-
-        private void UpdateInfosInRegistry(string serviceName, int processPid)
+        /// <summary>
+        /// Updates the process pid.
+        /// </summary>
+        private void UpdateProcessPid()
         {
             try
             {
-                using (RegistryKey processKey = Registry.LocalMachine.OpenSubKey(RegPath + serviceName + @"\ProcessInfo", true))
+                if (_oldProcessPid != _dmProcess.ProcessPid)
                 {
-                    if (processKey == null)
-                        return;
+                    using (RegistryKey processKey = Registry.LocalMachine.OpenSubKey(RegPath + _serviceName + @"\ProcessInfo", true))
+                    {
+                        if (processKey == null)
+                            return;
 
-                    processKey.SetValue("ProcessPid", processPid, RegistryValueKind.DWord);
+                        processKey.SetValue("ProcessPid", _dmProcess.ProcessPid, RegistryValueKind.DWord);
 
-                    processKey.Close();
+                        processKey.Close();
+                    }
+
+                    _oldProcessPid = _dmProcess.ProcessPid;
                 }
             }
             catch (Exception ex)
@@ -189,6 +165,26 @@ namespace DaemonMasterService
 
                 //do nothing other, so that the service can run even when this key is not set (not necessary key)
             }
+        }
+
+        /// <summary>
+        /// Gets the name of the service.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception">Can't get the service name.</exception>
+        private static string GetServiceName()
+        {
+            int processId = System.Diagnostics.Process.GetCurrentProcess().Id;
+            string query = "SELECT * FROM Win32_Service where ProcessId = " + processId;
+            var searcher = new ManagementObjectSearcher(query);
+
+            foreach (ManagementBaseObject o in searcher.Get())
+            {
+                var queryObj = (ManagementObject)o;
+                return queryObj["Name"].ToString();
+            }
+
+            throw new Exception("Can't get the service name.");
         }
     }
 }

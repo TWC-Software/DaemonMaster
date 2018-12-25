@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -65,43 +66,58 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BetterDaemonProcess.cs" />
     <Compile Include="Config\Config.cs" />
     <Compile Include="Config\ConfigManagement.cs" />
-    <Compile Include="DaemonProcessState.cs" />
-    <Compile Include="DaemonServiceState.cs" />
     <Compile Include="Exceptions\ServiceStoppedException.cs" />
     <Compile Include="Exceptions\ServiceNotStoppedException.cs" />
-    <Compile Include="ServiceStartInfo.cs" />
+    <Compile Include="Win32\PInvoke\Kernel32\IoCounters.cs" />
+    <Compile Include="Win32\PInvoke\Kernel32\JobObjectBasicLimitInfo.cs" />
+    <Compile Include="Win32\PInvoke\Kernel32\JobObjectExtendedLimitInfo.cs" />
+    <Compile Include="Win32\PInvoke\Kernel32\JobObjectLimit.cs" />
+    <Compile Include="Win32\Win32Sid.cs" />
+    <Compile Include="Win32\ServiceCredentials.cs" />
+    <Compile Include="DmServiceDefinition.cs" />
     <Compile Include="DaemonMasterUtils.cs" />
-    <Compile Include="ServiceListViewItem.cs" />
-    <Compile Include="PluginSystem\API.cs" />
-    <Compile Include="PluginSystem\IAPI.cs" />
-    <Compile Include="PluginSystem\PluginContracts.cs" />
-    <Compile Include="PluginSystem\PluginLoader.cs" />
-    <Compile Include="ProcessManagement.cs" />
-    <Compile Include="ServiceCommands.cs" />
     <Compile Include="ServiceInfo.cs" />
-    <Compile Include="SystemManagement.cs" />
+    <Compile Include="Win32\IWin32ServiceDefinition.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\Advapi32Helpers.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\CreationFlags.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\ErrorControl.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\LogonProvider.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\LogonType.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\LsaObjectAttributes.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\LsaUnicodeString.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\ProcessInformation.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\ProcessStartInfo.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\ServiceDescription.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\ServiceDelayedAutoStartInfo.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\ServiceInfoLevel.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\ServiceAccessRights.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\ServiceControl.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\ServiceStartType.cs" />
     <Compile Include="Jobs\KillChildProcessJob.cs" />
     <Compile Include="Win32\JobHandle.cs" />
     <Compile Include="Win32\LsaPolicyHandle.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\Advapi32.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\ServiceControlManagerAccessRights.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\ServiceStatus.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\ServiceStatusProcess.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\ServiceType.cs" />
+    <Compile Include="Win32\PInvoke\Kernel32\AccessMask.cs" />
+    <Compile Include="Win32\PInvoke\Kernel32\CtrlEvent.cs" />
+    <Compile Include="Win32\PInvoke\Kernel32\JobObjectInfoType.cs" />
+    <Compile Include="Win32\PInvoke\Kernel32\Kernel32.cs" />
+    <Compile Include="Win32\PInvoke\Kernel32\SecurityAttributes.cs" />
+    <Compile Include="Win32\PInvoke\Kernel32\ThreadAccess.cs" />
+    <Compile Include="Win32\PInvoke\Core\NtStatus.cs" />
+    <Compile Include="Win32\PInvoke\Winsta\Winsta.cs" />
+    <Compile Include="Win32\PInvoke\Wtsapi32\Wtsapi32.cs" />
     <Compile Include="Win32\ShellLinkWrapper.cs" />
-    <Compile Include="Win32\PInvoke\NativeMethodsConsts.cs" />
-    <Compile Include="Win32\PInvoke\NativeMethodsStructs.cs" />
-    <Compile Include="Win32\PInvoke\NativeMethods.cs" />
-    <Compile Include="Win32\PInvoke\DLLFiles.cs" />
-    <Compile Include="Win32\PInvoke\NativeMethodsEnums.cs" />
     <Compile Include="Win32\ServiceControlManager.cs" />
     <Compile Include="Win32\ServiceHandle.cs" />
-    <Compile Include="Win32\ThreadHandle.cs" />
     <Compile Include="Win32\TokenHandle.cs" />
-    <Compile Include="WPF\InvertBooleanConverter.cs" />
-    <Compile Include="WPF\PlaceholderTextBox.cs" />
-    <Compile Include="DaemonProcess.cs" />
     <Compile Include="RegistryManagement.cs" />
-    <Compile Include="SecurityManagement.cs" />
-    <Compile Include="ServiceManagement.cs" />
+    <Compile Include="Security.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

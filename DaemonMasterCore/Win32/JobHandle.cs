@@ -20,42 +20,42 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using DaemonMasterCore.Win32.PInvoke;
+using DaemonMasterCore.Win32.PInvoke.Kernel32;
 using Microsoft.Win32.SafeHandles;
 
 namespace DaemonMasterCore.Win32
 {
     public class JobHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
-        public JobHandle() : base(true)
+        public JobHandle() : base(ownsHandle: true)
         {
         }
 
         protected override bool ReleaseHandle()
         {
-            return NativeMethods.CloseHandle(handle);
+            return Kernel32.CloseHandle(handle);
         }
 
-        public static JobHandle CreateJob(NativeMethods.SECURITY_ATTRIBUTES lpJobAttributes, string lpName)
+        public static JobHandle CreateJob(Kernel32.SecurityAttributes jobAttributes, string name)
         {
-            JobHandle jobHandle = NativeMethods.CreateJobObject(lpJobAttributes, lpName);
+            JobHandle jobHandle = Kernel32.CreateJobObject(jobAttributes, name);
 
             if (jobHandle.IsInvalid)
-                throw new Win32Exception("Unable to create job. Error: " + Marshal.GetLastWin32Error());
+                throw new Win32Exception(Marshal.GetLastWin32Error());
 
             return jobHandle;
         }
 
-        public void SetInformation(NativeMethods.JobObjectInfoType infoType, IntPtr lpJobObjectInfo, uint cbJobObjectInfoLength)
+        public void SetInformation(Kernel32.JobObjectInfoType infoType, IntPtr jobObjectInfo, uint jobObjectInfoLength)
         {
-            if (!NativeMethods.SetInformationJobObject(this, infoType, lpJobObjectInfo, cbJobObjectInfoLength))
-                throw new Win32Exception("Unable to set job informations. Error: " + Marshal.GetLastWin32Error());
+            if (!Kernel32.SetInformationJobObject(this, infoType, jobObjectInfo, jobObjectInfoLength))
+                throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
-        public void AssignProcess(SafeProcessHandle hProcess)
+        public void AssignProcess(SafeProcessHandle processHandlerocess)
         {
-            if (!NativeMethods.AssignProcessToJobObject(this, hProcess))
-                throw new Win32Exception("Unable to assign process to the job. Error: " + Marshal.GetLastWin32Error());
+            if (!Kernel32.AssignProcessToJobObject(this, processHandlerocess))
+                throw new Win32Exception(Marshal.GetLastWin32Error());
         }
     }
 }

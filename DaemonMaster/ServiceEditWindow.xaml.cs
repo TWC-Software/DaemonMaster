@@ -25,7 +25,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Resources;
-using System.Security;
 using System.ServiceProcess;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -33,7 +32,7 @@ using System.Windows.Data;
 using DaemonMaster.Language;
 using DaemonMasterCore;
 using DaemonMasterCore.Win32;
-using DaemonMasterCore.Win32.PInvoke;
+using DaemonMasterCore.Win32.PInvoke.Advapi32;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Tulpep.ActiveDirectoryObjectPicker;
@@ -45,7 +44,7 @@ namespace DaemonMaster
     /// </summary>
     public partial class ServiceEditWindow : Window
     {
-        public ServiceStartInfo GetServiceStartInfo() => _tempServiceConfig;
+        public DmServiceDefinition GetServiceStartInfo() => _tempServiceConfig;
 
         private const string PLACEHOLDER_PASSWORD = "88301CEB-1E6E-435C-A355-D055F9F8D430";
 
@@ -56,17 +55,17 @@ namespace DaemonMaster
         private ObservableCollection<string> _dependOnGroupObservableCollection;
         private ObservableCollection<string> _allGroupsObservableCollection;
 
-        private ServiceStartInfo _tempServiceConfig;
+        private DmServiceDefinition _tempServiceConfig;
         private bool _createNewService;
 
-        public ServiceEditWindow(ServiceStartInfo daemon)
+        public ServiceEditWindow(DmServiceDefinition daemon)
         {
             InitializeComponent();
 
-            _tempServiceConfig = daemon ?? new ServiceStartInfo();
+            _tempServiceConfig = daemon ?? new DmServiceDefinition(serviceName: null);
 
             //Create a new service when the service name is empty
-            if (String.IsNullOrWhiteSpace(_tempServiceConfig.ServiceName))
+            if (string.IsNullOrWhiteSpace(_tempServiceConfig.ServiceName))
                 _createNewService = true;
 
             //Show the information on the UI
@@ -78,32 +77,31 @@ namespace DaemonMaster
             #region GeneralTab
 
             //Set to readonly when it has already a servicename
-            if (!String.IsNullOrWhiteSpace(_tempServiceConfig.ServiceName))
+            if (!string.IsNullOrWhiteSpace(_tempServiceConfig.ServiceName))
                 textBoxServiceName.Text = _tempServiceConfig.ServiceName.Substring(13);
 
             textBoxServiceName.IsReadOnly = !_createNewService;
 
             textBoxDisplayName.Text = _tempServiceConfig.DisplayName;
 
-            if (!String.IsNullOrWhiteSpace(_tempServiceConfig.FileName) &&
-                !String.IsNullOrWhiteSpace(_tempServiceConfig.FileDir))
-                textBoxFilePath.Text = _tempServiceConfig.FullPath;
+            if (!string.IsNullOrWhiteSpace(_tempServiceConfig.BinaryPath))
+                textBoxFilePath.Text = _tempServiceConfig.BinaryPath;
 
-            textBoxParam.Text = _tempServiceConfig.Parameter;
+            textBoxParam.Text = _tempServiceConfig.Arguments;
             textBoxDescription.Text = _tempServiceConfig.Description;
 
             //StartType
             switch (_tempServiceConfig.StartType)
             {
-                case NativeMethods.SERVICE_START.SERVICE_AUTO_START:
+                case Advapi32.ServiceStartType.AutoStart:
                     comboBoxStartType.SelectedIndex = _tempServiceConfig.DelayedStart ? 1 : 0;
                     break;
 
-                case NativeMethods.SERVICE_START.SERVICE_DEMAND_START:
+                case Advapi32.ServiceStartType.StartOnDemand:
                     comboBoxStartType.SelectedIndex = 2;
                     break;
 
-                case NativeMethods.SERVICE_START.SERVICE_DISABLED:
+                case Advapi32.ServiceStartType.Disabled:
                     comboBoxStartType.SelectedIndex = 3;
                     break;
             }
@@ -112,16 +110,16 @@ namespace DaemonMaster
 
             #region CustomUser
 
-            if (_tempServiceConfig.UseLocalSystem)
+            if (Equals(_tempServiceConfig.Credentials, ServiceCredentials.LocalSystem))
             {
-                textBoxUsername.Text = String.Empty;
-                textBoxPassword.Password = String.Empty;
+                textBoxUsername.Text = string.Empty;
+                textBoxPassword.Password = string.Empty;
                 checkBoxUseLocalSystem.IsChecked = true;
             }
             else
             {
-                textBoxUsername.Text = _tempServiceConfig.Username;
-                textBoxPassword.Password = _createNewService ? String.Empty : PLACEHOLDER_PASSWORD;
+                textBoxUsername.Text = _tempServiceConfig.Credentials.Username;
+                textBoxPassword.Password = _createNewService ? string.Empty : PLACEHOLDER_PASSWORD;
                 checkBoxUseLocalSystem.IsChecked = false;
             }
 
@@ -130,12 +128,12 @@ namespace DaemonMaster
             #region AdvancedTab
 
 
-            textBoxMaxRestarts.Text = _tempServiceConfig.MaxRestarts.ToString();
-            textBoxProcessTimeoutTime.Text = _tempServiceConfig.ProcessKillTime.ToString();
+            textBoxMaxRestarts.Text = _tempServiceConfig.ProcessMaxRestarts.ToString();
+            textBoxProcessTimeoutTime.Text = _tempServiceConfig.ProcessTimoutTime.ToString();
             textBoxProcessRestartDelay.Text = _tempServiceConfig.ProcessRestartDelay.ToString();
             textBoxCounterResetTime.Text = _tempServiceConfig.CounterResetTime.ToString();
 
-            checkBoxIsConsoleApp.IsChecked = _tempServiceConfig.ConsoleApplication;
+            checkBoxIsConsoleApp.IsChecked = _tempServiceConfig.IsConsoleApplication;
             radioButtonUseCtrlC.IsChecked = _tempServiceConfig.UseCtrlC;
             radioButtonUseCtrlBreak.IsChecked = !_tempServiceConfig.UseCtrlC;
 
@@ -158,13 +156,18 @@ namespace DaemonMaster
 
             //Load Data into _dependOnServiceObservableCollection
             _dependOnServiceObservableCollection = new ObservableCollection<ServiceInfo>();
-            foreach (var dep in _tempServiceConfig.DependOnService)
+            foreach (string dep in _tempServiceConfig.DependOnService)
             {
-                ServiceInfo serviceInfo = new ServiceInfo
+                var serviceInfo = new ServiceInfo
                 {
-                    DisplayName = DaemonMasterUtils.GetDisplayName(dep),
                     ServiceName = dep
                 };
+
+                //Get display name
+                using (var serviceController = new ServiceController(dep))
+                {
+                    serviceInfo.DisplayName = serviceController.DisplayName;
+                }
 
                 _dependOnServiceObservableCollection.Add(serviceInfo);
             }
@@ -180,9 +183,9 @@ namespace DaemonMaster
 
             //Load Data into _allServicesObservableCollection
             _allServicesObservableCollection = new ObservableCollection<ServiceInfo>();
-            foreach (var service in ServiceController.GetServices())
+            foreach (ServiceController service in ServiceController.GetServices())
             {
-                ServiceInfo serviceInfo = new ServiceInfo
+                var serviceInfo = new ServiceInfo
                 {
                     DisplayName = service.DisplayName,
                     ServiceName = service.ServiceName
@@ -237,7 +240,7 @@ namespace DaemonMaster
 
         private void buttonSearchPath_OnClick(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog =
+            var openFileDialog =
                 new OpenFileDialog
                 {
                     InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
@@ -256,7 +259,7 @@ namespace DaemonMaster
                 textBoxFilePath.Text = openFileDialog.FileName;
 
                 //If the display name is empty, then it will use the file name
-                if (String.IsNullOrWhiteSpace(textBoxDisplayName.Text))
+                if (string.IsNullOrWhiteSpace(textBoxDisplayName.Text))
                 {
                     textBoxDisplayName.Text = Path.GetFileNameWithoutExtension(openFileDialog.SafeFileName);
                 }
@@ -265,7 +268,7 @@ namespace DaemonMaster
 
         private void buttonOpenADOP_OnClick(object sender, RoutedEventArgs e)
         {
-            using (DirectoryObjectPickerDialog pickerDialog = new DirectoryObjectPickerDialog
+            using (var pickerDialog = new DirectoryObjectPickerDialog
             {
 
                 AllowedObjectTypes = ObjectTypes.Users,
@@ -356,7 +359,7 @@ namespace DaemonMaster
         {
             string args = textBoxParam.Text;
 
-            if (String.IsNullOrWhiteSpace(args))
+            if (string.IsNullOrWhiteSpace(args))
                 return;
 
             //Remove leading and trailing white-space characters
@@ -389,12 +392,12 @@ namespace DaemonMaster
                 }
 
                 //Invalid value error
-                if (String.IsNullOrWhiteSpace(textBoxDisplayName.Text) ||
-                    String.IsNullOrWhiteSpace(textBoxServiceName.Text) ||
-                    !int.TryParse(textBoxMaxRestarts.Text, out var maxRestarts) ||
-                    !int.TryParse(textBoxProcessTimeoutTime.Text, out var processKillTime) ||
-                    !int.TryParse(textBoxProcessRestartDelay.Text, out var processRestartDelay) ||
-                    !int.TryParse(textBoxCounterResetTime.Text, out var counterResetTime) ||
+                if (string.IsNullOrWhiteSpace(textBoxDisplayName.Text) ||
+                    string.IsNullOrWhiteSpace(textBoxServiceName.Text) ||
+                    !int.TryParse(textBoxMaxRestarts.Text, out int maxRestarts) ||
+                    !int.TryParse(textBoxProcessTimeoutTime.Text, out int processKillTime) ||
+                    !int.TryParse(textBoxProcessRestartDelay.Text, out int processRestartDelay) ||
+                    !int.TryParse(textBoxCounterResetTime.Text, out int counterResetTime) ||
                     (checkBoxIsConsoleApp.IsChecked ?? false) && !(radioButtonUseCtrlBreak.IsChecked ?? true) &&
                     !(radioButtonUseCtrlC.IsChecked ?? true))
                 {
@@ -406,20 +409,20 @@ namespace DaemonMaster
 
                 #region Password/LocalSystem
 
-                _tempServiceConfig.UseLocalSystem = checkBoxUseLocalSystem.IsChecked ?? true;
-
-                if (_tempServiceConfig.UseLocalSystem || // => LocalSystem is null
-                    String.Equals(textBoxPassword.Password, PLACEHOLDER_PASSWORD) && //Nothing has changed (null safe)
-                    String.Equals(textBoxUsername.Text, _tempServiceConfig.Username)) //Nothing has changed (null safe)
+                if (checkBoxUseLocalSystem.IsChecked ?? true) // => LocalSystem is null            
                 {
-                    _tempServiceConfig.Username = _tempServiceConfig.UseLocalSystem && !_createNewService ? "LocalSystem" : null;
-                    _tempServiceConfig.Password = new SecureString();
+                    _tempServiceConfig.Credentials = ServiceCredentials.LocalSystem;
+                }
+                else if (string.Equals(textBoxPassword.Password, PLACEHOLDER_PASSWORD) && //Nothing has changed (null safe)
+                         string.Equals(textBoxUsername.Text, _tempServiceConfig.Credentials.Username)) //Nothing has changed (null safe
+                {
+                    _tempServiceConfig.Credentials = ServiceCredentials.NoChange; //Null stands for nothing has changed 
                 }
                 else
                 {
                     //No date has been written in the textfields
-                    if (String.IsNullOrWhiteSpace(textBoxUsername.Text) ||
-                        String.IsNullOrWhiteSpace(textBoxPassword.Password))
+                    if (string.IsNullOrWhiteSpace(textBoxUsername.Text) ||
+                        string.IsNullOrWhiteSpace(textBoxPassword.Password))
                     {
                         MessageBox.Show(_resManager.GetString("invalid_pw_user", CultureInfo.CurrentUICulture),
                             _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
@@ -437,7 +440,7 @@ namespace DaemonMaster
                     }
 
                     //Password or username is not correct
-                    if (!SystemManagement.ValidateUser(textBoxUsername.Text, textBoxPassword.SecurePassword))
+                    if (!DaemonMasterUtils.ValidateUser(textBoxUsername.Text, textBoxPassword.SecurePassword))
                     {
                         MessageBox.Show(_resManager.GetString("login_failed", CultureInfo.CurrentUICulture),
                             _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
@@ -445,8 +448,7 @@ namespace DaemonMaster
                         return;
                     }
 
-                    _tempServiceConfig.Username = textBoxUsername.Text;
-                    _tempServiceConfig.Password = textBoxPassword.SecurePassword;
+                    _tempServiceConfig.Credentials = new ServiceCredentials(textBoxUsername.Text, textBoxPassword.SecurePassword);
                 }
 
                 #endregion
@@ -454,13 +456,13 @@ namespace DaemonMaster
                 _tempServiceConfig.DisplayName = textBoxDisplayName.Text;
                 _tempServiceConfig.ServiceName = "DaemonMaster_" + textBoxServiceName.Text;
 
-                _tempServiceConfig.FullPath = textBoxFilePath.Text;
+                _tempServiceConfig.BinaryPath = textBoxFilePath.Text;
 
-                _tempServiceConfig.Parameter = textBoxParam.Text;
+                _tempServiceConfig.Arguments = textBoxParam.Text;
                 _tempServiceConfig.Description = textBoxDescription.Text;
 
-                _tempServiceConfig.MaxRestarts = maxRestarts;
-                _tempServiceConfig.ProcessKillTime = processKillTime;
+                _tempServiceConfig.ProcessMaxRestarts = maxRestarts;
+                _tempServiceConfig.ProcessTimoutTime = processKillTime;
                 _tempServiceConfig.ProcessRestartDelay = processRestartDelay;
                 _tempServiceConfig.CounterResetTime = counterResetTime;
 
@@ -468,8 +470,8 @@ namespace DaemonMaster
                     _dependOnServiceObservableCollection.Select(x => x.ServiceName).ToArray();
                 _tempServiceConfig.DependOnGroup = _dependOnGroupObservableCollection.ToArray();
 
-                _tempServiceConfig.ConsoleApplication = checkBoxIsConsoleApp.IsChecked ?? false;
-                _tempServiceConfig.UseCtrlC = _tempServiceConfig.ConsoleApplication &&
+                _tempServiceConfig.IsConsoleApplication = checkBoxIsConsoleApp.IsChecked ?? false;
+                _tempServiceConfig.UseCtrlC = _tempServiceConfig.IsConsoleApplication &&
                                              (radioButtonUseCtrlC.IsChecked ?? true) &&
                                              !(radioButtonUseCtrlBreak.IsChecked ?? false);
 
@@ -477,30 +479,21 @@ namespace DaemonMaster
 
                 switch (comboBoxStartType.SelectedIndex)
                 {
-
-                    //Automatic
                     case 0:
                         _tempServiceConfig.DelayedStart = false;
-                        _tempServiceConfig.StartType = NativeMethods.SERVICE_START.SERVICE_AUTO_START;
+                        _tempServiceConfig.StartType = Advapi32.ServiceStartType.AutoStart;
                         break;
-
-
-                    //Automatic with delay
                     case 1:
                         _tempServiceConfig.DelayedStart = true;
-                        _tempServiceConfig.StartType = NativeMethods.SERVICE_START.SERVICE_AUTO_START;
+                        _tempServiceConfig.StartType = Advapi32.ServiceStartType.AutoStart;
                         break;
-
-                    //Manual
                     case 2:
                         _tempServiceConfig.DelayedStart = false;
-                        _tempServiceConfig.StartType = NativeMethods.SERVICE_START.SERVICE_DEMAND_START;
+                        _tempServiceConfig.StartType = Advapi32.ServiceStartType.StartOnDemand;
                         break;
-
-                    //Disabled
                     case 3:
                         _tempServiceConfig.DelayedStart = false;
-                        _tempServiceConfig.StartType = NativeMethods.SERVICE_START.SERVICE_DISABLED;
+                        _tempServiceConfig.StartType = Advapi32.ServiceStartType.Disabled;
                         break;
                 }
 
@@ -519,11 +512,11 @@ namespace DaemonMaster
             try
             {
                 //Only Check that right if its not the local system
-                if (!_tempServiceConfig.UseLocalSystem)
+                if (!Equals(_tempServiceConfig.Credentials, ServiceCredentials.LocalSystem) && !Equals(_tempServiceConfig.Credentials, ServiceCredentials.NoChange))
                 {
-                    using (LsaPolicyHandle lsaWrapper = new LsaPolicyHandle())
+                    using (LsaPolicyHandle lsaWrapper = LsaPolicyHandle.OpenPolicyHandle())
                     {
-                        bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(_tempServiceConfig.Username).Any(x => x.Buffer == "SeServiceLogonRight");
+                        bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(_tempServiceConfig.Credentials.Username).Any(x => x.Buffer == "SeServiceLogonRight");
                         if (!hasRightToStartAsService)
                         {
                             MessageBoxResult result = MessageBox.Show(_resManager.GetString("logon_as_a_service", CultureInfo.CurrentUICulture), _resManager.GetString("question", CultureInfo.CurrentUICulture), MessageBoxButton.YesNo, MessageBoxImage.Question);
@@ -531,23 +524,34 @@ namespace DaemonMaster
                                 return;
 
                             //Give the account the right to start as service
-                            lsaWrapper.AddPrivileges(_tempServiceConfig.Username, new[] { "SeServiceLogonRight" });
+                            lsaWrapper.AddPrivileges(_tempServiceConfig.Credentials.Username, new[] { "SeServiceLogonRight" });
                         }
                     }
                 }
 
                 if (_createNewService)
                 {
-                    ServiceManagement.CreateInteractiveService(_tempServiceConfig);
+                    using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.CreateService))
+                    {
+                        scm.CreateService(_tempServiceConfig);
 
-                    MessageBox.Show(
-                        _resManager.GetString("the_service_installation_was_successful", CultureInfo.CurrentUICulture),
-                        _resManager.GetString("success", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Information);
+                        //When no exception has been throwed show up a message
+                        MessageBox.Show(
+                            _resManager.GetString("the_service_installation_was_successful", CultureInfo.CurrentUICulture),
+                            _resManager.GetString("success", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
                 }
                 else
                 {
-                    ServiceManagement.ChangeServiceConfig(_tempServiceConfig);
+                    using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
+                    {
+                        using (ServiceHandle serviceHandle = scm.OpenService(_tempServiceConfig.ServiceName, Advapi32.ServiceAccessRights.ChangeConfig))
+                        {
+                            serviceHandle.ChangeConfig(_tempServiceConfig);
+                        }
+                    }
                 }
+
 
                 //Save settings in registry after no error is oucoured
                 RegistryManagement.SaveInRegistry(_tempServiceConfig);
@@ -566,7 +570,7 @@ namespace DaemonMaster
 
         private void ImportConfiguration()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog
+            var openFileDialog = new OpenFileDialog
             {
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
                 Filter = "DaemonMaster Config (*.dmdf)|*.dmdf|" +
@@ -583,7 +587,11 @@ namespace DaemonMaster
                 if (openFileDialog.ShowDialog() == true)
                 {
                     _createNewService = true;
-                    _tempServiceConfig = SystemManagement.ParseDmdfFile(openFileDialog.FileName);
+                    using (StreamReader streamReader = File.OpenText(openFileDialog.FileName))
+                    {
+                        var serializer = new JsonSerializer();
+                        _tempServiceConfig = (DmServiceDefinition)serializer.Deserialize(streamReader, typeof(DmServiceDefinition));
+                    }
 
                     LoadServiceInfos();
                 }
@@ -596,7 +604,7 @@ namespace DaemonMaster
 
         private void ExportConfiguration()
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog
+            var saveFileDialog = new SaveFileDialog
             {
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
                 Filter = "DaemonMaster Config (*.dmdf)|*.dmdf|" +
@@ -613,7 +621,7 @@ namespace DaemonMaster
                 {
                     using (StreamWriter streamWriter = File.CreateText(saveFileDialog.FileName))
                     {
-                        JsonSerializer serializer = new JsonSerializer
+                        var serializer = new JsonSerializer
                         {
                             Formatting = Formatting.Indented
                         };

@@ -39,8 +39,8 @@ namespace DaemonMasterUpdater
         {
             InitializeComponent();
 
-            LabelUpdate.Content = String.Format(_resManager.GetString("label_update", CultureInfo.CurrentUICulture), Updater.AppName);
-            LabelDescription.Content = String.Format(_resManager.GetString("label_description", CultureInfo.CurrentUICulture), Updater.AppName, Updater.LastGitHubRelease.Version);
+            LabelUpdate.Content = string.Format(_resManager.GetString("label_update", CultureInfo.CurrentUICulture), Updater.AppName);
+            LabelDescription.Content = string.Format(_resManager.GetString("label_description", CultureInfo.CurrentUICulture), Updater.AppName, Updater.LastGitHubRelease.Version);
         }
 
         private void ButtonUpdate_Click(object sender, RoutedEventArgs e)

@@ -37,6 +37,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -81,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CmdLineOptions.cs" />
+    <Compile Include="DmProcess.cs" />
     <Compile Include="Service.cs">
       <SubType>Component</SubType>
     </Compile>

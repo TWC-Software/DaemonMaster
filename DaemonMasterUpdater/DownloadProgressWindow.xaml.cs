@@ -150,12 +150,12 @@ namespace DaemonMasterUpdater
         {
             if (File.Exists(file))
             {
-                ProcessStartInfo startInfo = new ProcessStartInfo()
+                var startInfo = new ProcessStartInfo()
                 {
                     UseShellExecute = true,
                     FileName = file,
                 };
-                Process process = new Process()
+                var process = new Process()
                 {
                     StartInfo = startInfo,
                 };

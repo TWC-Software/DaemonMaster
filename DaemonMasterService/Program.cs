@@ -18,13 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.IO;
-using System.Linq;
-using System.Security;
 using System.ServiceProcess;
-using CommandLine;
-using DaemonMasterCore;
-using DaemonMasterCore.Win32.PInvoke;
 using NLog;
 
 namespace DaemonMasterService
@@ -38,233 +32,233 @@ namespace DaemonMasterService
         /// </summary>
         static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<GeneralOptions, ServiceOptions, EditOptions, InstallOptions, InstallDmdfOptions>(args)
-               .MapResult(
-                   (GeneralOptions opts) => RunOptionsAndReturnExitCode(opts),
-                   (ServiceOptions opts) => RunServiceAndReturnExitCode(opts),
-                   (EditOptions opts) => RunEditReturnExitCode(opts),
-                   (InstallOptions opts) => RunInstallAndReturnExitCode(opts),
-                   (InstallDmdfOptions opts) => RunInstallDmdfAndReturnExitCode(opts),
-                   errs => 1);
+            //Parser.Default.ParseArguments<ServiceOptions, GeneralOptions, EditOptions, InstallOptions, InstallDmdfOptions>(args)
+            //   .MapResult(
+            //        (ServiceOptions opts) => RunServiceAndReturnExitCode(opts),
+            //       //(GeneralOptions opts) => RunOptionsAndReturnExitCode(opts),
+            //       //(EditOptions opts) => RunEditReturnExitCode(opts),
+            //       //(InstallOptions opts) => RunInstallAndReturnExitCode(opts),
+            //       //(InstallDmdfOptions opts) => RunInstallDmdfAndReturnExitCode(opts),
+            //       errs => 1);
+            StartService();
         }
 
         private static int RunServiceAndReturnExitCode(ServiceOptions opts)
         {
-            return StartService(opts.EnablePause);
+            return StartService();
         }
 
-        private static int RunOptionsAndReturnExitCode(GeneralOptions option)
-        {
-            int result = 0;
+        //private static int RunOptionsAndReturnExitCode(GeneralOptions option)
+        //{
+        //    int result = 0;
 
-            //Check Admin right
-            if (!SystemManagement.IsElevated())
-            {
-                Logger.Error("You must start the programm with admin rights.");
-                return 1;
-            }
-
-
-            if (option.KillAllServices)
-                if (ServiceManagement.KillAllServices())
-                    result = 1;
-
-            if (option.DeleteAllServices)
-                if (ServiceManagement.DeleteAllServices())
-                    result = 1;
-
-            return result;
-        }
-
-        private static int RunEditReturnExitCode(EditOptions opts)
-        {
-            //Check Admin right
-            if (!SystemManagement.IsElevated())
-            {
-                Logger.Error("You must start the programm with admin rights.");
-                return 1;
-            }
-
-            return InstallEditService(opts, opts.ServiceName, editMode: true);
-        }
-
-        private static int RunInstallAndReturnExitCode(InstallOptions opts)
-        {
-            //Check Admin right
-            if (!SystemManagement.IsElevated())
-            {
-                Logger.Error("You must start the programm with admin rights.");
-                return 1;
-            }
-
-            return InstallEditService(opts, opts.ServiceName, editMode: false);
-        }
-
-        private static int RunInstallDmdfAndReturnExitCode(InstallDmdfOptions opts)
-        {
-            //Check Admin right
-            if (!SystemManagement.IsElevated())
-            {
-                Logger.Error("You must start the programm with admin rights.");
-                return 1;
-            }
-
-            if (!String.IsNullOrWhiteSpace(opts.Path) && File.Exists(opts.Path))
-            {
-                Logger.Error("Invalid or no path defined.");
-                return 1;
-            }
-
-            return InstallNewServiceDmdf(opts.Path, opts.Password.ConvertStringToSecureString());
-        }
+        //    //Check Admin right
+        //    if (!SystemManagement.IsElevated())
+        //    {
+        //        Logger.Error("You must start the programm with admin rights.");
+        //        return 1;
+        //    }
 
 
-        private static int InstallEditService(CommonEditInstallOptions opts, string serviceName, bool editMode)
-        {
-            try
-            {
-                SecureString pw = opts.Password?.ConvertStringToSecureString();
+        //    if (option.KillAllServices)
+        //        if (ServiceManagement.KillAllServices())
+        //            result = 1;
 
-                if (opts.CanInteractWithDesktop && !DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
-                {
-                    Logger.Error("CanInteractWithDesktop is not supported in this windows version.");
-                    return 1;
-                }
-                if (opts.CanInteractWithDesktop && !String.IsNullOrWhiteSpace(opts.Username))
-                {
-                    Logger.Error("CanInteractWithDesktop is not supported with custom user.");
-                    return 1;
-                }
-                if ((String.IsNullOrWhiteSpace(opts.Username) && pw != null) || (!String.IsNullOrWhiteSpace(opts.Username) && pw == null))
-                {
-                    Logger.Error("Password/username parameter is missing!");
-                    return 1;
-                }
+        //    if (option.DeleteAllServices)
+        //        if (ServiceManagement.DeleteAllServices())
+        //            result = 1;
+
+        //    return result;
+        //}
+
+        //private static int RunEditReturnExitCode(EditOptions opts)
+        //{
+        //    //Check Admin right
+        //    if (!SystemManagement.IsElevated())
+        //    {
+        //        Logger.Error("You must start the programm with admin rights.");
+        //        return 1;
+        //    }
+
+        //    return InstallEditService(opts, opts.ServiceName, editMode: true);
+        //}
+
+        //private static int RunInstallAndReturnExitCode(InstallOptions opts)
+        //{
+        //    //Check Admin right
+        //    if (!SystemManagement.IsElevated())
+        //    {
+        //        Logger.Error("You must start the programm with admin rights.");
+        //        return 1;
+        //    }
+
+        //    return InstallEditService(opts, opts.ServiceName, editMode: false);
+        //}
+
+        //private static int RunInstallDmdfAndReturnExitCode(InstallDmdfOptions opts)
+        //{
+        //    //Check Admin right
+        //    if (!SystemManagement.IsElevated())
+        //    {
+        //        Logger.Error("You must start the programm with admin rights.");
+        //        return 1;
+        //    }
+
+        //    //Check Path
+        //    if (String.IsNullOrWhiteSpace(opts.Path) || !File.Exists(opts.Path))
+        //    {
+        //        Logger.Error("Invalid or no path defined.");
+        //        return 1;
+        //    }
+
+        //    return InstallNewServiceDmdf(opts.Path, opts.Password.ConvertStringToSecureString());
+        //}
 
 
-                ServiceStartInfo serviceStartInfo = new ServiceStartInfo
-                {
-                    FullPath = opts.FullPath,
-                    ServiceName = serviceName,
-                    DisplayName = opts.DisplayName,
-                    Description = opts.Description,
-                    Parameter = opts.Arguments,
-                    CanInteractWithDesktop = opts.CanInteractWithDesktop,
-                    UseLocalSystem = String.IsNullOrWhiteSpace(opts.Username) && pw == null,
-                    MaxRestarts = opts.MaxRestarts,
-                    ProcessKillTime = opts.ProcessKillTime,
-                    ProcessRestartDelay = opts.ProcessRestartDelay,
-                    CounterResetTime = opts.CounterResetTime,
-                    ConsoleApplication = opts.ConsoleApplication,
-                    UseCtrlC = opts.UseCtrlC
-                };
+        //private static int InstallEditService(CommonEditInstallOptions opts, string serviceName, bool editMode)
+        //{
+        //    try
+        //    {
+        //        SecureString pw = opts.Password?.ConvertStringToSecureString();
 
-                //Custom user
-                if (serviceStartInfo.UseLocalSystem)
-                {
-                    serviceStartInfo.Username = editMode ? "LocalSystem" : null; //Null stand in edit mode for no change so "LocalSystem" must be used there
-                    serviceStartInfo.Password = null;
-                }
-                else
-                {
-                    if (!SystemManagement.ValidateUser(opts.Username, pw))
-                    {
-                        Logger.Error("Failed to validate the given password/username.");
-                        return 1;
-                    }
+        //        if (opts.CanInteractWithDesktop && !DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
+        //        {
+        //            Logger.Error("CanInteractWithDesktop is not supported in this windows version.");
+        //            return 1;
+        //        }
+        //        if (opts.CanInteractWithDesktop && !String.IsNullOrWhiteSpace(opts.Username))
+        //        {
+        //            Logger.Error("CanInteractWithDesktop is not supported with custom user.");
+        //            return 1;
+        //        }
+        //        if ((String.IsNullOrWhiteSpace(opts.Username) && pw != null) || (!String.IsNullOrWhiteSpace(opts.Username) && pw == null))
+        //        {
+        //            Logger.Error("Password/username parameter is missing!");
+        //            return 1;
+        //        }
 
-                    serviceStartInfo.Username = opts.Username;
-                    serviceStartInfo.Password = pw;
-                }
 
-                //Set the start type
-                switch (opts.StartType)
-                {
-                    case 0:
-                        serviceStartInfo.StartType = NativeMethods.SERVICE_START.SERVICE_DISABLED;
-                        serviceStartInfo.DelayedStart = false;
-                        break;
+        //        DmServiceDefinition serviceDefinition = new DmServiceDefinition(serviceName)
+        //        {
+        //            BinaryPath = opts.FullPath,
+        //            DisplayName = opts.DisplayName,
+        //            Description = opts.Description,
+        //            Arguments = opts.Arguments,
+        //            CanInteractWithDesktop = opts.CanInteractWithDesktop,
+        //            ProcessMaxRestarts = opts.MaxRestarts,
+        //            ProcessTimoutTime = opts.ProcessKillTime,
+        //            ProcessRestartDelay = opts.ProcessRestartDelay,
+        //            CounterResetTime = opts.CounterResetTime,
+        //            IsConsoleApplication = opts.ConsoleApplication,
+        //            UseCtrlC = opts.UseCtrlC
+        //        };
 
-                    case 1:
-                        serviceStartInfo.StartType = NativeMethods.SERVICE_START.SERVICE_DEMAND_START;
-                        serviceStartInfo.DelayedStart = false;
-                        break;
+        //        //Custom user
+        //        if (!Equals(serviceDefinition.Credentials, ServiceCredentials.LocalSystem))
+        //        {
+        //            if (!SystemManagement.ValidateUser(opts.Username, pw))
+        //            {
+        //                Logger.Error("Failed to validate the given password/username.");
+        //                return 1;
+        //            }
 
-                    case 2:
-                        serviceStartInfo.StartType = NativeMethods.SERVICE_START.SERVICE_AUTO_START;
-                        serviceStartInfo.DelayedStart = false;
-                        break;
+        //            serviceDefinition.Credentials = new ServiceCredentials(opts.Username, pw);
+        //        }
 
-                    case 4:
-                        serviceStartInfo.StartType = NativeMethods.SERVICE_START.SERVICE_AUTO_START;
-                        serviceStartInfo.DelayedStart = true;
-                        break;
+        //        //Set the start type
+        //        switch (opts.StartType)
+        //        {
+        //            case 0:
+        //                serviceDefinition.StartType = ServiceStartType.Disabled;
+        //                serviceDefinition.DelayedStart = false;
+        //                break;
 
-                    default:
-                        Logger.Error("The StartType can only be between 0-4 (0 = Disabled / 1 = Demand start / 2 = Auto start / 4 = Delayed auto start).");
-                        return 1;
+        //            case 1:
+        //                serviceDefinition.StartType = ServiceStartType.StartOnDemand;
+        //                serviceDefinition.DelayedStart = false;
+        //                break;
 
-                }
+        //            case 2:
+        //                serviceDefinition.StartType = ServiceStartType.AutoStart;
+        //                serviceDefinition.DelayedStart = false;
+        //                break;
 
-                if (editMode)
-                {
-                    ServiceManagement.ChangeServiceConfig(serviceStartInfo);
-                }
-                else
-                {
-                    ServiceManagement.CreateInteractiveService(serviceStartInfo);
-                }
+        //            case 4:
+        //                serviceDefinition.StartType = ServiceStartType.AutoStart;
+        //                serviceDefinition.DelayedStart = true;
+        //                break;
 
-                Logger.Info("Successful!");
-                return 0;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex.Message);
-                return 1;
-            }
-        }
+        //            default:
+        //                Logger.Error("The StartType can only be between 0-4 (0 = Disabled / 1 = Demand start / 2 = Auto start / 4 = Delayed auto start).");
+        //                return 1;
 
-        private static int InstallNewServiceDmdf(string path, SecureString pw)
-        {
-            try
-            {
-                ServiceStartInfo serviceStartInfo = SystemManagement.ParseDmdfFile(path);
+        //        }
 
-                //Check if the service already exist
-                if (ServiceController.GetServices().Any(service => String.Equals(serviceStartInfo.ServiceName, service.ServiceName)))
-                    throw new ArgumentException("A service with the same name already exist.");
+        //        if (editMode)
+        //        {
+        //            ServiceManagement.ChangeServiceConfig(serviceDefinition);
+        //        }
+        //        else
+        //        {
+        //            ServiceManagement.CreateInteractiveService(serviceDefinition);
+        //        }
 
-                //Check if the password is valid when not the local system account is used
-                if (!serviceStartInfo.UseLocalSystem)
-                {
-                    if (pw != null && pw.Length > 0)
-                    {
-                        serviceStartInfo.Password = pw; //Set password
-                    }
-                    else
-                    {
-                        throw new ArgumentException("You must give a password with the --pw parameter when you will use a custom user account.");
-                    }
-                }
+        //        Logger.Info("Successful!");
+        //        return 0;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Error(ex.Message);
+        //        return 1;
+        //    }
+        //}
 
-                ServiceManagement.CreateInteractiveService(serviceStartInfo);
+        //private static int InstallNewServiceDmdf(string path, SecureString pw)
+        //{
+        //    try
+        //    {
+        //        DmServiceDefinition serviceDefinition = SystemManagement.ParseDmdfFile(path);
 
-                Logger.Info("Successful!");
-                return 0;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex.Message);
-                return 1;
-            }
-        }
+        //        //Check if the service already exist
+        //        if (ServiceController.GetServices().Any(service => String.Equals(serviceDefinition.ServiceName, service.ServiceName)))
+        //            throw new ArgumentException("A service with the same name already exist.");
 
-        private static int StartService(bool enablePause)
+        //        //Check if the password is valid when not the local system account is used
+        //        if (!Equals(serviceDefinition.Credentials, ServiceCredentials.LocalSystem))
+        //        {
+        //            if (pw != null)
+        //            {
+        //                if (!SystemManagement.ValidateUser(serviceDefinition.Credentials.Username, pw))
+        //                {
+        //                    Logger.Error("Failed to validate the given password/username.");
+        //                    return 1;
+        //                }
+
+        //                serviceDefinition.Credentials = new ServiceCredentials(serviceDefinition.Credentials.Username, pw); //Set password
+        //            }
+        //            else
+        //            {
+        //                throw new ArgumentException("You must give a password with the --pw parameter when you will use a custom user account.");
+        //            }
+        //        }
+
+        //        ServiceManagement.CreateInteractiveService(serviceDefinition);
+
+        //        Logger.Info("Successful!");
+        //        return 0;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Error(ex.Message);
+        //        return 1;
+        //    }
+        //}
+
+        private static int StartService()
         {
             var servicesToRun = new ServiceBase[]
             {
-                new Service(enablePause)
+                new Service()
             };
 
             try

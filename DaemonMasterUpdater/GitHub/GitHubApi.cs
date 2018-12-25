@@ -73,7 +73,7 @@ namespace DaemonMasterUpdater.GitHub
             repoApiUrl.Append("/releases");
 
             //Adding access token when present
-            if (!String.IsNullOrWhiteSpace(accessToken))
+            if (!string.IsNullOrWhiteSpace(accessToken))
                 repoApiUrl.Append("?access_token=").Append(accessToken);
 
             using (var httpClient = new HttpClient())
@@ -87,13 +87,13 @@ namespace DaemonMasterUpdater.GitHub
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                var result = await httpClient.GetAsync(repoApiUrl.ToString());
+                HttpResponseMessage result = await httpClient.GetAsync(repoApiUrl.ToString());
 
                 //Make an exception if the result is not valid
                 result.EnsureSuccessStatusCode();
 
                 var releases = JsonConvert.DeserializeObject<List<GitHubRelease>>(await result.Content.ReadAsStringAsync());
-                var lastReleases = releases
+                GitHubRelease lastReleases = releases
                     .Where(x => acceptPrerelease || !x.Prerelease) //Exclude or include prerelease
                     .OrderByDescending(x => x.PublishedAt) //Order by publishing date
                     .First(); //Get only the first one back

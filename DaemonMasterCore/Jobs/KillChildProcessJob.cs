@@ -21,8 +21,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using DaemonMasterCore.Win32;
-using DaemonMasterCore.Win32.PInvoke;
-using Microsoft.Win32.SafeHandles;
+using DaemonMasterCore.Win32.PInvoke.Kernel32;
 
 namespace DaemonMasterCore.Jobs
 {
@@ -37,37 +36,38 @@ namespace DaemonMasterCore.Jobs
             if (Environment.OSVersion.Version.Major <= 6 && Environment.OSVersion.Version.Minor <= 1)
                 return;
 
-            //Create job
-            _jobHandle = JobHandle.CreateJob(null, "KillChildProcessJob" + Process.GetCurrentProcess().Id);
+            //Create default security attributes
+            var securityAttributes = new Kernel32.SecurityAttributes();
+            securityAttributes.length = (uint)Marshal.SizeOf(securityAttributes);
 
-            NativeMethods.JOBOBJECT_BASIC_LIMIT_INFORMATION jobBasicLimitInformation = new NativeMethods.JOBOBJECT_BASIC_LIMIT_INFORMATION
+            //Create a job handle
+            _jobHandle = JobHandle.CreateJob(securityAttributes, "KillChildProcessJob" + Process.GetCurrentProcess().Id);
+
+            //Create basic limit infos
+            var jobBasicLimitInformation = new Kernel32.JobObjectBasicLimitInformation()
             {
-                LimitFlags = NativeMethods.JobObjectLimitFlags.KillOnJobClose
+                LimitFlags = Kernel32.JobObjectlimit.KillOnJobClose
             };
 
-            NativeMethods.JOBOBJECT_EXTENDED_LIMIT_INFORMATION jobExtendedLimitInformation = new NativeMethods.JOBOBJECT_EXTENDED_LIMIT_INFORMATION
+            //Create extended limit infos
+            var jobExtendedLimitInformation = new Kernel32.JobObjectExtendedLimitInformation()
             {
                 BasicLimitInformation = jobBasicLimitInformation
             };
 
-            int length = Marshal.SizeOf(typeof(NativeMethods.JOBOBJECT_EXTENDED_LIMIT_INFORMATION));
+            //Set the information for the job handle
+            int length = Marshal.SizeOf(jobExtendedLimitInformation);
             IntPtr jobExtendedLimitInformationHandle = Marshal.AllocHGlobal(length);
             try
             {
-                Marshal.StructureToPtr(jobExtendedLimitInformation, jobExtendedLimitInformationHandle, true);
+                Marshal.StructureToPtr(jobExtendedLimitInformation, jobExtendedLimitInformationHandle, false);
 
-                _jobHandle.SetInformation(NativeMethods.JobObjectInfoType.ExtendedLimitInformation, jobExtendedLimitInformationHandle, (uint)length);
+                _jobHandle.SetInformation(Kernel32.JobObjectInfoType.ExtendedLimitInformation, jobExtendedLimitInformationHandle, (uint)length);
             }
             finally
             {
                 Marshal.FreeHGlobal(jobExtendedLimitInformationHandle);
             }
-        }
-
-        public void AssignProcess(SafeProcessHandle processHandle)
-        {
-            if (!_jobHandle.IsInvalid)
-                _jobHandle.AssignProcess(processHandle);
         }
 
         public void AssignProcess(Process process)

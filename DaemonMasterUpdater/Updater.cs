@@ -129,7 +129,7 @@ namespace DaemonMasterUpdater
                     }
                     else
                     {
-                        Thread thread = new Thread(ShowUpdateWindow);
+                        var thread = new Thread(ShowUpdateWindow);
                         thread.CurrentCulture = thread.CurrentUICulture = CultureInfo.CurrentCulture;
                         thread.SetApartmentState(ApartmentState.STA);
                         thread.Start();
@@ -163,8 +163,8 @@ namespace DaemonMasterUpdater
         /// </summary>
         private static void CloseAllRunningInstances()
         {
-            var currentProcess = Process.GetCurrentProcess();
-            foreach (var process in Process.GetProcessesByName(currentProcess.ProcessName))
+            Process currentProcess = Process.GetCurrentProcess();
+            foreach (Process process in Process.GetProcessesByName(currentProcess.ProcessName))
             {
                 string fileName;
                 try

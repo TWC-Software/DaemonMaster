@@ -23,6 +23,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
+// ReSharper disable ArrangeAccessorOwnerBody
+// ReSharper disable InconsistentNaming
 
 namespace DaemonMasterCore.Win32
 {
@@ -46,7 +48,7 @@ namespace DaemonMasterCore.Win32
 
         [ComImport]
         [Guid("000214F9-0000-0000-C000-000000000046"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        interface IShellLinkW
+        private interface IShellLinkW
         {
             /// <summary>Retrieves the path and file name of a Shell link object</summary>
             [return: MarshalAs(UnmanagedType.I4)]
@@ -188,16 +190,16 @@ namespace DaemonMasterCore.Win32
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         struct WIN32_FIND_DATAW
         {
-            public uint dwFileAttributes;
-            public long ftCreationTime;
-            public long ftLastAccessTime;
-            public long ftLastWriteTime;
-            public uint nFileSizeHigh;
-            public uint nFileSizeLow;
-            public uint dwReserved0;
-            public uint dwReserved1;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)] public string cFileName;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 14)] public string cAlternateFileName;
+            uint dwFileAttributes;
+            long ftCreationTime;
+            long ftLastAccessTime;
+            long ftLastWriteTime;
+            uint nFileSizeHigh;
+            uint nFileSizeLow;
+            uint dwReserved0;
+            uint dwReserved1;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)] string cFileName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 14)] string cAlternateFileName;
         }
         #endregion
 
@@ -219,7 +221,7 @@ namespace DaemonMasterCore.Win32
         {
             try
             {
-                shellLink = (IShellLinkW)new ShellLink();
+                shellLink = new ShellLink() as IShellLinkW;
             }
             catch (Exception)
             {
@@ -234,7 +236,7 @@ namespace DaemonMasterCore.Win32
         {
             get
             {
-                IPersistFile persistFile = shellLink as IPersistFile;
+                var persistFile = shellLink as IPersistFile;
 
                 if (persistFile == null)
                     throw new COMException("Failed to create IPersistFile from shellLink!");
@@ -245,7 +247,7 @@ namespace DaemonMasterCore.Win32
 
         private void LoadShortcut(string filePath)
         {
-            if (String.IsNullOrWhiteSpace(filePath))
+            if (string.IsNullOrWhiteSpace(filePath))
                 throw new ArgumentException("File path is not valid!");
 
             if (!File.Exists(filePath))
@@ -281,9 +283,8 @@ namespace DaemonMasterCore.Win32
         {
             get
             {
-                string shortcutPath;
 
-                PersistFile.GetCurFile(out shortcutPath);
+                PersistFile.GetCurFile(out string shortcutPath);
                 return shortcutPath;
             }
         }
@@ -292,8 +293,8 @@ namespace DaemonMasterCore.Win32
         {
             get
             {
-                StringBuilder stringBuilder = new StringBuilder(MAX_PATH);
-                WIN32_FIND_DATAW data = new WIN32_FIND_DATAW();
+                var stringBuilder = new StringBuilder(MAX_PATH);
+                var data = new WIN32_FIND_DATAW();
 
                 CheckResult(shellLink.GetPath(stringBuilder, stringBuilder.Capacity, out data, 0));
                 return stringBuilder.ToString();
@@ -309,7 +310,7 @@ namespace DaemonMasterCore.Win32
         {
             get
             {
-                StringBuilder stringBuilder = new StringBuilder(MAX_PATH);
+                var stringBuilder = new StringBuilder(MAX_PATH);
 
                 CheckResult(shellLink.GetWorkingDirectory(stringBuilder, stringBuilder.Capacity));
                 return stringBuilder.ToString();
@@ -325,7 +326,7 @@ namespace DaemonMasterCore.Win32
         {
             get
             {
-                StringBuilder stringBuilder = new StringBuilder(INFOTIPSIZE);
+                var stringBuilder = new StringBuilder(INFOTIPSIZE);
 
                 CheckResult(shellLink.GetArguments(stringBuilder, stringBuilder.Capacity));
                 return stringBuilder.ToString();
@@ -341,7 +342,7 @@ namespace DaemonMasterCore.Win32
         {
             get
             {
-                StringBuilder stringBuilder = new StringBuilder(INFOTIPSIZE);
+                var stringBuilder = new StringBuilder(INFOTIPSIZE);
 
                 CheckResult(shellLink.GetDescription(stringBuilder, stringBuilder.Capacity));
                 return stringBuilder.ToString();
@@ -360,7 +361,7 @@ namespace DaemonMasterCore.Win32
 
         public static bool IsShortcut(string shortcutFullPath)
         {
-            return String.Equals(Path.GetExtension(shortcutFullPath), ".lnk", StringComparison.OrdinalIgnoreCase);
+            return string.Equals(Path.GetExtension(shortcutFullPath), ".lnk", StringComparison.OrdinalIgnoreCase);
         }
 
         private static void CheckResult(int hresult)

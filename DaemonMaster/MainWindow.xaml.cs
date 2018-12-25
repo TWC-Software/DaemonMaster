@@ -24,6 +24,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Resources;
+using System.ServiceProcess;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -32,7 +33,10 @@ using DaemonMaster.Language;
 using DaemonMasterCore;
 using DaemonMasterCore.Config;
 using DaemonMasterCore.Exceptions;
-using DaemonMasterCore.Win32.PInvoke;
+using DaemonMasterCore.Win32;
+using DaemonMasterCore.Win32.PInvoke.Advapi32;
+using DaemonMasterCore.Win32.PInvoke.Winsta;
+using TimeoutException = System.TimeoutException;
 
 namespace DaemonMaster
 {
@@ -55,7 +59,7 @@ namespace DaemonMaster
 
 
             //Fill the list and subs to the event
-            _processCollection = RegistryManagement.LoadDaemonItemsFromRegistry();
+            _processCollection = new ObservableCollection<ServiceListViewItem>(RegistryManagement.LoadInstalledServices().ConvertAll(x => new ServiceListViewItem(x.ServiceName, x.DisplayName, x.BinaryPath, Equals(x.Credentials, ServiceCredentials.LocalSystem))));
             _processCollection.CollectionChanged += ProcessCollectionOnCollectionChanged;
 
             //Start ListView updater
@@ -134,29 +138,19 @@ namespace DaemonMaster
             if (listViewDaemons.SelectedItem == null)
                 return;
 
-            ServiceListViewItem serviceListViewItem = (ServiceListViewItem)listViewDaemons.SelectedItem;
+            var serviceListViewItem = (ServiceListViewItem)listViewDaemons.SelectedItem;
 
             try
             {
-                switch (ServiceManagement.StartService(serviceListViewItem.ServiceName, true))
+                using (var serviceController = new ServiceController(serviceListViewItem.ServiceName))
                 {
-                    case DaemonServiceState.Unsuccessful:
-                        MessageBox.Show(_resManager.GetString("start_was_unsuccessful"),
-                            _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-                        break;
-                    case DaemonServiceState.Successful:
-                        MessageBox.Show(_resManager.GetString("start_was_successful"),
-                            _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                        break;
-                    case DaemonServiceState.AlreadyStopped:
-                        MessageBox.Show(_resManager.GetString("the_selected_process_is_already_started"),
-                            _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                        break;
+                    var args = new[] { "-startInUserSession" };
+                    serviceController.Start(args);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Cannot start the service in user session:\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -204,7 +198,7 @@ namespace DaemonMaster
 
         private void MenuItem_Credits_OnClick(object sender, RoutedEventArgs e)
         {
-            CreditsWindow creditsWindow = new CreditsWindow();
+            var creditsWindow = new CreditsWindow();
             creditsWindow.ShowDialog();
         }
         #endregion
@@ -217,7 +211,7 @@ namespace DaemonMaster
 
         private void UpdateListViewFilter()
         {
-            if (String.IsNullOrWhiteSpace(textBoxFilter.Text))
+            if (string.IsNullOrWhiteSpace(textBoxFilter.Text))
             {
                 if (Equals(listViewDaemons.ItemsSource, _processCollection) || listViewDaemons.Items.Count <= 0)
                     return;
@@ -229,7 +223,7 @@ namespace DaemonMaster
             listViewDaemons.ItemsSource = null;
             listViewDaemons.Items.Clear();
 
-            foreach (var item in _processCollection)
+            foreach (ServiceListViewItem item in _processCollection)
             {
                 if (item.DisplayName.ToLower().Contains(textBoxFilter.Text.ToLower()))
                     listViewDaemons.Items.Add(item);
@@ -271,11 +265,11 @@ namespace DaemonMaster
             {
                 try
                 {
-                    ServiceEditWindow serviceEditWindow = new ServiceEditWindow(null);
-                    var dialogResult = serviceEditWindow.ShowDialog(); //Wait until the window is closed
+                    var serviceEditWindow = new ServiceEditWindow(null);
+                    bool? dialogResult = serviceEditWindow.ShowDialog(); //Wait until the window is closed
                     if (dialogResult.HasValue && dialogResult.Value)
                     {
-                        _processCollection.Add(ServiceListViewItem.CreateItemFromInfo(serviceEditWindow.GetServiceStartInfo()));
+                        _processCollection.Add(ServiceListViewItem.CreateFromServiceDefinition(serviceEditWindow.GetServiceStartInfo()));
                     }
                 }
                 catch (Exception ex)
@@ -299,7 +293,13 @@ namespace DaemonMaster
 
             try
             {
-                ServiceManagement.DeleteService(serviceListViewItem.ServiceName);
+                using (var scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
+                {
+                    using (ServiceHandle servicehandle = scm.OpenService(serviceListViewItem.ServiceName, Advapi32.ServiceAccessRights.AllAccess))
+                    {
+                        servicehandle.DeleteService();
+                    }
+                }
                 _processCollection.Remove(_processCollection.Single(i => i.ServiceName == serviceListViewItem.ServiceName));
 
                 MessageBox.Show(_resManager.GetString("the_service_deletion_was_successful"),
@@ -326,42 +326,59 @@ namespace DaemonMaster
             if (listViewDaemons.SelectedItem == null)
                 return;
 
-            ServiceListViewItem serviceListViewItem = (ServiceListViewItem)listViewDaemons.SelectedItem;
+            var serviceListViewItem = (ServiceListViewItem)listViewDaemons.SelectedItem;
 
-            if (ServiceManagement.IsServiceRunning(serviceListViewItem.ServiceName))
+            //Stop service first
+            using (var serviceController = new ServiceController(serviceListViewItem.ServiceName))
             {
-                MessageBoxResult result = MessageBox.Show(_resManager.GetString("you_must_stop_the_service_first"),
-                    _resManager.GetString("information"), MessageBoxButton.YesNo, MessageBoxImage.Information);
+                if (serviceController.Status != ServiceControllerStatus.Stopped)
+                {
+                    MessageBoxResult result = MessageBox.Show(_resManager.GetString("you_must_stop_the_service_first"),
+                        _resManager.GetString("information"), MessageBoxButton.YesNo, MessageBoxImage.Information);
 
-                if (result == MessageBoxResult.Yes)
-                {
-                    StopService(serviceListViewItem);
-                }
-                else
-                {
-                    return;
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        StopService(serviceListViewItem);
+
+                        try
+                        {
+                            serviceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(10));
+                        }
+                        catch (TimeoutException ex)
+                        {
+                            //TODO: Better message
+                            MessageBox.Show("Cannot stop the service:\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
             }
+
 
             try
             {
                 //Open service edit window with the data from registry
-                ServiceEditWindow serviceEditWindow = new ServiceEditWindow(RegistryManagement.LoadServiceStartInfosFromRegistry(serviceListViewItem.ServiceName));
+                var serviceEditWindow = new ServiceEditWindow(RegistryManagement.LoadServiceStartInfosFromRegistry(serviceListViewItem.ServiceName));
                 //stops until windows has been closed
-                var dialogResult = serviceEditWindow.ShowDialog();
+                bool? dialogResult = serviceEditWindow.ShowDialog();
                 //Check result
                 if (dialogResult.HasValue && dialogResult.Value)
                 {
-                    ServiceStartInfo serviceStartInfo = serviceEditWindow.GetServiceStartInfo();
-                    if (String.Equals(serviceStartInfo.ServiceName, serviceListViewItem.ServiceName))
+                    DmServiceDefinition serviceDefinition = serviceEditWindow.GetServiceStartInfo();
+                    if (string.Equals(serviceDefinition.ServiceName, serviceListViewItem.ServiceName))
                     {
                         //Update serviceListViewItem
-                        _processCollection[_processCollection.IndexOf(serviceListViewItem)] = ServiceListViewItem.CreateItemFromInfo(serviceStartInfo);
+                        _processCollection[_processCollection.IndexOf(serviceListViewItem)] = ServiceListViewItem.CreateFromServiceDefinition(serviceDefinition);
                     }
                     else
                     {
                         //Create new daemon (Import as happend with a diffrent service name => create new service with that name)
-                        _processCollection.Add(ServiceListViewItem.CreateItemFromInfo(serviceStartInfo));
+                        _processCollection.Add(ServiceListViewItem.CreateFromServiceDefinition(serviceDefinition));
                     }
                 }
             }
@@ -375,24 +392,14 @@ namespace DaemonMaster
         {
             try
             {
-                switch (ServiceManagement.StartService(serviceListViewItem.ServiceName))
+                using (var serviceController = new ServiceController(serviceListViewItem.ServiceName))
                 {
-                    case DaemonServiceState.Unsuccessful:
-                        MessageBox.Show(_resManager.GetString("cannot_start_the_service"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-                        break;
-
-                    case DaemonServiceState.AlreadyStarted:
-                        MessageBox.Show(_resManager.GetString("cannot_start_the_service_already_running"), _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                        break;
-
-                    case DaemonServiceState.Successful:
-                        MessageBox.Show(_resManager.GetString("service_start_was_successful"), _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                        break;
+                    serviceController.Start();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Cannot start the service:\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -400,24 +407,14 @@ namespace DaemonMaster
         {
             try
             {
-                switch (ServiceManagement.StopService(serviceListViewItem.ServiceName))
+                using (var serviceController = new ServiceController(serviceListViewItem.ServiceName))
                 {
-                    case DaemonServiceState.Unsuccessful:
-                        MessageBox.Show(_resManager.GetString("cannot_stop_the_service"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-                        break;
-
-                    case DaemonServiceState.AlreadyStopped:
-                        MessageBox.Show(_resManager.GetString("cannot_stop_the_service_already_stopped"), _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                        break;
-
-                    case DaemonServiceState.Successful:
-                        MessageBox.Show(_resManager.GetString("service_stop_was_successful"), _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                        break;
+                    serviceController.Stop();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Cannot stop the service:\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -425,33 +422,17 @@ namespace DaemonMaster
         {
             try
             {
-                switch (ServiceManagement.KillService(serviceListViewItem.ServiceName))
-                {
-                    case DaemonServiceState.AlreadyStopped:
-                        MessageBox.Show(_resManager.GetString("cannot_stop_the_service_already_stopped"),
-                            _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-                        break;
-
-                    case DaemonServiceState.Successful:
-                        MessageBox.Show(_resManager.GetString("the_process_killing_was_successful"),
-                            _resManager.GetString("information"), MessageBoxButton.OK, MessageBoxImage.Information);
-                        break;
-
-                    case DaemonServiceState.Unsuccessful:
-                        MessageBox.Show(_resManager.GetString("the_process_killing_was_unsuccessful"),
-                            _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-                        break;
-                }
+                throw new NotImplementedException("Currently not supported feature.");
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Cannot kill the service:\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void SwitchToSession0()
         {
-            if (DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
+            if (!DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
             {
                 MessageBox.Show(_resManager.GetString("windows10_1803_switch_session0", CultureInfo.CurrentUICulture),
                     _resManager.GetString("warning", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
@@ -460,7 +441,7 @@ namespace DaemonMaster
             }
 
 
-            if (ServiceManagement.CheckUI0DetectService())
+            if (DaemonMasterUtils.CheckUI0DetectService())
             {
                 //if its Windows 10 then showing a warning message
                 if (DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
@@ -474,7 +455,7 @@ namespace DaemonMaster
                         return;
                 }
                 //Switch to session 0
-                NativeMethods.WinStationSwitchToServicesSession();
+                Winsta.WinStationSwitchToServicesSession();
             }
             else
             {
@@ -509,7 +490,7 @@ namespace DaemonMaster
                 //If Windows 10 1803 installed don't ask for UI0Detect registry key change
                 AskToEnableInteractiveServices();
 
-                if (!ServiceManagement.CheckUI0DetectService())
+                if (!DaemonMasterUtils.CheckUI0DetectService())
                 {
                     MessageBox.Show(_resManager.GetString("error_ui0service", CultureInfo.CurrentUICulture),
                         _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
@@ -554,7 +535,7 @@ namespace DaemonMaster
 
         private void StartListViewUpdateTimer(uint interval)
         {
-            DispatcherTimer guiDispatcherTimer = new DispatcherTimer();
+            var guiDispatcherTimer = new DispatcherTimer();
             guiDispatcherTimer.Tick += UpdateListView;
             guiDispatcherTimer.Interval = TimeSpan.FromSeconds(interval);
             guiDispatcherTimer.Start();
@@ -565,7 +546,7 @@ namespace DaemonMaster
 
         private void UpdateListView(object sender, EventArgs e)
         {
-            foreach (var daemonItem in _processCollection)
+            foreach (ServiceListViewItem daemonItem in _processCollection)
             {
                 daemonItem.UpdateStatus();
             }

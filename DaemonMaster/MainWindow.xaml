@@ -34,7 +34,7 @@
                     <GridViewColumn ctrl:FixedColumn.Width="50" Width="50">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Image Source="{Binding Path=Icon}"/>
+                                <Image Source="{Binding Path=BinaryIcon}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

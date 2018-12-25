@@ -47,7 +47,7 @@ namespace DaemonMaster
 
             //Set the language of the threads
             CultureInfo cultureInfo;
-            if (String.IsNullOrWhiteSpace(config.Language) || config.Language == "windows")
+            if (string.IsNullOrWhiteSpace(config.Language) || config.Language == "windows")
             {
                 cultureInfo = CultureInfo.CurrentCulture;
             }
@@ -75,8 +75,8 @@ namespace DaemonMaster
             //                                             START                                                    //
             //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            App app = new App();
-            MainWindow mainWindow = new MainWindow();
+            var app = new App();
+            var mainWindow = new MainWindow();
             app.Run(mainWindow);
         }
     }

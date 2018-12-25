@@ -18,111 +18,93 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Diagnostics;
-using System.Drawing;
-using System.Management;
+using System.ComponentModel;
+using System.Security;
+using System.Security.Principal;
 using System.ServiceProcess;
-using System.Windows;
-using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using DaemonMasterCore.Win32;
+using DaemonMasterCore.Win32.PInvoke.Advapi32;
 
 namespace DaemonMasterCore
 {
     public static class DaemonMasterUtils
     {
-        /// <summary>
-        /// Give the icon of an .exe or file
-        /// </summary>
-        /// <param name="fullPath"></param>
-        /// <returns></returns>
-        public static ImageSource GetIcon(string fullPath)
-        {
-            try
-            {
-                //Get the real filePath if it's a shortcut
-                if (ShellLinkWrapper.IsShortcut(fullPath))
-                {
-                    using (ShellLinkWrapper shellLinkWrapper = new ShellLinkWrapper(fullPath))
-                    {
-                        fullPath = shellLinkWrapper.FilePath;
-                    }
-                }
-
-                using (Icon icon = Icon.ExtractAssociatedIcon(fullPath))
-                {
-                    return Imaging.CreateBitmapSourceFromHIcon(
-                        icon.Handle,
-                        Int32Rect.Empty,
-                        BitmapSizeOptions.FromEmptyOptions());
-                }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        //From: http://stackoverflow.com/questions/1841790/how-can-a-windows-service-determine-its-servicename, 02.05.2017
-        public static String GetServiceName()
-        {
-            // Calling System.ServiceProcess.ServiceBase::ServiceNamea allways returns
-            // an empty string,
-            // see https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=387024
-
-            // So we have to do some more work to find out our service name, this only works if
-            // the process contains a single service, if there are more than one services hosted
-            // in the process you will have to do something else
-
-            int processId = Process.GetCurrentProcess().Id;
-            String query = "SELECT * FROM Win32_Service where ProcessId = " + processId;
-            ManagementObjectSearcher searcher =
-                new ManagementObjectSearcher(query);
-
-            foreach (ManagementObject queryObj in searcher.Get())
-            {
-                return queryObj["Name"].ToString();
-            }
-
-            throw new Exception("Can not get the ServiceName");
-        }
-
-        public static string GetDisplayName(string serviceName)
-        {
-            using (ServiceController sc = new ServiceController(serviceName))
-            {
-                return sc.DisplayName;
-            }
-        }
-
         public static bool IsSupportedWindows10VersionOrLower()
         {
             return Environment.OSVersion.Version.Major < 10 || (Environment.OSVersion.Version.Major == 10 && Environment.OSVersion.Version.Build < 17134);
         }
 
+        public static bool CheckUI0DetectService()
+        {
+            try
+            {
+                using (ServiceController scManager = new ServiceController("UI0Detect"))
+                {
+                    if (scManager.Status == ServiceControllerStatus.Running)
+                        return true;
+
+                    if (scManager.Status != ServiceControllerStatus.StartPending)
+                        scManager.Start();
+
+                    scManager.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromMilliseconds(10000));
+
+                    return scManager.Status == ServiceControllerStatus.Running;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static string GetLoginFromUsername(string s)
         {
             int stop = s.IndexOf("\\", StringComparison.Ordinal);
-            return (stop > -1) ? s.Substring(stop + 1, s.Length - stop - 1) : String.Empty;
+            return (stop > -1) ? s.Substring(stop + 1, s.Length - stop - 1) : string.Empty;
         }
 
         public static string GetDomainFromUsername(string s)
         {
             int stop = s.IndexOf("\\", StringComparison.Ordinal);
-            string domainName = (stop > -1) ? s.Substring(0, stop) : String.Empty; //when nothing is there make the string empty
-            return (domainName != ".") ? domainName : String.Empty; // "." stands also for local domain so make it empty
+            string domainName = (stop > -1) ? s.Substring(0, stop) : string.Empty; //when nothing is there make the string empty
+            return (domainName != ".") ? domainName : string.Empty; // "." stands also for local domain so make it empty
         }
 
         public static bool IsLocalDomain(string s)
         {
             string domainName = GetDomainFromUsername(s);
-
-            if (domainName == String.Empty || domainName == ".")
-                return true;
-
-            return false;
+            return domainName == string.Empty || domainName == ".";
         }
 
+        public static bool ValidateUser(string username, SecureString password)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+                throw new ArgumentNullException(nameof(username));
+
+            if (password == null)
+                throw new ArgumentNullException(nameof(password));
+
+
+            try
+            {
+                using (TokenHandle tokenHandle = TokenHandle.GetTokenFromLogon(username, password, Advapi32.LogonType.Interactive))
+                {
+                    return !tokenHandle.IsInvalid;
+                }
+            }
+            catch (Win32Exception)
+            {
+                return false;
+            }
+        }
+
+        public static bool IsElevated()
+        {
+            using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+            {
+                var principal = new WindowsPrincipal(identity);
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
+        }
     }
 }
