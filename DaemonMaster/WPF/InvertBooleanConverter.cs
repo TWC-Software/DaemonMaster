@@ -21,7 +21,7 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace DaemonMasterCore.WPF
+namespace DaemonMaster.WPF
 {
     [ValueConversion(typeof(bool), typeof(bool))]
     public class InvertBooleanConverter : IValueConverter

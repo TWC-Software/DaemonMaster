@@ -21,7 +21,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace DaemonMasterCore.WPF
+namespace DaemonMaster.WPF
 {
     public class PlaceholderTextBox : TextBox
     {

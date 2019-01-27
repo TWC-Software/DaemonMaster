@@ -32,14 +32,14 @@ namespace DaemonMasterService
         public string Description { get; set; }
 
 
-        [Option("args", Required = false, HelpText = "Here you can give argumments that  ar for the service.", Default = null)]
+        [Option("args", Required = false, HelpText = "Here you can give arguments that  ar for the service.", Default = null)]
         public string Arguments { get; set; }
 
         [Option("fullPath", Required = true, HelpText = "The full path to the file that should started as service", Default = null)]
         public string FullPath { get; set; }
 
 
-        [Option("username", SetName = "CustomUser", Required = false, HelpText = "Only local users (Exampel: '.\\Alfred')", Default = null)]
+        [Option("username", SetName = "CustomUser", Required = false, HelpText = "Only local users (Example: '.\\Alfred')", Default = null)]
         public string Username { get; set; }
 
         [Option("pw", SetName = "CustomUser", Required = false, HelpText = "Password if it should start with custom user account.", Default = null)]
@@ -52,8 +52,8 @@ namespace DaemonMasterService
         [Option("startType", Required = true, HelpText = "", Default = null)]
         public int StartType { get; set; }
 
-        [Option("processKillTime", Required = false, HelpText = "", Default = null)]
-        public int ProcessKillTime { get; set; }
+        [Option("processTimeoutTime", Required = false, HelpText = "", Default = null)]
+        public int ProcessTimeoutTime { get; set; }
 
         [Option("processRestartDelay", Required = false, HelpText = "", Default = null)]
         public int ProcessRestartDelay { get; set; }
@@ -81,17 +81,7 @@ namespace DaemonMasterService
     [Verb("install", HelpText = "Create a new service.")]
     public class InstallOptions : CommonEditInstallOptions
     {
-        [Option("serviceName", Required = true, HelpText = "Name of the new Service", Default = null)]
+        [Option("serviceName", Required = true, HelpText = "Name of the new service", Default = null)]
         public string ServiceName { get; set; }
-    }
-
-    [Verb("installDmdf", HelpText = "Create a new service with an DMDF file.")]
-    public class InstallDmdfOptions : GlobalOptions
-    {
-        [Option("path", Required = true, HelpText = "Path to the dmdf file (JSON format).", Default = null)]
-        public string Path { get; set; }
-
-        [Option("pw", Required = false, HelpText = "Password if it should start with custom user account. Required when a Username is defined!", Default = null)]
-        public string Password { get; set; }
     }
 }

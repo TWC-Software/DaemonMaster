@@ -67,20 +67,15 @@
     <Reference Include="Itenso.Windows.Controls.ListViewLayout">
       <HintPath>..\..\..\..\Documents\Visual Studio 2017\DLLs\Itenso.Windows.Controls.ListViewLayout.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
@@ -199,20 +194,19 @@
     <Resource Include="DeamonMaster Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DaemonMasterCore\DaemonMasterCore.csproj">
-      <Project>{fa9d9d3d-af33-4ff0-acb3-3d7278e5a90b}</Project>
-      <Name>DaemonMasterCore</Name>
+    <ProjectReference Include="..\DaemonMaster.Core\DaemonMaster.Core.csproj">
+      <Project>{144d809e-b1f7-43d9-bd94-806874c9e683}</Project>
+      <Name>DaemonMaster.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DaemonMaster.Updater\DaemonMaster.Updater.csproj">
+      <Project>{11288e0f-a7de-43ee-8bd9-93b955dcdbba}</Project>
+      <Name>DaemonMaster.Updater</Name>
     </ProjectReference>
     <ProjectReference Include="..\DaemonMasterService\DaemonMasterService.csproj">
       <Project>{227ba4d7-56ac-40ba-a73c-0b28ac8c99f8}</Project>
       <Name>DaemonMasterService</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DaemonMasterUpdater\DaemonMasterUpdater.csproj">
-      <Project>{11288e0f-a7de-43ee-8bd9-93b955dcdbba}</Project>
-      <Name>DaemonMasterUpdater</Name>
-    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Release del *.pdb</PostBuildEvent>

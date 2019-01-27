@@ -7,11 +7,11 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using DaemonMasterCore;
-using DaemonMasterCore.Jobs;
-using DaemonMasterCore.Win32;
-using DaemonMasterCore.Win32.PInvoke.Advapi32;
-using DaemonMasterCore.Win32.PInvoke.Kernel32;
+using DaemonMaster.Core;
+using DaemonMaster.Core.Jobs;
+using DaemonMaster.Core.Win32;
+using DaemonMaster.Core.Win32.PInvoke.Advapi32;
+using DaemonMaster.Core.Win32.PInvoke.Kernel32;
 using NLog;
 
 namespace DaemonMasterService
@@ -269,9 +269,9 @@ namespace DaemonMasterService
                 }
 
                 //Wait for a defined time
-                if (!_process.WaitForExit(_serviceDefinition.ProcessTimoutTime))
+                if (!_process.WaitForExit(_serviceDefinition.ProcessTimeoutTime))
                 {
-                    Logger.Warn("Failed to stop process: timeout ({0}ms)", _serviceDefinition.ProcessTimoutTime);
+                    Logger.Warn("Failed to stop process: timeout ({0}ms)", _serviceDefinition.ProcessTimeoutTime);
                     return false;
                 }
 

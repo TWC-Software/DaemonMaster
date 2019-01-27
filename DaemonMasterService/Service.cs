@@ -22,8 +22,8 @@ using System;
 using System.Management;
 using System.ServiceProcess;
 using System.Timers;
-using DaemonMasterCore;
-using DaemonMasterCore.Config;
+using DaemonMaster.Core;
+using DaemonMaster.Core.Config;
 using Microsoft.Win32;
 using NLog;
 
@@ -38,7 +38,7 @@ namespace DaemonMasterService
         private Timer _updateTimer;
         private Config _config;
 
-        uint _oldProcessPid;
+        private uint _oldProcessPid;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                              CONST                                                   //
@@ -143,20 +143,20 @@ namespace DaemonMasterService
         {
             try
             {
-                if (_oldProcessPid != _dmProcess.ProcessPid)
+                if (_oldProcessPid == _dmProcess.ProcessPid)
+                    return;
+
+                using (RegistryKey processKey = Registry.LocalMachine.OpenSubKey(RegPath + _serviceName + @"\ProcessInfo", true))
                 {
-                    using (RegistryKey processKey = Registry.LocalMachine.OpenSubKey(RegPath + _serviceName + @"\ProcessInfo", true))
-                    {
-                        if (processKey == null)
-                            return;
+                    if (processKey == null)
+                        return;
 
-                        processKey.SetValue("ProcessPid", _dmProcess.ProcessPid, RegistryValueKind.DWord);
+                    processKey.SetValue("ProcessPid", _dmProcess.ProcessPid, RegistryValueKind.DWord);
 
-                        processKey.Close();
-                    }
-
-                    _oldProcessPid = _dmProcess.ProcessPid;
+                    processKey.Close();
                 }
+
+                _oldProcessPid = _dmProcess.ProcessPid;
             }
             catch (Exception ex)
             {

@@ -22,7 +22,7 @@ using System;
 using System.Globalization;
 using System.Threading;
 using System.Windows;
-using DaemonMasterCore.Config;
+using DaemonMaster.Core.Config;
 
 namespace DaemonMaster
 {
@@ -57,7 +57,7 @@ namespace DaemonMaster
                 {
                     cultureInfo = new CultureInfo(config.Language);
                 }
-                catch (Exception)
+                catch
                 {
                     cultureInfo = CultureInfo.CurrentCulture;
                 }

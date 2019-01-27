@@ -29,10 +29,10 @@ using System.ServiceProcess;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Data;
+using DaemonMaster.Core;
+using DaemonMaster.Core.Win32;
+using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using DaemonMaster.Language;
-using DaemonMasterCore;
-using DaemonMasterCore.Win32;
-using DaemonMasterCore.Win32.PInvoke.Advapi32;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Tulpep.ActiveDirectoryObjectPicker;
@@ -76,7 +76,7 @@ namespace DaemonMaster
         {
             #region GeneralTab
 
-            //Set to readonly when it has already a servicename
+            //Set to readonly when it has already a service name
             if (!string.IsNullOrWhiteSpace(_tempServiceConfig.ServiceName))
                 textBoxServiceName.Text = _tempServiceConfig.ServiceName.Substring(13);
 
@@ -129,7 +129,7 @@ namespace DaemonMaster
 
 
             textBoxMaxRestarts.Text = _tempServiceConfig.ProcessMaxRestarts.ToString();
-            textBoxProcessTimeoutTime.Text = _tempServiceConfig.ProcessTimoutTime.ToString();
+            textBoxProcessTimeoutTime.Text = _tempServiceConfig.ProcessTimeoutTime.ToString();
             textBoxProcessRestartDelay.Text = _tempServiceConfig.ProcessRestartDelay.ToString();
             textBoxCounterResetTime.Text = _tempServiceConfig.CounterResetTime.ToString();
 
@@ -266,7 +266,7 @@ namespace DaemonMaster
             }
         }
 
-        private void buttonOpenADOP_OnClick(object sender, RoutedEventArgs e)
+        private void buttonOpenAdop_OnClick(object sender, RoutedEventArgs e)
         {
             using (var pickerDialog = new DirectoryObjectPickerDialog
             {
@@ -462,7 +462,7 @@ namespace DaemonMaster
                 _tempServiceConfig.Description = textBoxDescription.Text;
 
                 _tempServiceConfig.ProcessMaxRestarts = maxRestarts;
-                _tempServiceConfig.ProcessTimoutTime = processKillTime;
+                _tempServiceConfig.ProcessTimeoutTime = processKillTime;
                 _tempServiceConfig.ProcessRestartDelay = processRestartDelay;
                 _tempServiceConfig.CounterResetTime = counterResetTime;
 
@@ -545,7 +545,7 @@ namespace DaemonMaster
                 {
                     using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
                     {
-                        using (ServiceHandle serviceHandle = scm.OpenService(_tempServiceConfig.ServiceName, Advapi32.ServiceAccessRights.ChangeConfig))
+                        using (ServiceHandle serviceHandle = scm.OpenService(_tempServiceConfig.ServiceName, Advapi32.ServiceAccessRights.AllAccess))
                         {
                             serviceHandle.ChangeConfig(_tempServiceConfig);
                         }
@@ -553,7 +553,7 @@ namespace DaemonMaster
                 }
 
 
-                //Save settings in registry after no error is oucoured
+                //Save settings in registry after no error is occured
                 RegistryManagement.SaveInRegistry(_tempServiceConfig);
 
                 DialogResult = true;

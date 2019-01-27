@@ -29,13 +29,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+using DaemonMaster.Core;
+using DaemonMaster.Core.Config;
+using DaemonMaster.Core.Exceptions;
+using DaemonMaster.Core.Win32;
+using DaemonMaster.Core.Win32.PInvoke.Advapi32;
+using DaemonMaster.Core.Win32.PInvoke.Winsta;
 using DaemonMaster.Language;
-using DaemonMasterCore;
-using DaemonMasterCore.Config;
-using DaemonMasterCore.Exceptions;
-using DaemonMasterCore.Win32;
-using DaemonMasterCore.Win32.PInvoke.Advapi32;
-using DaemonMasterCore.Win32.PInvoke.Winsta;
 using TimeoutException = System.TimeoutException;
 
 namespace DaemonMaster

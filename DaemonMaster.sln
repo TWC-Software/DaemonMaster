@@ -4,20 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaemonMaster", "DaemonMaster\DaemonMaster.csproj", "{22341581-8624-4394-86C3-330956B03C03}"
-	ProjectSection(ProjectDependencies) = postProject
-		{227BA4D7-56AC-40BA-A73C-0B28AC8C99F8} = {227BA4D7-56AC-40BA-A73C-0B28AC8C99F8}
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaemonMasterService", "DaemonMasterService\DaemonMasterService.csproj", "{227BA4D7-56AC-40BA-A73C-0B28AC8C99F8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{10A8BD2F-8374-464F-858A-0341027CBCB3}"
 	ProjectSection(SolutionItems) = preProject
 		AutoUpdater.xml = AutoUpdater.xml
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaemonMasterCore", "DaemonMasterCore\DaemonMasterCore.csproj", "{FA9D9D3D-AF33-4FF0-ACB3-3D7278E5A90B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaemonMasterCustomActions", "DaemonMasterCustomActions\DaemonMasterCustomActions.csproj", "{ECF66D86-2C68-4540-86EF-20F3F26A14E6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Licences", "Licences", "{5909E6D3-0954-440A-83A9-D3D7E807909D}"
 	ProjectSection(SolutionItems) = preProject
@@ -28,7 +19,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Licences", "Licences", "{59
 		NLOG_LICENSE.txt = NLOG_LICENSE.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaemonMasterUpdater", "DaemonMasterUpdater\DaemonMasterUpdater.csproj", "{11288E0F-A7DE-43EE-8BD9-93B955DCDBBA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaemonMasterService", "DaemonMasterService\DaemonMasterService.csproj", "{227BA4D7-56AC-40BA-A73C-0B28AC8C99F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaemonMaster.Core", "DaemonMaster.Core\DaemonMaster.Core.csproj", "{144D809E-B1F7-43D9-BD94-806874C9E683}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaemonMaster.Updater", "DaemonMaster.Updater\DaemonMaster.Updater.csproj", "{11288E0F-A7DE-43EE-8BD9-93B955DCDBBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -64,26 +59,18 @@ Global
 		{227BA4D7-56AC-40BA-A73C-0B28AC8C99F8}.Release|x64.Build.0 = Release|Any CPU
 		{227BA4D7-56AC-40BA-A73C-0B28AC8C99F8}.Release|x86.ActiveCfg = Release|Any CPU
 		{227BA4D7-56AC-40BA-A73C-0B28AC8C99F8}.Release|x86.Build.0 = Release|Any CPU
-		{FA9D9D3D-AF33-4FF0-ACB3-3D7278E5A90B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FA9D9D3D-AF33-4FF0-ACB3-3D7278E5A90B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FA9D9D3D-AF33-4FF0-ACB3-3D7278E5A90B}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{FA9D9D3D-AF33-4FF0-ACB3-3D7278E5A90B}.Debug|x64.Build.0 = Debug|Any CPU
-		{FA9D9D3D-AF33-4FF0-ACB3-3D7278E5A90B}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{FA9D9D3D-AF33-4FF0-ACB3-3D7278E5A90B}.Debug|x86.Build.0 = Debug|Any CPU
-		{FA9D9D3D-AF33-4FF0-ACB3-3D7278E5A90B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FA9D9D3D-AF33-4FF0-ACB3-3D7278E5A90B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FA9D9D3D-AF33-4FF0-ACB3-3D7278E5A90B}.Release|x64.ActiveCfg = Release|Any CPU
-		{FA9D9D3D-AF33-4FF0-ACB3-3D7278E5A90B}.Release|x64.Build.0 = Release|Any CPU
-		{FA9D9D3D-AF33-4FF0-ACB3-3D7278E5A90B}.Release|x86.ActiveCfg = Release|Any CPU
-		{FA9D9D3D-AF33-4FF0-ACB3-3D7278E5A90B}.Release|x86.Build.0 = Release|Any CPU
-		{ECF66D86-2C68-4540-86EF-20F3F26A14E6}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{ECF66D86-2C68-4540-86EF-20F3F26A14E6}.Debug|x64.ActiveCfg = Debug|x86
-		{ECF66D86-2C68-4540-86EF-20F3F26A14E6}.Debug|x86.ActiveCfg = Debug|x86
-		{ECF66D86-2C68-4540-86EF-20F3F26A14E6}.Debug|x86.Build.0 = Debug|x86
-		{ECF66D86-2C68-4540-86EF-20F3F26A14E6}.Release|Any CPU.ActiveCfg = Release|x86
-		{ECF66D86-2C68-4540-86EF-20F3F26A14E6}.Release|x64.ActiveCfg = Release|x86
-		{ECF66D86-2C68-4540-86EF-20F3F26A14E6}.Release|x86.ActiveCfg = Release|x86
-		{ECF66D86-2C68-4540-86EF-20F3F26A14E6}.Release|x86.Build.0 = Release|x86
+		{144D809E-B1F7-43D9-BD94-806874C9E683}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{144D809E-B1F7-43D9-BD94-806874C9E683}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{144D809E-B1F7-43D9-BD94-806874C9E683}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{144D809E-B1F7-43D9-BD94-806874C9E683}.Debug|x64.Build.0 = Debug|Any CPU
+		{144D809E-B1F7-43D9-BD94-806874C9E683}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{144D809E-B1F7-43D9-BD94-806874C9E683}.Debug|x86.Build.0 = Debug|Any CPU
+		{144D809E-B1F7-43D9-BD94-806874C9E683}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{144D809E-B1F7-43D9-BD94-806874C9E683}.Release|Any CPU.Build.0 = Release|Any CPU
+		{144D809E-B1F7-43D9-BD94-806874C9E683}.Release|x64.ActiveCfg = Release|Any CPU
+		{144D809E-B1F7-43D9-BD94-806874C9E683}.Release|x64.Build.0 = Release|Any CPU
+		{144D809E-B1F7-43D9-BD94-806874C9E683}.Release|x86.ActiveCfg = Release|Any CPU
+		{144D809E-B1F7-43D9-BD94-806874C9E683}.Release|x86.Build.0 = Release|Any CPU
 		{11288E0F-A7DE-43EE-8BD9-93B955DCDBBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{11288E0F-A7DE-43EE-8BD9-93B955DCDBBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11288E0F-A7DE-43EE-8BD9-93B955DCDBBA}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -104,9 +91,9 @@ Global
 		{5909E6D3-0954-440A-83A9-D3D7E807909D} = {10A8BD2F-8374-464F-858A-0341027CBCB3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		RESX_PrefixTranslations = False
-		SolutionGuid = {637CC3EA-9C1C-402E-ABF0-F131C3E28C9C}
-		RESX_ResXSortingComparison = OrdinalIgnoreCase
 		RESX_SaveFilesImmediatelyUponChange = True
+		RESX_ResXSortingComparison = OrdinalIgnoreCase
+		SolutionGuid = {637CC3EA-9C1C-402E-ABF0-F131C3E28C9C}
+		RESX_PrefixTranslations = False
 	EndGlobalSection
 EndGlobal

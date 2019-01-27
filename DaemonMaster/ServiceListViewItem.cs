@@ -25,9 +25,9 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using DaemonMasterCore;
-using DaemonMasterCore.Win32;
-using DaemonMasterCore.Win32.PInvoke.Advapi32;
+using DaemonMaster.Core;
+using DaemonMaster.Core.Win32;
+using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using Microsoft.Win32;
 
 namespace DaemonMaster
