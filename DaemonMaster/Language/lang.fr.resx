@@ -375,4 +375,7 @@
   <data name="you_must_stop_the_service_first" xml:space="preserve">
     <value>Vous devez arrêter le service tout d’abord. Voulez-vous arrêter le service maintenant ? !</value>
   </data>
+  <data name="label_loadOrderGroup" xml:space="preserve">
+    <value>Load Order Groupe:</value>
+  </data>
 </root>

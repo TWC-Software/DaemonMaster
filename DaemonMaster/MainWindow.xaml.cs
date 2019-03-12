@@ -66,7 +66,7 @@ namespace DaemonMaster
             StartListViewUpdateTimer(_config.UpdateInterval);
 
             //Show the list in the list view
-            listViewDaemons.ItemsSource = _processCollection;
+            ListViewDaemons.ItemsSource = _processCollection;
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,10 +89,10 @@ namespace DaemonMaster
 
         private void buttonDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (listViewDaemons.SelectedItem == null)
+            if (ListViewDaemons.SelectedItem == null)
                 return;
 
-            RemoveDaemon((ServiceListViewItem)listViewDaemons.SelectedItem);
+            RemoveDaemon((ServiceListViewItem)ListViewDaemons.SelectedItem);
         }
 
         private void buttonSwitchToSession0_Click(object sender, RoutedEventArgs e)
@@ -103,42 +103,42 @@ namespace DaemonMaster
         //ListBox
         private void MenuItem_Start_OnClick(object sender, RoutedEventArgs e)
         {
-            if (listViewDaemons.SelectedItem == null)
+            if (ListViewDaemons.SelectedItem == null)
                 return;
 
-            StartService((ServiceListViewItem)listViewDaemons.SelectedItem);
+            StartService((ServiceListViewItem)ListViewDaemons.SelectedItem);
         }
 
         private void MenuItem_Stop_OnClick(object sender, RoutedEventArgs e)
         {
-            if (listViewDaemons.SelectedItem == null)
+            if (ListViewDaemons.SelectedItem == null)
                 return;
 
-            StopService((ServiceListViewItem)listViewDaemons.SelectedItem);
+            StopService((ServiceListViewItem)ListViewDaemons.SelectedItem);
         }
 
         private void MenuItem_Kill_OnClick(object sender, RoutedEventArgs e)
         {
-            if (listViewDaemons.SelectedItem == null)
+            if (ListViewDaemons.SelectedItem == null)
                 return;
 
-            KillService((ServiceListViewItem)listViewDaemons.SelectedItem);
+            KillService((ServiceListViewItem)ListViewDaemons.SelectedItem);
         }
 
         private void MenuItem_Delete_OnClick(object sender, RoutedEventArgs e)
         {
-            if (listViewDaemons.SelectedItem == null)
+            if (ListViewDaemons.SelectedItem == null)
                 return;
 
-            RemoveDaemon((ServiceListViewItem)listViewDaemons.SelectedItem);
+            RemoveDaemon((ServiceListViewItem)ListViewDaemons.SelectedItem);
         }
 
         private void MenuItem_StartInSession_OnClick(object sender, RoutedEventArgs e)
         {
-            if (listViewDaemons.SelectedItem == null)
+            if (ListViewDaemons.SelectedItem == null)
                 return;
 
-            var serviceListViewItem = (ServiceListViewItem)listViewDaemons.SelectedItem;
+            var serviceListViewItem = (ServiceListViewItem)ListViewDaemons.SelectedItem;
 
             try
             {
@@ -161,11 +161,11 @@ namespace DaemonMaster
 
         private void ListViewDaemons_OnContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
-            if (listViewDaemons.SelectedItem == null)
+            if (ListViewDaemons.SelectedItem == null)
                 return;
 
             //Only show "Start in session" if the service run under the Local System account
-            MenuItem_StartInSession.IsEnabled = ((ServiceListViewItem)listViewDaemons.SelectedItem).UseLocalSystem;
+            MenuItemStartInSession.IsEnabled = ((ServiceListViewItem)ListViewDaemons.SelectedItem).UseLocalSystem;
         }
 
         //MENU
@@ -177,15 +177,15 @@ namespace DaemonMaster
 
         private void MenuItem_RemoveDaemon_OnClick(object sender, RoutedEventArgs e)
         {
-            if (listViewDaemons.SelectedItem == null)
+            if (ListViewDaemons.SelectedItem == null)
                 return;
 
-            RemoveDaemon((ServiceListViewItem)listViewDaemons.SelectedItem);
+            RemoveDaemon((ServiceListViewItem)ListViewDaemons.SelectedItem);
         }
 
         private void MenuItem_EditDaemon_OnClick(object sender, RoutedEventArgs e)
         {
-            if (listViewDaemons.SelectedItem == null)
+            if (ListViewDaemons.SelectedItem == null)
                 return;
 
             EditDaemon();
@@ -211,22 +211,22 @@ namespace DaemonMaster
 
         private void UpdateListViewFilter()
         {
-            if (string.IsNullOrWhiteSpace(textBoxFilter.Text))
+            if (string.IsNullOrWhiteSpace(TextBoxFilter.Text))
             {
-                if (Equals(listViewDaemons.ItemsSource, _processCollection) || listViewDaemons.Items.Count <= 0)
+                if (Equals(ListViewDaemons.ItemsSource, _processCollection) || ListViewDaemons.Items.Count <= 0)
                     return;
 
-                listViewDaemons.Items.Clear();
-                listViewDaemons.ItemsSource = _processCollection;
+                ListViewDaemons.Items.Clear();
+                ListViewDaemons.ItemsSource = _processCollection;
             }
 
-            listViewDaemons.ItemsSource = null;
-            listViewDaemons.Items.Clear();
+            ListViewDaemons.ItemsSource = null;
+            ListViewDaemons.Items.Clear();
 
             foreach (ServiceListViewItem item in _processCollection)
             {
-                if (item.DisplayName.ToLower().Contains(textBoxFilter.Text.ToLower()))
-                    listViewDaemons.Items.Add(item);
+                if (item.DisplayName.ToLower().Contains(TextBoxFilter.Text.ToLower()))
+                    ListViewDaemons.Items.Add(item);
             }
         }
 
@@ -261,7 +261,7 @@ namespace DaemonMaster
 
         private void AddDaemon()
         {
-            if (listViewDaemons.Items.Count <= 128)
+            if (ListViewDaemons.Items.Count <= 128)
             {
                 try
                 {
@@ -323,10 +323,10 @@ namespace DaemonMaster
 
         private void EditDaemon()
         {
-            if (listViewDaemons.SelectedItem == null)
+            if (ListViewDaemons.SelectedItem == null)
                 return;
 
-            var serviceListViewItem = (ServiceListViewItem)listViewDaemons.SelectedItem;
+            var serviceListViewItem = (ServiceListViewItem)ListViewDaemons.SelectedItem;
 
             //Stop service first
             using (var serviceController = new ServiceController(serviceListViewItem.ServiceName))
@@ -552,7 +552,7 @@ namespace DaemonMaster
             }
 
             //Force refresh of the listview
-            listViewDaemons.Items.Refresh();
+            ListViewDaemons.Items.Refresh();
         }
     }
 }

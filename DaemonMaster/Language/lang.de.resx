@@ -495,4 +495,31 @@
   <data name="extern_domain_user_error" xml:space="preserve">
     <value>DaemonMaster unterstützt nur locale Nutzer!</value>
   </data>
+  <data name="label_loadOrderGroup" xml:space="preserve">
+    <value>Load Order Gruppe:</value>
+  </data>
+  <data name="priority_aboveNormal" xml:space="preserve">
+    <value>Über normal</value>
+  </data>
+  <data name="priority_normal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="priority_belowNormal" xml:space="preserve">
+    <value>Unter normal</value>
+  </data>
+  <data name="priority_high" xml:space="preserve">
+    <value>Hoch</value>
+  </data>
+  <data name="priority_idle" xml:space="preserve">
+    <value>Leerlauf</value>
+  </data>
+  <data name="priority_realtime" xml:space="preserve">
+    <value>Echtzeit</value>
+  </data>
+  <data name="label_priority" xml:space="preserve">
+    <value>Priorität:</value>
+  </data>
+  <data name="groupBox_process" xml:space="preserve">
+    <value>Prozess</value>
+  </data>
 </root>

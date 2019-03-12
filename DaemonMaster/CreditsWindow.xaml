@@ -5,11 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DaemonMaster"
         mc:Ignorable="d"
-        Title="CreditsWindow" Height="442.818" Width="626.138" ResizeMode="NoResize">
-    <Grid>
-        <Image x:Name="image" Height="159" Margin="64,13,64,0" VerticalAlignment="Top" Source="DeamonMaster Icon.bmp"/>
-        <TextBox x:Name="textBoxCredits" TextWrapping="Wrap" Margin="10,194,10,27" RenderTransformOrigin="0.5,0.5" Height="Auto" VerticalAlignment="Stretch" AcceptsReturn="True" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
-        Text=""/>
-        <Label x:Name="labelVersion"  Content="vX.X.X.X" HorizontalAlignment="Left" Margin="10,0,0,1" Height="26" VerticalAlignment="Bottom"/>
+        Title="CreditsWindow" Height="368.589" Width="626.138" ResizeMode="NoResize">
+    <Grid Margin="0,0,-0.021,-0.399">
+        <Image x:Name="Image" Height="85" Margin="514,10,10,0" VerticalAlignment="Top" Source="DeamonMaster Icon.bmp"/>
+        <Label x:Name="LabelVersion"  Content="vX.X.X.X" HorizontalAlignment="Left" Margin="10,0,0,1" Height="26" VerticalAlignment="Bottom"/>
+        <Label x:Name="LabelCredits" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="291" Width="601"/>
     </Grid>
 </Window>

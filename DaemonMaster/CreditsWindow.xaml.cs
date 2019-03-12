@@ -31,18 +31,22 @@ namespace DaemonMaster
         {
             InitializeComponent();
 
-            textBoxCredits.IsReadOnly = true;
-            textBoxCredits.Text =
-                "The program \"DeamonMaster\" was originally created by MCPC10 (Main Developer) and Stuffi3000 \n\n GUI: Stuffi3000, MCPC10 \n Code: MCPC10 \n Icon: Stuffi3000 \n\n" +
-                "Used Librarys: \n" +
-                "=> Newtonsoft.Json - James Newton - King - MIT License \n" +
-                "=> NLog - Jaroslaw Kowalski, Kim Christensen, Julian Verdurmen - BSD 3 clause \"New\" or \"Revised\" License \n" +
-                "=> AutoUpdater.NET - RBSoft - MIT License \n" +
-                "=> Active Directory Object Picker - Tulpep - MS-PL License \n" +
-                "=> ListView Layout Manager - Jani Giannoudis - CPOL License \n\n" +
-                "Thanks to: \n Pinvoke.net \n stackoverflow.com (for help from the users) \n entwickler-ecke.de (for help from the users)";
+            LabelCredits.Content =
+                "The program \"DeamonMaster\" was originally created by:\n" +
+                "   - MCPC10 (code, GUI, translations, etc)\n" +
+                "   - Stuffi3000 (GUI, translations, etc)  \n\n" +
+                "Used librarys: \n" +
+                "   => Newtonsoft.Json - James Newton - King - MIT License \n" +
+                "   => NLog - Jaroslaw Kowalski, Kim Christensen, Julian Verdurmen - BSD 3 clause \"New\" or \"Revised\" License \n" +
+                "   => AutoUpdater.NET - RBSoft - MIT License \n" +
+                "   => Active Directory Object Picker - Tulpep - MS-PL License \n" +
+                "   => ListView Layout Manager - Jani Giannoudis - CPOL License \n\n" +
+                "Also thanks to: \n" +
+                "   - PInvoke.net \n " +
+                "   - stackoverflow.com (for help from the users) \n " +
+                "   - entwickler-ecke.de (for help from the users)";
 
-            labelVersion.Content = "v" + Assembly.GetExecutingAssembly().GetName().Version;
+            LabelVersion.Content = "v" + Assembly.GetExecutingAssembly().GetName().Version;
         }
     }
 }

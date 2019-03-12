@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DaemonMaster"
-        xmlns:LocalWPF="clr-namespace:DaemonMaster.WPF"
+        xmlns:localWpf="clr-namespace:DaemonMaster.WPF"
         xmlns:resx="clr-namespace:DaemonMaster.Language"
         xmlns:ctrl="clr-namespace:Itenso.Windows.Controls.ListViewLayout;assembly=Itenso.Windows.Controls.ListViewLayout"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
@@ -13,22 +13,22 @@
 
 
     <Window.Resources>
-        <LocalWPF:ServiceControllerStatusConverter x:Key="serviceControllerStatusConverter"/>
+        <localWpf:ServiceControllerStatusConverter x:Key="ServiceControllerStatusConverter"/>
     </Window.Resources>
 
     <Grid>
-        <Button x:Name="buttonAdd" Content="{x:Static resx:lang.button_add}" HorizontalAlignment="Left" Margin="271,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonAdd_Click"/>
-        <Button x:Name="buttonDelete" Content="{x:Static resx:lang.button_delete_service}" HorizontalAlignment="Left" Margin="431,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonDelete_Click"/>
-        <Button x:Name="buttonEdit" Content="{x:Static resx:lang.button_edit_service}" HorizontalAlignment="Left" Margin="351,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonEdit_Click"/>
-        <Button x:Name="buttonSwitchToSession0" Content="{x:Static resx:lang.button_switch_to_session_0}" HorizontalAlignment="Left" Margin="271,319,0,0" VerticalAlignment="Top" Width="235" Click="buttonSwitchToSession0_Click"/>
+        <Button x:Name="ButtonAdd" Content="{x:Static resx:lang.button_add}" HorizontalAlignment="Left" Margin="271,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonAdd_Click"/>
+        <Button x:Name="ButtonDelete" Content="{x:Static resx:lang.button_delete_service}" HorizontalAlignment="Left" Margin="431,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonDelete_Click"/>
+        <Button x:Name="ButtonEdit" Content="{x:Static resx:lang.button_edit_service}" HorizontalAlignment="Left" Margin="351,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonEdit_Click"/>
+        <Button x:Name="ButtonSwitchToSession0" Content="{x:Static resx:lang.button_switch_to_session_0}" HorizontalAlignment="Left" Margin="271,319,0,0" VerticalAlignment="Top" Width="235" Click="buttonSwitchToSession0_Click"/>
 
-        <GroupBox x:Name="groupBoxFilter" Header="{x:Static resx:lang.label_filter}" HorizontalAlignment="Left" Height="64" Margin="10,281,0,0" VerticalAlignment="Top" Width="257" Foreground="Black">
+        <GroupBox x:Name="GroupBoxFilter" Header="{x:Static resx:lang.label_filter}" HorizontalAlignment="Left" Height="64" Margin="10,281,0,0" VerticalAlignment="Top" Width="257" Foreground="Black">
             <Grid>
-                <TextBox x:Name="textBoxFilter" HorizontalAlignment="Left" Height="23" Margin="1,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="234" TextChanged="TextBoxFilter_OnTextChanged"/>
+                <TextBox x:Name="TextBoxFilter" HorizontalAlignment="Left" Height="23" Margin="1,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="234" TextChanged="TextBoxFilter_OnTextChanged"/>
             </Grid>
         </GroupBox>
 
-        <ListView x:Name="listViewDaemons" HorizontalAlignment="Left" Height="255" Margin="10,21,0,0" VerticalAlignment="Top" Width="497" MouseDoubleClick="listBoxDaemons_MouseDoubleClick" ContextMenuOpening="ListViewDaemons_OnContextMenuOpening" ctrl:ListViewLayoutManager.Enabled="true">
+        <ListView x:Name="ListViewDaemons" HorizontalAlignment="Left" Height="255" Margin="10,21,0,0" VerticalAlignment="Top" Width="497" MouseDoubleClick="listBoxDaemons_MouseDoubleClick" ContextMenuOpening="ListViewDaemons_OnContextMenuOpening" ctrl:ListViewLayoutManager.Enabled="true">
             <ListView.View>
                 <GridView>
                     <GridViewColumn ctrl:FixedColumn.Width="50" Width="50">
@@ -42,25 +42,25 @@
                     <GridViewColumn Header="{x:Static resx:lang.service}" DisplayMemberBinding="{Binding Path=DisplayName}" Width="120"/>
                     <GridViewColumn Header="{x:Static resx:lang.service_pid}" DisplayMemberBinding="{Binding Path=ServicePid, TargetNullValue='{x:Static resx:lang.enum_stopped}'}" Width="70"/>
                     <GridViewColumn Header="{x:Static resx:lang.process_pid}" DisplayMemberBinding="{Binding Path=ProcessPid, TargetNullValue='{x:Static resx:lang.enum_stopped}'}" Width="70"/>
-                    <GridViewColumn Header="{x:Static resx:lang.status}" DisplayMemberBinding="{Binding Path=ServiceState, Converter={StaticResource serviceControllerStatusConverter}}" Width="70"/>
+                    <GridViewColumn Header="{x:Static resx:lang.status}" DisplayMemberBinding="{Binding Path=ServiceState, Converter={StaticResource ServiceControllerStatusConverter}}" Width="70"/>
                 </GridView>
             </ListView.View>
 
             <!--Defines a context menu-->
             <ListView.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Name="MenuItem_StartService" Header="{x:Static resx:lang.button_start_service}" Click="MenuItem_Start_OnClick"/>
-                    <MenuItem Name="MenuItem_StopService" Header="{x:Static resx:lang.button_stop_service}" Click="MenuItem_Stop_OnClick"/>
-                    <MenuItem Name="MenuItem_KillService" Header="{x:Static resx:lang.button_kill_service}" Click="MenuItem_Kill_OnClick"/>
+                    <MenuItem Name="MenuItemStartService" Header="{x:Static resx:lang.button_start_service}" Click="MenuItem_Start_OnClick"/>
+                    <MenuItem Name="MenuItemStopService" Header="{x:Static resx:lang.button_stop_service}" Click="MenuItem_Stop_OnClick"/>
+                    <MenuItem Name="MenuItemKillService" Header="{x:Static resx:lang.button_kill_service}" Click="MenuItem_Kill_OnClick"/>
                     <Separator/>
-                    <MenuItem Name="MenuItem_StartInSession" Header="{x:Static resx:lang.button_start}" Click="MenuItem_StartInSession_OnClick"/>
+                    <MenuItem Name="MenuItemStartInSession" Header="{x:Static resx:lang.button_start}" Click="MenuItem_StartInSession_OnClick"/>
                     <Separator/>
-                    <MenuItem Name="MenuItem_DeleteService" Header="{x:Static resx:lang.button_delete_service}" Click="MenuItem_Delete_OnClick"/>
+                    <MenuItem Name="MenuItemDeleteService" Header="{x:Static resx:lang.button_delete_service}" Click="MenuItem_Delete_OnClick"/>
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>
         
-        <Menu x:Name="menu" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="519">
+        <Menu x:Name="Menu" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="519">
             <MenuItem Header="{x:Static resx:lang.button_file}">
             </MenuItem>
             <MenuItem Header="{x:Static resx:lang.button_edit_service}">

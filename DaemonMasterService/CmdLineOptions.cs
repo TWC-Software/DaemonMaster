@@ -10,11 +10,11 @@ namespace DaemonMasterService
     [Verb("general", HelpText = "General options like deleteAllServices, etc.")]
     public class GeneralOptions : GlobalOptions
     {
-        [Option("deleteAllServices", Required = false, HelpText = "Delete all installed services that are using this .exe to work.", Default = false)]
-        public bool DeleteAllServices { get; set; }
+        //[Option("deleteAllServices", Required = false, HelpText = "Delete all installed services that are using this .exe to work.", Default = false)]
+        //public bool DeleteAllServices { get; set; }
 
-        [Option("killAllServices", Required = false, HelpText = "Kill all installed services that are using this .exe to work.", Default = false)]
-        public bool KillAllServices { get; set; }
+        //[Option("killAllServices", Required = false, HelpText = "Kill all installed services that are using this .exe to work.", Default = false)]
+        //public bool KillAllServices { get; set; }
     }
 
     [Verb("service", HelpText = "Start the .exe in service mode.")]
@@ -28,46 +28,46 @@ namespace DaemonMasterService
         [Option("displayName", Required = true, HelpText = "", Default = null)]
         public string DisplayName { get; set; }
 
-        [Option("description", Required = false, HelpText = "Here you can give the service a description.", Default = null)]
+        [Option("description", Required = false, HelpText = "Here you can give the service a description.", Default = "")]
         public string Description { get; set; }
 
 
-        [Option("args", Required = false, HelpText = "Here you can give arguments that  ar for the service.", Default = null)]
+        [Option("args", Required = false, HelpText = "Here you can give arguments that  ar for the service.", Default = "")]
         public string Arguments { get; set; }
 
         [Option("fullPath", Required = true, HelpText = "The full path to the file that should started as service", Default = null)]
         public string FullPath { get; set; }
 
 
-        [Option("username", SetName = "CustomUser", Required = false, HelpText = "Only local users (Example: '.\\Alfred')", Default = null)]
+        [Option("username", SetName = "CustomUser", Required = false, HelpText = "Only local users (Example: '.\\Alfred')", Default = "")]
         public string Username { get; set; }
 
         [Option("pw", SetName = "CustomUser", Required = false, HelpText = "Password if it should start with custom user account.", Default = null)]
         public string Password { get; set; }
 
 
-        [Option("maxRestarts", Required = false, HelpText = "", Default = null)]
+        [Option("maxRestarts", Required = false, HelpText = "", Default = 3)]
         public int MaxRestarts { get; set; }
 
         [Option("startType", Required = true, HelpText = "", Default = null)]
         public int StartType { get; set; }
 
-        [Option("processTimeoutTime", Required = false, HelpText = "", Default = null)]
+        [Option("processTimeoutTime", Required = false, HelpText = "", Default = 9000)]
         public int ProcessTimeoutTime { get; set; }
 
-        [Option("processRestartDelay", Required = false, HelpText = "", Default = null)]
+        [Option("processRestartDelay", Required = false, HelpText = "", Default = 2000)]
         public int ProcessRestartDelay { get; set; }
 
-        [Option("counterResetTime", Required = false, HelpText = "", Default = null)]
+        [Option("counterResetTime", Required = false, HelpText = "", Default = 1440)]
         public int CounterResetTime { get; set; }
 
-        [Option("consoleApp", Required = false, HelpText = "", Default = null)]
+        [Option("consoleApp", Required = false, HelpText = "", Default = false)]
         public bool ConsoleApplication { get; set; }
 
-        [Option("ctrlC", Required = false, HelpText = "", Default = null)]
+        [Option("ctrlC", Required = false, HelpText = "", Default = false)]
         public bool UseCtrlC { get; set; }
 
-        [Option("canInteractWithDesktop", SetName = "LocalUser", Required = false, HelpText = "Can only be used with supported windows versions and also NOT with a custom user.", Default = null)]
+        [Option("canInteractWithDesktop", SetName = "LocalUser", Required = false, HelpText = "Can only be used with supported windows versions and also NOT with a custom user.", Default = false)]
         public bool CanInteractWithDesktop { get; set; }
     }
 

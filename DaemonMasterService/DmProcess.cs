@@ -26,6 +26,7 @@ namespace DaemonMasterService
 
         private uint _restarts;
         private DateTime _lastRestartTime;
+        private bool _lastStartInUserSession = false;
 
         /// <summary>
         /// Get the process PID (if invalid it returns -1)
@@ -119,6 +120,9 @@ namespace DaemonMasterService
         {
             Logger.Info("Start process in service session...");
 
+            //Reset last start in user session
+            _lastStartInUserSession = false;
+
             //Close old instances
             Close();
 
@@ -140,6 +144,10 @@ namespace DaemonMasterService
             _process.Exited += ProcessOnExited;
             _process.Start();
 
+
+            //Set process priority
+            _process.PriorityClass = _serviceDefinition.ProcessPriority;
+
             //Assign process to job
             _killChildProcessJob.AssignProcess(_process);
 
@@ -157,6 +165,9 @@ namespace DaemonMasterService
         {
             Logger.Info("Start process in user session...");
 
+            //Set last start in user session
+            _lastStartInUserSession = true;
+
             //Close old instances
             Close();
 
@@ -170,7 +181,34 @@ namespace DaemonMasterService
             var processInformation = new Advapi32.ProcessInformation();
 
             //Flags that specify the priority and creation method of the process
-            const Advapi32.CreationFlags creationFlags = Advapi32.CreationFlags.CreateUnicodeEnvironment | Advapi32.CreationFlags.CreateNewConsole;
+            Advapi32.CreationFlags creationFlags = Advapi32.CreationFlags.CreateUnicodeEnvironment | Advapi32.CreationFlags.CreateNewConsole;
+
+            //Process priority
+            switch (_serviceDefinition.ProcessPriority)
+            {
+                case ProcessPriorityClass.Normal:
+                    creationFlags |= Advapi32.CreationFlags.NormalPriorityClass;
+                    break;
+                case ProcessPriorityClass.Idle:
+                    creationFlags |= Advapi32.CreationFlags.IdlePriorityClass;
+                    break;
+                case ProcessPriorityClass.High:
+                    creationFlags |= Advapi32.CreationFlags.HighPriorityClass;
+                    break;
+                case ProcessPriorityClass.RealTime:
+                    creationFlags |= Advapi32.CreationFlags.RealtimePriorityClass;
+                    break;
+                case ProcessPriorityClass.BelowNormal:
+                    creationFlags |= Advapi32.CreationFlags.BelowNormalPriorityClass;
+                    break;
+                case ProcessPriorityClass.AboveNormal:
+                    creationFlags |= Advapi32.CreationFlags.AboveNormalPriorityClass;
+                    break;
+
+                default:
+                    creationFlags |= Advapi32.CreationFlags.NormalPriorityClass;
+                    break;
+            }
 
             //Create default process security attributes
             var processSecurityAttributes = new Kernel32.SecurityAttributes();
@@ -204,8 +242,9 @@ namespace DaemonMasterService
 
                     _process = Process.GetProcessById((int)processInformation.rocessId);
 
-                    //Disable raising events
-                    _process.EnableRaisingEvents = false; //Not supported in this mode
+                    //Enable raising events
+                    _process.EnableRaisingEvents = true;
+                    _process.Exited += ProcessOnExited;
 
                     //Assign process to job
                     _killChildProcessJob.AssignProcess(_process);
@@ -300,7 +339,7 @@ namespace DaemonMasterService
         internal bool KillProcess()
         {
             Logger.Info("Killing process...");
-            //If process already stoppend return
+            //If process already stoped return
             if (!IsRunning())
                 return true;
 
@@ -368,7 +407,14 @@ namespace DaemonMasterService
                 Logger.Info("Restart process...");
                 Thread.Sleep(_serviceDefinition.ProcessRestartDelay);
 
-                StartInServiceSession();
+                if (_lastStartInUserSession)
+                {
+                    StartInUserSession();
+                }
+                else
+                {
+                    StartInServiceSession();
+                }
 
                 _restarts++;
                 _lastRestartTime = DateTime.UtcNow;

@@ -21,6 +21,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -78,31 +79,34 @@ namespace DaemonMaster
 
             //Set to readonly when it has already a service name
             if (!string.IsNullOrWhiteSpace(_tempServiceConfig.ServiceName))
-                textBoxServiceName.Text = _tempServiceConfig.ServiceName.Substring(13);
+                TextBoxServiceName.Text = _tempServiceConfig.ServiceName.Substring(13);
 
-            textBoxServiceName.IsReadOnly = !_createNewService;
+            TextBoxServiceName.IsReadOnly = !_createNewService;
 
-            textBoxDisplayName.Text = _tempServiceConfig.DisplayName;
+            TextBoxDisplayName.Text = _tempServiceConfig.DisplayName;
 
             if (!string.IsNullOrWhiteSpace(_tempServiceConfig.BinaryPath))
-                textBoxFilePath.Text = _tempServiceConfig.BinaryPath;
+                TextBoxFilePath.Text = _tempServiceConfig.BinaryPath;
 
-            textBoxParam.Text = _tempServiceConfig.Arguments;
-            textBoxDescription.Text = _tempServiceConfig.Description;
+            TextBoxParam.Text = _tempServiceConfig.Arguments;
+            TextBoxDescription.Text = _tempServiceConfig.Description;
 
             //StartType
             switch (_tempServiceConfig.StartType)
             {
                 case Advapi32.ServiceStartType.AutoStart:
-                    comboBoxStartType.SelectedIndex = _tempServiceConfig.DelayedStart ? 1 : 0;
+                    ComboBoxStartType.SelectedIndex = _tempServiceConfig.DelayedStart ? 1 : 0;
                     break;
 
                 case Advapi32.ServiceStartType.StartOnDemand:
-                    comboBoxStartType.SelectedIndex = 2;
+                    ComboBoxStartType.SelectedIndex = 2;
                     break;
 
                 case Advapi32.ServiceStartType.Disabled:
-                    comboBoxStartType.SelectedIndex = 3;
+                    ComboBoxStartType.SelectedIndex = 3;
+                    break;
+                default:
+                    ComboBoxStartType.SelectedIndex = 0;
                     break;
             }
 
@@ -112,15 +116,15 @@ namespace DaemonMaster
 
             if (Equals(_tempServiceConfig.Credentials, ServiceCredentials.LocalSystem))
             {
-                textBoxUsername.Text = string.Empty;
-                textBoxPassword.Password = string.Empty;
-                checkBoxUseLocalSystem.IsChecked = true;
+                TextBoxUsername.Text = string.Empty;
+                TextBoxPassword.Password = string.Empty;
+                CheckBoxUseLocalSystem.IsChecked = true;
             }
             else
             {
-                textBoxUsername.Text = _tempServiceConfig.Credentials.Username;
-                textBoxPassword.Password = _createNewService ? string.Empty : PLACEHOLDER_PASSWORD;
-                checkBoxUseLocalSystem.IsChecked = false;
+                TextBoxUsername.Text = _tempServiceConfig.Credentials.Username;
+                TextBoxPassword.Password = _createNewService ? string.Empty : PLACEHOLDER_PASSWORD;
+                CheckBoxUseLocalSystem.IsChecked = false;
             }
 
             #endregion
@@ -128,24 +132,52 @@ namespace DaemonMaster
             #region AdvancedTab
 
 
-            textBoxMaxRestarts.Text = _tempServiceConfig.ProcessMaxRestarts.ToString();
-            textBoxProcessTimeoutTime.Text = _tempServiceConfig.ProcessTimeoutTime.ToString();
-            textBoxProcessRestartDelay.Text = _tempServiceConfig.ProcessRestartDelay.ToString();
-            textBoxCounterResetTime.Text = _tempServiceConfig.CounterResetTime.ToString();
+            TextBoxMaxRestarts.Text = _tempServiceConfig.ProcessMaxRestarts.ToString();
+            TextBoxProcessTimeoutTime.Text = _tempServiceConfig.ProcessTimeoutTime.ToString();
+            TextBoxProcessRestartDelay.Text = _tempServiceConfig.ProcessRestartDelay.ToString();
+            TextBoxCounterResetTime.Text = _tempServiceConfig.CounterResetTime.ToString();
+            TextBoxLoadOrderGroup.Text = _tempServiceConfig.LoadOrderGroup;
 
-            checkBoxIsConsoleApp.IsChecked = _tempServiceConfig.IsConsoleApplication;
-            radioButtonUseCtrlC.IsChecked = _tempServiceConfig.UseCtrlC;
-            radioButtonUseCtrlBreak.IsChecked = !_tempServiceConfig.UseCtrlC;
+            //Process Priority
+            switch (_tempServiceConfig.ProcessPriority)
+            {
+                case ProcessPriorityClass.Idle:
+                    ComboBoxProcessPriority.SelectedIndex = 0;
+                    break;
+                case ProcessPriorityClass.BelowNormal:
+                    ComboBoxProcessPriority.SelectedIndex = 1;
+                    break;
+                case ProcessPriorityClass.Normal:
+                    ComboBoxProcessPriority.SelectedIndex = 2;
+                    break;
+                case ProcessPriorityClass.AboveNormal:
+                    ComboBoxProcessPriority.SelectedIndex = 3;
+                    break;
+                case ProcessPriorityClass.High:
+                    ComboBoxProcessPriority.SelectedIndex = 4;
+                    break;
+                case ProcessPriorityClass.RealTime:
+                    ComboBoxProcessPriority.SelectedIndex = 5;
+                    break;
+                default:
+                    ComboBoxProcessPriority.SelectedIndex = 2;
+                    break;
+            }
+
+            CheckBoxIsConsoleApp.IsChecked = _tempServiceConfig.IsConsoleApplication;
+            RadioButtonUseCtrlC.IsChecked = _tempServiceConfig.UseCtrlC;
+            RadioButtonUseCtrlBreak.IsChecked = !_tempServiceConfig.UseCtrlC;
+
 
             //Hide check box interact with desktop on not supported systems (windows 10 1803+)
             if (!DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
             {
-                checkBoxInteractDesk.IsChecked = false;
-                checkBoxInteractDesk.IsEnabled = false;
+                CheckBoxInteractDesk.IsChecked = false;
+                CheckBoxInteractDesk.IsEnabled = false;
             }
             else
             {
-                checkBoxInteractDesk.IsChecked = _tempServiceConfig.CanInteractWithDesktop;
+                CheckBoxInteractDesk.IsChecked = _tempServiceConfig.CanInteractWithDesktop;
             }
 
             #endregion
@@ -175,7 +207,7 @@ namespace DaemonMaster
             //Sort the list in alphabetical order
             ICollectionView collectionView1 = CollectionViewSource.GetDefaultView(_dependOnServiceObservableCollection);
             collectionView1.SortDescriptions.Add(new SortDescription("DisplayName", ListSortDirection.Ascending));
-            listBoxDependOnService.ItemsSource = collectionView1;
+            ListBoxDependOnService.ItemsSource = collectionView1;
 
             #endregion
 
@@ -198,7 +230,7 @@ namespace DaemonMaster
             //Sort the list in alphabetical order
             ICollectionView collectionView2 = CollectionViewSource.GetDefaultView(_allServicesObservableCollection);
             collectionView2.SortDescriptions.Add(new SortDescription("DisplayName", ListSortDirection.Ascending));
-            listBoxAllServices.ItemsSource = collectionView2;
+            ListBoxAllServices.ItemsSource = collectionView2;
 
             #endregion
 
@@ -209,7 +241,7 @@ namespace DaemonMaster
             //Sort the list in alphabetical order
             ICollectionView collectionView3 = CollectionViewSource.GetDefaultView(_allGroupsObservableCollection);
             collectionView3.SortDescriptions.Add(new SortDescription());
-            listBoxAllGroups.ItemsSource = collectionView3;
+            ListBoxAllGroups.ItemsSource = collectionView3;
 
             #endregion
 
@@ -220,7 +252,7 @@ namespace DaemonMaster
             //Sort the list in alphabetical order
             ICollectionView collectionView4 = CollectionViewSource.GetDefaultView(_dependOnGroupObservableCollection);
             collectionView3.SortDescriptions.Add(new SortDescription());
-            listBoxDependOnGroup.ItemsSource = collectionView4;
+            ListBoxDependOnGroup.ItemsSource = collectionView4;
 
             #endregion
 
@@ -256,12 +288,12 @@ namespace DaemonMaster
             //If a file has been chosen
             if (openFileDialog.ShowDialog() == true)
             {
-                textBoxFilePath.Text = openFileDialog.FileName;
+                TextBoxFilePath.Text = openFileDialog.FileName;
 
                 //If the display name is empty, then it will use the file name
-                if (string.IsNullOrWhiteSpace(textBoxDisplayName.Text))
+                if (string.IsNullOrWhiteSpace(TextBoxDisplayName.Text))
                 {
-                    textBoxDisplayName.Text = Path.GetFileNameWithoutExtension(openFileDialog.SafeFileName);
+                    TextBoxDisplayName.Text = Path.GetFileNameWithoutExtension(openFileDialog.SafeFileName);
                 }
             }
         }
@@ -281,7 +313,7 @@ namespace DaemonMaster
             {
                 if (pickerDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    textBoxUsername.Text = ".\\" + pickerDialog.SelectedObject.Name;  // ".\\" = Local computer
+                    TextBoxUsername.Text = ".\\" + pickerDialog.SelectedObject.Name;  // ".\\" = Local computer
                 }
             }
         }
@@ -312,38 +344,38 @@ namespace DaemonMaster
 
         private void buttonRemoveDependentService_Click(object sender, RoutedEventArgs e)
         {
-            if (listBoxDependOnService.SelectedItem == null)
+            if (ListBoxDependOnService.SelectedItem == null)
                 return;
 
-            _allServicesObservableCollection.Add((ServiceInfo)listBoxDependOnService.SelectedItem);
-            _dependOnServiceObservableCollection.Remove((ServiceInfo)listBoxDependOnService.SelectedItem);
+            _allServicesObservableCollection.Add((ServiceInfo)ListBoxDependOnService.SelectedItem);
+            _dependOnServiceObservableCollection.Remove((ServiceInfo)ListBoxDependOnService.SelectedItem);
         }
 
         private void buttonAddDependentService_Click(object sender, RoutedEventArgs e)
         {
-            if (listBoxAllServices.SelectedItem == null)
+            if (ListBoxAllServices.SelectedItem == null)
                 return;
 
-            _dependOnServiceObservableCollection.Add((ServiceInfo)listBoxAllServices.SelectedItem);
-            _allServicesObservableCollection.Remove((ServiceInfo)listBoxAllServices.SelectedItem);
+            _dependOnServiceObservableCollection.Add((ServiceInfo)ListBoxAllServices.SelectedItem);
+            _allServicesObservableCollection.Remove((ServiceInfo)ListBoxAllServices.SelectedItem);
         }
 
         private void buttonAddDependentGroup_Click(object sender, RoutedEventArgs e)
         {
-            if (listBoxAllGroups.SelectedItem == null)
+            if (ListBoxAllGroups.SelectedItem == null)
                 return;
 
-            _dependOnGroupObservableCollection.Add((string)listBoxAllGroups.SelectedItem);
-            _allGroupsObservableCollection.Remove((string)listBoxAllGroups.SelectedItem);
+            _dependOnGroupObservableCollection.Add((string)ListBoxAllGroups.SelectedItem);
+            _allGroupsObservableCollection.Remove((string)ListBoxAllGroups.SelectedItem);
         }
 
         private void buttonRemoveDependentGroup_Click(object sender, RoutedEventArgs e)
         {
-            if (listBoxDependOnGroup.SelectedItem == null)
+            if (ListBoxDependOnGroup.SelectedItem == null)
                 return;
 
-            _allGroupsObservableCollection.Add((string)listBoxDependOnGroup.SelectedItem);
-            _dependOnGroupObservableCollection.Remove((string)listBoxDependOnGroup.SelectedItem);
+            _allGroupsObservableCollection.Add((string)ListBoxDependOnGroup.SelectedItem);
+            _dependOnGroupObservableCollection.Remove((string)ListBoxDependOnGroup.SelectedItem);
         }
 
         #endregion
@@ -357,7 +389,7 @@ namespace DaemonMaster
         //Auto formatting the given arguments on focus lost
         private void TextBoxParam_OnLostFocus(object sender, RoutedEventArgs e)
         {
-            string args = textBoxParam.Text;
+            string args = TextBoxParam.Text;
 
             if (string.IsNullOrWhiteSpace(args))
                 return;
@@ -366,7 +398,7 @@ namespace DaemonMaster
             args = args.Trim();
 
             //Remove double spaces etc
-            textBoxParam.Text = Regex.Replace(args, @"\s+", " ");
+            TextBoxParam.Text = Regex.Replace(args, @"\s+", " ");
         }
 
         #endregion
@@ -382,8 +414,8 @@ namespace DaemonMaster
             try
             {
                 //Path / File not exist
-                if (!Directory.Exists(Path.GetDirectoryName(textBoxFilePath.Text)) ||
-                    !File.Exists(textBoxFilePath.Text))
+                if (!Directory.Exists(Path.GetDirectoryName(TextBoxFilePath.Text)) ||
+                    !File.Exists(TextBoxFilePath.Text))
                 {
                     MessageBox.Show(_resManager.GetString("invalid_path", CultureInfo.CurrentUICulture),
                         _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
@@ -392,14 +424,14 @@ namespace DaemonMaster
                 }
 
                 //Invalid value error
-                if (string.IsNullOrWhiteSpace(textBoxDisplayName.Text) ||
-                    string.IsNullOrWhiteSpace(textBoxServiceName.Text) ||
-                    !int.TryParse(textBoxMaxRestarts.Text, out int maxRestarts) ||
-                    !int.TryParse(textBoxProcessTimeoutTime.Text, out int processKillTime) ||
-                    !int.TryParse(textBoxProcessRestartDelay.Text, out int processRestartDelay) ||
-                    !int.TryParse(textBoxCounterResetTime.Text, out int counterResetTime) ||
-                    (checkBoxIsConsoleApp.IsChecked ?? false) && !(radioButtonUseCtrlBreak.IsChecked ?? true) &&
-                    !(radioButtonUseCtrlC.IsChecked ?? true))
+                if (string.IsNullOrWhiteSpace(TextBoxDisplayName.Text) ||
+                    string.IsNullOrWhiteSpace(TextBoxServiceName.Text) ||
+                    !int.TryParse(TextBoxMaxRestarts.Text, out int maxRestarts) ||
+                    !int.TryParse(TextBoxProcessTimeoutTime.Text, out int processKillTime) ||
+                    !int.TryParse(TextBoxProcessRestartDelay.Text, out int processRestartDelay) ||
+                    !int.TryParse(TextBoxCounterResetTime.Text, out int counterResetTime) ||
+                    (CheckBoxIsConsoleApp.IsChecked ?? false) && !(RadioButtonUseCtrlBreak.IsChecked ?? true) &&
+                    !(RadioButtonUseCtrlC.IsChecked ?? true))
                 {
                     MessageBox.Show(_resManager.GetString("invalid_values", CultureInfo.CurrentUICulture),
                         _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
@@ -409,20 +441,20 @@ namespace DaemonMaster
 
                 #region Password/LocalSystem
 
-                if (checkBoxUseLocalSystem.IsChecked ?? true) // => LocalSystem is null            
+                if (CheckBoxUseLocalSystem.IsChecked ?? true) // => LocalSystem is null            
                 {
                     _tempServiceConfig.Credentials = ServiceCredentials.LocalSystem;
                 }
-                else if (string.Equals(textBoxPassword.Password, PLACEHOLDER_PASSWORD) && //Nothing has changed (null safe)
-                         string.Equals(textBoxUsername.Text, _tempServiceConfig.Credentials.Username)) //Nothing has changed (null safe
+                else if (string.Equals(TextBoxPassword.Password, PLACEHOLDER_PASSWORD) && //Nothing has changed (null safe)
+                         string.Equals(TextBoxUsername.Text, _tempServiceConfig.Credentials.Username)) //Nothing has changed (null safe
                 {
                     _tempServiceConfig.Credentials = ServiceCredentials.NoChange; //Null stands for nothing has changed 
                 }
                 else
                 {
                     //No date has been written in the textfields
-                    if (string.IsNullOrWhiteSpace(textBoxUsername.Text) ||
-                        string.IsNullOrWhiteSpace(textBoxPassword.Password))
+                    if (string.IsNullOrWhiteSpace(TextBoxUsername.Text) ||
+                        string.IsNullOrWhiteSpace(TextBoxPassword.Password))
                     {
                         MessageBox.Show(_resManager.GetString("invalid_pw_user", CultureInfo.CurrentUICulture),
                             _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
@@ -431,7 +463,7 @@ namespace DaemonMaster
                     }
 
                     //When its not a local user...
-                    if (!DaemonMasterUtils.IsLocalDomain(textBoxUsername.Text))
+                    if (!DaemonMasterUtils.IsLocalDomain(TextBoxUsername.Text))
                     {
                         MessageBox.Show(_resManager.GetString("extern_domain_user_error", CultureInfo.CurrentUICulture),
                             _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
@@ -440,7 +472,7 @@ namespace DaemonMaster
                     }
 
                     //Password or username is not correct
-                    if (!DaemonMasterUtils.ValidateUser(textBoxUsername.Text, textBoxPassword.SecurePassword))
+                    if (!DaemonMasterUtils.ValidateUser(TextBoxUsername.Text, TextBoxPassword.SecurePassword))
                     {
                         MessageBox.Show(_resManager.GetString("login_failed", CultureInfo.CurrentUICulture),
                             _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
@@ -448,36 +480,62 @@ namespace DaemonMaster
                         return;
                     }
 
-                    _tempServiceConfig.Credentials = new ServiceCredentials(textBoxUsername.Text, textBoxPassword.SecurePassword);
+                    _tempServiceConfig.Credentials = new ServiceCredentials(TextBoxUsername.Text, TextBoxPassword.SecurePassword);
                 }
 
                 #endregion
 
-                _tempServiceConfig.DisplayName = textBoxDisplayName.Text;
-                _tempServiceConfig.ServiceName = "DaemonMaster_" + textBoxServiceName.Text;
+                _tempServiceConfig.DisplayName = TextBoxDisplayName.Text;
+                _tempServiceConfig.ServiceName = "DaemonMaster_" + TextBoxServiceName.Text;
 
-                _tempServiceConfig.BinaryPath = textBoxFilePath.Text;
+                _tempServiceConfig.BinaryPath = TextBoxFilePath.Text;
 
-                _tempServiceConfig.Arguments = textBoxParam.Text;
-                _tempServiceConfig.Description = textBoxDescription.Text;
+                _tempServiceConfig.Arguments = TextBoxParam.Text;
+                _tempServiceConfig.Description = TextBoxDescription.Text;
+                _tempServiceConfig.LoadOrderGroup = TextBoxLoadOrderGroup.Text;
 
                 _tempServiceConfig.ProcessMaxRestarts = maxRestarts;
                 _tempServiceConfig.ProcessTimeoutTime = processKillTime;
                 _tempServiceConfig.ProcessRestartDelay = processRestartDelay;
                 _tempServiceConfig.CounterResetTime = counterResetTime;
 
-                _tempServiceConfig.DependOnService =
-                    _dependOnServiceObservableCollection.Select(x => x.ServiceName).ToArray();
+                _tempServiceConfig.DependOnService = _dependOnServiceObservableCollection.Select(x => x.ServiceName).ToArray();
                 _tempServiceConfig.DependOnGroup = _dependOnGroupObservableCollection.ToArray();
 
-                _tempServiceConfig.IsConsoleApplication = checkBoxIsConsoleApp.IsChecked ?? false;
+
+                switch (ComboBoxProcessPriority.SelectedIndex)
+                {
+                    case 0:
+                        _tempServiceConfig.ProcessPriority = ProcessPriorityClass.Idle;
+                        break;
+                    case 1:
+                        _tempServiceConfig.ProcessPriority = ProcessPriorityClass.BelowNormal;
+                        break;
+                    case 2:
+                        _tempServiceConfig.ProcessPriority = ProcessPriorityClass.Normal;
+                        break;
+                    case 3:
+                        _tempServiceConfig.ProcessPriority = ProcessPriorityClass.AboveNormal;
+                        break;
+                    case 4:
+                        _tempServiceConfig.ProcessPriority = ProcessPriorityClass.High;
+                        break;
+                    case 5:
+                        _tempServiceConfig.ProcessPriority = ProcessPriorityClass.RealTime;
+                        break;
+                    default:
+                        _tempServiceConfig.ProcessPriority = ProcessPriorityClass.Normal;
+                        break;
+                }
+
+                _tempServiceConfig.IsConsoleApplication = CheckBoxIsConsoleApp.IsChecked ?? false;
                 _tempServiceConfig.UseCtrlC = _tempServiceConfig.IsConsoleApplication &&
-                                             (radioButtonUseCtrlC.IsChecked ?? true) &&
-                                             !(radioButtonUseCtrlBreak.IsChecked ?? false);
+                                             (RadioButtonUseCtrlC.IsChecked ?? true) &&
+                                             !(RadioButtonUseCtrlBreak.IsChecked ?? false);
 
-                _tempServiceConfig.CanInteractWithDesktop = checkBoxInteractDesk.IsChecked ?? false;
+                _tempServiceConfig.CanInteractWithDesktop = CheckBoxInteractDesk.IsChecked ?? false;
 
-                switch (comboBoxStartType.SelectedIndex)
+                switch (ComboBoxStartType.SelectedIndex)
                 {
                     case 0:
                         _tempServiceConfig.DelayedStart = false;
@@ -494,6 +552,10 @@ namespace DaemonMaster
                     case 3:
                         _tempServiceConfig.DelayedStart = false;
                         _tempServiceConfig.StartType = Advapi32.ServiceStartType.Disabled;
+                        break;
+                    default:
+                        _tempServiceConfig.DelayedStart = false;
+                        _tempServiceConfig.StartType = Advapi32.ServiceStartType.AutoStart;
                         break;
                 }
 

@@ -539,6 +539,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Process ähnelt.
+        /// </summary>
+        public static string groupBox_process {
+            get {
+                return ResourceManager.GetString("groupBox_process", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Information ähnelt.
         /// </summary>
         public static string information {
@@ -665,6 +674,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Load Order Group: ähnelt.
+        /// </summary>
+        public static string label_loadOrderGroup {
+            get {
+                return ResourceManager.GetString("label_loadOrderGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Max Restarts: ähnelt.
         /// </summary>
         public static string label_max_restarts {
@@ -688,6 +706,15 @@ namespace DaemonMaster.Language {
         public static string label_password {
             get {
                 return ResourceManager.GetString("label_password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Priority: ähnelt.
+        /// </summary>
+        public static string label_priority {
+            get {
+                return ResourceManager.GetString("label_priority", resourceCulture);
             }
         }
         
@@ -818,6 +845,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        /// </summary>
+        public static string placeholder_loadOrderGroup {
+            get {
+                return ResourceManager.GetString("placeholder_loadOrderGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die unlimited restarts =&gt; -1 ähnelt.
         /// </summary>
         public static string placeholder_max_restarts {
@@ -859,6 +895,60 @@ namespace DaemonMaster.Language {
         public static string placeholder_username {
             get {
                 return ResourceManager.GetString("placeholder_username", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Above normal ähnelt.
+        /// </summary>
+        public static string priority_aboveNormal {
+            get {
+                return ResourceManager.GetString("priority_aboveNormal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Below normal ähnelt.
+        /// </summary>
+        public static string priority_belowNormal {
+            get {
+                return ResourceManager.GetString("priority_belowNormal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die High ähnelt.
+        /// </summary>
+        public static string priority_high {
+            get {
+                return ResourceManager.GetString("priority_high", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Idle ähnelt.
+        /// </summary>
+        public static string priority_idle {
+            get {
+                return ResourceManager.GetString("priority_idle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Normal ähnelt.
+        /// </summary>
+        public static string priority_normal {
+            get {
+                return ResourceManager.GetString("priority_normal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Realtime ähnelt.
+        /// </summary>
+        public static string priority_realtime {
+            get {
+                return ResourceManager.GetString("priority_realtime", resourceCulture);
             }
         }
         

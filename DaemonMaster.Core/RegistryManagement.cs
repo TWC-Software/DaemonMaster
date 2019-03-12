@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.ServiceProcess;
@@ -64,6 +65,7 @@ namespace DaemonMaster.Core
                     parameters.SetValue("ProcessTimeoutTime", serviceDefinition.ProcessTimeoutTime, RegistryValueKind.DWord);
                     parameters.SetValue("ProcessRestartDelay", serviceDefinition.ProcessRestartDelay, RegistryValueKind.DWord);
                     parameters.SetValue("CounterResetTime", serviceDefinition.CounterResetTime, RegistryValueKind.DWord);
+                    parameters.SetValue("ProcessPriority", serviceDefinition.ProcessPriority, RegistryValueKind.DWord);
 
                     //Bools
                     parameters.SetValue("IsConsoleApplication", serviceDefinition.IsConsoleApplication, RegistryValueKind.DWord);
@@ -140,6 +142,7 @@ namespace DaemonMaster.Core
                     serviceDefinition.ProcessTimeoutTime = Convert.ToInt32(parameters.GetValue("ProcessTimeoutTime", 9500));
                     serviceDefinition.ProcessRestartDelay = Convert.ToInt32(parameters.GetValue("ProcessRestartDelay", 2000));
                     serviceDefinition.CounterResetTime = Convert.ToInt32(parameters.GetValue("CounterResetTime", 43200));
+                    serviceDefinition.ProcessPriority = (ProcessPriorityClass)parameters.GetValue("ProcessPriority", ProcessPriorityClass.Normal);
                     serviceDefinition.IsConsoleApplication = Convert.ToBoolean(parameters.GetValue("IsConsoleApplication", false));
                     serviceDefinition.UseCtrlC = Convert.ToBoolean(parameters.GetValue("UseCtrlC", false));
                     serviceDefinition.CanInteractWithDesktop = Convert.ToBoolean(parameters.GetValue("CanInteractWithDesktop", false));

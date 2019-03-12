@@ -10,80 +10,95 @@
         Title="{x:Static resx:lang.window_edit_add}" Height="343.496" Width="893.398" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
 
     <Window.Resources>
-        <wpf:InvertBooleanConverter x:Key="invertBoolConverter"/>
+        <wpf:InvertBooleanConverter x:Key="InvertBoolConverter"/>
     </Window.Resources>
 
     <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,0,0" Height="308" Width="890">
-        <Button x:Name="buttonSave" Content="{x:Static resx:lang.button_save}" Margin="10,276,0,0" Click="buttonSave_OnClick" Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139"/>
-        <Button x:Name="buttonCancel" Content="{x:Static resx:lang.button_cancel}" Margin="741,276,0,0"  Click="buttonCancel_OnClick"  Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139"/>
+        <Button x:Name="ButtonSave" Content="{x:Static resx:lang.button_save}" Margin="10,276,0,0" Click="buttonSave_OnClick" Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139"/>
+        <Button x:Name="ButtonCancel" Content="{x:Static resx:lang.button_cancel}" Margin="741,276,0,0"  Click="buttonCancel_OnClick"  Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139"/>
 
         <TabControl VerticalContentAlignment="Center" Margin="0,0,0,42" RenderTransformOrigin="0,0">
             <TabItem Header="{x:Static resx:lang.tabitem_general}" IsSelected="True">
                 <Grid>
-                    <Label x:Name="labelServiceName" Content="{x:Static resx:lang.label_service_name}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-                    <wpf:PlaceholderTextBox x:Name="textBoxServiceName" Height="23" Margin="147,14,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_service_name}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" />
-                    <Button x:Name="buttonSearchPath" Content="{x:Static resx:lang.button_search_file}" HorizontalAlignment="Left" Margin="147,194,0,0" VerticalAlignment="Top" Width="717" Click="buttonSearchPath_OnClick"/>
+                    <Label x:Name="LabelServiceName" Content="{x:Static resx:lang.label_service_name}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                    <wpf:PlaceholderTextBox x:Name="TextBoxServiceName" Height="23" Margin="147,14,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_service_name}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" />
+                    <Button x:Name="ButtonSearchPath" Content="{x:Static resx:lang.button_search_file}" HorizontalAlignment="Left" Margin="147,194,0,0" VerticalAlignment="Top" Width="717" Click="buttonSearchPath_OnClick"/>
 
-                    <wpf:PlaceholderTextBox x:Name="textBoxFilePath" Height="23" Margin="147,166,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_file_path}" VerticalAlignment="Top" IsReadOnly="True" HorizontalAlignment="Left" Width="717" UndoLimit="0" />
-                    <Label x:Name="labelFilePath" Content="{x:Static resx:lang.label_file_path}" HorizontalAlignment="Left" Margin="10,162,0,0" VerticalAlignment="Top"/>
-                    <TextBox x:Name="textBoxParam" Height="23" Width="321" Margin="147,98,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" LostFocus="TextBoxParam_OnLostFocus"/>
-                    <Label x:Name="labelParam" Content="{x:Static resx:lang.label_parameters}" HorizontalAlignment="Left" Margin="10,95,0,0" VerticalAlignment="Top"/>
-                    <GroupBox x:Name="groupBoxCustomUsername" Header="{x:Static resx:lang.groupbox_custom_user}" HorizontalAlignment="Left" Height="116" Margin="486,-3,0,0" VerticalAlignment="Top" Width="378">
+                    <wpf:PlaceholderTextBox x:Name="TextBoxFilePath" Height="23" Margin="147,166,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_file_path}" VerticalAlignment="Top" IsReadOnly="True" HorizontalAlignment="Left" Width="717" UndoLimit="0" />
+                    <Label x:Name="LabelFilePath" Content="{x:Static resx:lang.label_file_path}" HorizontalAlignment="Left" Margin="10,162,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="TextBoxParam" Height="23" Width="321" Margin="147,98,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" LostFocus="TextBoxParam_OnLostFocus"/>
+                    <Label x:Name="LabelParam" Content="{x:Static resx:lang.label_parameters}" HorizontalAlignment="Left" Margin="10,95,0,0" VerticalAlignment="Top"/>
+                    <GroupBox x:Name="GroupBoxCustomUsername" Header="{x:Static resx:lang.groupbox_custom_user}" HorizontalAlignment="Left" Height="116" Margin="486,-3,0,0" VerticalAlignment="Top" Width="378">
                         <Grid HorizontalAlignment="Left" Height="100" Margin="0,0,-2,-6" VerticalAlignment="Top" Width="267">
-                            <Label x:Name="labelUsername" Content="{x:Static resx:lang.label_username}" HorizontalAlignment="Left" Margin="4,32,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.258,0.487"/>
-                            <Label x:Name="labelPassword" Content="{x:Static resx:lang.label_password}" HorizontalAlignment="Left" Margin="4,63,0,0" VerticalAlignment="Top"/>
-                            <wpf:PlaceholderTextBox x:Name="textBoxUsername" HorizontalAlignment="Left" Height="23" Margin="93,32,-35,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_username}" VerticalAlignment="Top" Width="209" IsReadOnly="False" IsEnabled="{Binding ElementName=checkBoxUseLocalSystem, Path=IsChecked, TargetNullValue=false, Converter={StaticResource invertBoolConverter}}"/>
-                            <PasswordBox x:Name="textBoxPassword" HorizontalAlignment="Left" Height="23" Margin="93,67,-94,0" VerticalAlignment="Top" Width="268" IsEnabled="{Binding ElementName=checkBoxUseLocalSystem, Path=IsChecked, TargetNullValue=false, Converter={StaticResource invertBoolConverter}}"/>
-                            <Button x:Name="buttonOpenADOP" Content="{x:Static resx:lang.button_search}" HorizontalAlignment="Left" Margin="307,32,-94,0" VerticalAlignment="Top" Width="54" Height="23" Click="buttonOpenAdop_OnClick" IsEnabled="{Binding ElementName=checkBoxUseLocalSystem, Path=IsChecked, TargetNullValue=false, Converter={StaticResource invertBoolConverter}}"/>
-                            <CheckBox x:Name="checkBoxUseLocalSystem" Content="{x:Static resx:lang.checkbox_use_local_system_account}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" IsChecked="True"/>
+                            <Label x:Name="LabelUsername" Content="{x:Static resx:lang.label_username}" HorizontalAlignment="Left" Margin="4,32,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.258,0.487"/>
+                            <Label x:Name="LabelPassword" Content="{x:Static resx:lang.label_password}" HorizontalAlignment="Left" Margin="4,63,0,0" VerticalAlignment="Top"/>
+                            <wpf:PlaceholderTextBox x:Name="TextBoxUsername" HorizontalAlignment="Left" Height="23" Margin="93,32,-35,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_username}" VerticalAlignment="Top" Width="209" IsReadOnly="False" IsEnabled="{Binding ElementName=CheckBoxUseLocalSystem, Path=IsChecked, TargetNullValue=false, Converter={StaticResource InvertBoolConverter}}"/>
+                            <PasswordBox x:Name="TextBoxPassword" HorizontalAlignment="Left" Height="23" Margin="93,67,-94,0" VerticalAlignment="Top" Width="268" IsEnabled="{Binding ElementName=CheckBoxUseLocalSystem, Path=IsChecked, TargetNullValue=false, Converter={StaticResource InvertBoolConverter}}"/>
+                            <Button x:Name="ButtonOpenAdop" Content="{x:Static resx:lang.button_search}" HorizontalAlignment="Left" Margin="307,32,-94,0" VerticalAlignment="Top" Width="54" Height="23" Click="buttonOpenAdop_OnClick" IsEnabled="{Binding ElementName=CheckBoxUseLocalSystem, Path=IsChecked, TargetNullValue=false, Converter={StaticResource InvertBoolConverter}}"/>
+                            <CheckBox x:Name="CheckBoxUseLocalSystem" Content="{x:Static resx:lang.checkbox_use_local_system_account}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" IsChecked="True"/>
                         </Grid>
                     </GroupBox>
-                    <Label x:Name="labelDisplayName" Content="{x:Static resx:lang.label_display_name}" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top"/>
-                    <wpf:PlaceholderTextBox x:Name="textBoxDisplayName" Height="23" Margin="147,42,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_display_name}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
-                    <wpf:PlaceholderTextBox x:Name="textBoxDescription" Height="23" Margin="147,70,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_description}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" SpellCheck.IsEnabled="True"/>
-                    <Label x:Name="labelDescription" Content="{x:Static resx:lang.label_description}" HorizontalAlignment="Left" Margin="10,66,0,0" VerticalAlignment="Top"/>
-                    <ComboBox x:Name="comboBoxStartType" HorizontalAlignment="Left" Margin="147,126,0,0" VerticalAlignment="Top" Width="321" RenderTransformOrigin="1.217,1.045" SelectedIndex="0">
+                    <Label x:Name="LabelDisplayName" Content="{x:Static resx:lang.label_display_name}" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top"/>
+                    <wpf:PlaceholderTextBox x:Name="TextBoxDisplayName" Height="23" Margin="147,42,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_display_name}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
+                    <wpf:PlaceholderTextBox x:Name="TextBoxDescription" Height="23" Margin="147,70,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_description}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" SpellCheck.IsEnabled="True"/>
+                    <Label x:Name="LabelDescription" Content="{x:Static resx:lang.label_description}" HorizontalAlignment="Left" Margin="10,66,0,0" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="ComboBoxStartType" HorizontalAlignment="Left" Margin="147,126,0,0" VerticalAlignment="Top" Width="321" RenderTransformOrigin="1.217,1.045" SelectedIndex="0">
                         <ComboBoxItem Content="{x:Static resx:lang.starttype_automatic}"/>
                         <ComboBoxItem Content="{x:Static resx:lang.starttype_automatic_with_delay}"/>
                         <ComboBoxItem Content="{x:Static resx:lang.starttype_manual}"/>
                         <ComboBoxItem Content="{x:Static resx:lang.starttype_disabled}"/>
                     </ComboBox>
-                    <Label x:Name="labelStarttyp" Content="{x:Static resx:lang.label_start_type}" HorizontalAlignment="Left" Margin="10,126,0,0" VerticalAlignment="Top"/>
-                    <Label x:Name="labelWarningPasswords" Content="{x:Static resx:lang.warning_file_access}" HorizontalAlignment="Left" Margin="271,213,0,0" VerticalAlignment="Top"/>
-                    <Button x:Name="buttonImport" Content="{x:Static resx:lang.button_import}" Margin="530,126,210,90" Click="buttonImport_Click"/>
-                    <Button x:Name="buttonExport" Content="{x:Static resx:lang.button_export}" Margin="679,126,61,90" Click="buttonExport_Click"/>
+                    <Label x:Name="LabelStarttyp" Content="{x:Static resx:lang.label_start_type}" HorizontalAlignment="Left" Margin="10,126,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="LabelWarningPasswords" Content="{x:Static resx:lang.warning_file_access}" HorizontalAlignment="Left" Margin="271,213,0,0" VerticalAlignment="Top"/>
+                    <Button x:Name="ButtonImport" Content="{x:Static resx:lang.button_import}" Margin="530,126,210,90" Click="buttonImport_Click"/>
+                    <Button x:Name="ButtonExport" Content="{x:Static resx:lang.button_export}" Margin="679,126,61,90" Click="buttonExport_Click"/>
                 </Grid>
             </TabItem>
             <TabItem Header="{x:Static resx:lang.tabitem_advanced}">
                 <Grid>
-                    <wpf:PlaceholderTextBox x:Name="textBoxMaxRestarts" HorizontalAlignment="Left" Height="23" Margin="239,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="268" Placeholder="{x:Static resx:lang.placeholder_max_restarts}"/>
-                    <Label x:Name="labelMaxRestarts" Content="{x:Static resx:lang.label_max_restarts}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
-                    <wpf:PlaceholderTextBox x:Name="textBoxProcessTimeoutTime" HorizontalAlignment="Left" Height="23" Margin="239,39,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="268" Placeholder="{x:Static resx:lang.placeholder_process_kill_time}"/>
-                    <Label x:Name="labelProcessTimeoutTime" Content="{x:Static resx:lang.label_process_kill_time}" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
-                    <wpf:PlaceholderTextBox x:Name="textBoxProcessRestartDelay" HorizontalAlignment="Left" Height="23" Margin="239,65,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="268" Placeholder="{x:Static resx:lang.placeholder_process_restart_delay}"/>
-                    <Label x:Name="labelProcessRestartDelay" Content="{x:Static resx:lang.label_process_restart_delay}" HorizontalAlignment="Left" Margin="10,62,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
-                    <wpf:PlaceholderTextBox x:Name="textBoxCounterResetTime" HorizontalAlignment="Left" Height="23" Margin="239,91,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="268" Placeholder="{x:Static resx:lang.placeholder_counter_reset_time}"/>
-                    <Label x:Name="labelCounterResetTime" Content="{x:Static resx:lang.label_counter_reset_time}" HorizontalAlignment="Left" Margin="10,88,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
-                    <CheckBox x:Name="checkBoxIsConsoleApp" Content="{x:Static resx:lang.checkbox_is_console_app}" HorizontalAlignment="Left" Margin="10,136,0,0" VerticalAlignment="Top"/>
-                    <RadioButton x:Name="radioButtonUseCtrlC" Content="{x:Static resx:lang.radiobutton_use_ctrlc}" HorizontalAlignment="Left" Margin="387,159,0,0" VerticalAlignment="Top" IsEnabled="{Binding ElementName=checkBoxIsConsoleApp, Path=IsChecked}"/>
-                    <RadioButton x:Name="radioButtonUseCtrlBreak" Content="{x:Static resx:lang.radiobutton_use_ctrlbreak}" HorizontalAlignment="Left" Margin="387,139,0,0" VerticalAlignment="Top" IsChecked="True" IsEnabled="{Binding ElementName=checkBoxIsConsoleApp, Path=IsChecked}"/>
-                    <Label x:Name="labelShutdownConsoleApp" Content="{x:Static resx:lang.label_shutdown_console_app}" HorizontalAlignment="Left" Margin="239,133,0,0" VerticalAlignment="Top" IsEnabled="{Binding ElementName=checkBoxIsConsoleApp, Path=IsChecked}"/>
-                    <CheckBox x:Name="checkBoxInteractDesk" Content="{x:Static resx:lang.interact_with_desktop}" Margin="10,168,608,54" IsEnabled="{Binding ElementName=checkBoxUseLocalSystem, Path=IsChecked}"/>
+                    <wpf:PlaceholderTextBox x:Name="TextBoxMaxRestarts" HorizontalAlignment="Left" Height="23" Margin="239,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" Placeholder="{x:Static resx:lang.placeholder_max_restarts}"/>
+                    <Label x:Name="LabelMaxRestarts" Content="{x:Static resx:lang.label_max_restarts}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
+                    <wpf:PlaceholderTextBox x:Name="TextBoxProcessTimeoutTime" HorizontalAlignment="Left" Height="23" Margin="239,39,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" Placeholder="{x:Static resx:lang.placeholder_process_kill_time}"/>
+                    <Label x:Name="LabelProcessTimeoutTime" Content="{x:Static resx:lang.label_process_kill_time}" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
+                    <wpf:PlaceholderTextBox x:Name="TextBoxProcessRestartDelay" HorizontalAlignment="Left" Height="23" Margin="239,65,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" Placeholder="{x:Static resx:lang.placeholder_process_restart_delay}"/>
+                    <Label x:Name="LabelProcessRestartDelay" Content="{x:Static resx:lang.label_process_restart_delay}" HorizontalAlignment="Left" Margin="10,62,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
+                    <wpf:PlaceholderTextBox x:Name="TextBoxCounterResetTime" HorizontalAlignment="Left" Height="23" Margin="239,91,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" Placeholder="{x:Static resx:lang.placeholder_counter_reset_time}"/>
+                    <Label x:Name="LabelCounterResetTime" Content="{x:Static resx:lang.label_counter_reset_time}" HorizontalAlignment="Left" Margin="10,88,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
+                    <CheckBox x:Name="CheckBoxInteractDesk" Content="{x:Static resx:lang.interact_with_desktop}" Margin="497,50,121.14,171.65" IsEnabled="{Binding ElementName=CheckBoxUseLocalSystem, Path=IsChecked}"/>
+                    <wpf:PlaceholderTextBox x:Name="TextBoxLoadOrderGroup" HorizontalAlignment="Left" Height="23" Margin="637,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" Placeholder="{x:Static resx:lang.placeholder_loadOrderGroup}"/>
+                    <Label x:Name="LabelLoadOrderGroup" Content="{x:Static resx:lang.label_loadOrderGroup}" HorizontalAlignment="Left" Margin="492,9,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577" Width="119" Height="31"/>
+                    <GroupBox Header="{x:Static resx:lang.groupBox_process}" Margin="24,119,468.14,5.65" >
+                        <Grid Margin="0,0,-2.028,-0.86">
+                            <Label x:Name="LabelLoadOrderGroupCopy" Content="{x:Static resx:lang.label_priority}" Margin="10,2,248,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577" Height="27"/>
+                            <ComboBox x:Name="ComboBoxProcessPriority" HorizontalAlignment="Left" Margin="94,4,0,0" VerticalAlignment="Top" Width="283" RenderTransformOrigin="1.217,1.045" SelectedIndex="0">
+                                <ComboBoxItem Content="{x:Static resx:lang.priority_idle}"/>
+                                <ComboBoxItem Content="{x:Static resx:lang.priority_belowNormal}"/>
+                                <ComboBoxItem Content="{x:Static resx:lang.priority_normal}"/>
+                                <ComboBoxItem Content="{x:Static resx:lang.priority_aboveNormal}"/>
+                                <ComboBoxItem Content="{x:Static resx:lang.priority_high}"/>
+                                <ComboBoxItem Content="{x:Static resx:lang.priority_realtime}"/>
+                            </ComboBox>
+                            <RadioButton x:Name="RadioButtonUseCtrlBreak" Content="{x:Static resx:lang.radiobutton_use_ctrlbreak}" HorizontalAlignment="Left" Margin="262,51,0,0" VerticalAlignment="Top" IsChecked="True" IsEnabled="{Binding IsChecked, ElementName=CheckBoxIsConsoleApp}"/>
+                            <RadioButton x:Name="RadioButtonUseCtrlC" Content="{x:Static resx:lang.radiobutton_use_ctrlc}" HorizontalAlignment="Left" Margin="262,69,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, ElementName=CheckBoxIsConsoleApp}"/>
+                            <Label x:Name="LabelShutdownConsoleApp" Content="{x:Static resx:lang.label_shutdown_console_app}" HorizontalAlignment="Left" Margin="174,44,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, ElementName=CheckBoxIsConsoleApp}"/>
+                            <CheckBox x:Name="CheckBoxIsConsoleApp" Content="{x:Static resx:lang.checkbox_is_console_app}" HorizontalAlignment="Left" Margin="10,50,0,0" VerticalAlignment="Top"/>
+                        </Grid>
+                    </GroupBox>
                 </Grid>
             </TabItem>
             <TabItem Header="{x:Static resx:lang.tabitem_dependencies}">
                 <Grid>
-                    <ListBox x:Name="listBoxDependOnService" HorizontalAlignment="Left" Height="104" Margin="147,10,0,0" VerticalAlignment="Top" Width="360" DisplayMemberPath="DisplayName"/>
-                    <Label x:Name="labelDependOnService" Content="{x:Static resx:lang.label_depend_on_service}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-                    <Button x:Name="buttonAddDependentService" Content="{x:Static resx:lang.button_add}" Margin="26,41,777,171" Click="buttonAddDependentService_Click"/>
-                    <Button x:Name="buttonRemoveDependentService" Content="{x:Static resx:lang.button_remove}" Margin="26,72,777,140" Click="buttonRemoveDependentService_Click"/>
-                    <ListBox x:Name="listBoxAllServices" Margin="514,10,10,124" DisplayMemberPath="DisplayName"/>
+                    <ListBox x:Name="ListBoxDependOnService" HorizontalAlignment="Left" Height="104" Margin="147,10,0,0" VerticalAlignment="Top" Width="360" DisplayMemberPath="DisplayName"/>
+                    <Label x:Name="LabelDependOnService" Content="{x:Static resx:lang.label_depend_on_service}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                    <Button x:Name="ButtonAddDependentService" Content="{x:Static resx:lang.button_add}" Margin="26,41,777,171" Click="buttonAddDependentService_Click"/>
+                    <Button x:Name="ButtonRemoveDependentService" Content="{x:Static resx:lang.button_remove}" Margin="26,72,777,140" Click="buttonRemoveDependentService_Click"/>
+                    <ListBox x:Name="ListBoxAllServices" Margin="514,10,10,124" DisplayMemberPath="DisplayName"/>
 
-                    <ListBox x:Name="listBoxDependOnGroup" HorizontalAlignment="Left" Height="104" Margin="147,119,0,0" VerticalAlignment="Top" Width="360"/>
-                    <Label x:Name="labelDependOnGroup" Content="{x:Static resx:lang.label_depend_on_group}" HorizontalAlignment="Left" Margin="10,119,0,0" VerticalAlignment="Top"/>
-                    <Button x:Name="buttonAddDependentGroup" Content="{x:Static resx:lang.button_add}" Margin="26,150,777,62" Click="buttonAddDependentGroup_Click"/>
-                    <Button x:Name="buttonRemoveDependentGroup" Content="{x:Static resx:lang.button_remove}" Margin="26,181,777,31" Click="buttonRemoveDependentGroup_Click"/>
-                    <ListBox x:Name="listBoxAllGroups" Margin="514,119,10,15"/>
+                    <ListBox x:Name="ListBoxDependOnGroup" HorizontalAlignment="Left" Height="104" Margin="147,119,0,0" VerticalAlignment="Top" Width="360"/>
+                    <Label x:Name="LabelDependOnGroup" Content="{x:Static resx:lang.label_depend_on_group}" HorizontalAlignment="Left" Margin="10,119,0,0" VerticalAlignment="Top"/>
+                    <Button x:Name="ButtonAddDependentGroup" Content="{x:Static resx:lang.button_add}" Margin="26,150,777,62" Click="buttonAddDependentGroup_Click"/>
+                    <Button x:Name="ButtonRemoveDependentGroup" Content="{x:Static resx:lang.button_remove}" Margin="26,181,777,31" Click="buttonRemoveDependentGroup_Click"/>
+                    <ListBox x:Name="ListBoxAllGroups" Margin="514,119,10,15"/>
                 </Grid>
             </TabItem>
         </TabControl>

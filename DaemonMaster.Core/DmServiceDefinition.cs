@@ -18,6 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Diagnostics;
 using DaemonMaster.Core.Win32;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 
@@ -93,6 +94,11 @@ namespace DaemonMaster.Core
         /// Get or set the time after that the restart counter will be reset in minutes
         /// </summary>
         public int CounterResetTime { get; set; } = 1440; // default is 24h = 1440m
+
+        /// <summary>
+        /// Gets or sets the process priority.
+        /// </summary>
+        public ProcessPriorityClass ProcessPriority { get; set; } = ProcessPriorityClass.Normal;
 
         //----------------------------------------------------------------------------
 

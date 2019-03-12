@@ -96,7 +96,7 @@ namespace DaemonMasterService
                 }
 
 
-                var serviceDefinition = new DmServiceDefinition(serviceName)
+                var serviceDefinition = new DmServiceDefinition("DaemonMaster_" + serviceName)
                 {
                     BinaryPath = opts.FullPath,
                     DisplayName = opts.DisplayName,
@@ -111,7 +111,7 @@ namespace DaemonMasterService
                     UseCtrlC = opts.UseCtrlC
                 };
 
-                //Custom user
+                //Custom user //TODO 
                 if (!Equals(serviceDefinition.Credentials, ServiceCredentials.LocalSystem))
                 {
                     if (!DaemonMasterUtils.ValidateUser(opts.Username, pw))
@@ -180,6 +180,9 @@ namespace DaemonMasterService
                         }
                     }
                 }
+
+                //Save in registry
+                RegistryManagement.SaveInRegistry(serviceDefinition);
 
                 Logger.Info("Successful!");
                 return 0;

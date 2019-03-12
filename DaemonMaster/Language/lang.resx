@@ -497,4 +497,34 @@
   <data name="extern_domain_user_error" xml:space="preserve">
     <value>DaemonMaster only supports local user!</value>
   </data>
+  <data name="placeholder_loadOrderGroup" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="label_loadOrderGroup" xml:space="preserve">
+    <value>Load Order Group:</value>
+  </data>
+  <data name="priority_aboveNormal" xml:space="preserve">
+    <value>Above normal</value>
+  </data>
+  <data name="priority_normal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="priority_belowNormal" xml:space="preserve">
+    <value>Below normal</value>
+  </data>
+  <data name="priority_high" xml:space="preserve">
+    <value>High</value>
+  </data>
+  <data name="priority_idle" xml:space="preserve">
+    <value>Idle</value>
+  </data>
+  <data name="priority_realtime" xml:space="preserve">
+    <value>Realtime</value>
+  </data>
+  <data name="label_priority" xml:space="preserve">
+    <value>Priority:</value>
+  </data>
+  <data name="groupBox_process" xml:space="preserve">
+    <value>Process</value>
+  </data>
 </root>
