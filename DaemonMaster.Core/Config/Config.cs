@@ -33,13 +33,12 @@ namespace DaemonMaster.Core.Config
                 return _updateInterval;
             }
 
-            set
-            {
-                _updateInterval = value;
-            }
+            set => _updateInterval = value;
         }
+
         public string Language { get; set; } = "windows";
         public bool ActivateLegacyFunctions { get; set; } = false;
         public bool UseExperimentalFunctions { get; set; } = false;
+        public bool UseNewExperimentalServiceSearchSystem { get; set; } = false;
     }
 }

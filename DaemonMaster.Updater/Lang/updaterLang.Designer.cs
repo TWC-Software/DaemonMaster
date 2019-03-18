@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace DaemonMasterUpdater.Lang {
+namespace DaemonMaster.Updater.Lang {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace DaemonMasterUpdater.Lang {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DaemonMasterUpdater.Lang.updaterLang", typeof(updaterLang).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DaemonMaster.Updater.Lang.updaterLang", typeof(updaterLang).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

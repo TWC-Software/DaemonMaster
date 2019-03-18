@@ -573,23 +573,24 @@ namespace DaemonMaster
         {
             try
             {
+                //TODO make problems
                 //Only Check that right if its not the local system
-                if (!Equals(_tempServiceConfig.Credentials, ServiceCredentials.LocalSystem) && !Equals(_tempServiceConfig.Credentials, ServiceCredentials.NoChange))
-                {
-                    using (LsaPolicyHandle lsaWrapper = LsaPolicyHandle.OpenPolicyHandle())
-                    {
-                        bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(_tempServiceConfig.Credentials.Username).Any(x => x.Buffer == "SeServiceLogonRight");
-                        if (!hasRightToStartAsService)
-                        {
-                            MessageBoxResult result = MessageBox.Show(_resManager.GetString("logon_as_a_service", CultureInfo.CurrentUICulture), _resManager.GetString("question", CultureInfo.CurrentUICulture), MessageBoxButton.YesNo, MessageBoxImage.Question);
-                            if (result != MessageBoxResult.OK)
-                                return;
+                //if (!Equals(_tempServiceConfig.Credentials, ServiceCredentials.LocalSystem) && !Equals(_tempServiceConfig.Credentials, ServiceCredentials.NoChange))
+                //{
+                //    using (LsaPolicyHandle lsaWrapper = LsaPolicyHandle.OpenPolicyHandle())
+                //    {
+                //        bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(_tempServiceConfig.Credentials.Username).Any(x => x.Buffer == "SeServiceLogonRight");
+                //        if (!hasRightToStartAsService)
+                //        {
+                //            MessageBoxResult result = MessageBox.Show(_resManager.GetString("logon_as_a_service", CultureInfo.CurrentUICulture), _resManager.GetString("question", CultureInfo.CurrentUICulture), MessageBoxButton.YesNo, MessageBoxImage.Question);
+                //            if (result != MessageBoxResult.Yes)
+                //                return;
 
-                            //Give the account the right to start as service
-                            lsaWrapper.AddPrivileges(_tempServiceConfig.Credentials.Username, new[] { "SeServiceLogonRight" });
-                        }
-                    }
-                }
+                //            //Give the account the right to start as service
+                //            lsaWrapper.AddPrivileges(_tempServiceConfig.Credentials.Username, new[] { "SeServiceLogonRight" });
+                //        }
+                //    }
+                //}
 
                 if (_createNewService)
                 {

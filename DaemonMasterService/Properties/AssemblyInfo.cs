@@ -1,4 +1,5 @@
-using System.Reflection;
+﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // Allgemeine Informationen über eine Assembly werden über die folgenden
@@ -7,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("DaemonMasterService")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("TWC-Software")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("DaemonMasterService")]
-[assembly: AssemblyCopyright("Copyright © 2017-2018 Mike Cremer / Stephan André")]
+[assembly: AssemblyCopyright("Copyright © 2017-2019 Mike Cremer / Stephan André")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -19,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Die folgende GUID bestimmt die ID der Typbibliothek, wenn dieses Projekt für COM verfügbar gemacht wird
-[assembly: Guid("227ba4d7-56ac-40ba-a73c-0b28ac8c99f8")]
+[assembly: Guid("3829c18e-3af1-4c8a-ad83-23a739483d9f")]
 
 // Versionsinformationen für eine Assembly bestehen aus den folgenden vier Werten:
 //

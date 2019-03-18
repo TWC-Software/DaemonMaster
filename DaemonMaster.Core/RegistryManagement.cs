@@ -23,6 +23,7 @@ using System.Diagnostics;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.ServiceProcess;
+using DaemonMaster.Core.Config;
 using DaemonMaster.Core.Win32;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using Microsoft.Win32;
@@ -128,6 +129,7 @@ namespace DaemonMaster.Core
                     Description = Convert.ToString(key.GetValue("Description", string.Empty)),
                     DependOnService = (string[])key.GetValue("DependOnService", Array.Empty<string>()),
                     DependOnGroup = (string[])key.GetValue("DependOnGroup", Array.Empty<string>()),
+                    LoadOrderGroup = Convert.ToString(key.GetValue("Group", string.Empty)),
                     DelayedStart = Convert.ToBoolean(key.GetValue("DelayedAutostart", false)),
                     StartType = (Advapi32.ServiceStartType)Convert.ToUInt32(key.GetValue("Start", 2))
                 };
@@ -162,31 +164,82 @@ namespace DaemonMaster.Core
 
         public static List<DmServiceDefinition> LoadInstalledServices()
         {
+            return ConfigManagement.GetConfig.UseNewExperimentalServiceSearchSystem ? LoadInstalledServicesNewSystem() : LoadInstalledServicesOldSystem();
+        }
+
+        [Obsolete("Later it gets replaced with the new one, but for now it rest as the default system.", false)]
+        public static List<DmServiceDefinition> LoadInstalledServicesOldSystem()
+        {
             var daemons = new List<DmServiceDefinition>();
 
             ServiceController[] sc = ServiceController.GetServices();
 
             foreach (ServiceController service in sc)
             {
-                if (service.ServiceName.Contains("DaemonMaster_"))
+                if (!service.ServiceName.Contains("DaemonMaster_"))
+                    continue;
+
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + service.ServiceName + @"\Parameters", false))
                 {
-                    using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + service.ServiceName + @"\Parameters", false))
+                    if (key == null)
+                        throw new Exception("Can't open registry key!");
+
+                    var serviceDefinition = new DmServiceDefinition(service.ServiceName)
                     {
-                        if (key == null)
-                            throw new Exception("Can't open registry key!");
+                        DisplayName = service.DisplayName,
+                        BinaryPath = Convert.ToString(key.GetValue("BinaryPath")),
+                    };
+
+                    daemons.Add(serviceDefinition);
+                }
+            }
+            return daemons;
+        }
+
+        public static List<DmServiceDefinition> LoadInstalledServicesNewSystem()
+        {
+            var daemons = new List<DmServiceDefinition>();
+
+
+            ServiceController[] sc = ServiceController.GetServices();
+            foreach (ServiceController service in sc)
+            {
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + service.ServiceName, false))
+                {
+                    //If the key invalid, skip this service
+                    if (key == null)
+                        continue;
+
+                    //Get the exe path of the service to determine later if its a service from DaemonMaster
+                    string serviceExePath = Convert.ToString(key.GetValue("ImagePath") ?? string.Empty);
+
+                    //If the serviceExePath is invalid skip this service
+                    if (string.IsNullOrWhiteSpace(serviceExePath))
+                        continue;
+
+                    if (!serviceExePath.Contains(ServiceControlManager.DmServiceExe))
+                        continue;
+
+                    using (RegistryKey parameterKey = key.OpenSubKey(@"\Parameters", false))
+                    {
+                        //If the parameters sub key invalid, skip this service
+                        if (parameterKey == null)
+                            continue;
 
                         var serviceDefinition = new DmServiceDefinition(service.ServiceName)
                         {
                             DisplayName = service.DisplayName,
-                            BinaryPath = Convert.ToString(key.GetValue("BinaryPath")),
+                            BinaryPath = Convert.ToString(parameterKey.GetValue("BinaryPath")),
                         };
 
                         daemons.Add(serviceDefinition);
                     }
                 }
             }
+
             return daemons;
         }
+
 
         public static string[] GetAllServiceGroups()
         {

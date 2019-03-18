@@ -25,7 +25,7 @@ namespace DaemonMaster.Core.Win32
 {
     public class ServiceControlManager : SafeHandleZeroOrMinusOneIsInvalid
     {
-        internal static readonly string DmServiceExe = AppDomain.CurrentDomain.BaseDirectory + "DaemonMasterService.exe" + " service";
+        public static readonly string DmServiceExe = AppDomain.CurrentDomain.BaseDirectory + "DaemonMasterService.exe" + " service";
 
         private ServiceControlManager() : base(ownsHandle: true)
         {

@@ -18,9 +18,11 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Resources;
@@ -32,11 +34,13 @@ using System.Windows.Threading;
 using DaemonMaster.Core;
 using DaemonMaster.Core.Config;
 using DaemonMaster.Core.Exceptions;
+using DaemonMaster.Core.Jobs;
 using DaemonMaster.Core.Win32;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using DaemonMaster.Core.Win32.PInvoke.Winsta;
 using DaemonMaster.Language;
-using TimeoutException = System.TimeoutException;
+using DaemonMasterService;
+using TimeoutException = System.ServiceProcess.TimeoutException;
 
 namespace DaemonMaster
 {
@@ -189,6 +193,21 @@ namespace DaemonMaster
                 return;
 
             EditDaemon();
+        }
+
+        private void MenuItem_RefreshListOnClick(object sender, RoutedEventArgs e)
+        {
+            //Clear the list and refill it so that the event gets fired
+            _processCollection.Clear();
+
+            List<ServiceListViewItem> list = RegistryManagement.LoadInstalledServices().ConvertAll(x => new ServiceListViewItem(x.ServiceName, x.DisplayName, x.BinaryPath, Equals(x.Credentials, ServiceCredentials.LocalSystem)));
+            foreach (ServiceListViewItem item in list)
+            {
+                _processCollection.Add(item);
+            }
+
+            //Force Update after refresh
+            UpdateListView(null, EventArgs.Empty);
         }
 
         private void MenuItem_CheckForUpdates_OnClick(object sender, RoutedEventArgs e)
@@ -422,11 +441,33 @@ namespace DaemonMaster
         {
             try
             {
-                throw new NotImplementedException("Currently not supported feature.");
+                using (var serviceController = new ServiceController(serviceListViewItem.ServiceName))
+                {
+                    if (serviceController.Status == ServiceControllerStatus.Stopped)
+                        return;
+
+                    try
+                    {
+                        serviceController.ExecuteCommand((int)ServiceCommands.ServiceKillProcessAndStop); //Kill command for the process
+                        serviceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(2));
+                    }
+                    catch (TimeoutException)
+                    {
+                        if (KillChildProcessJob.IsSupportedWindowsVersion && serviceListViewItem.ServicePid != null)
+                        {
+                            Process process = Process.GetProcessById((int)serviceListViewItem.ServicePid);
+                            process.Kill();
+                        }
+                        else
+                        {
+                            MessageBox.Show(_resManager.GetString("cannot_kill_service", CultureInfo.CurrentUICulture), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Cannot kill the service:\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(_resManager.GetString("cannot_kill_service", CultureInfo.CurrentUICulture) + ":\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -441,7 +482,7 @@ namespace DaemonMaster
             }
 
 
-            if (DaemonMasterUtils.CheckUI0DetectService())
+            if (DaemonMasterUtils.CheckUi0DetectService())
             {
                 //if its Windows 10 then showing a warning message
                 if (DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
@@ -468,7 +509,7 @@ namespace DaemonMaster
 
         private void CheckForUpdates()
         {
-            _ = DaemonMasterUpdater.Updater.StartAsync("https://github.com/TWC-Software/DaemonMaster");
+            _ = Updater.Updater.StartAsync("https://github.com/TWC-Software/DaemonMaster");
         }
 
         #endregion
@@ -490,7 +531,7 @@ namespace DaemonMaster
                 //If Windows 10 1803 installed don't ask for UI0Detect registry key change
                 AskToEnableInteractiveServices();
 
-                if (!DaemonMasterUtils.CheckUI0DetectService())
+                if (!DaemonMasterUtils.CheckUi0DetectService())
                 {
                     MessageBox.Show(_resManager.GetString("error_ui0service", CultureInfo.CurrentUICulture),
                         _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,

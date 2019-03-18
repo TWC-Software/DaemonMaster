@@ -103,7 +103,7 @@ namespace DaemonMaster
             }
 
             //Get process PID
-            if (servicePid != 0) //normaly no process can run when the service has been stoppen
+            if (servicePid != 0) //normally no process can run when the service has been stopped
             {
                 using (RegistryKey processKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\" + ServiceName + @"\ProcessInfo", false))
                 {

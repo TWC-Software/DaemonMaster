@@ -152,7 +152,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
         [DllImport(DllName, ExactSpelling = true)]
         public static extern NtStatus LsaOpenPolicy
         (
-            ref LsaUnicodeString systemName,
+            LsaUnicodeString[] systemName,
             ref LsaObjectAttributes objectAttributes,
             Kernel32.Kernel32.AccessMask.PolicySpecificRights accessMask,
             out LsaPolicyHandle policyHandle
@@ -163,7 +163,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
         (
             LsaPolicyHandle policyHandle,
             IntPtr accountSid,
-            ref LsaUnicodeString[] userRights,
+            LsaUnicodeString[] userRights,
             uint countOfRights
         );
 
@@ -173,7 +173,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
             LsaPolicyHandle policyHandle,
             IntPtr accountSid,
             bool allRights,
-            ref LsaUnicodeString[] userRights,
+            LsaUnicodeString[] userRights,
             uint countOfRights
         );
 

@@ -117,18 +117,18 @@ namespace DaemonMaster.Language {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Delete ähnelt.
         /// </summary>
-        public static string button_delete_service {
+        public static string button_delete {
             get {
-                return ResourceManager.GetString("button_delete_service", resourceCulture);
+                return ResourceManager.GetString("button_delete", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Edit ähnelt.
         /// </summary>
-        public static string button_edit_service {
+        public static string button_edit {
             get {
-                return ResourceManager.GetString("button_edit_service", resourceCulture);
+                return ResourceManager.GetString("button_edit", resourceCulture);
             }
         }
         
@@ -183,6 +183,15 @@ namespace DaemonMaster.Language {
         public static string button_load_shortcut {
             get {
                 return ResourceManager.GetString("button_load_shortcut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Refresh list ähnelt.
+        /// </summary>
+        public static string button_refresh_list {
+            get {
+                return ResourceManager.GetString("button_refresh_list", resourceCulture);
             }
         }
         
@@ -291,6 +300,15 @@ namespace DaemonMaster.Language {
         public static string cannot_import_daemon {
             get {
                 return ResourceManager.GetString("cannot_import_daemon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Cannot kill the service ähnelt.
+        /// </summary>
+        public static string cannot_kill_service {
+            get {
+                return ResourceManager.GetString("cannot_kill_service", resourceCulture);
             }
         }
         
@@ -845,7 +863,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Name of the load order group ähnelt.
         /// </summary>
         public static string placeholder_loadOrderGroup {
             get {

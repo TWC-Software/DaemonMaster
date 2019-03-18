@@ -30,11 +30,13 @@ namespace DaemonMaster.Core.Jobs
         private bool _isDisposed;
         private JobHandle _jobHandle;
 
+        public static bool IsSupportedWindowsVersion => (Environment.OSVersion.Version.Major > 6 || (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor > 1));
+
         public KillChildProcessJob()
         {
             //Return if the windows version is lower or equal to win7
-            if (Environment.OSVersion.Version.Major <= 6 && Environment.OSVersion.Version.Minor <= 1)
-                return;
+            if (!IsSupportedWindowsVersion)
+                throw new NotSupportedException("KillChildProcessJob is not supported in your windows version.");
 
             //Create default security attributes
             var securityAttributes = new Kernel32.SecurityAttributes();
@@ -98,7 +100,7 @@ namespace DaemonMaster.Core.Jobs
             if (disposing)
             {
                 //Free managed objects here
-                _jobHandle.Dispose();
+                _jobHandle?.Dispose();
                 _jobHandle = null;
             }
             //Free unmanaged objects here

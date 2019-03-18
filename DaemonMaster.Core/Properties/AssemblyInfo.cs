@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("DaemonMaster.Core")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyCopyright("Copyright © 2017-2019 Mike Cremer / Stephan André")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

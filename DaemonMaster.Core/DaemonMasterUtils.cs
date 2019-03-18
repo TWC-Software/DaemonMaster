@@ -34,7 +34,7 @@ namespace DaemonMaster.Core
             return Environment.OSVersion.Version.Major < 10 || (Environment.OSVersion.Version.Major == 10 && Environment.OSVersion.Version.Build < 17134);
         }
 
-        public static bool CheckUI0DetectService()
+        public static bool CheckUi0DetectService()
         {
             try
             {
@@ -59,7 +59,7 @@ namespace DaemonMaster.Core
 
         public static string GetLoginFromUsername(string s)
         {
-            int stop = s.IndexOf("\\", StringComparison.Ordinal);
+            int stop = s.LastIndexOf("\\", StringComparison.Ordinal); //last index because textbox output is like this ".\\\\Olaf"
             return (stop > -1) ? s.Substring(stop + 1, s.Length - stop - 1) : string.Empty;
         }
 
@@ -105,6 +105,19 @@ namespace DaemonMaster.Core
                 var principal = new WindowsPrincipal(identity);
                 return principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
+        }
+
+        //Source: https://social.msdn.microsoft.com/Forums/vstudio/en-US/a979351c-800f-41e7-b153-2d53ff6aac29/how-to-get-running-windows-service-process-id-?forum=netfxbcl
+        public static uint GetProcessIdByServiceName(string serviceName)
+        {
+            uint processId = 0;
+            string qry = "SELECT PROCESSID FROM WIN32_SERVICE WHERE NAME = '" + serviceName + "'";
+            System.Management.ManagementObjectSearcher searcher = new System.Management.ManagementObjectSearcher(qry);
+            foreach (System.Management.ManagementObject mngntObj in searcher.Get())
+            {
+                processId = (uint)mngntObj["PROCESSID"];
+            }
+            return processId;
         }
     }
 }

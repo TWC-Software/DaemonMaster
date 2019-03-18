@@ -41,6 +41,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -50,6 +51,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>DeamonMaster.ico</ApplicationIcon>
@@ -203,7 +206,7 @@
       <Name>DaemonMaster.Updater</Name>
     </ProjectReference>
     <ProjectReference Include="..\DaemonMasterService\DaemonMasterService.csproj">
-      <Project>{227ba4d7-56ac-40ba-a73c-0b28ac8c99f8}</Project>
+      <Project>{3829c18e-3af1-4c8a-ad83-23a739483d9f}</Project>
       <Name>DaemonMasterService</Name>
     </ProjectReference>
   </ItemGroup>

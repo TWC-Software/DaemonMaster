@@ -40,7 +40,8 @@ namespace DaemonMaster
                 "   => NLog - Jaroslaw Kowalski, Kim Christensen, Julian Verdurmen - BSD 3 clause \"New\" or \"Revised\" License \n" +
                 "   => AutoUpdater.NET - RBSoft - MIT License \n" +
                 "   => Active Directory Object Picker - Tulpep - MS-PL License \n" +
-                "   => ListView Layout Manager - Jani Giannoudis - CPOL License \n\n" +
+                "   => ListView Layout Manager - Jani Giannoudis - CPOL License \n" +
+                "   => CommandLineParser - Giacomo Stelluti Scala & Contributors - MIT License \n\n" +
                 "Also thanks to: \n" +
                 "   - PInvoke.net \n " +
                 "   - stackoverflow.com (for help from the users) \n " +

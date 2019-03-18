@@ -23,9 +23,9 @@ using System.IO;
 using System.Linq;
 using System.Resources;
 using System.Windows;
-using DaemonMasterUpdater.Lang;
+using DaemonMaster.Updater.Lang;
 
-namespace DaemonMasterUpdater
+namespace DaemonMaster.Updater
 {
     /// <summary>
     /// Interaktionslogik für MainWindow.xaml

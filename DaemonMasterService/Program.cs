@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Security;
 using System.ServiceProcess;
 using CommandLine;
@@ -84,11 +85,13 @@ namespace DaemonMasterService
                     Logger.Error("CanInteractWithDesktop is not supported in this windows version.");
                     return 1;
                 }
-                if (opts.CanInteractWithDesktop && !string.IsNullOrWhiteSpace(opts.Username))
+
+                if (opts.CanInteractWithDesktop && (!string.IsNullOrWhiteSpace(opts.Username) || pw != null))
                 {
                     Logger.Error("CanInteractWithDesktop is not supported with custom user.");
                     return 1;
                 }
+
                 if ((string.IsNullOrWhiteSpace(opts.Username) && pw != null) || (!string.IsNullOrWhiteSpace(opts.Username) && pw == null))
                 {
                     Logger.Error("Password/username parameter is missing!");
@@ -102,6 +105,7 @@ namespace DaemonMasterService
                     DisplayName = opts.DisplayName,
                     Description = opts.Description,
                     Arguments = opts.Arguments,
+                    LoadOrderGroup = opts.LoadOrderGroup,
                     CanInteractWithDesktop = opts.CanInteractWithDesktop,
                     ProcessMaxRestarts = opts.MaxRestarts,
                     ProcessTimeoutTime = opts.ProcessTimeoutTime,
@@ -111,8 +115,9 @@ namespace DaemonMasterService
                     UseCtrlC = opts.UseCtrlC
                 };
 
-                //Custom user //TODO 
-                if (!Equals(serviceDefinition.Credentials, ServiceCredentials.LocalSystem))
+                //Custom user
+                //Create new ServiceCredentials instance
+                if (!string.IsNullOrWhiteSpace(opts.Username) && pw != null)
                 {
                     if (!DaemonMasterUtils.ValidateUser(opts.Username, pw))
                     {
@@ -121,6 +126,31 @@ namespace DaemonMasterService
                     }
 
                     serviceDefinition.Credentials = new ServiceCredentials(opts.Username, pw);
+
+                    //TODO make problems
+                    //Check if he has the right to start as service
+                    //using (LsaPolicyHandle lsaWrapper = LsaPolicyHandle.OpenPolicyHandle())
+                    //{
+                    //    bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(serviceDefinition.Credentials.Username).Any(x => x.Buffer == "SeServiceLogonRight");
+                    //    if (!hasRightToStartAsService)
+                    //    {
+                    //        Logger.Error("The user doesn't have the right to start as service. Do you want to give him that right? [Yes/No]");
+                    //        switch (Console.ReadLine())
+                    //        {
+                    //            case "yes":
+                    //            case "Yes":
+                    //            case "y":
+                    //            case "Y":
+                    //                //Give the account the right to start as service
+                    //                lsaWrapper.AddPrivileges(serviceDefinition.Credentials.Username, new[] { "SeServiceLogonRight" });
+                    //                break;
+
+                    //            default:
+                    //                Logger.Error("Cannot create the service without that right.");
+                    //                return 1;
+                    //        }
+                    //    }
+                    //}
                 }
 
                 //Set the start type
@@ -149,10 +179,39 @@ namespace DaemonMasterService
                     default:
                         Logger.Error("The StartType can only be between 0-4 (0 = Disabled / 1 = Demand start / 2 = Auto start / 4 = Delayed auto start).");
                         return 1;
-
                 }
 
+                //Set the start type
+                switch (opts.ProcessPriority)
+                {
+                    case 0:
+                        serviceDefinition.ProcessPriority = ProcessPriorityClass.Idle;
+                        break;
 
+                    case 1:
+                        serviceDefinition.ProcessPriority = ProcessPriorityClass.BelowNormal;
+                        break;
+
+                    case 2:
+                        serviceDefinition.ProcessPriority = ProcessPriorityClass.Normal;
+                        break;
+
+                    case 4:
+                        serviceDefinition.ProcessPriority = ProcessPriorityClass.AboveNormal;
+                        break;
+
+                    case 5:
+                        serviceDefinition.ProcessPriority = ProcessPriorityClass.High;
+                        break;
+
+                    case 6:
+                        serviceDefinition.ProcessPriority = ProcessPriorityClass.RealTime;
+                        break;
+
+                    default:
+                        Logger.Error("The ProcessPriority can only be between 0-6 (0 = Idle / 1 = Below normal / 2 = Normal / 4 = Above normal / 5 = High / 6 = Real time (not recommended to use)).");
+                        return 1;
+                }
 
                 if (editMode)
                 {
@@ -174,10 +233,7 @@ namespace DaemonMasterService
                 {
                     using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.CreateService))
                     {
-                        using (ServiceHandle service = scm.CreateService(serviceDefinition))
-                        {
-
-                        }
+                        scm.CreateService(serviceDefinition);
                     }
                 }
 

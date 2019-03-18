@@ -135,10 +135,10 @@
   <data name="button_credits" xml:space="preserve">
     <value>Credits</value>
   </data>
-  <data name="button_delete_service" xml:space="preserve">
+  <data name="button_delete" xml:space="preserve">
     <value>Delete</value>
   </data>
-  <data name="button_edit_service" xml:space="preserve">
+  <data name="button_edit" xml:space="preserve">
     <value>Edit</value>
   </data>
   <data name="button_export" xml:space="preserve">
@@ -498,7 +498,7 @@
     <value>DaemonMaster only supports local user!</value>
   </data>
   <data name="placeholder_loadOrderGroup" xml:space="preserve">
-    <value></value>
+    <value>Name of the load order group</value>
   </data>
   <data name="label_loadOrderGroup" xml:space="preserve">
     <value>Load Order Group:</value>
@@ -526,5 +526,11 @@
   </data>
   <data name="groupBox_process" xml:space="preserve">
     <value>Process</value>
+  </data>
+  <data name="cannot_kill_service" xml:space="preserve">
+    <value>Cannot kill the service</value>
+  </data>
+  <data name="button_refresh_list" xml:space="preserve">
+    <value>Refresh list</value>
   </data>
 </root>

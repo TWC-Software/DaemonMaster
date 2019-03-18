@@ -64,10 +64,8 @@ namespace DaemonMaster.Core.Win32
             lsaObjectAttributes.SecurityQualityOfService = IntPtr.Zero;
             lsaObjectAttributes.Length = (uint)Marshal.SizeOf(typeof(LsaObjectAttributes));
 
-            //LocalSystem
-            Advapi32.LsaUnicodeString systemName = null;
             //Create a new LSA policy handle
-            NtStatus ret = Advapi32.LsaOpenPolicy(ref systemName, ref lsaObjectAttributes, Kernel32.AccessMask.PolicySpecificRights.PolicyAllAccess, out LsaPolicyHandle policyHandle); //systemName = null (Local System)
+            NtStatus ret = Advapi32.LsaOpenPolicy(null, ref lsaObjectAttributes, Kernel32.AccessMask.PolicySpecificRights.PolicyAllAccess, out LsaPolicyHandle policyHandle); //systemName = null (Local System)
             if (ret != NtStatus.Success)
                 throw new Win32Exception(Advapi32.LsaNtStatusToWinError(ret));
 
@@ -95,7 +93,7 @@ namespace DaemonMaster.Core.Win32
             using (var win32Sid = new Win32Sid(account))
             {
                 //Add account rights
-                NtStatus ret = Advapi32.LsaAddAccountRights(this, win32Sid.Pointer, ref privileges, (uint)privilege.Length);
+                NtStatus ret = Advapi32.LsaAddAccountRights(this, win32Sid.Pointer, privileges, (uint)privilege.Length);
                 if (ret != NtStatus.Success)
                     throw new Win32Exception(Advapi32.LsaNtStatusToWinError(ret));
             }
@@ -118,7 +116,7 @@ namespace DaemonMaster.Core.Win32
             using (var win32Sid = new Win32Sid(account))
             {
                 //Remove account rights
-                NtStatus ret = Advapi32.LsaRemoveAccountRights(this, win32Sid.Pointer, removeAllRights, ref privileges, (uint)privilege.Length);
+                NtStatus ret = Advapi32.LsaRemoveAccountRights(this, win32Sid.Pointer, removeAllRights, privileges, (uint)privilege.Length);
                 if (ret != NtStatus.Success)
                     throw new Win32Exception(Advapi32.LsaNtStatusToWinError(ret));
             }

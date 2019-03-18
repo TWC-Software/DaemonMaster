@@ -29,7 +29,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
-
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -39,10 +38,10 @@ using System.Resources;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using DaemonMasterUpdater.GitHub;
-using DaemonMasterUpdater.Lang;
+using DaemonMaster.Updater.GitHub;
+using DaemonMaster.Updater.Lang;
 
-namespace DaemonMasterUpdater
+namespace DaemonMaster.Updater
 {
     public sealed class Updater
     {

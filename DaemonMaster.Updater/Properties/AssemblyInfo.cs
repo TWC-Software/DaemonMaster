@@ -7,12 +7,12 @@ using System.Windows;
 // Allgemeine Informationen über eine Assembly werden über die folgenden
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
-[assembly: AssemblyTitle("DaemonMasterUpdater")]
+[assembly: AssemblyTitle("DaemonMaster.Updater")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("DaemonMasterUpdater")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyProduct("DaemonMaster.Updater")]
+[assembly: AssemblyCopyright("Copyright © 2017-2019 Mike Cremer / Stephan André")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

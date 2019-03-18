@@ -40,8 +40,8 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
             var lus = new LsaUnicodeString
             {
                 Buffer = s,
-                Length = (ushort)(s.Length * sizeof(char)),
-                MaximumLength = (ushort)((s.Length + 1) * sizeof(char))
+                Length = (ushort)(s.Length * UnicodeEncoding.CharSize),
+                MaximumLength = (ushort)((s.Length + 1) * UnicodeEncoding.CharSize)
             };
 
             return lus;

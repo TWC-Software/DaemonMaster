@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("TWC-Software")]
 [assembly: AssemblyProduct("DaemonMaster")]
-[assembly: AssemblyCopyright("Copyright © 2017-2018 Mike Cremer / Stephan André")]
+[assembly: AssemblyCopyright("Copyright © 2017-2019 Mike Cremer / Stephan André")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

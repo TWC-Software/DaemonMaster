@@ -19,6 +19,7 @@ namespace DaemonMasterService
     internal class DmProcess
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         private readonly KillChildProcessJob _killChildProcessJob = new KillChildProcessJob();
         private readonly DmServiceDefinition _serviceDefinition;
         private Process _process;
@@ -59,7 +60,7 @@ namespace DaemonMasterService
         internal bool IsRunning()
         {
             if (_process == null)
-                throw new ArgumentNullException(nameof(_process));
+                return false;
 
             try
             {
@@ -144,12 +145,12 @@ namespace DaemonMasterService
             _process.Exited += ProcessOnExited;
             _process.Start();
 
+            //Assign process to job
+            if (KillChildProcessJob.IsSupportedWindowsVersion)
+                _killChildProcessJob.AssignProcess(_process);
 
             //Set process priority
             _process.PriorityClass = _serviceDefinition.ProcessPriority;
-
-            //Assign process to job
-            _killChildProcessJob.AssignProcess(_process);
 
             _lastRestartTime = DateTime.UtcNow;
 
@@ -247,7 +248,8 @@ namespace DaemonMasterService
                     _process.Exited += ProcessOnExited;
 
                     //Assign process to job
-                    _killChildProcessJob.AssignProcess(_process);
+                    if (KillChildProcessJob.IsSupportedWindowsVersion)
+                        _killChildProcessJob.AssignProcess(_process);
 
                     _lastRestartTime = DateTime.UtcNow;
 
@@ -274,7 +276,7 @@ namespace DaemonMasterService
             //TODO: Make better system
             Logger.Info("Stopping process...");
 
-            //If process already stoppend return
+            //If process already stopped return
             if (!IsRunning())
                 return true;
 
@@ -339,7 +341,7 @@ namespace DaemonMasterService
         internal bool KillProcess()
         {
             Logger.Info("Killing process...");
-            //If process already stoped return
+            //If process already stopped return
             if (!IsRunning())
                 return true;
 
@@ -428,14 +430,12 @@ namespace DaemonMasterService
 
         protected virtual void OnMaxRestartsReached()
         {
-            EventHandler handler = MaxRestartsReached;
-            handler?.Invoke(this, EventArgs.Empty);
+            MaxRestartsReached?.Invoke(this, EventArgs.Empty);
         }
 
         protected virtual void OnUpdateProcessPid()
         {
-            EventHandler handler = UpdateProcessPid;
-            handler?.Invoke(this, EventArgs.Empty);
+            UpdateProcessPid?.Invoke(this, EventArgs.Empty);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////

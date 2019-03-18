@@ -120,6 +120,34 @@ namespace DaemonMasterService
             base.OnStop();
         }
 
+        protected override void OnCustomCommand(int command)
+        {
+            switch (command)
+            {
+                case (int)ServiceCommands.ServiceKillProcessAndStop:
+                    if (_dmProcess != null && _dmProcess.KillProcess())
+                    {
+                        Stop();
+                    }
+                    else
+                    {
+                        Logger.Error("OnCustomCommand: Failed to kill process.");
+                    }
+                    break;
+
+                case (int)ServiceCommands.ServiceKillProcess:
+                    if (_dmProcess != null && !_dmProcess.KillProcess())
+                    {
+                        Logger.Error("OnCustomCommand: Failed to kill process.");
+                    }
+                    break;
+
+                default:
+                    Logger.Error("OnCustomCommand: command not found!");
+                    break;
+            }
+        }
+
 
         private void DmProcessOnMaxRestartsReached(object sender, EventArgs e)
         {
@@ -143,7 +171,7 @@ namespace DaemonMasterService
         {
             try
             {
-                if (_oldProcessPid == _dmProcess.ProcessPid)
+                if (_dmProcess == null || _oldProcessPid == _dmProcess.ProcessPid)
                     return;
 
                 using (RegistryKey processKey = Registry.LocalMachine.OpenSubKey(RegPath + _serviceName + @"\ProcessInfo", true))

@@ -27,9 +27,9 @@ using System.Net.Cache;
 using System.Resources;
 using System.Threading.Tasks;
 using System.Windows;
-using DaemonMasterUpdater.Lang;
+using DaemonMaster.Updater.Lang;
 
-namespace DaemonMasterUpdater
+namespace DaemonMaster.Updater
 {
     /// <summary>
     /// Interaktionslogik für DownloadProgressWindow.xaml

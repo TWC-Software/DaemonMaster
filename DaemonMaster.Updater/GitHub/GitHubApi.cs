@@ -22,7 +22,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace DaemonMasterUpdater.GitHub
+namespace DaemonMaster.Updater.GitHub
 {
     public sealed class GitHubApi
     {

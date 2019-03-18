@@ -135,10 +135,10 @@
   <data name="button_credits" xml:space="preserve">
     <value>Générique</value>
   </data>
-  <data name="button_delete_service" xml:space="preserve">
+  <data name="button_delete" xml:space="preserve">
     <value>Supprimer</value>
   </data>
-  <data name="button_edit_service" xml:space="preserve">
+  <data name="button_edit" xml:space="preserve">
     <value>Modifier</value>
   </data>
   <data name="button_export" xml:space="preserve">
