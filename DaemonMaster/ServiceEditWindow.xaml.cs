@@ -453,8 +453,7 @@ namespace DaemonMaster
                 else
                 {
                     //No date has been written in the textfields
-                    if (string.IsNullOrWhiteSpace(TextBoxUsername.Text) ||
-                        string.IsNullOrWhiteSpace(TextBoxPassword.Password))
+                    if (string.IsNullOrWhiteSpace(TextBoxUsername.Text))
                     {
                         MessageBox.Show(_resManager.GetString("invalid_pw_user", CultureInfo.CurrentUICulture),
                             _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
@@ -471,14 +470,14 @@ namespace DaemonMaster
                         return;
                     }
 
-                    //Password or username is not correct
-                    if (!DaemonMasterUtils.ValidateUser(TextBoxUsername.Text, TextBoxPassword.SecurePassword))
-                    {
-                        MessageBox.Show(_resManager.GetString("login_failed", CultureInfo.CurrentUICulture),
-                            _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
-                            MessageBoxImage.Error);
-                        return;
-                    }
+                    ////Password or username is not correct
+                    //if (!DaemonMasterUtils.ValidateUser(TextBoxUsername.Text, TextBoxPassword.SecurePassword))
+                    //{
+                    //    MessageBox.Show(_resManager.GetString("login_failed", CultureInfo.CurrentUICulture),
+                    //        _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
+                    //        MessageBoxImage.Error);
+                    //    return;
+                    //}
 
                     _tempServiceConfig.Credentials = new ServiceCredentials(TextBoxUsername.Text, TextBoxPassword.SecurePassword);
                 }
@@ -573,24 +572,27 @@ namespace DaemonMaster
         {
             try
             {
-                //TODO make problems
                 //Only Check that right if its not the local system
-                //if (!Equals(_tempServiceConfig.Credentials, ServiceCredentials.LocalSystem) && !Equals(_tempServiceConfig.Credentials, ServiceCredentials.NoChange))
-                //{
-                //    using (LsaPolicyHandle lsaWrapper = LsaPolicyHandle.OpenPolicyHandle())
-                //    {
-                //        bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(_tempServiceConfig.Credentials.Username).Any(x => x.Buffer == "SeServiceLogonRight");
-                //        if (!hasRightToStartAsService)
-                //        {
-                //            MessageBoxResult result = MessageBox.Show(_resManager.GetString("logon_as_a_service", CultureInfo.CurrentUICulture), _resManager.GetString("question", CultureInfo.CurrentUICulture), MessageBoxButton.YesNo, MessageBoxImage.Question);
-                //            if (result != MessageBoxResult.Yes)
-                //                return;
+                if (!Equals(_tempServiceConfig.Credentials, ServiceCredentials.LocalSystem))
+                {
+                    string username = _tempServiceConfig.Credentials.Username;
+                    if (string.IsNullOrWhiteSpace(username))
+                        username = TextBoxUsername.Text;
 
-                //            //Give the account the right to start as service
-                //            lsaWrapper.AddPrivileges(_tempServiceConfig.Credentials.Username, new[] { "SeServiceLogonRight" });
-                //        }
-                //    }
-                //}
+                    using (LsaPolicyHandle lsaWrapper = LsaPolicyHandle.OpenPolicyHandle())
+                    {
+                        bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(username).Any(x => x.Buffer == "SeServiceLogonRight");
+                        if (!hasRightToStartAsService)
+                        {
+                            MessageBoxResult result = MessageBox.Show(_resManager.GetString("logon_as_a_service", CultureInfo.CurrentUICulture), _resManager.GetString("question", CultureInfo.CurrentUICulture), MessageBoxButton.YesNo, MessageBoxImage.Question);
+                            if (result != MessageBoxResult.Yes)
+                                return;
+
+                            //Give the account the right to start as service
+                            lsaWrapper.AddPrivileges(username, "SeServiceLogonRight");
+                        }
+                    }
+                }
 
                 if (_createNewService)
                 {

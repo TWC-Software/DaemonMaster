@@ -6,9 +6,9 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
     [StructLayout(LayoutKind.Sequential)]
     public struct LsaObjectAttributes
     {
-        public uint Length;
+        public int Length;
         public IntPtr RootDirectory;
-        public IntPtr ObjectName;
+        public Advapi32.LsaUnicodeString ObjectName;
         public uint Attributes;
         public IntPtr SecurityDescriptor;
         public IntPtr SecurityQualityOfService;

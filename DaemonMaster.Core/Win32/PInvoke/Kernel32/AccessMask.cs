@@ -8,7 +8,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Kernel32
         {
             //TODO
             [Flags]
-            public enum StandartRights : uint
+            public enum StandartRights
             {
                 Delete = 0x00010000,
                 ReadControl = 0x00020000,
@@ -23,7 +23,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Kernel32
             }
 
             [Flags]
-            public enum SpecialSpecificRights : uint
+            public enum SpecialSpecificRights
             {
                 SpecificRightsAll = 0x0000FFFF,
                 AccessSystemSecurity = 0x01000000,
@@ -31,7 +31,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Kernel32
             }
 
             [Flags]
-            public enum DesktopSpecificRights : uint
+            public enum DesktopSpecificRights
             {
                 DesktopReadobjects = 0x00000001,
                 DesktopCreatewindow = 0x00000002,
@@ -46,7 +46,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Kernel32
 
 
             [Flags]
-            public enum WinstaSpecificRights : uint
+            public enum WinstaSpecificRights
             {
                 WinstaEnumdesktops = 0x00000001,
                 WinstaReadattributes = 0x00000002,
@@ -61,7 +61,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Kernel32
             }
 
             [Flags]
-            public enum PolicySpecificRights : uint
+            public enum PolicySpecificRights
             {
                 PolicyViewLocalInformation = 0x00000001,
                 PolicyViewAuditInformation = 0x00000002,

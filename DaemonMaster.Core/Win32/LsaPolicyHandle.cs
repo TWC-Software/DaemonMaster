@@ -26,6 +26,7 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Text;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using DaemonMaster.Core.Win32.PInvoke.Core;
 using DaemonMaster.Core.Win32.PInvoke.Kernel32;
@@ -44,7 +45,7 @@ namespace DaemonMaster.Core.Win32
         /// <summary>
         /// Initializes a new instance of the <see cref="T:DaemonMaster.Core.Win32.LsaPolicyHandle" /> class.
         /// </summary>
-        private LsaPolicyHandle() : base(ownsHandle: true)
+        public LsaPolicyHandle() : base(ownsHandle: true)
         {
         }
 
@@ -56,16 +57,19 @@ namespace DaemonMaster.Core.Win32
         /// <exception cref="Win32Exception"></exception>
         public static LsaPolicyHandle OpenPolicyHandle()
         {
-            LsaObjectAttributes lsaObjectAttributes;
-            lsaObjectAttributes.RootDirectory = IntPtr.Zero;
-            lsaObjectAttributes.ObjectName = IntPtr.Zero;
-            lsaObjectAttributes.Attributes = 0;
-            lsaObjectAttributes.SecurityDescriptor = IntPtr.Zero;
-            lsaObjectAttributes.SecurityQualityOfService = IntPtr.Zero;
-            lsaObjectAttributes.Length = (uint)Marshal.SizeOf(typeof(LsaObjectAttributes));
+            var systemName = new Advapi32.LsaUnicodeString();
+
+            var lsaObjectAttributes = new LsaObjectAttributes
+            {
+                RootDirectory = IntPtr.Zero,
+                Attributes = 0,
+                SecurityDescriptor = IntPtr.Zero,
+                SecurityQualityOfService = IntPtr.Zero,
+                Length = Marshal.SizeOf(typeof(LsaObjectAttributes))
+            };
 
             //Create a new LSA policy handle
-            NtStatus ret = Advapi32.LsaOpenPolicy(null, ref lsaObjectAttributes, Kernel32.AccessMask.PolicySpecificRights.PolicyAllAccess, out LsaPolicyHandle policyHandle); //systemName = null (Local System)
+            NtStatus ret = Advapi32.LsaOpenPolicy(ref systemName, ref lsaObjectAttributes, Kernel32.AccessMask.PolicySpecificRights.PolicyAllAccess, out LsaPolicyHandle policyHandle); //systemName = null (Local System)
             if (ret != NtStatus.Success)
                 throw new Win32Exception(Advapi32.LsaNtStatusToWinError(ret));
 
@@ -82,18 +86,20 @@ namespace DaemonMaster.Core.Win32
         /// </summary>
         /// <param name="account">Account name like "Olaf" xD</param>
         /// <param name="privilege"></param>
-        public void AddPrivileges(string account, string[] privilege)
+        public void AddPrivileges(string account, string privilege)
         {
-            var privileges = new Advapi32.LsaUnicodeString[privilege.Length];
-            for (var i = 0; i < privilege.Length; i++)
+            var lsaPrivileges = new Advapi32.LsaUnicodeString[1];
+            lsaPrivileges[0] = new Advapi32.LsaUnicodeString
             {
-                privileges[i] = privilege[i].ToLsaString();
-            }
+                Buffer = privilege,
+                Length = (ushort)(privilege.Length * UnicodeEncoding.CharSize),
+                MaximumLength = (ushort)((privilege.Length + 1) * UnicodeEncoding.CharSize)
+            };
 
             using (var win32Sid = new Win32Sid(account))
             {
                 //Add account rights
-                NtStatus ret = Advapi32.LsaAddAccountRights(this, win32Sid.Pointer, privileges, (uint)privilege.Length);
+                NtStatus ret = Advapi32.LsaAddAccountRights(this, win32Sid.Pointer, lsaPrivileges, 1);
                 if (ret != NtStatus.Success)
                     throw new Win32Exception(Advapi32.LsaNtStatusToWinError(ret));
             }
@@ -105,22 +111,25 @@ namespace DaemonMaster.Core.Win32
         /// <param name="account">Account name like "Olaf"</param>
         /// <param name="privilege"></param>
         /// <param name="removeAllRights">Remove all privileges</param>
-        public void RemovePrivileges(string account, string[] privilege, bool removeAllRights = false)
+        public void RemovePrivileges(string account, string privilege, bool removeAllRights = false)
         {
-            var privileges = new Advapi32.LsaUnicodeString[privilege.Length];
-            for (var i = 0; i < privilege.Length; i++)
+            var lsaPrivileges = new Advapi32.LsaUnicodeString[1];
+            lsaPrivileges[0] = new Advapi32.LsaUnicodeString
             {
-                privileges[i] = privilege[i].ToLsaString();
-            }
+                Buffer = privilege,
+                Length = (ushort)(privilege.Length * UnicodeEncoding.CharSize),
+                MaximumLength = (ushort)((privilege.Length + 1) * UnicodeEncoding.CharSize)
+            };
 
             using (var win32Sid = new Win32Sid(account))
             {
                 //Remove account rights
-                NtStatus ret = Advapi32.LsaRemoveAccountRights(this, win32Sid.Pointer, removeAllRights, privileges, (uint)privilege.Length);
+                NtStatus ret = Advapi32.LsaRemoveAccountRights(this, win32Sid.Pointer, removeAllRights, lsaPrivileges, 1);
                 if (ret != NtStatus.Success)
                     throw new Win32Exception(Advapi32.LsaNtStatusToWinError(ret));
             }
         }
+
 
         /// <summary>
         /// Give you an array with all privileges that the account have

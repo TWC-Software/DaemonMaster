@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Security;
 using System.ServiceProcess;
 using CommandLine;
@@ -119,38 +120,37 @@ namespace DaemonMasterService
                 //Create new ServiceCredentials instance
                 if (!string.IsNullOrWhiteSpace(opts.Username) && pw != null)
                 {
-                    if (!DaemonMasterUtils.ValidateUser(opts.Username, pw))
-                    {
-                        Logger.Error("Failed to validate the given password/username.");
-                        return 1;
-                    }
+                    //if (!DaemonMasterUtils.ValidateUser(opts.Username, pw))
+                    //{
+                    //    Logger.Error("Failed to validate the given password/username.");
+                    //    return 1;
+                    //}
 
                     serviceDefinition.Credentials = new ServiceCredentials(opts.Username, pw);
 
-                    //TODO make problems
                     //Check if he has the right to start as service
-                    //using (LsaPolicyHandle lsaWrapper = LsaPolicyHandle.OpenPolicyHandle())
-                    //{
-                    //    bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(serviceDefinition.Credentials.Username).Any(x => x.Buffer == "SeServiceLogonRight");
-                    //    if (!hasRightToStartAsService)
-                    //    {
-                    //        Logger.Error("The user doesn't have the right to start as service. Do you want to give him that right? [Yes/No]");
-                    //        switch (Console.ReadLine())
-                    //        {
-                    //            case "yes":
-                    //            case "Yes":
-                    //            case "y":
-                    //            case "Y":
-                    //                //Give the account the right to start as service
-                    //                lsaWrapper.AddPrivileges(serviceDefinition.Credentials.Username, new[] { "SeServiceLogonRight" });
-                    //                break;
+                    using (LsaPolicyHandle lsaWrapper = LsaPolicyHandle.OpenPolicyHandle())
+                    {
+                        bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(serviceDefinition.Credentials.Username).Any(x => x.Buffer == "SeServiceLogonRight");
+                        if (!hasRightToStartAsService)
+                        {
+                            Logger.Error("The user doesn't have the right to start as service. Do you want to give him that right? [Yes/No]");
+                            switch (Console.ReadLine())
+                            {
+                                case "yes":
+                                case "Yes":
+                                case "y":
+                                case "Y":
+                                    //Give the account the right to start as service
+                                    lsaWrapper.AddPrivileges(serviceDefinition.Credentials.Username, "SeServiceLogonRight");
+                                    break;
 
-                    //            default:
-                    //                Logger.Error("Cannot create the service without that right.");
-                    //                return 1;
-                    //        }
-                    //    }
-                    //}
+                                default:
+                                    Logger.Error("Cannot create the service without that right.");
+                                    return 1;
+                            }
+                        }
+                    }
                 }
 
                 //Set the start type

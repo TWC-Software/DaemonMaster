@@ -149,10 +149,19 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
 
         //LSA 
 
+        [DllImport(DllName, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern bool LookupAccountName(string systemName, string accountName, IntPtr pSid, ref uint cbSid, StringBuilder referencedDomainName, ref uint cbReferencedDomainName, out uint use);
+
+        [DllImport(DllName)]
+        public static extern void FreeSid(IntPtr pSid);
+
+        [DllImport(DllName)]
+        public static extern bool IsValidSid(IntPtr pSid);
+
         [DllImport(DllName, ExactSpelling = true)]
         public static extern NtStatus LsaOpenPolicy
         (
-            LsaUnicodeString[] systemName,
+            ref LsaUnicodeString systemName,
             ref LsaObjectAttributes objectAttributes,
             Kernel32.Kernel32.AccessMask.PolicySpecificRights accessMask,
             out LsaPolicyHandle policyHandle
@@ -164,7 +173,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
             LsaPolicyHandle policyHandle,
             IntPtr accountSid,
             LsaUnicodeString[] userRights,
-            uint countOfRights
+            long countOfRights
         );
 
         [DllImport(DllName, ExactSpelling = true)]
@@ -174,7 +183,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
             IntPtr accountSid,
             bool allRights,
             LsaUnicodeString[] userRights,
-            uint countOfRights
+            long countOfRights
         );
 
         [DllImport(DllName, ExactSpelling = true)]
