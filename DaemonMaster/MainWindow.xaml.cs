@@ -146,15 +146,23 @@ namespace DaemonMaster
 
             try
             {
-                using (var serviceController = new ServiceController(serviceListViewItem.ServiceName))
+                //using (var serviceController = new ServiceController(serviceListViewItem.ServiceName))
+                //{
+                //    var args = new[] { "-startInUserSession" };
+                //    serviceController.Start(args);
+                //}
+
+                using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
                 {
-                    var args = new[] { "-startInUserSession" };
-                    serviceController.Start(args);
+                    using (ServiceHandle serviceHandle = scm.OpenService(serviceListViewItem.ServiceName, Advapi32.ServiceAccessRights.Start))
+                    {
+                        serviceHandle.Start(new[] { "-startInUserSession" });
+                    }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Cannot start the service in user session:\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -312,11 +320,11 @@ namespace DaemonMaster
 
             try
             {
-                using (var scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
+                using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
                 {
-                    using (ServiceHandle servicehandle = scm.OpenService(serviceListViewItem.ServiceName, Advapi32.ServiceAccessRights.AllAccess))
+                    using (ServiceHandle serviceHandle = scm.OpenService(serviceListViewItem.ServiceName, Advapi32.ServiceAccessRights.AllAccess))
                     {
-                        servicehandle.DeleteService();
+                        serviceHandle.DeleteService();
                     }
                 }
                 _processCollection.Remove(_processCollection.Single(i => i.ServiceName == serviceListViewItem.ServiceName));
@@ -411,14 +419,22 @@ namespace DaemonMaster
         {
             try
             {
-                using (var serviceController = new ServiceController(serviceListViewItem.ServiceName))
+                //using (var serviceController = new ServiceController(serviceListViewItem.ServiceName))
+                //{
+                //    serviceController.Start();
+                //}
+
+                using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
                 {
-                    serviceController.Start();
+                    using (ServiceHandle serviceHandle = scm.OpenService(serviceListViewItem.ServiceName, Advapi32.ServiceAccessRights.Start))
+                    {
+                        serviceHandle.Start();
+                    }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Cannot start the service:\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -426,14 +442,22 @@ namespace DaemonMaster
         {
             try
             {
-                using (var serviceController = new ServiceController(serviceListViewItem.ServiceName))
+                //using (var serviceController = new ServiceController(serviceListViewItem.ServiceName))
+                //{
+                //    serviceController.Stop();
+                //}
+
+                using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
                 {
-                    serviceController.Stop();
+                    using (ServiceHandle serviceHandle = scm.OpenService(serviceListViewItem.ServiceName, Advapi32.ServiceAccessRights.Stop))
+                    {
+                        serviceHandle.Stop();
+                    }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Cannot stop the service:\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
