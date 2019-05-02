@@ -276,7 +276,7 @@ namespace DaemonMaster
                 new OpenFileDialog
                 {
                     InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
-                    Filter = "Application files (*.exe, *.lnk)|*.exe; *.lnk|" +
+                    Filter = "Application files (*.exe, *.lnk, *.bat)|*.exe; *.lnk; *.bat|" +
                              "All files (*.*)|*.*",
                     AddExtension = true,
                     CheckFileExists = true,

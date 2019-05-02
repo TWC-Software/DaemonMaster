@@ -133,10 +133,30 @@ namespace DaemonMasterService
             //Create the start info for the process
             var startInfo = new ProcessStartInfo
             {
-                FileName = _serviceDefinition.BinaryPath,
-                Arguments = _serviceDefinition.Arguments,
                 UseShellExecute = false
             };
+
+            //Support for .bat files
+            try
+            {
+                if (Path.GetExtension(_serviceDefinition.BinaryPath) == ".bat")
+                {
+                    startInfo.FileName = "cmd.exe";
+                    startInfo.Arguments = "/c \"" + _serviceDefinition.BinaryPath + "\" ";
+                    startInfo.WorkingDirectory = Path.GetDirectoryName(_serviceDefinition.BinaryPath) ?? throw new InvalidOperationException();
+                }
+                else
+                {
+                    startInfo.FileName = _serviceDefinition.BinaryPath;
+                    startInfo.Arguments = _serviceDefinition.Arguments;
+                }
+            }
+            catch
+            {
+                startInfo.FileName = _serviceDefinition.BinaryPath;
+                startInfo.Arguments = _serviceDefinition.Arguments;
+            }
+
 
             _process.StartInfo = startInfo;
 
@@ -211,6 +231,17 @@ namespace DaemonMasterService
                     break;
             }
 
+            //Support for .bat files
+            bool useBatchMode = false;
+            try
+            {
+                useBatchMode = Path.GetExtension(_serviceDefinition.BinaryPath) == ".bat";
+            }
+            catch
+            {
+                useBatchMode = false;
+            }
+
             //Create default process security attributes
             var processSecurityAttributes = new Kernel32.SecurityAttributes();
             processSecurityAttributes.length = (uint)Marshal.SizeOf(processSecurityAttributes);
@@ -220,25 +251,52 @@ namespace DaemonMasterService
             threadSecurityAttributes.length = (uint)Marshal.SizeOf(threadSecurityAttributes);
 
 
+            //TODO: Change Kernel32.WTSGetActiveConsoleSessionId() to WTSEnumerateSessionsW for RDP
             //Get user token
             using (TokenHandle currentUserToken = TokenHandle.GetTokenFromSessionId(Kernel32.WTSGetActiveConsoleSessionId()))
             {
                 try
                 {
-                    if (!Advapi32.CreateProcessAsUser(
-                        currentUserToken,
-                        null,
-                        BuildCommandLineString(_serviceDefinition.BinaryPath, _serviceDefinition.Arguments),
-                        processSecurityAttributes,
-                        threadSecurityAttributes,
-                        false,
-                        creationFlags,
-                        IntPtr.Zero,
-                        Path.GetDirectoryName(_serviceDefinition.BinaryPath),
-                        ref startupInfo,
-                        out processInformation))
+                    if (!useBatchMode)
                     {
-                        throw new Win32Exception(Marshal.GetLastWin32Error());
+
+                        if (!Advapi32.CreateProcessAsUser(
+                            currentUserToken,
+                            null,
+                            BuildCommandLineString(_serviceDefinition.BinaryPath, _serviceDefinition.Arguments),
+                            processSecurityAttributes,
+                            threadSecurityAttributes,
+                            false,
+                            creationFlags,
+                            IntPtr.Zero,
+                            Path.GetDirectoryName(_serviceDefinition.BinaryPath),
+                            ref startupInfo,
+                            out processInformation))
+                        {
+                            throw new Win32Exception(Marshal.GetLastWin32Error());
+                        }
+                    }
+                    else
+                    {
+                        var cmdLine = new StringBuilder();
+                        cmdLine.Append("cmd.exe /c ");
+                        cmdLine.Append(BuildDoubleQuotedString(_serviceDefinition.BinaryPath));
+
+                        if (!Advapi32.CreateProcessAsUser(
+                            currentUserToken,
+                            null,
+                            cmdLine,
+                            processSecurityAttributes,
+                            threadSecurityAttributes,
+                            false,
+                            creationFlags,
+                            IntPtr.Zero,
+                            Path.GetDirectoryName(_serviceDefinition.BinaryPath),
+                            ref startupInfo,
+                            out processInformation))
+                        {
+                            throw new Win32Exception(Marshal.GetLastWin32Error());
+                        }
                     }
 
                     _process = Process.GetProcessById((int)processInformation.rocessId);
@@ -500,6 +558,28 @@ namespace DaemonMasterService
                 stringBuilder.Append(" ");
                 stringBuilder.Append(arguments);
             }
+
+            return stringBuilder;
+        }
+
+        /// <summary>
+        /// Builds the double quoted string.
+        /// </summary>
+        /// <param name="filePath">The file path.</param>
+        /// <returns></returns>
+        private static StringBuilder BuildDoubleQuotedString(string filePath)
+        {
+            var stringBuilder = new StringBuilder();
+            filePath = filePath.Trim();
+
+            bool filePathIsQuoted = filePath.StartsWith("\"", StringComparison.Ordinal) && filePath.EndsWith("\"", StringComparison.Ordinal);
+            if (!filePathIsQuoted)
+                stringBuilder.Append("\"");
+
+            stringBuilder.Append(filePath);
+
+            if (!filePathIsQuoted)
+                stringBuilder.Append("\"");
 
             return stringBuilder;
         }
