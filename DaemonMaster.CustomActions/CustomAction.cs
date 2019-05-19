@@ -58,8 +58,6 @@ namespace DaemonMaster.CustomActions
                     {
                         using (ServiceHandle service = controlManager.OpenService(serviceItem.ServiceName, Advapi32.ServiceAccessRights.AllAccess))
                         {
-                            Advapi32.ServiceStatusProcess serviceStatus = service.QueryServiceStatus();
-
                             using (var serviceController = new ServiceController(serviceItem.ServiceName))
                             {
                                 if (serviceController.Status == ServiceControllerStatus.Stopped)
@@ -74,10 +72,11 @@ namespace DaemonMaster.CustomActions
                                 catch (System.ServiceProcess.TimeoutException)
                                 {
                                     session.Log("Terminate " + serviceItem.ServiceName + " service.");
-                                    Process process = Process.GetProcessById((int)serviceStatus.processId);
+                                    Process process = Process.GetProcessById((int)service.GetServicePid());
                                     process.Kill();
                                 }
                             }
+
 
                             service.DeleteService();
                             session.Log("Deleted " + serviceItem.ServiceName + " service successful.");

@@ -65,7 +65,7 @@ namespace DaemonMaster.Core.Win32
             var serviceType = Advapi32.ServiceType.Win32OwnProcess; //DM only supports Win32OwnProcess
             if (Equals(serviceDefinition.Credentials, ServiceCredentials.LocalSystem) && serviceDefinition.CanInteractWithDesktop)
             {
-                if (DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
+                if (DaemonMasterUtils.IsSupportedWindows10VersionForIwd)
                 {
                     serviceType |= Advapi32.ServiceType.InteractivProcess;
                 }

@@ -170,7 +170,7 @@ namespace DaemonMaster
 
 
             //Hide check box interact with desktop on not supported systems (windows 10 1803+)
-            if (!DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
+            if (!DaemonMasterUtils.IsSupportedWindows10VersionForIwd)
             {
                 CheckBoxInteractDesk.IsChecked = false;
                 CheckBoxInteractDesk.IsEnabled = false;

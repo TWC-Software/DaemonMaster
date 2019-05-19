@@ -258,7 +258,7 @@ namespace DaemonMaster.Core
         public static bool EnableInteractiveServices(bool enable)
         {
             //If Windows10 1803 or higher return false (UI0Detect service does not exist anymore)
-            if (!DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
+            if (!DaemonMasterUtils.IsSupportedWindows10VersionForIwd)
                 return false;
 
             try
@@ -283,7 +283,7 @@ namespace DaemonMaster.Core
         public static bool CheckNoInteractiveServicesRegKey()
         {
             //If Windows10 1803 or higher return false (UI0Detect service does not exist anymore)
-            if (!DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
+            if (!DaemonMasterUtils.IsSupportedWindows10VersionForIwd)
                 return false;
 
             try

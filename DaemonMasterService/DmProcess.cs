@@ -142,7 +142,7 @@ namespace DaemonMasterService
                 if (Path.GetExtension(_serviceDefinition.BinaryPath) == ".bat")
                 {
                     startInfo.FileName = "cmd.exe";
-                    startInfo.Arguments = "/c \"" + _serviceDefinition.BinaryPath + "\" ";
+                    startInfo.Arguments = "/c " + BuildDoubleQuotedString(_serviceDefinition.BinaryPath) + _serviceDefinition.Arguments;
                     startInfo.WorkingDirectory = Path.GetDirectoryName(_serviceDefinition.BinaryPath) ?? throw new InvalidOperationException();
                 }
                 else
@@ -192,24 +192,19 @@ namespace DaemonMasterService
             //Close old instances
             Close();
 
-            //Set the startinfos (like desktop)
-            var startupInfo = new Advapi32.StartupInfo()
-            {
-                desktop = @"winsta0\default"
-            };
+            //Set the startupinfo
+            var startupInfo = new Advapi32.StartupInfo();
             startupInfo.cb = (uint)Marshal.SizeOf(startupInfo);
+
 
             var processInformation = new Advapi32.ProcessInformation();
 
             //Flags that specify the priority and creation method of the process
-            Advapi32.CreationFlags creationFlags = Advapi32.CreationFlags.CreateUnicodeEnvironment | Advapi32.CreationFlags.CreateNewConsole;
+            Advapi32.CreationFlags creationFlags = Advapi32.CreationFlags.CreateUnicodeEnvironment | Advapi32.CreationFlags.CreateNewConsole; //Windows 7+ always using the unicode environment 
 
             //Process priority
             switch (_serviceDefinition.ProcessPriority)
             {
-                case ProcessPriorityClass.Normal:
-                    creationFlags |= Advapi32.CreationFlags.NormalPriorityClass;
-                    break;
                 case ProcessPriorityClass.Idle:
                     creationFlags |= Advapi32.CreationFlags.IdlePriorityClass;
                     break;
@@ -225,22 +220,11 @@ namespace DaemonMasterService
                 case ProcessPriorityClass.AboveNormal:
                     creationFlags |= Advapi32.CreationFlags.AboveNormalPriorityClass;
                     break;
-
                 default:
                     creationFlags |= Advapi32.CreationFlags.NormalPriorityClass;
                     break;
             }
 
-            //Support for .bat files
-            bool useBatchMode = false;
-            try
-            {
-                useBatchMode = Path.GetExtension(_serviceDefinition.BinaryPath) == ".bat";
-            }
-            catch
-            {
-                useBatchMode = false;
-            }
 
             //Create default process security attributes
             var processSecurityAttributes = new Kernel32.SecurityAttributes();
@@ -257,49 +241,38 @@ namespace DaemonMasterService
             {
                 try
                 {
-                    if (!useBatchMode)
+                    StringBuilder cmdLine;
+                    if (Path.GetExtension(_serviceDefinition.BinaryPath) == ".bat")   //Cmd mode: (.bat)
                     {
-
-                        if (!Advapi32.CreateProcessAsUser(
-                            currentUserToken,
-                            null,
-                            BuildCommandLineString(_serviceDefinition.BinaryPath, _serviceDefinition.Arguments),
-                            processSecurityAttributes,
-                            threadSecurityAttributes,
-                            false,
-                            creationFlags,
-                            IntPtr.Zero,
-                            Path.GetDirectoryName(_serviceDefinition.BinaryPath),
-                            ref startupInfo,
-                            out processInformation))
-                        {
-                            throw new Win32Exception(Marshal.GetLastWin32Error());
-                        }
-                    }
-                    else
-                    {
-                        var cmdLine = new StringBuilder();
-                        cmdLine.Append("cmd.exe /c ");
+                        cmdLine = new StringBuilder();
+                        cmdLine.Append(BuildDoubleQuotedString("cmd.exe"));
+                        cmdLine.Append(" /c ");
                         cmdLine.Append(BuildDoubleQuotedString(_serviceDefinition.BinaryPath));
-
-                        if (!Advapi32.CreateProcessAsUser(
-                            currentUserToken,
-                            null,
-                            cmdLine,
-                            processSecurityAttributes,
-                            threadSecurityAttributes,
-                            false,
-                            creationFlags,
-                            IntPtr.Zero,
-                            Path.GetDirectoryName(_serviceDefinition.BinaryPath),
-                            ref startupInfo,
-                            out processInformation))
-                        {
-                            throw new Win32Exception(Marshal.GetLastWin32Error());
-                        }
+                        cmdLine.Append(" ");
+                        cmdLine.Append(_serviceDefinition.Arguments);
+                    }
+                    else //Normal mode (.exe, etc)
+                    {
+                        cmdLine = BuildCommandLineString(_serviceDefinition.BinaryPath, _serviceDefinition.Arguments);
                     }
 
-                    _process = Process.GetProcessById((int)processInformation.rocessId);
+                    if (!Advapi32.CreateProcessAsUser(
+                        currentUserToken,
+                        null,
+                        cmdLine,
+                        processSecurityAttributes,
+                        threadSecurityAttributes,
+                        false,
+                        creationFlags,
+                        IntPtr.Zero,
+                        Path.GetDirectoryName(_serviceDefinition.BinaryPath),
+                        ref startupInfo,
+                        out processInformation))
+                    {
+                        throw new Win32Exception(Marshal.GetLastWin32Error());
+                    }
+
+                    _process = Process.GetProcessById((int)processInformation.processId);
 
                     //Enable raising events
                     _process.EnableRaisingEvents = true;
@@ -565,18 +538,18 @@ namespace DaemonMasterService
         /// <summary>
         /// Builds the double quoted string.
         /// </summary>
-        /// <param name="filePath">The file path.</param>
+        /// <param name="s">The file path.</param>
         /// <returns></returns>
-        private static StringBuilder BuildDoubleQuotedString(string filePath)
+        private static StringBuilder BuildDoubleQuotedString(string s)
         {
             var stringBuilder = new StringBuilder();
-            filePath = filePath.Trim();
+            s = s.Trim();
 
-            bool filePathIsQuoted = filePath.StartsWith("\"", StringComparison.Ordinal) && filePath.EndsWith("\"", StringComparison.Ordinal);
+            bool filePathIsQuoted = s.StartsWith("\"", StringComparison.Ordinal) && s.EndsWith("\"", StringComparison.Ordinal);
             if (!filePathIsQuoted)
                 stringBuilder.Append("\"");
 
-            stringBuilder.Append(filePath);
+            stringBuilder.Append(s);
 
             if (!filePathIsQuoted)
                 stringBuilder.Append("\"");

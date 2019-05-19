@@ -29,10 +29,22 @@ namespace DaemonMaster.Core
 {
     public static class DaemonMasterUtils
     {
-        public static bool IsSupportedWindows10VersionOrLower()
+        public static bool IsSupportedWindows10VersionForIwd
         {
-            return Environment.OSVersion.Version.Major < 10 || (Environment.OSVersion.Version.Major == 10 && Environment.OSVersion.Version.Build < 17134);
+            get
+            {
+                return Environment.OSVersion.Version.Major < 10 || (Environment.OSVersion.Version.Major == 10 && Environment.OSVersion.Version.Build < 17134);
+            }
         }
+
+        public static bool IsNt
+        {
+            get
+            {
+                return Environment.OSVersion.Platform == PlatformID.Win32NT;
+            }
+        }
+
 
         public static bool CheckUi0DetectService()
         {

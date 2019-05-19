@@ -81,7 +81,7 @@ namespace DaemonMasterService
             {
                 SecureString pw = opts.Password?.ConvertStringToSecureString();
 
-                if (opts.CanInteractWithDesktop && !DaemonMasterUtils.IsSupportedWindows10VersionOrLower())
+                if (opts.CanInteractWithDesktop && !DaemonMasterUtils.IsSupportedWindows10VersionForIwd)
                 {
                     Logger.Error("CanInteractWithDesktop is not supported in this windows version.");
                     return 1;
