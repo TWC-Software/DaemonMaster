@@ -139,7 +139,7 @@ namespace DaemonMaster.Core
                 using (RegistryKey parameters = key.OpenSubKey("Parameters", false))
                 {
                     serviceDefinition.BinaryPath = Convert.ToString(parameters.GetValue("BinaryPath"));
-                    serviceDefinition.Arguments = Convert.ToString(parameters.GetValue("Parameter", string.Empty));
+                    serviceDefinition.Arguments = Convert.ToString(parameters.GetValue("Arguments", string.Empty));
                     serviceDefinition.ProcessMaxRestarts = Convert.ToInt32(parameters.GetValue("ProcessMaxRestarts", 3));
                     serviceDefinition.ProcessTimeoutTime = Convert.ToInt32(parameters.GetValue("ProcessTimeoutTime", 9500));
                     serviceDefinition.ProcessRestartDelay = Convert.ToInt32(parameters.GetValue("ProcessRestartDelay", 2000));
