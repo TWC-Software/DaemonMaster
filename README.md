@@ -11,6 +11,7 @@ You can download the pre-release here: [Click here](https://github.com/TWC-Softw
 - Creating / Editing new services in realtime
 - Using any .exe program as a service
 - Works with shortcuts (arguments are supported)
+- Works with .bat files
 - Automatic service-startup with Windows itself (Manual, Automatic with delay and Disabled works also)
 - Custom username and password for a service
 
@@ -24,7 +25,7 @@ You can download the pre-release here: [Click here](https://github.com/TWC-Softw
 - stackoverflow.com (for help from the users)
 - entwickler-ecke.de (for help from the users)
 
-## Used Librarys
+## Used Libraries
 - Newtonsoft.Json - James Newton - King - MIT License
 - NLog - Jaroslaw Kowalski, Kim Christensen, Julian Verdurmen - BSD 3 clause "New" or "Revised" License
 - Active Directory Object Picker - Tulpep - MS-PL License
