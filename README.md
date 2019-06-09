@@ -14,6 +14,7 @@ You can download the pre-release here: [Click here](https://github.com/TWC-Softw
 - Works with .bat files
 - Automatic service-startup with Windows itself (Manual, Automatic with delay and Disabled works also)
 - Custom username and password for a service
+- Works very well for game servers (tested on DayZ/Arma and Minecraft, but should work well with other games as well; if not, any bug reports are welcome)
 
 ## Planned Features
 - Command line parameters
