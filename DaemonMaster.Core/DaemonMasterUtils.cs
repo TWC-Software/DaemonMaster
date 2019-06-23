@@ -31,18 +31,12 @@ namespace DaemonMaster.Core
     {
         public static bool IsSupportedWindows10VersionForIwd
         {
-            get
-            {
-                return Environment.OSVersion.Version.Major < 10 || (Environment.OSVersion.Version.Major == 10 && Environment.OSVersion.Version.Build < 17134);
-            }
+            get { return Environment.OSVersion.Version.Major < 10 || (Environment.OSVersion.Version.Major == 10 && Environment.OSVersion.Version.Build < 17134); }
         }
 
         public static bool IsNt
         {
-            get
-            {
-                return Environment.OSVersion.Platform == PlatformID.Win32NT;
-            }
+            get { return Environment.OSVersion.Platform == PlatformID.Win32NT; }
         }
 
 
@@ -112,11 +106,9 @@ namespace DaemonMaster.Core
 
         public static bool IsElevated()
         {
-            using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
-            {
-                var principal = new WindowsPrincipal(identity);
-                return principal.IsInRole(WindowsBuiltInRole.Administrator);
-            }
+            WindowsIdentity identity = WindowsIdentity.GetCurrent();
+            var principal = new WindowsPrincipal(identity);
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
 
         //Source: https://social.msdn.microsoft.com/Forums/vstudio/en-US/a979351c-800f-41e7-b153-2d53ff6aac29/how-to-get-running-windows-service-process-id-?forum=netfxbcl
@@ -129,6 +121,7 @@ namespace DaemonMaster.Core
             {
                 processId = (uint)mngntObj["PROCESSID"];
             }
+
             return processId;
         }
     }

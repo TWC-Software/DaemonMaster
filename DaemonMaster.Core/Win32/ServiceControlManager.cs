@@ -17,6 +17,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.InteropServices;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using Microsoft.Win32.SafeHandles;
@@ -35,6 +36,15 @@ namespace DaemonMaster.Core.Win32
         {
             return Advapi32.CloseServiceHandle(handle);
         }
+
+        public static bool ValidServiceName(string serviceName)
+        {
+            if (string.IsNullOrWhiteSpace(serviceName) || serviceName.Length > 80)
+                return false;
+
+            return serviceName.ToCharArray().All(c => c != '\\' && c != '/');
+        }
+
 
         /// <summary>
         /// Creates a new service control manager instance
@@ -60,6 +70,8 @@ namespace DaemonMaster.Core.Win32
         {
             IntPtr passwordHandle = IntPtr.Zero;
 
+            if (!ValidServiceName(serviceDefinition.ServiceName))
+                throw new ArgumentException("The given service name is not a valid name.");
 
             //Create the service type
             var serviceType = Advapi32.ServiceType.Win32OwnProcess; //DM only supports Win32OwnProcess

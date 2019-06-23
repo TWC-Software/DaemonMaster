@@ -533,4 +533,10 @@
   <data name="button_refresh_list" xml:space="preserve">
     <value>Refresh list</value>
   </data>
+  <data name="button_restart_service" xml:space="preserve">
+    <value>Restart Service</value>
+  </data>
+  <data name="timeout_exception_service_restart" xml:space="preserve">
+    <value>The restart of the service took to long!</value>
+  </data>
 </root>

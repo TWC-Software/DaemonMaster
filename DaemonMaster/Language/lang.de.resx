@@ -154,7 +154,7 @@
     <value>Importiere</value>
   </data>
   <data name="button_kill_service" xml:space="preserve">
-    <value>Service "killen"</value>
+    <value>Dienst "killen"</value>
   </data>
   <data name="button_load_shortcut" xml:space="preserve">
     <value>Lade Informationen aus einer Verknüpfung (veraltet)</value>
@@ -172,13 +172,13 @@
     <value>Suche Datei</value>
   </data>
   <data name="button_start" xml:space="preserve">
-    <value>Start (auf Desktop)</value>
+    <value>Dienst auf Desktop starten</value>
   </data>
   <data name="button_start_service" xml:space="preserve">
-    <value>Start Service</value>
+    <value>Dienst starten</value>
   </data>
   <data name="button_stop_service" xml:space="preserve">
-    <value>Stop Service</value>
+    <value>Dienst stoppen</value>
   </data>
   <data name="button_switch_to_session_0" xml:space="preserve">
     <value>Wechsle zu Sitzung 0</value>
@@ -526,9 +526,15 @@
     <value>Name der load order Gruppe</value>
   </data>
   <data name="cannot_kill_service" xml:space="preserve">
-    <value>Service kann nicht gekillt werden</value>
+    <value>Dienst kann nicht gekillt werden</value>
   </data>
   <data name="button_refresh_list" xml:space="preserve">
     <value>Aktualisiere Liste</value>
+  </data>
+  <data name="button_restart_service" xml:space="preserve">
+    <value>Dienst neustarten</value>
+  </data>
+  <data name="timeout_exception_service_restart" xml:space="preserve">
+    <value>Der Neustart des Dienst braucht zulange!</value>
   </data>
 </root>

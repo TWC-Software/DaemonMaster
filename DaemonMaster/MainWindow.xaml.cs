@@ -121,6 +121,14 @@ namespace DaemonMaster
             StopService((ServiceListViewItem)ListViewDaemons.SelectedItem);
         }
 
+        private void MenuItem_Restart_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (ListViewDaemons.SelectedItem == null)
+                return;
+
+            RestartService((ServiceListViewItem)ListViewDaemons.SelectedItem);
+        }
+
         private void MenuItem_Kill_OnClick(object sender, RoutedEventArgs e)
         {
             if (ListViewDaemons.SelectedItem == null)
@@ -419,11 +427,6 @@ namespace DaemonMaster
         {
             try
             {
-                //using (var serviceController = new ServiceController(serviceListViewItem.ServiceName))
-                //{
-                //    serviceController.Start();
-                //}
-
                 using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
                 {
                     using (ServiceHandle serviceHandle = scm.OpenService(serviceListViewItem.ServiceName, Advapi32.ServiceAccessRights.Start))
@@ -442,11 +445,6 @@ namespace DaemonMaster
         {
             try
             {
-                //using (var serviceController = new ServiceController(serviceListViewItem.ServiceName))
-                //{
-                //    serviceController.Stop();
-                //}
-
                 using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
                 {
                     using (ServiceHandle serviceHandle = scm.OpenService(serviceListViewItem.ServiceName, Advapi32.ServiceAccessRights.Stop))
@@ -461,37 +459,71 @@ namespace DaemonMaster
             }
         }
 
+        private void RestartService(ServiceListViewItem serviceListViewItem)
+        {
+            try
+            {
+                using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
+                {
+                    using (ServiceHandle serviceHandle = scm.OpenService(serviceListViewItem.ServiceName, Advapi32.ServiceAccessRights.QueryStatus | Advapi32.ServiceAccessRights.Start | Advapi32.ServiceAccessRights.Stop))
+                    {
+                        Advapi32.ServiceStatusProcess status = serviceHandle.QueryServiceStatus();
+
+                        //Stop service (throws an exception if it is stopped)
+                        serviceHandle.Stop();
+
+                        //Wait for stop
+                        serviceHandle.WaitForStatus(Advapi32.ServiceCurrentState.Stopped, TimeSpan.FromSeconds(10));
+
+                        //Start service
+                        serviceHandle.Start();
+                    }
+                }
+            }
+            catch (System.TimeoutException)
+            {
+                MessageBox.Show(_resManager.GetString("timeout_exception_service_restart"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void KillService(ServiceListViewItem serviceListViewItem)
         {
             try
             {
-                using (var serviceController = new ServiceController(serviceListViewItem.ServiceName))
+                using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
                 {
-                    if (serviceController.Status == ServiceControllerStatus.Stopped)
-                        return;
+                    using (ServiceHandle serviceHandle = scm.OpenService(serviceListViewItem.ServiceName, Advapi32.ServiceAccessRights.UserDefinedControl | Advapi32.ServiceAccessRights.QueryStatus))
+                    {
+                        if (serviceHandle.QueryServiceStatus().currentState == Advapi32.ServiceCurrentState.Stopped)
+                            return;
 
-                    try
-                    {
-                        serviceController.ExecuteCommand((int)ServiceCommands.ServiceKillProcessAndStop); //Kill command for the process
-                        serviceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(2));
-                    }
-                    catch (TimeoutException)
-                    {
-                        if (KillChildProcessJob.IsSupportedWindowsVersion && serviceListViewItem.ServicePid != null)
+                        try
                         {
-                            Process process = Process.GetProcessById((int)serviceListViewItem.ServicePid);
-                            process.Kill();
+                            serviceHandle.ExecuteCommand((int)ServiceCommands.ServiceKillProcessAndStop);
+                            serviceHandle.WaitForStatus(Advapi32.ServiceCurrentState.Stopped, TimeSpan.FromSeconds(2));
                         }
-                        else
+                        catch (TimeoutException)
                         {
-                            MessageBox.Show(_resManager.GetString("cannot_kill_service", CultureInfo.CurrentUICulture), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                            if (KillChildProcessJob.IsSupportedWindowsVersion && serviceListViewItem.ServicePid != null)
+                            {
+                                Process process = Process.GetProcessById((int)serviceListViewItem.ServicePid);
+                                process.Kill();
+                            }
+                            else
+                            {
+                                MessageBox.Show(_resManager.GetString("cannot_kill_service", CultureInfo.CurrentUICulture), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(_resManager.GetString("cannot_kill_service", CultureInfo.CurrentUICulture) + ":\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

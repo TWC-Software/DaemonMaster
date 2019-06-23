@@ -76,6 +76,15 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
 
         [DllImport(DllName, SetLastError = true, ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ControlService
+        (
+            ServiceHandle serviceHandle,
+            int control,
+            ref ServiceStatus serviceStatus
+        );
+
+        [DllImport(DllName, SetLastError = true, ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool DeleteService
         (
             ServiceHandle serviceHandle

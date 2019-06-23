@@ -205,6 +205,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Restart Service ähnelt.
+        /// </summary>
+        public static string button_restart_service {
+            get {
+                return ResourceManager.GetString("button_restart_service", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Save ähnelt.
         /// </summary>
         public static string button_save {
@@ -1237,6 +1246,15 @@ namespace DaemonMaster.Language {
         public static string the_service_installation_was_unsuccessful {
             get {
                 return ResourceManager.GetString("the_service_installation_was_unsuccessful", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die The restart of the service took to long! ähnelt.
+        /// </summary>
+        public static string timeout_exception_service_restart {
+            get {
+                return ResourceManager.GetString("timeout_exception_service_restart", resourceCulture);
             }
         }
         

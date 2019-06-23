@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using DaemonMaster.Core.Exceptions;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using Microsoft.Win32.SafeHandles;
@@ -361,6 +362,49 @@ namespace DaemonMaster.Core.Win32
             {
                 if (bufferPtr != IntPtr.Zero)
                     Marshal.FreeHGlobal(bufferPtr);
+            }
+        }
+
+        /// <summary>
+        /// Executes the command. Needs SERVICE_USER_DEFINED_CONTROL right.
+        /// </summary>
+        /// <param name="command">The command.</param>
+        public void ExecuteCommand(int command)
+        {
+            if (command < 128 || command > 255)
+                throw new ArgumentException("Only a range of 128-255 is allowed.");
+
+            var serviceStatus = new Advapi32.ServiceStatus();
+            Advapi32.ControlService(this, command, ref serviceStatus);
+        }
+
+        /// <summary>
+        /// Waits for status.
+        /// </summary>
+        /// <param name="desiredStatus">The desired status.</param>
+        public void WaitForStatus(Advapi32.ServiceCurrentState desiredStatus)
+        {
+            WaitForStatus(desiredStatus, TimeSpan.MaxValue);
+        }
+
+        /// <summary>
+        /// Waits for the given status the given time.
+        /// </summary>
+        /// <param name="state">The state.</param>
+        /// <param name="timeout">The timeout.</param>
+        /// <exception cref="TimeoutException">WaitForStatus</exception>
+        public void WaitForStatus(Advapi32.ServiceCurrentState desiredStatus, TimeSpan timeout)
+        {
+            Advapi32.ServiceCurrentState serviceCurrentState = QueryServiceStatus().currentState;
+
+            DateTime utcNow = DateTime.UtcNow;
+            while (serviceCurrentState != desiredStatus)
+            {
+                if (DateTime.UtcNow - utcNow > timeout)
+                    throw new TimeoutException("Service: WaitForStatus timeout.");
+
+                Thread.Sleep(250);
+                serviceCurrentState = QueryServiceStatus().currentState;
             }
         }
     }

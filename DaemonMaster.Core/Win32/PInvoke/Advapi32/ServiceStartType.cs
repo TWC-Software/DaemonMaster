@@ -17,6 +17,8 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
+using System;
+
 namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
 {
     public static partial class Advapi32

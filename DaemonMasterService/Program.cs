@@ -1,36 +1,54 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Security;
 using System.ServiceProcess;
+using System.Text;
 using CommandLine;
 using DaemonMaster.Core;
 using DaemonMaster.Core.Win32;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using NLog;
+using NLog.Config;
+using NLog.Layouts;
+using NLog.Targets;
 
 namespace DaemonMasterService
 {
     internal static class Program
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static Logger Logger;
 
         /// <summary>
-        /// Der Haupteinstiegspunkt für die Anwendung.
+        /// Entry point of the application
         /// </summary>
         private static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<ServiceOptions, GeneralOptions, EditOptions, InstallOptions>(args)
-               .MapResult(
-                    (ServiceOptions opts) => RunServiceAndReturnExitCode(opts),
-                   (GeneralOptions opts) => RunOptionsAndReturnExitCode(opts),
-                   (EditOptions opts) => RunEditReturnExitCode(opts),
-                   (InstallOptions opts) => RunInstallAndReturnExitCode(opts),
-                   errs => 1);
+            try
+            {
+                Parser.Default.ParseArguments<ServiceOptions, GeneralOptions, EditOptions, InstallOptions, ListOptions>(args) //Type must be a console app not a windows app
+                    .MapResult(
+                        (ServiceOptions opts) => RunServiceAndReturnExitCode(opts),
+                        (GeneralOptions opts) => RunOptionsAndReturnExitCode(opts),
+                        (EditOptions opts) => RunEditReturnExitCode(opts),
+                        (InstallOptions opts) => RunInstallAndReturnExitCode(opts),
+                        (ListOptions opts) => RunListServicesAndReturnExitCode(opts),
+                        errs => 1);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            //Shutdown all logger
+            LogManager.Shutdown();
         }
 
         private static int RunServiceAndReturnExitCode(ServiceOptions opts)
         {
+            SetupNLog();
+            Logger = LogManager.GetCurrentClassLogger();
+
             return StartService();
         }
 
@@ -41,7 +59,7 @@ namespace DaemonMasterService
             //Check Admin right
             if (!DaemonMasterUtils.IsElevated())
             {
-                Logger.Error("You must start the programm with admin rights.");
+                Console.WriteLine("You must start the programm with admin rights.");
                 return 1;
             }
 
@@ -56,11 +74,54 @@ namespace DaemonMasterService
             //Check Admin right
             if (!DaemonMasterUtils.IsElevated())
             {
-                Logger.Error("You must start the programm with admin rights.");
+                Console.WriteLine("You must start the programm with admin rights.");
                 return 1;
             }
 
-            return InstallEditService(opts, opts.ServiceName, editMode: true);
+            //------------------------
+
+            DmServiceDefinition serviceDefinition;
+            try
+            {
+                //Load data from registry
+                serviceDefinition = RegistryManagement.LoadServiceStartInfosFromRegistry(opts.ServiceName);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Loading infos from registry failed.\n" + e.Message + "\n StackTrace: " + e.StackTrace);
+                return 1;
+            }
+
+            try
+            {
+                CheckAndSetCommonArguments(ref serviceDefinition, opts);
+
+                //Edit service
+                using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
+                {
+                    using (ServiceHandle service = scm.OpenService(serviceDefinition.ServiceName, Advapi32.ServiceAccessRights.AllAccess))
+                    {
+                        if (service.QueryServiceStatus().currentState != Advapi32.ServiceCurrentState.Stopped)
+                        {
+                            Console.WriteLine("Service is not stopped, please stop it first.");
+                            return 1;
+                        }
+
+                        service.ChangeConfig(serviceDefinition);
+                    }
+                }
+
+                //Save arguments in registry
+                RegistryManagement.SaveInRegistry(serviceDefinition);
+
+                Console.WriteLine("Successful!");
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return 1;
+            }
         }
 
         private static int RunInstallAndReturnExitCode(InstallOptions opts)
@@ -68,92 +129,92 @@ namespace DaemonMasterService
             //Check Admin right
             if (!DaemonMasterUtils.IsElevated())
             {
-                Logger.Error("You must start the programm with admin rights.");
+                Console.WriteLine("You must start the programm with admin rights.");
                 return 1;
             }
 
-            return InstallEditService(opts, opts.ServiceName, editMode: false);
-        }
+            //------------------------
 
-        private static int InstallEditService(CommonEditInstallOptions opts, string serviceName, bool editMode)
-        {
+            DmServiceDefinition serviceDefinition = new DmServiceDefinition(opts.ServiceName)
+            {
+                BinaryPath = opts.FullPath,
+                DisplayName = opts.DisplayName
+            };
+
             try
             {
-                SecureString pw = opts.Password?.ConvertStringToSecureString();
+                CheckAndSetCommonArguments(ref serviceDefinition, opts);
 
-                if (opts.CanInteractWithDesktop && !DaemonMasterUtils.IsSupportedWindows10VersionForIwd)
+                //Install service
+                using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.CreateService))
                 {
-                    Logger.Error("CanInteractWithDesktop is not supported in this windows version.");
-                    return 1;
+                    scm.CreateService(serviceDefinition);
                 }
 
-                if (opts.CanInteractWithDesktop && (!string.IsNullOrWhiteSpace(opts.Username) || pw != null))
+                //Save arguments in registry
+                RegistryManagement.SaveInRegistry(serviceDefinition);
+
+                Console.WriteLine("Successful!");
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return 1;
+            }
+        }
+
+        private static int RunListServicesAndReturnExitCode(ListOptions opts)
+        {
+            //Check Admin right
+            if (!DaemonMasterUtils.IsElevated())
+            {
+                Console.WriteLine("You must start the programm with admin rights.");
+                return 1;
+            }
+
+            try
+            {
+                Console.WriteLine("Number:  service name / display name");
+
+                List<DmServiceDefinition> services = RegistryManagement.LoadInstalledServices();
+                for (var i = 0; i < services.Count; i++)
                 {
-                    Logger.Error("CanInteractWithDesktop is not supported with custom user.");
-                    return 1;
+                    var sb = new StringBuilder();
+                    sb.Append(i);
+                    sb.Append(": ");
+                    sb.Append(services[i].ServiceName);
+                    sb.Append(" / ");
+                    sb.Append(services[i].DisplayName);
+                    Console.WriteLine(sb);
                 }
 
-                if ((string.IsNullOrWhiteSpace(opts.Username) && pw != null) || (!string.IsNullOrWhiteSpace(opts.Username) && pw == null))
-                {
-                    Logger.Error("Password/username parameter is missing!");
-                    return 1;
-                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return 1;
+            }
+        }
 
+        private static void CheckAndSetCommonArguments(ref DmServiceDefinition serviceDefinition, CommonEditInstallOptions opts)
+        {
 
-                var serviceDefinition = new DmServiceDefinition("DaemonMaster_" + serviceName)
-                {
-                    BinaryPath = opts.FullPath,
-                    DisplayName = opts.DisplayName,
-                    Description = opts.Description,
-                    Arguments = opts.Arguments,
-                    LoadOrderGroup = opts.LoadOrderGroup,
-                    CanInteractWithDesktop = opts.CanInteractWithDesktop,
-                    ProcessMaxRestarts = opts.MaxRestarts,
-                    ProcessTimeoutTime = opts.ProcessTimeoutTime,
-                    ProcessRestartDelay = opts.ProcessRestartDelay,
-                    CounterResetTime = opts.CounterResetTime,
-                    IsConsoleApplication = opts.ConsoleApplication,
-                    UseCtrlC = opts.UseCtrlC
-                };
+            serviceDefinition.Description = opts.Description ?? serviceDefinition.Description;
+            serviceDefinition.Arguments = opts.Arguments ?? serviceDefinition.Arguments;
+            serviceDefinition.LoadOrderGroup = opts.LoadOrderGroup ?? serviceDefinition.LoadOrderGroup;
+            serviceDefinition.CanInteractWithDesktop = opts.CanInteractWithDesktop ?? serviceDefinition.CanInteractWithDesktop;
+            serviceDefinition.ProcessMaxRestarts = opts.MaxRestarts ?? serviceDefinition.ProcessMaxRestarts;
+            serviceDefinition.ProcessTimeoutTime = opts.ProcessTimeoutTime ?? serviceDefinition.ProcessTimeoutTime;
+            serviceDefinition.ProcessRestartDelay = opts.ProcessRestartDelay ?? serviceDefinition.ProcessRestartDelay;
+            serviceDefinition.CounterResetTime = opts.CounterResetTime ?? serviceDefinition.CounterResetTime;
+            serviceDefinition.IsConsoleApplication = opts.ConsoleApplication ?? serviceDefinition.IsConsoleApplication;
+            serviceDefinition.UseCtrlC = opts.UseCtrlC ?? serviceDefinition.UseCtrlC;
+            serviceDefinition.Credentials = new ServiceCredentials(opts.Username, opts?.Password?.ConvertStringToSecureString());
 
-                //Custom user
-                //Create new ServiceCredentials instance
-                if (!string.IsNullOrWhiteSpace(opts.Username) && pw != null)
-                {
-                    //if (!DaemonMasterUtils.ValidateUser(opts.Username, pw))
-                    //{
-                    //    Logger.Error("Failed to validate the given password/username.");
-                    //    return 1;
-                    //}
-
-                    serviceDefinition.Credentials = new ServiceCredentials(opts.Username, pw);
-
-                    //Check if he has the right to start as service
-                    using (LsaPolicyHandle lsaWrapper = LsaPolicyHandle.OpenPolicyHandle())
-                    {
-                        bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(serviceDefinition.Credentials.Username).Any(x => x.Buffer == "SeServiceLogonRight");
-                        if (!hasRightToStartAsService)
-                        {
-                            Logger.Error("The user doesn't have the right to start as service. Do you want to give him that right? [Yes/No]");
-                            switch (Console.ReadLine())
-                            {
-                                case "yes":
-                                case "Yes":
-                                case "y":
-                                case "Y":
-                                    //Give the account the right to start as service
-                                    lsaWrapper.AddPrivileges(serviceDefinition.Credentials.Username, "SeServiceLogonRight");
-                                    break;
-
-                                default:
-                                    Logger.Error("Cannot create the service without that right.");
-                                    return 1;
-                            }
-                        }
-                    }
-                }
-
-                //Set the start type
+            if (opts.StartType != null)
+            {
                 switch (opts.StartType)
                 {
                     case 0:
@@ -177,76 +238,86 @@ namespace DaemonMasterService
                         break;
 
                     default:
-                        Logger.Error("The StartType can only be between 0-4 (0 = Disabled / 1 = Demand start / 2 = Auto start / 4 = Delayed auto start).");
-                        return 1;
+                        throw new ArgumentException("The StartType can only be between 0-4 (0 = Disabled / 1 = Demand start / 2 = Auto start / 4 = Delayed auto start).");
                 }
+            }
 
-                //Set the start type
+            if (opts.ProcessPriority != null)
+            {
                 switch (opts.ProcessPriority)
                 {
-                    case 0:
+                    case -2:
                         serviceDefinition.ProcessPriority = ProcessPriorityClass.Idle;
                         break;
 
-                    case 1:
+                    case -1:
                         serviceDefinition.ProcessPriority = ProcessPriorityClass.BelowNormal;
                         break;
 
-                    case 2:
+                    case 0:
                         serviceDefinition.ProcessPriority = ProcessPriorityClass.Normal;
                         break;
 
-                    case 4:
+                    case 1:
                         serviceDefinition.ProcessPriority = ProcessPriorityClass.AboveNormal;
                         break;
 
-                    case 5:
+                    case 2:
                         serviceDefinition.ProcessPriority = ProcessPriorityClass.High;
                         break;
 
-                    case 6:
+                    case 3:
                         serviceDefinition.ProcessPriority = ProcessPriorityClass.RealTime;
                         break;
 
                     default:
-                        Logger.Error("The ProcessPriority can only be between 0-6 (0 = Idle / 1 = Below normal / 2 = Normal / 4 = Above normal / 5 = High / 6 = Real time (not recommended to use)).");
-                        return 1;
+                        throw new ArgumentException("The ProcessPriority can only be between -2<->3 (-2 = Idle / -1 = Below normal / 0 = Normal / 1 = Above normal / 2 = High / 3 = Real time (not recommended to use)).");
                 }
+            }
 
-                if (editMode)
+
+            if (serviceDefinition.CanInteractWithDesktop && !DaemonMasterUtils.IsSupportedWindows10VersionForIwd)
+            {
+                throw new ArgumentException("CanInteractWithDesktop is not supported in this windows version.");
+            }
+
+            if (serviceDefinition.CanInteractWithDesktop && (!string.IsNullOrWhiteSpace(serviceDefinition.Credentials.Username) || serviceDefinition.Credentials.Password != null))
+            {
+                throw new ArgumentException("CanInteractWithDesktop is not supported with custom user.");
+            }
+
+            if ((string.IsNullOrWhiteSpace(serviceDefinition.Credentials.Username) && serviceDefinition.Credentials.Password != null) || (!string.IsNullOrWhiteSpace(serviceDefinition.Credentials.Username) && serviceDefinition.Credentials == null))
+            {
+                throw new ArgumentException("Password/username parameter is missing!");
+            }
+
+
+            //Custom user
+            //Create new ServiceCredentials instance
+            if (!string.IsNullOrWhiteSpace(serviceDefinition.Credentials.Username) && serviceDefinition.Credentials.Password != null)
+            {
+                //Check if he has the right to start as service
+                using (LsaPolicyHandle lsaWrapper = LsaPolicyHandle.OpenPolicyHandle())
                 {
-                    using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
+                    bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(serviceDefinition.Credentials.Username).Any(x => x.Buffer == "SeServiceLogonRight");
+                    if (!hasRightToStartAsService)
                     {
-                        using (ServiceHandle service = scm.OpenService(serviceDefinition.ServiceName, Advapi32.ServiceAccessRights.AllAccess))
+                        Console.WriteLine("The user doesn't have the right to start as service. Do you want to give him that right? [Yes/No]");
+                        switch (Console.ReadLine())
                         {
-                            if (service.QueryServiceStatus().currentState != Advapi32.ServiceCurrentState.Stopped)
-                            {
-                                Logger.Error("Service is not stopped, please stop it first.");
-                                return 1;
-                            }
+                            case "yes":
+                            case "Yes":
+                            case "y":
+                            case "Y":
+                                //Give the account the right to start as service
+                                lsaWrapper.AddPrivileges(serviceDefinition.Credentials.Username, "SeServiceLogonRight");
+                                break;
 
-                            service.ChangeConfig(serviceDefinition);
+                            default:
+                                throw new ArgumentException("Cannot create the service without that right.");
                         }
                     }
                 }
-                else
-                {
-                    using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.CreateService))
-                    {
-                        scm.CreateService(serviceDefinition);
-                    }
-                }
-
-                //Save in registry
-                RegistryManagement.SaveInRegistry(serviceDefinition);
-
-                Logger.Info("Successful!");
-                return 0;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, ex.Message);
-                return 1;
             }
         }
 
@@ -267,6 +338,60 @@ namespace DaemonMasterService
                 Logger.Error("Failed to start the service: \n" + ex.Message);
                 return 1;
             }
+        }
+
+        private static void SetupNLog()
+        {
+            //Create configuration object 
+            var config = new LoggingConfiguration();
+
+            //Define log name
+            if (config.Variables.ContainsKey("logName"))
+            {
+                config.Variables["logName"] = "DaemonMaster_Service";
+            }
+            else
+            {
+                config.Variables.Add("logName", SimpleLayout.Escape("DaemonMaster_Service"));
+            }
+
+            //Create targets and adding rules
+            var consoleTarget = new ColoredConsoleTarget("consoleTarget")
+            {
+                Layout = @"${date:format=HH\:mm\:ss} ${level:uppercase=true} ${message} ${exception}",
+                DetectConsoleAvailable = false
+            };
+            config.AddTarget(consoleTarget);
+            config.AddRule(LogLevel.Info, LogLevel.Fatal, consoleTarget);// only infos and higher
+
+#if DEBUG
+            var debugFileTarget = new FileTarget("debugFileTarget")
+            {
+                FileName = @"${basedir}\logs\Debug_${logDir}${var:logName}.${shortdate}.log",
+                Layout = @"${longdate}|${level:uppercase=true}|${exception:format=ToString,StackTrace}|${logger}|${message}",
+                ArchiveOldFileOnStartup = true,
+                ArchiveFileName = @"${basedir}\logs\archive\Debug_${archiveDir}${var:logName}.${shortdate}.{#####}.log",
+                ArchiveNumbering = ArchiveNumberingMode.Sequence,
+                MaxArchiveFiles = 10
+            };
+            config.AddTarget(debugFileTarget);
+            config.AddRuleForAllLevels(debugFileTarget);
+#else
+            var fileTarget = new FileTarget("fileTarget")
+            {
+                FileName = @"${basedir}\logs\${logDir}${var:logName}.${shortdate}.log",
+                Layout = @"${longdate}|${level:uppercase=true}|${exception:format=ToString,StackTrace}|${logger}|${message}",
+                ArchiveOldFileOnStartup = true,
+                ArchiveFileName = @"${basedir}\logs\archive\${var:logName}.${shortdate}.{#####}.log",
+                ArchiveNumbering = ArchiveNumberingMode.Sequence,
+                MaxArchiveFiles = 10
+            };
+            config.AddTarget(fileTarget);
+            config.AddRule(LogLevel.Info, LogLevel.Fatal, fileTarget); // only infos and higher
+#endif
+
+            //Activate the configuration
+            LogManager.Configuration = config;
         }
     }
 }

@@ -49,8 +49,11 @@
             <!--Defines a context menu-->
             <ListView.ContextMenu>
                 <ContextMenu>
+                    <MenuItem Name="MenuItemEditService" Header="{x:Static resx:lang.button_edit}" Click="MenuItem_EditDaemon_OnClick"/>
+                    <Separator/>
                     <MenuItem Name="MenuItemStartService" Header="{x:Static resx:lang.button_start_service}" Click="MenuItem_Start_OnClick"/>
                     <MenuItem Name="MenuItemStopService" Header="{x:Static resx:lang.button_stop_service}" Click="MenuItem_Stop_OnClick"/>
+                    <MenuItem Name="MenuItemRestartService" Header="{x:Static resx:lang.button_restart_service}" Click="MenuItem_Restart_OnClick"/>
                     <MenuItem Name="MenuItemKillService" Header="{x:Static resx:lang.button_kill_service}" Click="MenuItem_Kill_OnClick"/>
                     <Separator/>
                     <MenuItem Name="MenuItemStartInSession" Header="{x:Static resx:lang.button_start}" Click="MenuItem_StartInSession_OnClick"/>
