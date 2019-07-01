@@ -17,17 +17,6 @@
     </Window.Resources>
 
     <Grid>
-        <Button x:Name="ButtonAdd" Content="{x:Static resx:lang.button_add}" HorizontalAlignment="Left" Margin="271,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonAdd_Click"/>
-        <Button x:Name="ButtonDelete" Content="{x:Static resx:lang.button_delete}" HorizontalAlignment="Left" Margin="431,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonDelete_Click"/>
-        <Button x:Name="ButtonEdit" Content="{x:Static resx:lang.button_edit}" HorizontalAlignment="Left" Margin="351,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonEdit_Click"/>
-        <Button x:Name="ButtonSwitchToSession0" Content="{x:Static resx:lang.button_switch_to_session_0}" HorizontalAlignment="Left" Margin="271,319,0,0" VerticalAlignment="Top" Width="235" Click="buttonSwitchToSession0_Click"/>
-
-        <GroupBox x:Name="GroupBoxFilter" Header="{x:Static resx:lang.label_filter}" HorizontalAlignment="Left" Height="64" Margin="10,281,0,0" VerticalAlignment="Top" Width="257" Foreground="Black">
-            <Grid>
-                <TextBox x:Name="TextBoxFilter" HorizontalAlignment="Left" Height="23" Margin="1,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="234" TextChanged="TextBoxFilter_OnTextChanged"/>
-            </Grid>
-        </GroupBox>
-
         <ListView x:Name="ListViewDaemons" HorizontalAlignment="Left" Height="255" Margin="10,21,0,0" VerticalAlignment="Top" Width="497" MouseDoubleClick="listBoxDaemons_MouseDoubleClick" ContextMenuOpening="ListViewDaemons_OnContextMenuOpening" ctrl:ListViewLayoutManager.Enabled="true">
             <ListView.View>
                 <GridView>
@@ -62,7 +51,18 @@
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>
-        
+
+        <GroupBox x:Name="GroupBoxFilter" Header="{x:Static resx:lang.label_filter}" HorizontalAlignment="Left" Height="64" Margin="10,281,0,0" VerticalAlignment="Top" Width="257" Foreground="Black">
+            <Grid>
+                <TextBox x:Name="TextBoxFilter" HorizontalAlignment="Left" Height="23" Margin="1,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="234" TextChanged="TextBoxFilter_OnTextChanged"/>
+            </Grid>
+        </GroupBox>
+
+        <Button x:Name="ButtonAdd" Content="{x:Static resx:lang.button_add}" HorizontalAlignment="Left" Margin="271,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonAdd_Click"/>
+        <Button x:Name="ButtonEdit" Content="{x:Static resx:lang.button_edit}" HorizontalAlignment="Left" Margin="351,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonEdit_Click"/>
+        <Button x:Name="ButtonDelete" Content="{x:Static resx:lang.button_delete}" HorizontalAlignment="Left" Margin="431,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonDelete_Click"/>
+        <Button x:Name="ButtonSwitchToSession0" Content="{x:Static resx:lang.button_switch_to_session_0}" HorizontalAlignment="Left" Margin="271,319,0,0" VerticalAlignment="Top" Width="235" Click="buttonSwitchToSession0_Click"/>
+
         <Menu x:Name="Menu" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="519">
             <MenuItem Header="{x:Static resx:lang.button_file}">
             </MenuItem>
