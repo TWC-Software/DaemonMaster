@@ -17,7 +17,7 @@ namespace DaemonMasterService
 {
     internal static class Program
     {
-        private static Logger Logger;
+        private static Logger _logger;
 
         /// <summary>
         /// Entry point of the application
@@ -47,7 +47,7 @@ namespace DaemonMasterService
         private static int RunServiceAndReturnExitCode(ServiceOptions opts)
         {
             SetupNLog();
-            Logger = LogManager.GetCurrentClassLogger();
+            _logger = LogManager.GetCurrentClassLogger();
 
             return StartService();
         }
@@ -59,7 +59,7 @@ namespace DaemonMasterService
             //Check Admin right
             if (!DaemonMasterUtils.IsElevated())
             {
-                Console.WriteLine("You must start the programm with admin rights.");
+                Console.WriteLine("You must start the program with admin rights.");
                 return 1;
             }
 
@@ -74,7 +74,7 @@ namespace DaemonMasterService
             //Check Admin right
             if (!DaemonMasterUtils.IsElevated())
             {
-                Console.WriteLine("You must start the programm with admin rights.");
+                Console.WriteLine("You must start the program with admin rights.");
                 return 1;
             }
 
@@ -83,12 +83,25 @@ namespace DaemonMasterService
             DmServiceDefinition serviceDefinition;
             try
             {
+                if (string.IsNullOrWhiteSpace(opts.ServiceName))
+                {
+                    Console.WriteLine("The given service name is invalid.");
+                    return -1;
+                }
+
+                string prefixedServiceName = "DaemonMaster_" + opts.ServiceName;
+                if (!RegistryManagement.IsDaemonMasterService(prefixedServiceName))
+                {
+                    Console.WriteLine("Cannot found a DaemonMaster service with the given name.");
+                    return -1;
+                }
+
                 //Load data from registry
-                serviceDefinition = RegistryManagement.LoadServiceStartInfosFromRegistry(opts.ServiceName);
+                serviceDefinition = RegistryManagement.LoadServiceStartInfosFromRegistry(prefixedServiceName);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine("Loading infos from registry failed.\n" + e.Message + "\n StackTrace: " + e.StackTrace);
+                Console.WriteLine("Cannot found a service with the given service name."); //"\n" + e.Message + "\n StackTrace: " + e.StackTrace);
                 return 1;
             }
 
@@ -129,13 +142,20 @@ namespace DaemonMasterService
             //Check Admin right
             if (!DaemonMasterUtils.IsElevated())
             {
-                Console.WriteLine("You must start the programm with admin rights.");
+                Console.WriteLine("You must start the program with admin rights.");
                 return 1;
             }
 
             //------------------------
 
-            DmServiceDefinition serviceDefinition = new DmServiceDefinition(opts.ServiceName)
+            if (string.IsNullOrWhiteSpace(opts.ServiceName))
+            {
+                Console.WriteLine("The given service name is invalid.");
+                return -1;
+            }
+
+            string prefixedServiceName = "DaemonMaster_" + opts.ServiceName;
+            var serviceDefinition = new DmServiceDefinition(prefixedServiceName)
             {
                 BinaryPath = opts.FullPath,
                 DisplayName = opts.DisplayName
@@ -169,7 +189,7 @@ namespace DaemonMasterService
             //Check Admin right
             if (!DaemonMasterUtils.IsElevated())
             {
-                Console.WriteLine("You must start the programm with admin rights.");
+                Console.WriteLine("You must start the program with admin rights.");
                 return 1;
             }
 
@@ -183,7 +203,7 @@ namespace DaemonMasterService
                     var sb = new StringBuilder();
                     sb.Append(i);
                     sb.Append(": ");
-                    sb.Append(services[i].ServiceName);
+                    sb.Append(services[i].ServiceName.Length > 13 ? services[i].ServiceName.Remove(0, 13) : services[i].ServiceName); //Remove internally used prefix
                     sb.Append(" / ");
                     sb.Append(services[i].DisplayName);
                     Console.WriteLine(sb);
@@ -335,7 +355,7 @@ namespace DaemonMasterService
             }
             catch (Exception ex)
             {
-                Logger.Error("Failed to start the service: \n" + ex.Message);
+                _logger.Error("Failed to start the service: \n" + ex.Message);
                 return 1;
             }
         }

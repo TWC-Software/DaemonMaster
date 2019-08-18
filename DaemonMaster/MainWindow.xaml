@@ -17,7 +17,7 @@
     </Window.Resources>
 
     <Grid>
-        <ListView x:Name="ListViewDaemons" HorizontalAlignment="Left" Height="255" Margin="10,21,0,0" VerticalAlignment="Top" Width="497" MouseDoubleClick="listBoxDaemons_MouseDoubleClick" ContextMenuOpening="ListViewDaemons_OnContextMenuOpening" ctrl:ListViewLayoutManager.Enabled="true">
+        <ListView x:Name="ListViewDaemons" HorizontalAlignment="Left" Height="255" Margin="10,21,0,0" VerticalAlignment="Top" Width="497" MouseDoubleClick="ListBoxDaemons_MouseDoubleClick" ContextMenuOpening="ListViewDaemons_OnContextMenuOpening" ctrl:ListViewLayoutManager.Enabled="true">
             <ListView.View>
                 <GridView>
                     <GridViewColumn ctrl:FixedColumn.Width="50" Width="50">
@@ -45,7 +45,7 @@
                     <MenuItem Name="MenuItemRestartService" Header="{x:Static resx:lang.button_restart_service}" Click="MenuItem_Restart_OnClick"/>
                     <MenuItem Name="MenuItemKillService" Header="{x:Static resx:lang.button_kill_service}" Click="MenuItem_Kill_OnClick"/>
                     <Separator/>
-                    <MenuItem Name="MenuItemStartInSession" Header="{x:Static resx:lang.button_start}" Click="MenuItem_StartInSession_OnClick"/>
+                    <MenuItem Name="MenuItemStartInSession" Header="{x:Static resx:lang.button_start}" Click="MenuItem_StartInSession_OnClick" IsEnabled="{Binding Path=UseLocalSystem}"/>
                     <Separator/>
                     <MenuItem Name="MenuItemDeleteService" Header="{x:Static resx:lang.button_delete}" Click="MenuItem_Delete_OnClick"/>
                 </ContextMenu>
@@ -58,10 +58,10 @@
             </Grid>
         </GroupBox>
 
-        <Button x:Name="ButtonAdd" Content="{x:Static resx:lang.button_add}" HorizontalAlignment="Left" Margin="271,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonAdd_Click"/>
-        <Button x:Name="ButtonEdit" Content="{x:Static resx:lang.button_edit}" HorizontalAlignment="Left" Margin="351,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonEdit_Click"/>
-        <Button x:Name="ButtonDelete" Content="{x:Static resx:lang.button_delete}" HorizontalAlignment="Left" Margin="431,294,0,0" VerticalAlignment="Top" Width="75" Click="buttonDelete_Click"/>
-        <Button x:Name="ButtonSwitchToSession0" Content="{x:Static resx:lang.button_switch_to_session_0}" HorizontalAlignment="Left" Margin="271,319,0,0" VerticalAlignment="Top" Width="235" Click="buttonSwitchToSession0_Click"/>
+        <Button x:Name="ButtonAdd" Content="{x:Static resx:lang.button_add}" HorizontalAlignment="Left" Margin="271,294,0,0" VerticalAlignment="Top" Width="75" Click="ButtonAdd_Click"/>
+        <Button x:Name="ButtonEdit" Content="{x:Static resx:lang.button_edit}" HorizontalAlignment="Left" Margin="351,294,0,0" VerticalAlignment="Top" Width="75" Click="ButtonEdit_Click"/>
+        <Button x:Name="ButtonDelete" Content="{x:Static resx:lang.button_delete}" HorizontalAlignment="Left" Margin="431,294,0,0" VerticalAlignment="Top" Width="75" Click="ButtonDelete_Click"/>
+        <Button x:Name="ButtonSwitchToSession0" Content="{x:Static resx:lang.button_switch_to_session_0}" HorizontalAlignment="Left" Margin="271,319,0,0" VerticalAlignment="Top" Width="235" Click="ButtonSwitchToSession0_Click"/>
 
         <Menu x:Name="Menu" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="519">
             <MenuItem Header="{x:Static resx:lang.button_file}">

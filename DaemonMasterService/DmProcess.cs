@@ -12,6 +12,7 @@ using DaemonMaster.Core.Jobs;
 using DaemonMaster.Core.Win32;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using DaemonMaster.Core.Win32.PInvoke.Kernel32;
+using DaemonMaster.Core.Win32.PInvoke.Userenv;
 using NLog;
 
 namespace DaemonMasterService
@@ -192,15 +193,19 @@ namespace DaemonMasterService
             //Close old instances
             Close();
 
-            //Set the startupinfo
             var startupInfo = new Advapi32.StartupInfo();
-            startupInfo.cb = (uint)Marshal.SizeOf(startupInfo);
-
-
             var processInformation = new Advapi32.ProcessInformation();
+            var processSecurityAttributes = new Kernel32.SecurityAttributes();
+            var threadSecurityAttributes = new Kernel32.SecurityAttributes();
+            IntPtr environment = IntPtr.Zero;
+
 
             //Flags that specify the priority and creation method of the process
             Advapi32.CreationFlags creationFlags = Advapi32.CreationFlags.CreateUnicodeEnvironment | Advapi32.CreationFlags.CreateNewConsole; //Windows 7+ always using the unicode environment 
+
+            //Set the startupinfo
+            startupInfo.cb = (uint)Marshal.SizeOf(startupInfo);
+            startupInfo.desktop = "winsta0\\default";
 
             //Process priority
             switch (_serviceDefinition.ProcessPriority)
@@ -220,24 +225,19 @@ namespace DaemonMasterService
                 case ProcessPriorityClass.AboveNormal:
                     creationFlags |= Advapi32.CreationFlags.AboveNormalPriorityClass;
                     break;
-                default:
+                case ProcessPriorityClass.Normal:
                     creationFlags |= Advapi32.CreationFlags.NormalPriorityClass;
                     break;
             }
 
-
             //Create default process security attributes
-            var processSecurityAttributes = new Kernel32.SecurityAttributes();
             processSecurityAttributes.length = (uint)Marshal.SizeOf(processSecurityAttributes);
 
             //Create default thread security attributes
-            var threadSecurityAttributes = new Kernel32.SecurityAttributes();
             threadSecurityAttributes.length = (uint)Marshal.SizeOf(threadSecurityAttributes);
 
-
-            //TODO: Change Kernel32.WTSGetActiveConsoleSessionId() to WTSEnumerateSessionsW for RDP
             //Get user token
-            using (TokenHandle currentUserToken = TokenHandle.GetTokenFromSessionId(Kernel32.WTSGetActiveConsoleSessionId()))
+            using (TokenHandle currentUserToken = TokenHandle.GetActiveSessionUserToken())
             {
                 try
                 {
@@ -256,6 +256,12 @@ namespace DaemonMasterService
                         cmdLine = BuildCommandLineString(_serviceDefinition.BinaryPath, _serviceDefinition.Arguments);
                     }
 
+                    //Create environment block
+                    if (!Userenv.CreateEnvironmentBlock(ref environment, currentUserToken, false))
+                    {
+                        throw new Exception("StartInUserSession: CreateEnvironmentBlock failed.");
+                    }
+
                     if (!Advapi32.CreateProcessAsUser(
                         currentUserToken,
                         null,
@@ -264,7 +270,7 @@ namespace DaemonMasterService
                         threadSecurityAttributes,
                         false,
                         creationFlags,
-                        IntPtr.Zero,
+                        environment,
                         Path.GetDirectoryName(_serviceDefinition.BinaryPath),
                         ref startupInfo,
                         out processInformation))
@@ -289,6 +295,9 @@ namespace DaemonMasterService
                 }
                 finally
                 {
+                    if (environment != IntPtr.Zero)
+                        Userenv.DestroyEnvironmentBlock(environment);
+
                     if (processInformation.processHandle != IntPtr.Zero)
                         Kernel32.CloseHandle(processInformation.processHandle);
 

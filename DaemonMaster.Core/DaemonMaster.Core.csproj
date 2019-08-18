@@ -83,6 +83,8 @@
     <Compile Include="Win32\PInvoke\Advapi32\ServiceStatus.cs" />
     <Compile Include="Win32\PInvoke\Advapi32\ServiceStatusProcess.cs" />
     <Compile Include="Win32\PInvoke\Advapi32\ServiceType.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\SecurityImpersonationLevel.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\TokenType.cs" />
     <Compile Include="Win32\PInvoke\Core\NtStatus.cs" />
     <Compile Include="Win32\PInvoke\Kernel32\AccessMask.cs" />
     <Compile Include="Win32\PInvoke\Kernel32\CtrlEvent.cs" />
@@ -94,8 +96,11 @@
     <Compile Include="Win32\PInvoke\Kernel32\Kernel32.cs" />
     <Compile Include="Win32\PInvoke\Kernel32\SecurityAttributes.cs" />
     <Compile Include="Win32\PInvoke\Kernel32\ThreadAccess.cs" />
+    <Compile Include="Win32\PInvoke\Userenv\Userenv.cs" />
     <Compile Include="Win32\PInvoke\Winsta\Winsta.cs" />
     <Compile Include="Win32\PInvoke\Wtsapi32\Wtsapi32.cs" />
+    <Compile Include="Win32\PInvoke\Wtsapi32\WtsConnectstateClass.cs" />
+    <Compile Include="Win32\PInvoke\Wtsapi32\WtsSessionInfo.cs" />
     <Compile Include="Win32\ServiceControlManager.cs" />
     <Compile Include="Win32\ServiceCredentials.cs" />
     <Compile Include="Win32\ServiceHandle.cs" />

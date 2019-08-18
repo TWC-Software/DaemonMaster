@@ -214,5 +214,18 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
 
         [DllImport(DllName, ExactSpelling = true)]
         public static extern int LsaNtStatusToWinError(NtStatus ntStatus);
+
+        //Token
+
+        [DllImport(DllName, ExactSpelling = true)]
+        public static extern bool DuplicateTokenEx
+        (
+            TokenHandle existingTokenHandle,
+            uint desiredAccess,
+            IntPtr threadAttributes,
+            int tokenType,
+            int impersonationLevel,
+            ref TokenHandle duplicateTokenHandle
+        );
     }
 }

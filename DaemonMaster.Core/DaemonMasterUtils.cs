@@ -106,9 +106,11 @@ namespace DaemonMaster.Core
 
         public static bool IsElevated()
         {
-            WindowsIdentity identity = WindowsIdentity.GetCurrent();
-            var principal = new WindowsPrincipal(identity);
-            return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+            {
+                var principal = new WindowsPrincipal(identity);
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
         }
 
         //Source: https://social.msdn.microsoft.com/Forums/vstudio/en-US/a979351c-800f-41e7-b153-2d53ff6aac29/how-to-get-running-windows-service-process-id-?forum=netfxbcl

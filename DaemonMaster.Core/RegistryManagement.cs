@@ -240,6 +240,28 @@ namespace DaemonMaster.Core
             return daemons;
         }
 
+        public static bool IsDaemonMasterService(string serviceName)
+        {
+            //For new system
+            using (RegistryKey keyNew = Registry.LocalMachine.OpenSubKey(RegPath + serviceName, false))
+            {
+                if (keyNew != null)
+                {
+                    if (serviceName.Contains("DaemonMaster_"))
+                        return true; //Old system
+
+                    //Get the exe path of the service to determine later if its a service from DaemonMaster
+                    string serviceExePath = Convert.ToString(keyNew.GetValue("ImagePath") ?? string.Empty);
+
+                    //Check the path
+                    if (!string.IsNullOrWhiteSpace(serviceExePath) && serviceExePath.Contains(ServiceControlManager.DmServiceExe))
+                        return true; //New system
+                }
+            }
+
+            return false;
+        }
+
 
         public static string[] GetAllServiceGroups()
         {

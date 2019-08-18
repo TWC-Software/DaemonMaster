@@ -81,17 +81,17 @@ namespace DaemonMaster
 
         //Buttons
 
-        private void buttonAdd_Click(object sender, RoutedEventArgs e)
+        private void ButtonAdd_Click(object sender, RoutedEventArgs e)
         {
             AddDaemon();
         }
 
-        private void buttonEdit_Click(object sender, RoutedEventArgs e)
+        private void ButtonEdit_Click(object sender, RoutedEventArgs e)
         {
             EditDaemon();
         }
 
-        private void buttonDelete_Click(object sender, RoutedEventArgs e)
+        private void ButtonDelete_Click(object sender, RoutedEventArgs e)
         {
             if (ListViewDaemons.SelectedItem == null)
                 return;
@@ -99,7 +99,7 @@ namespace DaemonMaster
             RemoveDaemon((ServiceListViewItem)ListViewDaemons.SelectedItem);
         }
 
-        private void buttonSwitchToSession0_Click(object sender, RoutedEventArgs e)
+        private void ButtonSwitchToSession0_Click(object sender, RoutedEventArgs e)
         {
             SwitchToSession0();
         }
@@ -154,12 +154,6 @@ namespace DaemonMaster
 
             try
             {
-                //using (var serviceController = new ServiceController(serviceListViewItem.ServiceName))
-                //{
-                //    var args = new[] { "-startInUserSession" };
-                //    serviceController.Start(args);
-                //}
-
                 using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
                 {
                     using (ServiceHandle serviceHandle = scm.OpenService(serviceListViewItem.ServiceName, Advapi32.ServiceAccessRights.Start))
@@ -174,7 +168,7 @@ namespace DaemonMaster
             }
         }
 
-        private void listBoxDaemons_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void ListBoxDaemons_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             EditDaemon();
         }
