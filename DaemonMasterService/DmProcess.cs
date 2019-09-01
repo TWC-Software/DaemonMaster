@@ -187,6 +187,14 @@ namespace DaemonMasterService
         {
             Logger.Info("Start process in user session...");
 
+            string username = RegistryManagement.ReadAndDeleteStartInSessionAsUsername(_serviceDefinition.ServiceName);
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                Logger.Error("Cannot start the service in the user session (no user found).");
+                return;
+            }
+
+
             //Set last start in user session
             _lastStartInUserSession = true;
 
@@ -237,7 +245,7 @@ namespace DaemonMasterService
             threadSecurityAttributes.length = (uint)Marshal.SizeOf(threadSecurityAttributes);
 
             //Get user token
-            using (TokenHandle currentUserToken = TokenHandle.GetActiveSessionUserToken())
+            using (TokenHandle currentUserToken = TokenHandle.GetSessionTokenByUsername(username))
             {
                 try
                 {

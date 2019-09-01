@@ -28,5 +28,8 @@ namespace DaemonMaster.Core.Win32.PInvoke.Wtsapi32
 
         [DllImport(DllName, ExactSpelling = true)]
         public static extern void WTSFreeMemory(IntPtr sessionInfo);
+
+        [DllImport(DllName, SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern bool WTSQuerySessionInformation(IntPtr server, int sessionId, WtsInfoClass wtsInfoClass, out IntPtr buffer, out uint bytesReturned);
     }
 }

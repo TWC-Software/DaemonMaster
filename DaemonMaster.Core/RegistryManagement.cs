@@ -115,7 +115,6 @@ namespace DaemonMaster.Core
             }
         }
 
-
         public static DmServiceDefinition LoadServiceStartInfosFromRegistry(string serviceName)
         {
             //Open Regkey folder
@@ -148,11 +147,12 @@ namespace DaemonMaster.Core
                     serviceDefinition.IsConsoleApplication = Convert.ToBoolean(parameters.GetValue("IsConsoleApplication", false));
                     serviceDefinition.UseCtrlC = Convert.ToBoolean(parameters.GetValue("UseCtrlC", false));
                     serviceDefinition.CanInteractWithDesktop = Convert.ToBoolean(parameters.GetValue("CanInteractWithDesktop", false));
-
                     return serviceDefinition;
                 }
             }
         }
+
+
 
         public static object GetParameterFromRegistry(string serviceName, string parameterName, string subkey = "\\Parameters")
         {
@@ -179,17 +179,21 @@ namespace DaemonMaster.Core
                 if (!service.ServiceName.Contains("DaemonMaster_"))
                     continue;
 
-                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + service.ServiceName + @"\Parameters", false))
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + service.ServiceName, false))
                 {
                     if (key == null)
                         throw new Exception("Can't open registry key!");
 
-                    var serviceDefinition = new DmServiceDefinition(service.ServiceName)
+                    var serviceDefinition = new DmServiceDefinition(Convert.ToString(service.ServiceName))
                     {
-                        DisplayName = service.DisplayName,
-                        BinaryPath = Convert.ToString(key.GetValue("BinaryPath")),
+                        DisplayName = service.DisplayName, //Convert.ToString(key.GetValue("DisplayName")),
+                        Credentials = new ServiceCredentials(Convert.ToString(key.GetValue("ObjectName", ServiceCredentials.LocalSystem)), null),
                     };
 
+                    using (RegistryKey parameters = key.OpenSubKey("Parameters", false))
+                    {
+                        serviceDefinition.BinaryPath = Convert.ToString(parameters.GetValue("BinaryPath"));
+                    }
                     daemons.Add(serviceDefinition);
                 }
             }
@@ -220,18 +224,21 @@ namespace DaemonMaster.Core
                     if (!serviceExePath.Contains(ServiceControlManager.DmServiceExe))
                         continue;
 
-                    using (RegistryKey parameterKey = key.OpenSubKey(@"\Parameters", false))
+                    using (RegistryKey key2 = Registry.LocalMachine.OpenSubKey(RegPath + service.ServiceName, false))
                     {
-                        //If the parameters sub key invalid, skip this service
-                        if (parameterKey == null)
-                            continue;
+                        if (key2 == null)
+                            throw new Exception("Can't open registry key!");
 
-                        var serviceDefinition = new DmServiceDefinition(service.ServiceName)
+                        var serviceDefinition = new DmServiceDefinition(Convert.ToString(service.ServiceName))
                         {
-                            DisplayName = service.DisplayName,
-                            BinaryPath = Convert.ToString(parameterKey.GetValue("BinaryPath")),
+                            DisplayName = service.DisplayName, //Convert.ToString(key2.GetValue("DisplayName")),
+                            Credentials = new ServiceCredentials(Convert.ToString(key2.GetValue("ObjectName", ServiceCredentials.LocalSystem)), null),
                         };
 
+                        using (RegistryKey parameters = key2.OpenSubKey("Parameters", false))
+                        {
+                            serviceDefinition.BinaryPath = Convert.ToString(parameters.GetValue("BinaryPath"));
+                        }
                         daemons.Add(serviceDefinition);
                     }
                 }
@@ -239,6 +246,31 @@ namespace DaemonMaster.Core
 
             return daemons;
         }
+
+
+
+        public static void WriteStartInSessionAsUsername(string serviceName, string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+                throw new Exception("WriteStartInSessionAsUsername: Invalid username.");
+
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(RegPath + serviceName + "\\Parameters", true))
+            {
+                key.SetValue("StartInSessionAs", username, RegistryValueKind.String);
+            }
+        }
+
+        public static string ReadAndDeleteStartInSessionAsUsername(string serviceName)
+        {
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + serviceName + "\\Parameters", true))
+            {
+                string username = Convert.ToString(key.GetValue("StartInSessionAs", string.Empty));
+                key.SetValue("StartInSessionAs", string.Empty, RegistryValueKind.String);
+                return username;
+            }
+        }
+
+
 
         public static bool IsDaemonMasterService(string serviceName)
         {
@@ -261,7 +293,6 @@ namespace DaemonMaster.Core
 
             return false;
         }
-
 
         public static string[] GetAllServiceGroups()
         {

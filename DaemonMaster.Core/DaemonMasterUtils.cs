@@ -126,5 +126,10 @@ namespace DaemonMaster.Core
 
             return processId;
         }
+
+        public static string ConvertNullTerminatedStringToString(this string s)
+        {
+            return s.TrimEnd('\0');
+        }
     }
 }

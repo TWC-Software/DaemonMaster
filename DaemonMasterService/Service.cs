@@ -88,6 +88,9 @@ namespace DaemonMasterService
                 _dmProcess.MaxRestartsReached += DmProcessOnMaxRestartsReached;
                 _dmProcess.UpdateProcessPid += DmProcessOnUpdateProcessPid;
 
+                //Remove Value of StartInSessionAs
+                //Registry.LocalMachine.DeleteValue(RegPath + _serviceName + "\\Parameters\\StartInSessionAs", false);
+
                 Logger.Info("Starting the process...");
                 if (_startInUserSession)
                 {

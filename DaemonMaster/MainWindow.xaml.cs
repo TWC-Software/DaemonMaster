@@ -26,6 +26,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Resources;
+using System.Security.Principal;
 using System.ServiceProcess;
 using System.Windows;
 using System.Windows.Controls;
@@ -154,6 +155,9 @@ namespace DaemonMaster
 
             try
             {
+                //Write username where the service should start the process
+                RegistryManagement.WriteStartInSessionAsUsername(serviceListViewItem.ServiceName, WindowsIdentity.GetCurrent().Name);
+
                 using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
                 {
                     using (ServiceHandle serviceHandle = scm.OpenService(serviceListViewItem.ServiceName, Advapi32.ServiceAccessRights.Start))
