@@ -151,25 +151,7 @@ namespace DaemonMaster
             if (ListViewDaemons.SelectedItem == null)
                 return;
 
-            var serviceListViewItem = (ServiceListViewItem)ListViewDaemons.SelectedItem;
-
-            try
-            {
-                //Write username where the service should start the process
-                RegistryManagement.WriteStartInSessionAsUsername(serviceListViewItem.ServiceName, WindowsIdentity.GetCurrent().Name);
-
-                using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
-                {
-                    using (ServiceHandle serviceHandle = scm.OpenService(serviceListViewItem.ServiceName, Advapi32.ServiceAccessRights.Start))
-                    {
-                        serviceHandle.Start(new[] { "-startInUserSession" });
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            StartService((ServiceListViewItem)ListViewDaemons.SelectedItem, true);
         }
 
         private void ListBoxDaemons_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -421,10 +403,16 @@ namespace DaemonMaster
             }
         }
 
-        private void StartService(ServiceListViewItem serviceListViewItem)
+        private void StartService(ServiceListViewItem serviceListViewItem, bool inUserSession = false)
         {
             try
             {
+                if (inUserSession)
+                {
+                    //Write username where the service should start the process
+                    RegistryManagement.WriteSessionUsername(serviceListViewItem.ServiceName, WindowsIdentity.GetCurrent().Name);
+                }
+
                 using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
                 {
                     using (ServiceHandle serviceHandle = scm.OpenService(serviceListViewItem.ServiceName, Advapi32.ServiceAccessRights.Start))
@@ -563,7 +551,7 @@ namespace DaemonMaster
 
         private void CheckForUpdates()
         {
-            _ = Updater.Updater.StartAsync("https://github.com/TWC-Software/DaemonMaster");
+            _ = Updater.Updater.StartAsync("https://github.com/TWC-Software/DaemonMaster", false);
         }
 
         #endregion

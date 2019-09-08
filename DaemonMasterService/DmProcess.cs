@@ -29,6 +29,7 @@ namespace DaemonMasterService
         private uint _restarts;
         private DateTime _lastRestartTime;
         private bool _lastStartInUserSession = false;
+        private string _lastSessionUsername = string.Empty;
 
         /// <summary>
         /// Get the process PID (if invalid it returns -1)
@@ -120,8 +121,6 @@ namespace DaemonMasterService
         /// </summary>
         internal void StartInServiceSession()
         {
-            Logger.Info("Start process in service session...");
-
             //Reset last start in user session
             _lastStartInUserSession = false;
 
@@ -183,20 +182,11 @@ namespace DaemonMasterService
         /// Starts the process in the user session.
         /// </summary>
         /// <exception cref="Win32Exception"></exception>
-        internal void StartInUserSession()
+        internal void StartInUserSession(string username)
         {
-            Logger.Info("Start process in user session...");
-
-            string username = RegistryManagement.ReadAndDeleteStartInSessionAsUsername(_serviceDefinition.ServiceName);
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                Logger.Error("Cannot start the service in the user session (no user found).");
-                return;
-            }
-
-
             //Set last start in user session
             _lastStartInUserSession = true;
+            _lastSessionUsername = username;
 
             //Close old instances
             Close();
@@ -435,7 +425,7 @@ namespace DaemonMasterService
 
             if (_serviceDefinition.CounterResetTime != 0)
             {
-                //Reset the counter if secondsBetweenCraches is greater than or equal to CounterResetTime 
+                //Reset the counter if secondsBetweenCrashes is greater than or equal to CounterResetTime 
                 try
                 {
                     uint secondsBetweenCrashes = Convert.ToUInt32(DateTime.UtcNow.Subtract(_lastRestartTime).TotalSeconds);
@@ -444,7 +434,7 @@ namespace DaemonMasterService
                         ResetRestartCounter();
                     }
                 }
-                //Reset the counter if an overflow happens because secondsBetweenCraches must be greater than CounterResetTime
+                //Reset the counter if an overflow happens because secondsBetweenCrashes must be greater than CounterResetTime
                 catch (OverflowException)
                 {
                     ResetRestartCounter();
@@ -459,7 +449,7 @@ namespace DaemonMasterService
 
                 if (_lastStartInUserSession)
                 {
-                    StartInUserSession();
+                    StartInUserSession(_lastSessionUsername);
                 }
                 else
                 {

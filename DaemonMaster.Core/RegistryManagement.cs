@@ -249,10 +249,10 @@ namespace DaemonMaster.Core
 
 
 
-        public static void WriteStartInSessionAsUsername(string serviceName, string username)
+        public static void WriteSessionUsername(string serviceName, string username)
         {
             if (string.IsNullOrWhiteSpace(username))
-                throw new Exception("WriteStartInSessionAsUsername: Invalid username.");
+                throw new Exception("WriteSessionUsername: Invalid username.");
 
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(RegPath + serviceName + "\\Parameters", true))
             {
@@ -260,7 +260,7 @@ namespace DaemonMaster.Core
             }
         }
 
-        public static string ReadAndDeleteStartInSessionAsUsername(string serviceName)
+        public static string ReadAndClearSessionUsername(string serviceName)
         {
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + serviceName + "\\Parameters", true))
             {

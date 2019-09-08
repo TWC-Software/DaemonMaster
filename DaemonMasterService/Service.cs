@@ -33,7 +33,6 @@ namespace DaemonMasterService
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private static string _serviceName;
-        private bool _startInUserSession;
         private DmProcess _dmProcess;
         private Timer _updateTimer;
         private Config _config;
@@ -62,12 +61,6 @@ namespace DaemonMasterService
             //Get the config
             _config = ConfigManagement.GetConfig;
 
-            //Read args
-            foreach (string arg in args)
-            {
-                if (arg == "-startInUserSession") _startInUserSession = true;
-            }
-
             //Get the service name
             _serviceName = GetServiceName();
 
@@ -88,17 +81,17 @@ namespace DaemonMasterService
                 _dmProcess.MaxRestartsReached += DmProcessOnMaxRestartsReached;
                 _dmProcess.UpdateProcessPid += DmProcessOnUpdateProcessPid;
 
-                //Remove Value of StartInSessionAs
-                //Registry.LocalMachine.DeleteValue(RegPath + _serviceName + "\\Parameters\\StartInSessionAs", false);
-
-                Logger.Info("Starting the process...");
-                if (_startInUserSession)
+                //Check if the service should start in a user session or in the service session
+                string sessionUsername = RegistryManagement.ReadAndClearSessionUsername(_serviceName);
+                if (string.IsNullOrWhiteSpace(sessionUsername))
                 {
-                    _dmProcess.StartInUserSession();
+                    Logger.Info("Starting the process in service session...");
+                    _dmProcess.StartInServiceSession();
                 }
                 else
                 {
-                    _dmProcess.StartInServiceSession();
+                    Logger.Info("Starting the process in user session...");
+                    _dmProcess.StartInUserSession(sessionUsername);
                 }
             }
             catch (Exception ex)
