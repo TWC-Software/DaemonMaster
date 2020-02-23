@@ -220,7 +220,7 @@
     <value>Konsolenanwendung</value>
   </data>
   <data name="checkbox_use_local_system_account" xml:space="preserve">
-    <value>Nutze Lokales System</value>
+    <value>Nutze Systemkonto</value>
   </data>
   <data name="currently_unavailable" xml:space="preserve">
     <value>Derzeit nicht verfügbar :(</value>
@@ -536,5 +536,8 @@
   </data>
   <data name="timeout_exception_service_restart" xml:space="preserve">
     <value>Der Neustart des Dienst braucht zulange!</value>
+  </data>
+  <data name="checkbox_use_virtual_account" xml:space="preserve">
+    <value>Nutze virtuelles Dienstkonto</value>
   </data>
 </root>

@@ -1,4 +1,5 @@
-﻿using System.Security;
+﻿using System;
+using System.Security;
 
 //based on https://github.com/dasMulli/dotnet-win32-service
 namespace DaemonMaster.Core.Win32
@@ -52,6 +53,12 @@ namespace DaemonMaster.Core.Win32
         /// Services that run as the Network Service account access network resources by using the credentials of the computer account.
         /// </summary>
         public static ServiceCredentials NetworkService = new ServiceCredentials(username: @"NetworkService", password: null);
+
+        /// <summary>
+        /// The Network Service account is a built-in account that has more access to resources and objects than members of the Users group.
+        /// Services that run as the Network Service account access network resources by using the credentials of the computer account.
+        /// </summary>
+        public static ServiceCredentials VirtualAccount = new ServiceCredentials(username: @"NT SERVICE\", password: null);
 
         /// <summary>
         ///  Determines whether the specified <see cref="System.Object" />, is equal to this instance.

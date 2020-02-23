@@ -135,6 +135,16 @@ namespace DaemonMaster.Core.Win32
                 }
             }
 
+            //Add service name to the end if it is a virtual account
+            string username = credentials.Username;
+            if (Equals(credentials, ServiceCredentials.VirtualAccount))
+            {
+                using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
+                {
+                    username += scm.GetServiceName(displayName); //TODO: Works but not the best method to do that
+                }
+            }
+            
             //The credentials can't be null
             if (credentials == null)
                 throw new ArgumentNullException(nameof(credentials));
@@ -156,7 +166,7 @@ namespace DaemonMaster.Core.Win32
                     loadOrderGroup,
                     tagId: 0, // Tags are only evaluated for driver services that have SERVICE_BOOT_START or SERVICE_SYSTEM_START start types.
                     Advapi32.ConvertDependenciesArraysToDoubleNullTerminatedString(dependOnService, dependOnGroup),
-                    credentials.Username,
+                    username,
                     passwordHandle,
                     displayName
                 );

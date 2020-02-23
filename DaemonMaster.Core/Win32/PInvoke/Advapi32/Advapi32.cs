@@ -129,6 +129,16 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
 
         [DllImport(DllName, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetServiceKeyName
+        (
+            ServiceControlManager serviceControlManager,
+            string displayName,
+            IntPtr serviceName,
+            ref uint bytesNeeded
+        );
+
+        [DllImport(DllName, SetLastError = true, CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool LogonUser
         (
             string username,

@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.ServiceProcess;
@@ -100,9 +101,21 @@ namespace DaemonMaster.Core
                         {
                             rs.AddAccessRule(new RegistryAccessRule((NTAccount)new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null).Translate(typeof(NTAccount)), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
                         }
+                        else if (Equals(serviceDefinition.Credentials, ServiceCredentials.LocalService))
+                        {
+                            rs.AddAccessRule(new RegistryAccessRule((NTAccount)new SecurityIdentifier(WellKnownSidType.LocalServiceSid, null).Translate(typeof(NTAccount)), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
+                        }
+                        else if (Equals(serviceDefinition.Credentials, ServiceCredentials.NetworkService))
+                        {
+                            rs.AddAccessRule(new RegistryAccessRule((NTAccount)new SecurityIdentifier(WellKnownSidType.NetworkServiceSid, null).Translate(typeof(NTAccount)), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
+                        }
+                        else if (Equals(serviceDefinition.Credentials, ServiceCredentials.VirtualAccount))
+                        {
+                            rs.AddAccessRule(new RegistryAccessRule(new NTAccount("NT SERVICE\\" + serviceDefinition.ServiceName), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
+                        }
                         else
                         {
-                            rs.AddAccessRule(new RegistryAccessRule(new NTAccount(DaemonMasterUtils.GetDomainFromUsername(serviceDefinition.Credentials.Username), DaemonMasterUtils.GetLoginFromUsername(serviceDefinition.Credentials.Username)), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
+                            rs.AddAccessRule(new RegistryAccessRule(new NTAccount(serviceDefinition.Credentials.Username), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
                         }
 
                         processInfo.SetAccessControl(rs);
@@ -124,7 +137,6 @@ namespace DaemonMaster.Core
                 var serviceDefinition = new DmServiceDefinition(Convert.ToString(serviceName))
                 {
                     DisplayName = Convert.ToString(key.GetValue("DisplayName")),
-                    Credentials = new ServiceCredentials(Convert.ToString(key.GetValue("ObjectName", ServiceCredentials.LocalSystem)), null),
                     Description = Convert.ToString(key.GetValue("Description", string.Empty)),
                     DependOnService = (string[])key.GetValue("DependOnService", Array.Empty<string>()),
                     DependOnGroup = (string[])key.GetValue("DependOnGroup", Array.Empty<string>()),
@@ -133,6 +145,20 @@ namespace DaemonMaster.Core
                     StartType = (Advapi32.ServiceStartType)Convert.ToUInt32(key.GetValue("Start", 2))
                 };
 
+
+                string username = Convert.ToString(key.GetValue("ObjectName", ""));
+                if (DaemonMasterUtils.GetDomainFromUsername(username) == "NT SERVICE")
+                {
+                    serviceDefinition.Credentials = ServiceCredentials.VirtualAccount;
+                }
+                else if (string.IsNullOrWhiteSpace(username))
+                {
+                    serviceDefinition.Credentials = ServiceCredentials.LocalSystem;
+                }
+                else
+                {
+                    serviceDefinition.Credentials = new ServiceCredentials(username, null);
+                }
 
                 //Open Parameters SubKey
                 using (RegistryKey parameters = key.OpenSubKey("Parameters", false))
@@ -164,7 +190,14 @@ namespace DaemonMaster.Core
 
         public static List<DmServiceDefinition> LoadInstalledServices()
         {
-            return ConfigManagement.GetConfig.UseNewExperimentalServiceSearchSystem ? LoadInstalledServicesNewSystem() : LoadInstalledServicesOldSystem();
+            List<DmServiceDefinition> services = LoadInstalledServicesNewSystem();
+
+            if (ConfigManagement.GetConfig.UseOldNameBasedSearchSystemWithTheNewSystem)
+            {
+                services.AddRange(LoadInstalledServicesOldSystem().Where(x => services.All(y => y.ServiceName != x.ServiceName)));
+            }
+
+            return services;
         }
 
         [Obsolete("Later it gets replaced with the new one, but for now it rest as the default system.", false)]
@@ -204,44 +237,41 @@ namespace DaemonMaster.Core
         {
             var daemons = new List<DmServiceDefinition>();
 
-
-            ServiceController[] sc = ServiceController.GetServices();
-            foreach (ServiceController service in sc)
+            using (RegistryKey mainKey = Registry.LocalMachine.OpenSubKey(RegPath))
             {
-                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + service.ServiceName, false))
+                foreach (string serviceName in mainKey.GetSubKeyNames())
                 {
-                    //If the key invalid, skip this service
-                    if (key == null)
-                        continue;
-
-                    //Get the exe path of the service to determine later if its a service from DaemonMaster
-                    string serviceExePath = Convert.ToString(key.GetValue("ImagePath") ?? string.Empty);
-
-                    //If the serviceExePath is invalid skip this service
-                    if (string.IsNullOrWhiteSpace(serviceExePath))
-                        continue;
-
-                    if (!serviceExePath.Contains(ServiceControlManager.DmServiceExe))
-                        continue;
-
-                    using (RegistryKey key2 = Registry.LocalMachine.OpenSubKey(RegPath + service.ServiceName, false))
+                    using (RegistryKey key = mainKey.OpenSubKey(serviceName, false))
                     {
-                        if (key2 == null)
-                            throw new Exception("Can't open registry key!");
+                        //If the key invalid, skip this service
+                        if (key == null)
+                            continue;
 
-                        var serviceDefinition = new DmServiceDefinition(Convert.ToString(service.ServiceName))
+                        //Get the exe path of the service to determine later if its a service from DaemonMaster
+                        string serviceExePath = Convert.ToString(key.GetValue("ImagePath") ?? string.Empty);
+
+                        //If the serviceExePath is invalid skip this service
+                        if (string.IsNullOrWhiteSpace(serviceExePath))
+                            continue;
+
+                        if (!serviceExePath.Contains(ServiceControlManager.DmServiceExe))
+                            continue;
+
+                        var serviceDefinition = new DmServiceDefinition(serviceName)
                         {
-                            DisplayName = service.DisplayName, //Convert.ToString(key2.GetValue("DisplayName")),
-                            Credentials = new ServiceCredentials(Convert.ToString(key2.GetValue("ObjectName", ServiceCredentials.LocalSystem)), null),
+                            DisplayName = Convert.ToString(key.GetValue("DisplayName")),
+                            Credentials = new ServiceCredentials(Convert.ToString(key.GetValue("ObjectName", ServiceCredentials.LocalSystem)), null),
                         };
 
-                        using (RegistryKey parameters = key2.OpenSubKey("Parameters", false))
+                        using (RegistryKey parameters = key.OpenSubKey("Parameters", false))
                         {
                             serviceDefinition.BinaryPath = Convert.ToString(parameters.GetValue("BinaryPath"));
                         }
+
                         daemons.Add(serviceDefinition);
                     }
                 }
+
             }
 
             return daemons;

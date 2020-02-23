@@ -539,4 +539,7 @@
   <data name="timeout_exception_service_restart" xml:space="preserve">
     <value>The restart of the service took to long!</value>
   </data>
+  <data name="checkbox_use_virtual_account" xml:space="preserve">
+    <value>Use virtual service account</value>
+  </data>
 </root>

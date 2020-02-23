@@ -110,7 +110,7 @@ namespace DaemonMaster.Core.Win32
                     serviceDefinition.LoadOrderGroup,
                     tagId: 0, //Tags are only evaluated for driver services that have SERVICE_BOOT_START or SERVICE_SYSTEM_START start types.
                     Advapi32.ConvertDependenciesArraysToDoubleNullTerminatedString(serviceDefinition.DependOnService, serviceDefinition.DependOnGroup),
-                    serviceDefinition.Credentials.Username,
+                    serviceDefinition.Credentials.Username + (Equals(serviceDefinition.Credentials, ServiceCredentials.VirtualAccount) ? serviceDefinition.ServiceName : string.Empty),
                     passwordHandle
                 );
 
@@ -145,6 +145,48 @@ namespace DaemonMaster.Core.Win32
                 throw new Win32Exception(Marshal.GetLastWin32Error());
 
             return serviceHandle;
+        }
+
+        /// <summary>
+        /// Gets the name of the service from the display name.
+        /// </summary>
+        /// <param name="displayName">The display name of the service.</param>
+        /// <returns></returns>
+        /// <exception cref="Win32Exception">
+        /// </exception>
+        public string GetServiceName(string displayName)
+        {
+            IntPtr bufferPtr = IntPtr.Zero;
+            uint bytesNeeded = 0;
+
+            try
+            {
+                //Determine the required buffer size => buffer and bufferSize must be null
+                if (!Advapi32.GetServiceKeyName(this, displayName, IntPtr.Zero, ref bytesNeeded))
+                {
+                    int result = Marshal.GetLastWin32Error();
+
+                    if (result != 0x7A) //ERROR_INSUFFICIENT_BUFFER
+                        throw new Win32Exception(result);
+                }
+
+                //+1 for NULL terminator
+                bytesNeeded++;
+
+                //Allocate the required buffer size
+                bufferPtr = Marshal.AllocHGlobal((int)bytesNeeded); 
+
+
+                if (!Advapi32.GetServiceKeyName(this, displayName, bufferPtr, ref bytesNeeded))
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+
+                return Marshal.PtrToStringUni(bufferPtr, (int)bytesNeeded);
+            }
+            finally
+            {
+                if (bufferPtr != IntPtr.Zero)
+                    Marshal.FreeHGlobal(bufferPtr);
+            }
         }
     }
 }

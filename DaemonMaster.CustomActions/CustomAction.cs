@@ -1,5 +1,7 @@
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.ServiceProcess;
 using DaemonMaster.Core;
 using DaemonMaster.Core.Win32;
@@ -82,6 +84,28 @@ namespace DaemonMaster.CustomActions
                             session.Log("Deleted " + serviceItem.ServiceName + " service successful.");
                         }
                     }
+                }
+
+                return ActionResult.Success;
+            }
+            catch (Exception e)
+            {
+                session.Log(e.Message + "\n" + e.StackTrace);
+                return ActionResult.Failure;
+            }
+        }
+
+        [CustomAction]
+        public static ActionResult RemoveResidualFiles(Session session)
+        {
+            session.Log("Beginning the uninstall of residual files.");
+
+            try
+            {
+                string appFolder = session.CustomActionData["APPDIR"];
+                if (!string.IsNullOrWhiteSpace(appFolder) && Directory.Exists(appFolder))
+                {
+                    Directory.Delete(appFolder, true);
                 }
 
                 return ActionResult.Success;

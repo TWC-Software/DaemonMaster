@@ -19,7 +19,7 @@ namespace DaemonMaster.Language {
     // -Klasse über ein Tool wie ResGen oder Visual Studio automatisch generiert.
     // Um einen Member hinzuzufügen oder zu entfernen, bearbeiten Sie die .ResX-Datei und führen dann ResGen
     // mit der /str-Option erneut aus, oder Sie erstellen Ihr VS-Projekt neu.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class lang {
@@ -399,6 +399,15 @@ namespace DaemonMaster.Language {
         public static string checkbox_use_local_system_account {
             get {
                 return ResourceManager.GetString("checkbox_use_local_system_account", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Use virtual service account ähnelt.
+        /// </summary>
+        public static string checkbox_use_virtual_account {
+            get {
+                return ResourceManager.GetString("checkbox_use_virtual_account", resourceCulture);
             }
         }
         

@@ -11,6 +11,7 @@
 
     <Window.Resources>
         <wpf:InvertBooleanConverter x:Key="InvertBoolConverter"/>
+        <wpf:AndConverter x:Key="AddConverter"/>
     </Window.Resources>
 
     <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,0,0" Height="308" Width="890">
@@ -25,10 +26,10 @@
                     <Label x:Name="LabelDisplayName" Content="{x:Static resx:lang.label_display_name}" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top"/>
                     <wpf:PlaceholderTextBox x:Name="TextBoxDisplayName" Height="23" Margin="147,42,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_display_name}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
                     <Label x:Name="LabelDescription" Content="{x:Static resx:lang.label_description}" HorizontalAlignment="Left" Margin="10,66,0,0" VerticalAlignment="Top"/>
-                    <wpf:PlaceholderTextBox x:Name="TextBoxDescription" Height="23" Margin="147,70,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_description}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" SpellCheck.IsEnabled="True"/>
+                    <wpf:PlaceholderTextBoxAutoShrink x:Name="TextBoxDescription" Height="23" Margin="147,70,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_description}" VerticalAlignment="Top" SpellCheck.IsEnabled="True" Grid.ZIndex="11" HorizontalAlignment="Left" Width="321"/>
                     <Label x:Name="LabelParam" Content="{x:Static resx:lang.label_parameters}" HorizontalAlignment="Left" Margin="10,95,0,0" VerticalAlignment="Top"/>
-                    <TextBox x:Name="TextBoxParam" Height="23" Width="321" Margin="147,98,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" LostFocus="TextBoxParam_OnLostFocus"/>
-                    <Label x:Name="LabelStarttyp" Content="{x:Static resx:lang.label_start_type}" HorizontalAlignment="Left" Margin="10,126,0,0" VerticalAlignment="Top"/>
+                    <wpf:TextBoxAutoShrink x:Name="TextBoxParam" Width="321" Margin="147,98,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" LostFocus="TextBoxParam_OnLostFocus" AcceptsReturn="True" Height="23" ScrollViewer.VerticalScrollBarVisibility="Auto" Grid.ZIndex="10"/>
+                    <Label x:Name="LabelStartType" Content="{x:Static resx:lang.label_start_type}" HorizontalAlignment="Left" Margin="10,126,0,0" VerticalAlignment="Top"/>
                     <ComboBox x:Name="ComboBoxStartType" HorizontalAlignment="Left" Margin="147,126,0,0" VerticalAlignment="Top" Width="321" RenderTransformOrigin="1.217,1.045" SelectedIndex="0">
                         <ComboBoxItem Content="{x:Static resx:lang.starttype_automatic}"/>
                         <ComboBoxItem Content="{x:Static resx:lang.starttype_automatic_with_delay}"/>
@@ -42,12 +43,37 @@
 
                     <GroupBox x:Name="GroupBoxCustomUsername" Header="{x:Static resx:lang.groupbox_custom_user}" HorizontalAlignment="Left" Height="116" Margin="486,-3,0,0" VerticalAlignment="Top" Width="378">
                         <Grid HorizontalAlignment="Left" Height="100" Margin="0,0,-2,-6" VerticalAlignment="Top" Width="267">
-                            <CheckBox x:Name="CheckBoxUseLocalSystem" Content="{x:Static resx:lang.checkbox_use_local_system_account}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" IsChecked="True"/>
+                            <CheckBox x:Name="CheckBoxUseLocalSystem" Content="{x:Static resx:lang.checkbox_use_local_system_account}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" IsChecked="True" IsEnabled="{Binding ElementName=CheckBoxUseVirtualAccount, Path=IsChecked, TargetNullValue=false, Converter={StaticResource InvertBoolConverter}}" Width="168"/>
+                            <CheckBox x:Name="CheckBoxUseVirtualAccount" Content="{x:Static resx:lang.checkbox_use_virtual_account}" HorizontalAlignment="Left" Margin="183,10,-94,0" VerticalAlignment="Top" IsChecked="False"  IsEnabled="{Binding ElementName=CheckBoxUseLocalSystem, Path=IsChecked, TargetNullValue=false, Converter={StaticResource InvertBoolConverter}}" Width="178"/>
+
                             <Label x:Name="LabelUsername" Content="{x:Static resx:lang.label_username}" HorizontalAlignment="Left" Margin="4,32,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.258,0.487"/>
-                            <wpf:PlaceholderTextBox x:Name="TextBoxUsername" HorizontalAlignment="Left" Height="23" Margin="93,32,-35,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_username}" VerticalAlignment="Top" Width="209" IsReadOnly="False" IsEnabled="{Binding ElementName=CheckBoxUseLocalSystem, Path=IsChecked, TargetNullValue=false, Converter={StaticResource InvertBoolConverter}}"/>
-                            <Button x:Name="ButtonOpenAdop" Content="{x:Static resx:lang.button_search}" HorizontalAlignment="Left" Margin="307,32,-94,0" VerticalAlignment="Top" Width="54" Height="23" Click="buttonOpenAdop_OnClick" IsEnabled="{Binding ElementName=CheckBoxUseLocalSystem, Path=IsChecked, TargetNullValue=false, Converter={StaticResource InvertBoolConverter}}"/>
+                            <wpf:PlaceholderTextBox x:Name="TextBoxUsername" HorizontalAlignment="Left" Height="23" Margin="93,32,-35,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_username}" VerticalAlignment="Top" Width="209" IsReadOnly="False">
+                                <wpf:PlaceholderTextBox.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource AddConverter}">
+                                        <Binding ElementName="CheckBoxUseLocalSystem" Path="IsChecked" TargetNullValue="false" Converter="{StaticResource InvertBoolConverter}"/>
+                                        <Binding ElementName="CheckBoxUseVirtualAccount" Path="IsChecked" TargetNullValue="false" Converter="{StaticResource InvertBoolConverter}"/>
+                                    </MultiBinding>
+                                </wpf:PlaceholderTextBox.IsEnabled>
+                            </wpf:PlaceholderTextBox>
+
+                            <Button x:Name="ButtonOpenAdop" Content="{x:Static resx:lang.button_search}" HorizontalAlignment="Left" Margin="307,32,-94,0" VerticalAlignment="Top" Width="54" Height="23" Click="buttonOpenAdop_OnClick">
+                                <Button.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource AddConverter}">
+                                        <Binding ElementName="CheckBoxUseLocalSystem" Path="IsChecked" TargetNullValue="false" Converter="{StaticResource InvertBoolConverter}"/>
+                                        <Binding ElementName="CheckBoxUseVirtualAccount" Path="IsChecked" TargetNullValue="false" Converter="{StaticResource InvertBoolConverter}"/>
+                                    </MultiBinding>
+                                </Button.IsEnabled>
+                            </Button>
+
                             <Label x:Name="LabelPassword" Content="{x:Static resx:lang.label_password}" HorizontalAlignment="Left" Margin="4,63,0,0" VerticalAlignment="Top"/>
-                            <PasswordBox x:Name="TextBoxPassword" HorizontalAlignment="Left" Height="23" Margin="93,67,-94,0" VerticalAlignment="Top" Width="268" IsEnabled="{Binding ElementName=CheckBoxUseLocalSystem, Path=IsChecked, TargetNullValue=false, Converter={StaticResource InvertBoolConverter}}"/>
+                            <PasswordBox x:Name="TextBoxPassword" HorizontalAlignment="Left" Height="23" Margin="93,67,-94,0" VerticalAlignment="Top" Width="268">
+                                <PasswordBox.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource AddConverter}">
+                                        <Binding ElementName="CheckBoxUseLocalSystem" Path="IsChecked" TargetNullValue="false" Converter="{StaticResource InvertBoolConverter}"/>
+                                        <Binding ElementName="CheckBoxUseVirtualAccount" Path="IsChecked" TargetNullValue="false" Converter="{StaticResource InvertBoolConverter}"/>
+                                    </MultiBinding>
+                                </PasswordBox.IsEnabled>
+                            </PasswordBox>
                         </Grid>
                     </GroupBox>
                     <Button x:Name="ButtonImport" Content="{x:Static resx:lang.button_import}" Margin="530,126,210,90" Click="buttonImport_Click"/>

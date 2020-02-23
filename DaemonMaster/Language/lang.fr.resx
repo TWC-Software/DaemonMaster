@@ -205,7 +205,7 @@
     <value>Le service était déjà arrêté !!</value>
   </data>
   <data name="checkbox_use_local_system_account" xml:space="preserve">
-    <value>Utilisez le compte Système local!</value>
+    <value>Utilisez le compte Système local</value>
   </data>
   <data name="currently_unavailable" xml:space="preserve">
     <value>Actuellement indisponible :)</value>
@@ -377,5 +377,8 @@
   </data>
   <data name="label_loadOrderGroup" xml:space="preserve">
     <value>Load Order Groupe:</value>
+  </data>
+  <data name="checkbox_use_virtual_account" xml:space="preserve">
+    <value>Utiliser le compte de service</value>
   </data>
 </root>

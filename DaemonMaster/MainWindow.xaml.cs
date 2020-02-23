@@ -568,7 +568,7 @@ namespace DaemonMaster
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             //If Windows 10 1803 installed don't ask for start the UI0Detect service
-            if (DaemonMasterUtils.IsSupportedWindows10VersionForIwd)
+            if (true ||DaemonMasterUtils.IsSupportedWindows10VersionForIwd)
             {
                 //If Windows 10 1803 installed don't ask for UI0Detect registry key change
                 AskToEnableInteractiveServices();

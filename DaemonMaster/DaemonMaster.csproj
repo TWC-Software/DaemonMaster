@@ -87,6 +87,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="WPF\AndConverter.cs" />
+    <Compile Include="WPF\PlaceholderTextBoxAutoShrink.cs" />
+    <Compile Include="WPF\TextBoxAutoShrink.cs" />
     <Page Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

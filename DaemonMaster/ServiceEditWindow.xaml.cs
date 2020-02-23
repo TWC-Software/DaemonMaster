@@ -79,7 +79,7 @@ namespace DaemonMaster
 
             //Set to readonly when it has already a service name
             if (!string.IsNullOrWhiteSpace(_tempServiceConfig.ServiceName))
-                TextBoxServiceName.Text = _tempServiceConfig.ServiceName.Substring(13);
+                TextBoxServiceName.Text = _tempServiceConfig.ServiceName;
 
             TextBoxServiceName.IsReadOnly = !_createNewService;
 
@@ -119,12 +119,21 @@ namespace DaemonMaster
                 TextBoxUsername.Text = string.Empty;
                 TextBoxPassword.Password = string.Empty;
                 CheckBoxUseLocalSystem.IsChecked = true;
+                CheckBoxUseVirtualAccount.IsChecked = false;
+            }
+            else if (Equals(_tempServiceConfig.Credentials, ServiceCredentials.VirtualAccount))
+            {
+                TextBoxUsername.Text = string.Empty;
+                TextBoxPassword.Password = string.Empty;
+                CheckBoxUseVirtualAccount.IsChecked = true;
+                CheckBoxUseLocalSystem.IsChecked = false;
             }
             else
             {
                 TextBoxUsername.Text = _tempServiceConfig.Credentials.Username;
                 TextBoxPassword.Password = _createNewService ? string.Empty : PLACEHOLDER_PASSWORD;
                 CheckBoxUseLocalSystem.IsChecked = false;
+                CheckBoxUseVirtualAccount.IsChecked = false;
             }
 
             #endregion
@@ -441,9 +450,13 @@ namespace DaemonMaster
 
                 #region Password/LocalSystem
 
-                if (CheckBoxUseLocalSystem.IsChecked ?? true) // => LocalSystem is null            
+                if (CheckBoxUseLocalSystem.IsChecked ?? false) // => LocalSystem is null            
                 {
                     _tempServiceConfig.Credentials = ServiceCredentials.LocalSystem;
+                }
+                else if (CheckBoxUseVirtualAccount.IsChecked ?? false)            
+                {
+                    _tempServiceConfig.Credentials = ServiceCredentials.VirtualAccount;
                 }
                 else if (string.Equals(TextBoxPassword.Password, PLACEHOLDER_PASSWORD) && //Nothing has changed (null safe)
                          string.Equals(TextBoxUsername.Text, _tempServiceConfig.Credentials.Username)) //Nothing has changed (null safe
@@ -485,7 +498,7 @@ namespace DaemonMaster
                 #endregion
 
                 _tempServiceConfig.DisplayName = TextBoxDisplayName.Text;
-                _tempServiceConfig.ServiceName = "DaemonMaster_" + TextBoxServiceName.Text;
+                _tempServiceConfig.ServiceName = /*"DaemonMaster_"  + */ TextBoxServiceName.Text;
 
                 _tempServiceConfig.BinaryPath = TextBoxFilePath.Text;
 
@@ -572,8 +585,12 @@ namespace DaemonMaster
         {
             try
             {
-                //Only Check that right if its not the local system
-                if (!Equals(_tempServiceConfig.Credentials, ServiceCredentials.LocalSystem))
+                //Only set right it is not a build in account
+                if (!Equals(_tempServiceConfig.Credentials, ServiceCredentials.LocalSystem) &&
+                    !Equals(_tempServiceConfig.Credentials, ServiceCredentials.VirtualAccount) &&
+                    !Equals(_tempServiceConfig.Credentials, ServiceCredentials.LocalService) &&
+                    !Equals(_tempServiceConfig.Credentials, ServiceCredentials.NetworkService) &&
+                    !Equals(_tempServiceConfig.Credentials, ServiceCredentials.NoChange))
                 {
                     string username = _tempServiceConfig.Credentials.Username;
                     if (string.IsNullOrWhiteSpace(username))
