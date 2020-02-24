@@ -87,7 +87,7 @@ namespace DaemonMaster.Updater
         /// <param name="acceptPrerelease">If you want to accept prereleases as updates</param>
         /// <param name="accessToken">If you have an access token for the repo put it down here</param>
         /// <param name="myAssembly">If you want an other assembly the the calling assembly of the updater DLL file</param>
-        public static async Task StartAsync(string gitHubRepoPath, bool acceptPrerelease = false, string accessToken = null, Assembly myAssembly = null)
+        public static async Task StartAsync(string gitHubRepoPath, bool showNoUpdateFoundDialog = false, bool acceptPrerelease = false, string accessToken = null, Assembly myAssembly = null)
         {
             //Update checker already running
             if (_working)
@@ -134,6 +134,11 @@ namespace DaemonMaster.Updater
                         thread.Start();
                         thread.Join();
                     }
+                }
+                else
+                {
+                    if(showNoUpdateFoundDialog)
+                        MessageBox.Show(_resManager.GetString("no_update_found_text", CultureInfo.CurrentUICulture), _resManager.GetString("no_update_found", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Information);
                 }
 
                 _working = false;
@@ -202,7 +207,7 @@ namespace DaemonMaster.Updater
                 //Now we can close the updater itselfs
                 if (Application.Current != null)
                 {
-                    Application.Current.Dispatcher.BeginInvoke(new Action(() => Application.Current.Shutdown()));
+                    Application.Current.Dispatcher?.BeginInvoke(new Action(() => Application.Current.Shutdown()));
                 }
                 else
                 {

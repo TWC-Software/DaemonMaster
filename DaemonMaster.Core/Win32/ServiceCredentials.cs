@@ -31,6 +31,11 @@ namespace DaemonMaster.Core.Win32
         }
 
         /// <summary>
+        /// Empty password.
+        /// </summary>
+        public static SecureString EmptyPassword = string.Empty.ConvertStringToSecureString();
+
+        /// <summary>
         /// With in CreateService LocalSystem will be used with ChangeConfig nothing will be changed with the current user account
         /// </summary>
         public static ServiceCredentials NoChange = new ServiceCredentials(username: null, password: null);
@@ -38,7 +43,7 @@ namespace DaemonMaster.Core.Win32
         /// <summary>
         /// Local System is a very high-privileged built-in account. It has extensive privileges on the local system and acts as the computer on the network.
         /// </summary>
-        public static ServiceCredentials LocalSystem = new ServiceCredentials(username: @"LocalSystem", password: null);
+        public static ServiceCredentials LocalSystem = new ServiceCredentials(username: @"LocalSystem", password: EmptyPassword);
 
         /// <summary>
         /// The Local Service account is a built-in account that has the same level of access to resources and objects as members of the Users group. 
@@ -46,19 +51,25 @@ namespace DaemonMaster.Core.Win32
         /// Services that run as the Local Service account access network resources as a null session without credentials.
         /// Be aware that the Local Service account is not supported for the SQL Server or SQL Server Agent services.
         /// </summary>
-        public static ServiceCredentials LocalService = new ServiceCredentials(username: @"LocalService", password: null);
+        public static ServiceCredentials LocalService = new ServiceCredentials(username: @"LocalService", password: EmptyPassword);
 
         /// <summary>
         /// The Network Service account is a built-in account that has more access to resources and objects than members of the Users group.
         /// Services that run as the Network Service account access network resources by using the credentials of the computer account.
         /// </summary>
-        public static ServiceCredentials NetworkService = new ServiceCredentials(username: @"NetworkService", password: null);
+        public static ServiceCredentials NetworkService = new ServiceCredentials(username: @"NetworkService", password: EmptyPassword);
 
         /// <summary>
-        /// The Network Service account is a built-in account that has more access to resources and objects than members of the Users group.
-        /// Services that run as the Network Service account access network resources by using the credentials of the computer account.
+        /// Determines whether the credentials specifying a virtual account.
         /// </summary>
-        public static ServiceCredentials VirtualAccount = new ServiceCredentials(username: @"NT SERVICE\", password: null);
+        /// <param name="credentials">The credentials.</param>
+        /// <returns>
+        ///   <c>true</c> if it is virtual account; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool IsVirtualAccount(ServiceCredentials credentials)
+        {
+            return DaemonMasterUtils.GetDomainFromUsername(credentials.Username) == "NT SERVICE" && !string.IsNullOrWhiteSpace(DaemonMasterUtils.GetLoginFromUsername(credentials.Username)) && (credentials.Password == EmptyPassword || credentials.Password == null);
+        }
 
         /// <summary>
         ///  Determines whether the specified <see cref="System.Object" />, is equal to this instance.

@@ -26,6 +26,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Resources;
+using System.Security;
 using System.ServiceProcess;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -34,6 +35,7 @@ using DaemonMaster.Core;
 using DaemonMaster.Core.Win32;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using DaemonMaster.Language;
+using DaemonMasterService;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Tulpep.ActiveDirectoryObjectPicker;
@@ -121,7 +123,7 @@ namespace DaemonMaster
                 CheckBoxUseLocalSystem.IsChecked = true;
                 CheckBoxUseVirtualAccount.IsChecked = false;
             }
-            else if (Equals(_tempServiceConfig.Credentials, ServiceCredentials.VirtualAccount))
+            else if (ServiceCredentials.IsVirtualAccount(_tempServiceConfig.Credentials))
             {
                 TextBoxUsername.Text = string.Empty;
                 TextBoxPassword.Password = string.Empty;
@@ -407,7 +409,7 @@ namespace DaemonMaster
             args = args.Trim();
 
             //Remove double spaces etc
-            TextBoxParam.Text = Regex.Replace(args, @"\s+", " ");
+            TextBoxParam.Text = args;// Regex.Replace(args, @"\s+", " ");
         }
 
         #endregion
@@ -456,7 +458,7 @@ namespace DaemonMaster
                 }
                 else if (CheckBoxUseVirtualAccount.IsChecked ?? false)            
                 {
-                    _tempServiceConfig.Credentials = ServiceCredentials.VirtualAccount;
+                    _tempServiceConfig.Credentials = new ServiceCredentials("NT SERVICE\\" + _tempServiceConfig.ServiceName, ServiceCredentials.EmptyPassword);
                 }
                 else if (string.Equals(TextBoxPassword.Password, PLACEHOLDER_PASSWORD) && //Nothing has changed (null safe)
                          string.Equals(TextBoxUsername.Text, _tempServiceConfig.Credentials.Username)) //Nothing has changed (null safe
@@ -498,7 +500,7 @@ namespace DaemonMaster
                 #endregion
 
                 _tempServiceConfig.DisplayName = TextBoxDisplayName.Text;
-                _tempServiceConfig.ServiceName = /*"DaemonMaster_"  + */ TextBoxServiceName.Text;
+                _tempServiceConfig.ServiceName = TextBoxServiceName.Text;
 
                 _tempServiceConfig.BinaryPath = TextBoxFilePath.Text;
 
@@ -587,10 +589,10 @@ namespace DaemonMaster
             {
                 //Only set right it is not a build in account
                 if (!Equals(_tempServiceConfig.Credentials, ServiceCredentials.LocalSystem) &&
-                    !Equals(_tempServiceConfig.Credentials, ServiceCredentials.VirtualAccount) &&
                     !Equals(_tempServiceConfig.Credentials, ServiceCredentials.LocalService) &&
                     !Equals(_tempServiceConfig.Credentials, ServiceCredentials.NetworkService) &&
-                    !Equals(_tempServiceConfig.Credentials, ServiceCredentials.NoChange))
+                    !Equals(_tempServiceConfig.Credentials, ServiceCredentials.NoChange) &&
+                    !ServiceCredentials.IsVirtualAccount(_tempServiceConfig.Credentials)) //Normally all NT SERVICE\\... service has that right, so no need to add it.
                 {
                     string username = _tempServiceConfig.Credentials.Username;
                     if (string.IsNullOrWhiteSpace(username))

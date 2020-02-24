@@ -39,7 +39,7 @@ namespace DaemonMaster.Core.Config
         public string Language { get; set; } = "windows";
         public bool ActivateLegacyFunctions { get; set; } = false;
         public bool UseExperimentalFunctions { get; set; } = false;
-
         public bool UseOldNameBasedSearchSystemWithTheNewSystem { get; set; } = false;
+        public bool UnlockInteractiveServiceCreationOnNotSupportedSystem { get; set; } = false;
     }
 }

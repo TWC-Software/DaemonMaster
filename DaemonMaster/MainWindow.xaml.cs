@@ -208,7 +208,7 @@ namespace DaemonMaster
 
         private void MenuItem_CheckForUpdates_OnClick(object sender, RoutedEventArgs e)
         {
-            CheckForUpdates();
+            _ = Updater.Updater.StartAsync("https://github.com/TWC-Software/DaemonMaster", true);
         }
 
         private void MenuItem_Credits_OnClick(object sender, RoutedEventArgs e)
@@ -549,11 +549,6 @@ namespace DaemonMaster
             }
         }
 
-        private void CheckForUpdates()
-        {
-            _ = Updater.Updater.StartAsync("https://github.com/TWC-Software/DaemonMaster", false);
-        }
-
         #endregion
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -568,7 +563,7 @@ namespace DaemonMaster
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             //If Windows 10 1803 installed don't ask for start the UI0Detect service
-            if (true ||DaemonMasterUtils.IsSupportedWindows10VersionForIwd)
+            if (DaemonMasterUtils.IsSupportedWindows10VersionForIwd)
             {
                 //If Windows 10 1803 installed don't ask for UI0Detect registry key change
                 AskToEnableInteractiveServices();
@@ -581,7 +576,7 @@ namespace DaemonMaster
                 }
             }
 
-            CheckForUpdates();
+            _ = Updater.Updater.StartAsync("https://github.com/TWC-Software/DaemonMaster");
         }
 
         private void ProcessCollectionOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)

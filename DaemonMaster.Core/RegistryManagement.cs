@@ -109,10 +109,6 @@ namespace DaemonMaster.Core
                         {
                             rs.AddAccessRule(new RegistryAccessRule((NTAccount)new SecurityIdentifier(WellKnownSidType.NetworkServiceSid, null).Translate(typeof(NTAccount)), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
                         }
-                        else if (Equals(serviceDefinition.Credentials, ServiceCredentials.VirtualAccount))
-                        {
-                            rs.AddAccessRule(new RegistryAccessRule(new NTAccount("NT SERVICE\\" + serviceDefinition.ServiceName), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
-                        }
                         else
                         {
                             rs.AddAccessRule(new RegistryAccessRule(new NTAccount(serviceDefinition.Credentials.Username), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
@@ -147,11 +143,7 @@ namespace DaemonMaster.Core
 
 
                 string username = Convert.ToString(key.GetValue("ObjectName", ""));
-                if (DaemonMasterUtils.GetDomainFromUsername(username) == "NT SERVICE")
-                {
-                    serviceDefinition.Credentials = ServiceCredentials.VirtualAccount;
-                }
-                else if (string.IsNullOrWhiteSpace(username))
+                if (string.IsNullOrWhiteSpace(username))
                 {
                     serviceDefinition.Credentials = ServiceCredentials.LocalSystem;
                 }

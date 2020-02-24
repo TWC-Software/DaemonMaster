@@ -31,7 +31,10 @@ namespace DaemonMaster.Core
     {
         public static bool IsSupportedWindows10VersionForIwd
         {
-            get { return Environment.OSVersion.Version.Major < 10 || (Environment.OSVersion.Version.Major == 10 && Environment.OSVersion.Version.Build < 17134); }
+            get
+            {
+                return Config.ConfigManagement.GetConfig.UnlockInteractiveServiceCreationOnNotSupportedSystem || Environment.OSVersion.Version.Major < 10 || (Environment.OSVersion.Version.Major == 10 && Environment.OSVersion.Version.Build < 17134);
+            }
         }
 
         public static bool IsNt
@@ -130,6 +133,16 @@ namespace DaemonMaster.Core
         public static string ConvertNullTerminatedStringToString(this string s)
         {
             return s.TrimEnd('\0');
+        }
+
+        public static string SurroundWithDoubleQuotes(this string s)
+        {
+            return SurroundWith(s, "\"");
+        }
+
+        public static string SurroundWith(this string s, string value)
+        {
+            return value + s + value;
         }
     }
 }

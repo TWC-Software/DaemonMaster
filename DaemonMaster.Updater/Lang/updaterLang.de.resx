@@ -115,4 +115,10 @@
   <data name="warning" xml:space="preserve">
     <value>Warnung</value>
   </data>
+  <data name="no_update_found" xml:space="preserve">
+    <value>Keine Aktualisierung gefunden</value>
+  </data>
+  <data name="no_update_found_text" xml:space="preserve">
+    <value>Sie benutzten bereits die aktuellste Version von DaemonMaster.</value>
+  </data>
 </root>

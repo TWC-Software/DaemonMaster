@@ -115,4 +115,10 @@
   <data name="warning" xml:space="preserve">
     <value>Warning</value>
   </data>
+  <data name="no_update_found" xml:space="preserve">
+    <value>No update found</value>
+  </data>
+  <data name="no_update_found_text" xml:space="preserve">
+    <value>You are using currently the newest version of Daemon Master.</value>
+  </data>
 </root>
