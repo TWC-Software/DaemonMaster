@@ -62,7 +62,7 @@ namespace DaemonMasterService
             _config = ConfigManagement.GetConfig;
 
             //Get the service name
-            _serviceName = GetServiceName();
+            _serviceName =GetServiceName();
 
             try
             {

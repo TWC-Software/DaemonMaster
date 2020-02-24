@@ -53,10 +53,10 @@ namespace DaemonMaster.Core
 
         public static void SaveInRegistry(DmServiceDefinition serviceDefinition)
         {
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(RegPath + serviceDefinition.ServiceName))
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(RegPath + serviceDefinition.ServiceName, RegistryKeyPermissionCheck.ReadWriteSubTree))
             {
                 //Open Parameters SubKey
-                using (RegistryKey parameters = key.CreateSubKey("Parameters"))
+                using (RegistryKey parameters = key.CreateSubKey("Parameters", RegistryKeyPermissionCheck.ReadWriteSubTree))
                 {
                     //Strings
                     parameters.SetValue("BinaryPath", serviceDefinition.BinaryPath, RegistryValueKind.String);
@@ -79,7 +79,7 @@ namespace DaemonMaster.Core
 
 
                 //Create an give the user the permission to write to this key (needed for save the PID of the process if it's not the LocalSystem account)
-                using (RegistryKey processInfo = key.CreateSubKey("ProcessInfo"))
+                using (RegistryKey processInfo = key.CreateSubKey("ProcessInfo", RegistryKeyPermissionCheck.ReadWriteSubTree))
                 {
                     #region Setting permissions
                     //Only needed when user account has changed
@@ -127,7 +127,7 @@ namespace DaemonMaster.Core
         public static DmServiceDefinition LoadServiceStartInfosFromRegistry(string serviceName)
         {
             //Open Regkey folder
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + serviceName, false))
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + serviceName, RegistryKeyPermissionCheck.ReadSubTree))
             {
 
                 var serviceDefinition = new DmServiceDefinition(Convert.ToString(serviceName))
@@ -153,7 +153,7 @@ namespace DaemonMaster.Core
                 }
 
                 //Open Parameters SubKey
-                using (RegistryKey parameters = key.OpenSubKey("Parameters", false))
+                using (RegistryKey parameters = key.OpenSubKey("Parameters", RegistryKeyPermissionCheck.ReadSubTree))
                 {
                     serviceDefinition.BinaryPath = Convert.ToString(parameters.GetValue("BinaryPath"));
                     serviceDefinition.Arguments = Convert.ToString(parameters.GetValue("Arguments", string.Empty));
@@ -229,11 +229,11 @@ namespace DaemonMaster.Core
         {
             var daemons = new List<DmServiceDefinition>();
 
-            using (RegistryKey mainKey = Registry.LocalMachine.OpenSubKey(RegPath))
+            using (RegistryKey mainKey = Registry.LocalMachine.OpenSubKey(RegPath, RegistryKeyPermissionCheck.ReadSubTree))
             {
                 foreach (string serviceName in mainKey.GetSubKeyNames())
                 {
-                    using (RegistryKey key = mainKey.OpenSubKey(serviceName, false))
+                    using (RegistryKey key = mainKey.OpenSubKey(serviceName, RegistryKeyPermissionCheck.ReadSubTree))
                     {
                         //If the key invalid, skip this service
                         if (key == null)
@@ -255,7 +255,7 @@ namespace DaemonMaster.Core
                             Credentials = new ServiceCredentials(Convert.ToString(key.GetValue("ObjectName", ServiceCredentials.LocalSystem)), null),
                         };
 
-                        using (RegistryKey parameters = key.OpenSubKey("Parameters", false))
+                        using (RegistryKey parameters = key.OpenSubKey("Parameters", RegistryKeyPermissionCheck.ReadSubTree))
                         {
                             serviceDefinition.BinaryPath = Convert.ToString(parameters.GetValue("BinaryPath"));
                         }
@@ -284,9 +284,21 @@ namespace DaemonMaster.Core
 
         public static string ReadAndClearSessionUsername(string serviceName)
         {
+            //TODO: better method
+            string username;
+
+            //Just read here, so that restricted services crash not here
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + serviceName + "\\Parameters", false))
+            {
+                 username = Convert.ToString(key.GetValue("StartInSessionAs", string.Empty));
+            }
+
+            if (string.IsNullOrWhiteSpace(username))
+                return username;
+
+            //Write only when a name was in it
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + serviceName + "\\Parameters", true))
             {
-                string username = Convert.ToString(key.GetValue("StartInSessionAs", string.Empty));
                 key.SetValue("StartInSessionAs", string.Empty, RegistryValueKind.String);
                 return username;
             }

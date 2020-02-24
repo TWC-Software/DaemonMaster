@@ -106,7 +106,7 @@ namespace DaemonMaster.Core.Win32
                     serviceType,
                     serviceDefinition.StartType,
                     serviceDefinition.ErrorControl,
-                    DmServiceExe.SurroundWithDoubleQuotes(),
+                    DmServiceExe,
                     serviceDefinition.LoadOrderGroup,
                     tagId: 0, //Tags are only evaluated for driver services that have SERVICE_BOOT_START or SERVICE_SYSTEM_START start types.
                     Advapi32.ConvertDependenciesArraysToDoubleNullTerminatedString(serviceDefinition.DependOnService, serviceDefinition.DependOnGroup),

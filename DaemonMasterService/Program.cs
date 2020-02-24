@@ -46,6 +46,7 @@ namespace DaemonMasterService
 
         private static int RunServiceAndReturnExitCode(ServiceOptions opts)
         {
+
             SetupNLog();
             _logger = LogManager.GetCurrentClassLogger();
 
