@@ -44,7 +44,7 @@
                     <GroupBox x:Name="GroupBoxCustomUsername" Header="{x:Static resx:lang.groupbox_custom_user}" HorizontalAlignment="Left" Height="116" Margin="486,-3,0,0" VerticalAlignment="Top" Width="378">
                         <Grid HorizontalAlignment="Left" Height="100" Margin="0,0,-2,-6" VerticalAlignment="Top" Width="267">
                             <CheckBox x:Name="CheckBoxUseLocalSystem" Content="{x:Static resx:lang.checkbox_use_local_system_account}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" IsChecked="True" IsEnabled="{Binding ElementName=CheckBoxUseVirtualAccount, Path=IsChecked, TargetNullValue=false, Converter={StaticResource InvertBoolConverter}}" Width="168"/>
-                            <CheckBox x:Name="CheckBoxUseVirtualAccount" Content="{x:Static resx:lang.checkbox_use_virtual_account}" HorizontalAlignment="Left" Margin="183,10,-94,0" VerticalAlignment="Top" IsChecked="False"  IsEnabled="{Binding ElementName=CheckBoxUseLocalSystem, Path=IsChecked, TargetNullValue=false, Converter={StaticResource InvertBoolConverter}}" Width="178"/>
+                            <CheckBox x:Name="CheckBoxUseVirtualAccount" Content="{x:Static resx:lang.checkbox_use_virtual_account}" HorizontalAlignment="Left" Margin="183,10,-94,0" VerticalAlignment="Top" IsChecked="False" Unchecked="CheckBoxUseVirtualAccount_OnUnchecked" Checked="CheckBoxUseVirtualAccount_OnChecked" IsEnabled="{Binding ElementName=CheckBoxUseLocalSystem, Path=IsChecked, TargetNullValue=false, Converter={StaticResource InvertBoolConverter}}" Width="178"/>
 
                             <Label x:Name="LabelUsername" Content="{x:Static resx:lang.label_username}" HorizontalAlignment="Left" Margin="4,32,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.258,0.487"/>
                             <wpf:PlaceholderTextBox x:Name="TextBoxUsername" HorizontalAlignment="Left" Height="23" Margin="93,32,-35,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_username}" VerticalAlignment="Top" Width="209" IsReadOnly="False">
@@ -108,6 +108,11 @@
                             <Label x:Name="LabelShutdownConsoleApp" Content="{x:Static resx:lang.label_shutdown_console_app}" HorizontalAlignment="Left" Margin="174,44,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, ElementName=CheckBoxIsConsoleApp}"/>
                             <RadioButton x:Name="RadioButtonUseCtrlBreak" Content="{x:Static resx:lang.radiobutton_use_ctrlbreak}" HorizontalAlignment="Left" Margin="262,51,0,0" VerticalAlignment="Top" IsChecked="True" IsEnabled="{Binding IsChecked, ElementName=CheckBoxIsConsoleApp}"/>
                             <RadioButton x:Name="RadioButtonUseCtrlC" Content="{x:Static resx:lang.radiobutton_use_ctrlc}" HorizontalAlignment="Left" Margin="262,69,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, ElementName=CheckBoxIsConsoleApp}"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="{x:Static resx:lang.groupeBox_logging}" Margin="481,119,10.333,6.333" >
+                        <Grid Margin="0,0,-2.028,-0.86">
+                            <CheckBox x:Name="CheckBoxUseEventLog" Content="{x:Static resx:lang.checkbox_use_eventlog}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                         </Grid>
                     </GroupBox>
                 </Grid>

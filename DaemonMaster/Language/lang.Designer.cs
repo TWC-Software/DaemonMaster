@@ -394,6 +394,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Use event log ähnelt.
+        /// </summary>
+        public static string checkbox_use_eventlog {
+            get {
+                return ResourceManager.GetString("checkbox_use_eventlog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Use Local System account ähnelt.
         /// </summary>
         public static string checkbox_use_local_system_account {
@@ -580,6 +589,15 @@ namespace DaemonMaster.Language {
         public static string groupBox_process {
             get {
                 return ResourceManager.GetString("groupBox_process", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Logging ähnelt.
+        /// </summary>
+        public static string groupeBox_logging {
+            get {
+                return ResourceManager.GetString("groupeBox_logging", resourceCulture);
             }
         }
         

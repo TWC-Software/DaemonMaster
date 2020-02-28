@@ -540,4 +540,10 @@
   <data name="checkbox_use_virtual_account" xml:space="preserve">
     <value>Nutze virtuelles Dienstkonto</value>
   </data>
+  <data name="checkbox_use_eventlog" xml:space="preserve">
+    <value>Ereignisanzeige verwenden</value>
+  </data>
+  <data name="groupeBox_logging" xml:space="preserve">
+    <value>Ereignislogs</value>
+  </data>
 </root>

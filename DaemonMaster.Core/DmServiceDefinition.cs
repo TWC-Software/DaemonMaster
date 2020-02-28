@@ -100,6 +100,14 @@ namespace DaemonMaster.Core
         /// </summary>
         public ProcessPriorityClass ProcessPriority { get; set; } = ProcessPriorityClass.Normal;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the service should use the event log.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [use event log]; otherwise, <c>false</c>.
+        /// </value>
+        public bool UseEventLog { get; set; } = false;
+
         //----------------------------------------------------------------------------
 
         /// <summary>

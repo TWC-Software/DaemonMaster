@@ -17,7 +17,7 @@ namespace DaemonMasterService
 {
     internal static class Program
     {
-        private static Logger _logger;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Entry point of the application
@@ -26,6 +26,8 @@ namespace DaemonMasterService
         {
             try
             {
+                SetupNLog();
+
                 Parser.Default.ParseArguments<ServiceOptions, GeneralOptions, EditOptions, InstallOptions, ListOptions>(args) //Type must be a console app not a windows app
                     .MapResult(
                         (ServiceOptions opts) => RunServiceAndReturnExitCode(opts),
@@ -46,10 +48,6 @@ namespace DaemonMasterService
 
         private static int RunServiceAndReturnExitCode(ServiceOptions opts)
         {
-
-            SetupNLog();
-            _logger = LogManager.GetCurrentClassLogger();
-
             return StartService();
         }
 
@@ -356,13 +354,15 @@ namespace DaemonMasterService
             }
             catch (Exception ex)
             {
-                _logger.Error("Failed to start the service: \n" + ex.Message);
+                Logger.Error("Failed to start the service: \n" + ex.Message);
                 return 1;
             }
         }
 
         private static void SetupNLog()
         {
+            LogManager.KeepVariablesOnReload = true;
+
             //Create configuration object 
             var config = new LoggingConfiguration();
 
@@ -380,39 +380,40 @@ namespace DaemonMasterService
             var consoleTarget = new ColoredConsoleTarget("consoleTarget")
             {
                 Layout = @"${date:format=HH\:mm\:ss} ${level:uppercase=true} ${message} ${exception}",
-                DetectConsoleAvailable = false
+                DetectConsoleAvailable = true
             };
             config.AddTarget(consoleTarget);
             config.AddRule(LogLevel.Info, LogLevel.Fatal, consoleTarget);// only infos and higher
 
-#if DEBUG
-            var debugFileTarget = new FileTarget("debugFileTarget")
-            {
-                FileName = @"${basedir}\logs\Debug_${logDir}${var:logName}.${shortdate}.log",
-                Layout = @"${longdate}|${level:uppercase=true}|${exception:format=ToString,StackTrace}|${logger}|${message}",
-                ArchiveOldFileOnStartup = true,
-                ArchiveFileName = @"${basedir}\logs\archive\Debug_${archiveDir}${var:logName}.${shortdate}.{#####}.log",
-                ArchiveNumbering = ArchiveNumberingMode.Sequence,
-                MaxArchiveFiles = 10
-            };
-            config.AddTarget(debugFileTarget);
-            config.AddRuleForAllLevels(debugFileTarget);
-#else
-            var fileTarget = new FileTarget("fileTarget")
-            {
-                FileName = @"${basedir}\logs\${logDir}${var:logName}.${shortdate}.log",
-                Layout = @"${longdate}|${level:uppercase=true}|${exception:format=ToString,StackTrace}|${logger}|${message}",
-                ArchiveOldFileOnStartup = true,
-                ArchiveFileName = @"${basedir}\logs\archive\${var:logName}.${shortdate}.{#####}.log",
-                ArchiveNumbering = ArchiveNumberingMode.Sequence,
-                MaxArchiveFiles = 10
-            };
-            config.AddTarget(fileTarget);
-            config.AddRule(LogLevel.Info, LogLevel.Fatal, fileTarget); // only infos and higher
-#endif
+            //#if DEBUG
+            //            var debugFileTarget = new FileTarget("debugFileTarget")
+            //            {
+            //                FileName = @"${basedir}\logs\Debug_${logDir}${var:logName}.${shortdate}.log",
+            //                Layout = @"${longdate}|${level:uppercase=true}|${exception:format=ToString,StackTrace}|${logger}|${message}",
+            //                ArchiveOldFileOnStartup = true,
+            //                ArchiveFileName = @"${basedir}\logs\archive\Debug_${archiveDir}${var:logName}.${shortdate}.{#####}.log",
+            //                ArchiveNumbering = ArchiveNumberingMode.Sequence,
+            //                MaxArchiveFiles = 10
+            //            };
+            //            config.AddTarget(debugFileTarget);
+            //            config.AddRuleForAllLevels(debugFileTarget);
+            //#else
+            //            var fileTarget = new FileTarget("fileTarget")
+            //            {
+            //                FileName = @"${basedir}\logs\${logDir}${var:logName}.${shortdate}.log",
+            //                Layout = @"${longdate}|${level:uppercase=true}|${exception:format=ToString,StackTrace}|${logger}|${message}",
+            //                ArchiveOldFileOnStartup = true,
+            //                ArchiveFileName = @"${basedir}\logs\archive\${var:logName}.${shortdate}.{#####}.log",
+            //                ArchiveNumbering = ArchiveNumberingMode.Sequence,
+            //                MaxArchiveFiles = 10
+            //            };
+            //            config.AddTarget(fileTarget);
+            //            config.AddRule(LogLevel.Info, LogLevel.Fatal, fileTarget); // only infos and higher
+            //#endif
 
             //Activate the configuration
             LogManager.Configuration = config;
+            LogManager.ReconfigExistingLoggers();
         }
     }
 }

@@ -96,17 +96,21 @@ namespace DaemonMaster.CustomActions
         }
 
         [CustomAction]
-        public static ActionResult RemoveResidualFiles(Session session)
+        public static ActionResult Uninstall(Session session)
         {
-            session.Log("Beginning the uninstall of residual files.");
-
             try
             {
+                session.Log("Beginning the uninstall of residual files.");
+
                 string appFolder = session.CustomActionData["APPDIR"];
                 if (!string.IsNullOrWhiteSpace(appFolder) && Directory.Exists(appFolder))
                 {
                     Directory.Delete(appFolder, true);
                 }
+
+                session.Log("Beginning the uninstall of the event log source.");
+
+                EventLogManager.RemoveSource();
 
                 return ActionResult.Success;
             }

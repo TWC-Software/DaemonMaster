@@ -118,15 +118,13 @@ namespace DaemonMaster
 
             if (Equals(_tempServiceConfig.Credentials, ServiceCredentials.LocalSystem))
             {
-                TextBoxUsername.Text = string.Empty;
-                TextBoxPassword.Password = string.Empty;
+                TextBoxUsername.Clear();
+                TextBoxPassword.Clear();
                 CheckBoxUseLocalSystem.IsChecked = true;
                 CheckBoxUseVirtualAccount.IsChecked = false;
             }
             else if (ServiceCredentials.IsVirtualAccount(_tempServiceConfig.Credentials))
             {
-                TextBoxUsername.Text = string.Empty;
-                TextBoxPassword.Password = string.Empty;
                 CheckBoxUseVirtualAccount.IsChecked = true;
                 CheckBoxUseLocalSystem.IsChecked = false;
             }
@@ -190,6 +188,8 @@ namespace DaemonMaster
             {
                 CheckBoxInteractDesk.IsChecked = _tempServiceConfig.CanInteractWithDesktop;
             }
+
+            CheckBoxUseEventLog.IsChecked = _tempServiceConfig.UseEventLog;
 
             #endregion
 
@@ -345,6 +345,18 @@ namespace DaemonMaster
             ExportConfiguration();
         }
 
+        private void CheckBoxUseVirtualAccount_OnUnchecked(object sender, RoutedEventArgs e)
+        {
+            TextBoxUsername.Clear();
+            TextBoxPassword.Clear();
+        }
+     
+        private void CheckBoxUseVirtualAccount_OnChecked(object sender, RoutedEventArgs e)
+        {
+            TextBoxUsername.Text = "NT SERVICE\\" + _tempServiceConfig.ServiceName;
+            TextBoxPassword.Clear();
+        }
+
         #endregion
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -458,7 +470,7 @@ namespace DaemonMaster
                 }
                 else if (CheckBoxUseVirtualAccount.IsChecked ?? false)            
                 {
-                    _tempServiceConfig.Credentials = new ServiceCredentials("NT SERVICE\\" + _tempServiceConfig.ServiceName, ServiceCredentials.EmptyPassword);
+                    _tempServiceConfig.Credentials = new ServiceCredentials(TextBoxUsername.Text, ServiceCredentials.EmptyPassword);
                 }
                 else if (string.Equals(TextBoxPassword.Password, PLACEHOLDER_PASSWORD) && //Nothing has changed (null safe)
                          string.Equals(TextBoxUsername.Text, _tempServiceConfig.Credentials.Username)) //Nothing has changed (null safe
@@ -548,6 +560,7 @@ namespace DaemonMaster
                                              !(RadioButtonUseCtrlBreak.IsChecked ?? false);
 
                 _tempServiceConfig.CanInteractWithDesktop = CheckBoxInteractDesk.IsChecked ?? false;
+                _tempServiceConfig.UseEventLog = CheckBoxUseEventLog.IsChecked ?? false;
 
                 switch (ComboBoxStartType.SelectedIndex)
                 {

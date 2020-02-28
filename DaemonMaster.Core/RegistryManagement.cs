@@ -73,6 +73,7 @@ namespace DaemonMaster.Core
                     parameters.SetValue("IsConsoleApplication", serviceDefinition.IsConsoleApplication, RegistryValueKind.DWord);
                     parameters.SetValue("UseCtrlC", serviceDefinition.UseCtrlC, RegistryValueKind.DWord);
                     parameters.SetValue("CanInteractWithDesktop", serviceDefinition.CanInteractWithDesktop, RegistryValueKind.DWord);
+                    parameters.SetValue("UseEventLog", serviceDefinition.UseEventLog, RegistryValueKind.DWord);
 
                     parameters.Close();
                 }
@@ -165,6 +166,8 @@ namespace DaemonMaster.Core
                     serviceDefinition.IsConsoleApplication = Convert.ToBoolean(parameters.GetValue("IsConsoleApplication", false));
                     serviceDefinition.UseCtrlC = Convert.ToBoolean(parameters.GetValue("UseCtrlC", false));
                     serviceDefinition.CanInteractWithDesktop = Convert.ToBoolean(parameters.GetValue("CanInteractWithDesktop", false));
+                    serviceDefinition.UseEventLog = Convert.ToBoolean(parameters.GetValue("UseEventLog", false));
+
                     return serviceDefinition;
                 }
             }

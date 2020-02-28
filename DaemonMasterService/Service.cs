@@ -21,11 +21,10 @@
 using System;
 using System.Management;
 using System.ServiceProcess;
-using System.Timers;
 using DaemonMaster.Core;
-using DaemonMaster.Core.Config;
 using Microsoft.Win32;
 using NLog;
+using NLog.Targets;
 
 namespace DaemonMasterService
 {
@@ -34,10 +33,8 @@ namespace DaemonMasterService
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private static string _serviceName;
         private DmProcess _dmProcess;
-        private Timer _updateTimer;
-        private Config _config;
-
         private uint _oldProcessPid;
+        private DmServiceDefinition _serviceDefinition;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                              CONST                                                   //
@@ -46,7 +43,7 @@ namespace DaemonMasterService
         private const string RegPath = @"SYSTEM\CurrentControlSet\Services\";
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //                                             METHODS                                                  //
+        //                                        SERVICE METHODS                                               //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public Service()
@@ -58,26 +55,25 @@ namespace DaemonMasterService
         {
             base.OnStart(args);
 
-            //Get the config
-            _config = ConfigManagement.GetConfig;
-
-            //Get the service name
-            _serviceName =GetServiceName();
-
             try
             {
-                //Create a Timer to update the actual status of the service
-                _updateTimer = new Timer(_config.UpdateInterval);
-                _updateTimer.Elapsed += UpdateTimerOnElapsed;
-                _updateTimer.Enabled = true;
+                //Get the service name
+                _serviceName = GetServiceName();
 
+                //Get data from registry 
+                _serviceDefinition = RegistryManagement.LoadServiceStartInfosFromRegistry(_serviceName);
 
-                //Change the filename of the log file to the service name
-                if (LogManager.Configuration != null)
-                    LogManager.Configuration.Variables["logName"] = _serviceName;
+                //--------------------------------------------------------------------
+
+                //Setup NLOG for the service
+                if (_serviceDefinition.UseEventLog)
+                    SetupEventLogService();
+
+                //Request additional time
+                RequestAdditionalTime(_serviceDefinition.ProcessTimeoutTime + 1000);
 
                 //Create a new DmProcess instance with reg data
-                _dmProcess = new DmProcess(RegistryManagement.LoadServiceStartInfosFromRegistry(_serviceName));
+                _dmProcess = new DmProcess(_serviceDefinition);
                 _dmProcess.MaxRestartsReached += DmProcessOnMaxRestartsReached;
                 _dmProcess.UpdateProcessPid += DmProcessOnUpdateProcessPid;
 
@@ -105,6 +101,10 @@ namespace DaemonMasterService
         {
             try
             {
+                //Request additional time
+                if (_serviceDefinition != null)
+                    RequestAdditionalTime(_serviceDefinition.ProcessTimeoutTime + 1000);
+
                 _dmProcess.StopProcess();
             }
             catch (Exception ex)
@@ -145,29 +145,20 @@ namespace DaemonMasterService
         }
 
 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                             OTHER                                                    //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         private void DmProcessOnMaxRestartsReached(object sender, EventArgs e)
         {
             Stop();
         }
 
-        private void DmProcessOnUpdateProcessPid(object sender, EventArgs e)
-        {
-            UpdateProcessPid();
-        }
-
-        private void UpdateTimerOnElapsed(object sender, ElapsedEventArgs e)
-        {
-            UpdateProcessPid();
-        }
-
-        /// <summary>
-        /// Updates the process pid.
-        /// </summary>
-        private void UpdateProcessPid()
+        private void DmProcessOnUpdateProcessPid(object sender, uint pid)
         {
             try
             {
-                if (_dmProcess == null || _oldProcessPid == _dmProcess.ProcessPid)
+                if (_oldProcessPid == pid)
                     return;
 
                 using (RegistryKey processKey = Registry.LocalMachine.OpenSubKey(RegPath + _serviceName + @"\ProcessInfo", true))
@@ -175,12 +166,12 @@ namespace DaemonMasterService
                     if (processKey == null)
                         return;
 
-                    processKey.SetValue("ProcessPid", _dmProcess.ProcessPid, RegistryValueKind.DWord);
+                    processKey.SetValue("ProcessPid", pid, RegistryValueKind.DWord);
 
                     processKey.Close();
                 }
 
-                _oldProcessPid = _dmProcess.ProcessPid;
+                _oldProcessPid = pid;
             }
             catch (Exception ex)
             {
@@ -209,6 +200,31 @@ namespace DaemonMasterService
             }
 
             throw new Exception("Can't get the service name.");
+        }
+
+        private static void SetupEventLogService()
+        {
+            if (LogManager.Configuration == null)
+                return;
+
+            //Create targets and adding rules
+            var serviceEventLogTarget = new EventLogTarget("eventLogTarget")
+            {
+                Layout = "Service: " + _serviceName + "\n" + @"${date:format=HH\:mm\:ss} ${level:uppercase=true} ${message} ${exception}",
+                OptimizeBufferReuse = true,
+                Source = EventLogManager.EventSource,
+                Name = EventLogManager.EventLogName
+            };
+
+            LogManager.Configuration.AddTarget(serviceEventLogTarget);
+
+#if DEBUG
+            LogManager.Configuration.AddRule(LogLevel.Info, LogLevel.Fatal, serviceEventLogTarget);// only infos and higher
+#else
+            LogManager.Configuration.AddRule(LogLevel.Debug, LogLevel.Fatal, serviceEventLogTarget);// only infos and higher
+#endif
+
+            LogManager.ReconfigExistingLoggers();
         }
     }
 }

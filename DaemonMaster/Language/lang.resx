@@ -542,4 +542,10 @@
   <data name="checkbox_use_virtual_account" xml:space="preserve">
     <value>Use virtual service account</value>
   </data>
+  <data name="checkbox_use_eventlog" xml:space="preserve">
+    <value>Use event log</value>
+  </data>
+  <data name="groupeBox_logging" xml:space="preserve">
+    <value>Logging</value>
+  </data>
 </root>

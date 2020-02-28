@@ -19,10 +19,14 @@
 
 
 using System;
+using System.Diagnostics;
 using System.Globalization;
+using System.Resources;
 using System.Threading;
 using System.Windows;
+using DaemonMaster.Core;
 using DaemonMaster.Core.Config;
+using DaemonMaster.Language;
 
 namespace DaemonMaster
 {
@@ -31,6 +35,9 @@ namespace DaemonMaster
     /// </summary>
     public partial class App : Application
     {
+        private const string EventLogSource = "DaemonMaster";
+        private static readonly ResourceManager ResManager = new ResourceManager(typeof(lang));
+
         App()
         {
             InitializeComponent();
@@ -39,9 +46,10 @@ namespace DaemonMaster
         [STAThread]
         public static void Main()
         {
+            CreateAndCheckEventLogSource();
+
             //Load and apply config
             Config config = ConfigManagement.LoadConfig();
-
 
             #region Chose language
 
@@ -78,6 +86,18 @@ namespace DaemonMaster
             var app = new App();
             var mainWindow = new MainWindow();
             app.Run(mainWindow);
+        }
+
+        private static void CreateAndCheckEventLogSource()
+        {
+            try
+            {
+                EventLogManager.CheckSourceExists();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ResManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

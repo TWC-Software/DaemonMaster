@@ -82,7 +82,7 @@ namespace DaemonMasterService
         /// <summary>
         /// Occurs when the pid of the process updates.
         /// </summary>
-        internal event EventHandler UpdateProcessPid;
+        internal event EventHandler<uint> UpdateProcessPid;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                        Constructor + Init                                            //
@@ -421,7 +421,7 @@ namespace DaemonMasterService
         private void ProcessOnExited(object sender, EventArgs eventArgs)
         {
             //Trigger event to update pid
-            OnUpdateProcessPid();
+            OnUpdateProcessPid(0);
 
             if (_serviceDefinition.CounterResetTime != 0)
             {
@@ -471,9 +471,9 @@ namespace DaemonMasterService
             MaxRestartsReached?.Invoke(this, EventArgs.Empty);
         }
 
-        protected virtual void OnUpdateProcessPid()
+        protected virtual void OnUpdateProcessPid(uint? pid = null)
         {
-            UpdateProcessPid?.Invoke(this, EventArgs.Empty);
+            UpdateProcessPid?.Invoke(this, pid ?? ProcessPid);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -574,6 +574,8 @@ namespace DaemonMasterService
         public void Close()
         {
             _process?.Dispose();
+
+            OnUpdateProcessPid();
         }
 
         //Public implementation of Dispose pattern.

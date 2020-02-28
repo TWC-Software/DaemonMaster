@@ -46,6 +46,7 @@
     <Compile Include="Config\ConfigManagement.cs" />
     <Compile Include="DaemonMasterUtils.cs" />
     <Compile Include="DmServiceDefinition.cs" />
+    <Compile Include="EventLogManager.cs" />
     <Compile Include="Exceptions\ServiceNotStoppedException.cs" />
     <Compile Include="Exceptions\ServiceStoppedException.cs" />
     <Compile Include="Jobs\KillChildProcessJob.cs" />
