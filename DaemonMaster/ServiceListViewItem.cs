@@ -83,27 +83,20 @@ namespace DaemonMaster
         /// </summary>
         public void UpdateStatus()
         {
-            //Get Service ID
-            uint servicePid;
+            //Set service PID
             using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
             {
                 using (ServiceHandle serviceHandle = scm.OpenService(ServiceName, Advapi32.ServiceAccessRights.QueryStatus))
                 {
-                    servicePid = serviceHandle.GetServicePid();
+                    Advapi32.ServiceStatusProcess serviceStatus = serviceHandle.QueryServiceStatus();
+
+                    ServicePid = serviceStatus.processId <= 0 ? (uint?) null : serviceStatus.processId;
+                    ServiceState = Enum.TryParse(serviceStatus.currentState.ToString(), out ServiceControllerStatus outValue) ? outValue : ServiceControllerStatus.Stopped;
                 }
             }
 
-            if (servicePid < 1)
-            {
-                ServicePid = null;
-            }
-            else
-            {
-                ServicePid = servicePid;
-            }
-
-            //Get process PID
-            if (servicePid != 0) //normally no process can run when the service has been stopped
+            //Set process PID
+            if (ServicePid != null) //normally no process can run when the service has been stopped
             {
                 using (RegistryKey processKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\" + ServiceName + @"\ProcessInfo", false))
                 {
@@ -111,30 +104,12 @@ namespace DaemonMaster
                         return;
 
                     uint processPid = Convert.ToUInt32(processKey.GetValue("ProcessPid", 0));
-
-                    if (processPid <= 0)
-                    {
-                        ProcessPid = null;
-                    }
-                    else
-                    {
-                        ProcessPid = processPid;
-                    }
-
-
-                    processKey.Close();
+                    ProcessPid = processPid <= 0 ? (uint?) null : processPid;
                 }
             }
             else
             {
-                //TODO: Better way to fix this problem
                 ProcessPid = null;
-            }
-
-            //Get service status
-            using (var serviceController = new ServiceController(ServiceName))
-            {
-                ServiceState = serviceController.Status;
             }
         }
 

@@ -228,11 +228,12 @@ namespace DaemonMaster
         {
             if (string.IsNullOrWhiteSpace(TextBoxFilter.Text))
             {
-                if (Equals(ListViewDaemons.ItemsSource, _processCollection) || ListViewDaemons.Items.Count <= 0)
+                if (Equals(ListViewDaemons.ItemsSource, _processCollection))
                     return;
 
                 ListViewDaemons.Items.Clear();
                 ListViewDaemons.ItemsSource = _processCollection;
+                return;
             }
 
             ListViewDaemons.ItemsSource = null;

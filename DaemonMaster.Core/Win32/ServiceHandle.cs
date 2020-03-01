@@ -57,9 +57,6 @@ namespace DaemonMaster.Core.Win32
         /// </summary>
         public void DeleteService()
         {
-            if (QueryServiceStatus().currentState != Advapi32.ServiceCurrentState.Stopped)
-                throw new ServiceNotStoppedException();
-
             if (!Advapi32.DeleteService(serviceHandle: this))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
@@ -319,15 +316,12 @@ namespace DaemonMaster.Core.Win32
         //TODO: Rest of ChangeServiceConfig2
 
         /// <summary>
-        /// Gets the service pid.
+        /// Gets the service pid. If the process id is invalid the method returns the default value of the type (in this case: null).
         /// </summary>
         /// <returns></returns>
         public uint GetServicePid()
         {
-            if (IsInvalid)
-                return 0;
-
-            return QueryServiceStatus().processId;
+            return IsClosed ? 0 : QueryServiceStatus().processId;
         }
 
         /// <summary>
