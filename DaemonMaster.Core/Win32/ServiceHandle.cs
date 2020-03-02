@@ -120,16 +120,9 @@ namespace DaemonMaster.Core.Win32
                 throw new ServiceNotStoppedException();
 
             var serviceType = Advapi32.ServiceType.Win32OwnProcess; //DM only supports Win32OwnProcess
-            if (Equals(credentials, ServiceCredentials.LocalSystem) && canInteractWithDesktop && !DaemonMasterUtils.IsSupportedWindows10VersionForIwd)
+            if (Equals(credentials, ServiceCredentials.LocalSystem) && canInteractWithDesktop)
             {
-                if (DaemonMasterUtils.IsSupportedWindows10VersionForIwd)
-                {
-                    serviceType |= Advapi32.ServiceType.InteractivProcess;
-                }
-                else
-                {
-                    throw new ArgumentException("Can interact with desktop is currently not supported in your windows version.");
-                }
+                serviceType |= Advapi32.ServiceType.InteractivProcess;
             }
 
             //The credentials can't be null

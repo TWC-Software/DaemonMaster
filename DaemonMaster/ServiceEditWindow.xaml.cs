@@ -353,8 +353,12 @@ namespace DaemonMaster
      
         private void CheckBoxUseVirtualAccount_OnChecked(object sender, RoutedEventArgs e)
         {
-            TextBoxUsername.Text = "NT SERVICE\\" + _tempServiceConfig.ServiceName;
-            TextBoxPassword.Clear();
+            RenewVirtualAccountName();
+        }
+
+        private void TextBoxServiceName_OnLostFocus(object sender, RoutedEventArgs routedEventArgs)
+        {
+            RenewVirtualAccountName();
         }
 
         #endregion
@@ -431,6 +435,15 @@ namespace DaemonMaster
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         #region Other
+
+        private void RenewVirtualAccountName()
+        {
+            if (!CheckBoxUseVirtualAccount.IsChecked ?? false)
+                return;
+
+            TextBoxUsername.Text = "NT SERVICE\\" + TextBoxServiceName.Text;
+            TextBoxPassword.Clear();
+        }
 
         private void SaveConfiguration()
         {
@@ -632,10 +645,10 @@ namespace DaemonMaster
                     {
                         scm.CreateService(_tempServiceConfig);
 
-                        //When no exception has been throwed show up a message
-                        MessageBox.Show(
-                            _resManager.GetString("the_service_installation_was_successful", CultureInfo.CurrentUICulture),
-                            _resManager.GetString("success", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Information);
+                        ////When no exception has been throwed show up a message (no longer)
+                        //MessageBox.Show(
+                        //    _resManager.GetString("the_service_installation_was_successful", CultureInfo.CurrentUICulture),
+                        //    _resManager.GetString("success", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
                 else

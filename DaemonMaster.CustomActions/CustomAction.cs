@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using DaemonMaster.Core;
 using DaemonMaster.Core.Win32;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
@@ -121,7 +122,7 @@ namespace DaemonMaster.CustomActions
 
                     //Delete parent folder when it is empty
                     di = di.Parent;
-                    if (di != null && di.GetFiles().Length == 0 && di.GetDirectories().Length == 0)
+                    if (di != null && !di.EnumerateFiles("*", SearchOption.AllDirectories).Any())
                     {
                         di.Delete(true);
                     }

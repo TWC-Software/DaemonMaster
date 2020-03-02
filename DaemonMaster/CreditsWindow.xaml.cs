@@ -43,8 +43,8 @@ namespace DaemonMaster
                 "   => ListView Layout Manager - Jani Giannoudis - CPOL License \n" +
                 "   => CommandLineParser - Giacomo Stelluti Scala & Contributors - MIT License \n\n" +
                 "Also thanks to: \n" +
-                "   - PInvoke.net \n " +
-                "   - stackoverflow.com (for help from the users) \n " +
+                "   - PInvoke.net \n" +
+                "   - stackoverflow.com (for help from the users) \n" +
                 "   - entwickler-ecke.de (for help from the users)";
 
             LabelVersion.Content = "v" + Assembly.GetExecutingAssembly().GetName().Version;

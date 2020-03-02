@@ -79,14 +79,7 @@ namespace DaemonMaster.Core.Win32
             var serviceType = Advapi32.ServiceType.Win32OwnProcess; //DM only supports Win32OwnProcess
             if (Equals(serviceDefinition.Credentials, ServiceCredentials.LocalSystem) && serviceDefinition.CanInteractWithDesktop)
             {
-                if (DaemonMasterUtils.IsSupportedWindows10VersionForIwd)
-                {
-                    serviceType |= Advapi32.ServiceType.InteractivProcess;
-                }
-                else
-                {
-                    throw new ArgumentException("Can interact with desktop is not supported by your windows version.");
-                }
+                serviceType |= Advapi32.ServiceType.InteractivProcess;
             }
 
             //The credentials can't be null
@@ -176,7 +169,7 @@ namespace DaemonMaster.Core.Win32
                 bytesNeeded++;
 
                 //Allocate the required buffer size
-                bufferPtr = Marshal.AllocHGlobal((int)bytesNeeded); 
+                bufferPtr = Marshal.AllocHGlobal((int)bytesNeeded);
 
 
                 if (!Advapi32.GetServiceKeyName(this, displayName, bufferPtr, ref bytesNeeded))

@@ -88,15 +88,19 @@ namespace DaemonMasterService
                     return -1;
                 }
 
-                string prefixedServiceName = "DaemonMaster_" + opts.ServiceName;
-                if (!RegistryManagement.IsDaemonMasterService(prefixedServiceName))
+                string realServiceName = opts.ServiceName;
+                if (!RegistryManagement.IsDaemonMasterService(realServiceName))
                 {
-                    Console.WriteLine("Cannot found a DaemonMaster service with the given name.");
-                    return -1;
+                    realServiceName = "DaemonMaster_" + realServiceName; //Check for the name of the old system TODO: remove later
+                    if (!RegistryManagement.IsDaemonMasterService(realServiceName))
+                    {
+                        Console.WriteLine("Cannot found a DaemonMaster service with the given name.");
+                        return -1;
+                    }
                 }
 
                 //Load data from registry
-                serviceDefinition = RegistryManagement.LoadServiceStartInfosFromRegistry(prefixedServiceName);
+                serviceDefinition = RegistryManagement.LoadServiceStartInfosFromRegistry(realServiceName);
             }
             catch (Exception)
             {
@@ -153,8 +157,7 @@ namespace DaemonMasterService
                 return -1;
             }
 
-            string prefixedServiceName = "DaemonMaster_" + opts.ServiceName;
-            var serviceDefinition = new DmServiceDefinition(prefixedServiceName)
+            var serviceDefinition = new DmServiceDefinition(opts.ServiceName)
             {
                 BinaryPath = opts.FullPath,
                 DisplayName = opts.DisplayName
@@ -202,7 +205,7 @@ namespace DaemonMasterService
                     var sb = new StringBuilder();
                     sb.Append(i);
                     sb.Append(": ");
-                    sb.Append(services[i].ServiceName.Length > 13 ? services[i].ServiceName.Remove(0, 13) : services[i].ServiceName); //Remove internally used prefix
+                    sb.Append(services[i].ServiceName.Contains("DaemonMaster_") ? services[i].ServiceName.Remove(0, 13) : services[i].ServiceName); //Remove internally used prefix TODO: remove that on a later release
                     sb.Append(" / ");
                     sb.Append(services[i].DisplayName);
                     Console.WriteLine(sb);
@@ -313,7 +316,7 @@ namespace DaemonMasterService
 
             //Custom user
             //Create new ServiceCredentials instance
-            if (!string.IsNullOrWhiteSpace(serviceDefinition.Credentials.Username) && serviceDefinition.Credentials.Password != null)
+            if (!string.IsNullOrWhiteSpace(serviceDefinition.Credentials.Username) && serviceDefinition.Credentials.Password != null && !ServiceCredentials.IsVirtualAccount(serviceDefinition.Credentials))
             {
                 //Check if he has the right to start as service
                 using (LsaPolicyHandle lsaWrapper = LsaPolicyHandle.OpenPolicyHandle())

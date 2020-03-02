@@ -22,7 +22,7 @@
             <TabItem Header="{x:Static resx:lang.tabitem_general}" IsSelected="True">
                 <Grid>
                     <Label x:Name="LabelServiceName" Content="{x:Static resx:lang.label_service_name}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-                    <wpf:PlaceholderTextBox x:Name="TextBoxServiceName" Height="23" Margin="147,14,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_service_name}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" />
+                    <wpf:PlaceholderTextBox x:Name="TextBoxServiceName" Height="23" Margin="147,14,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_service_name}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" LostFocus="TextBoxServiceName_OnLostFocus" />
                     <Label x:Name="LabelDisplayName" Content="{x:Static resx:lang.label_display_name}" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top"/>
                     <wpf:PlaceholderTextBox x:Name="TextBoxDisplayName" Height="23" Margin="147,42,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_display_name}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
                     <Label x:Name="LabelDescription" Content="{x:Static resx:lang.label_description}" HorizontalAlignment="Left" Margin="10,66,0,0" VerticalAlignment="Top"/>

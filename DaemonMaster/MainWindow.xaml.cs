@@ -250,20 +250,18 @@ namespace DaemonMaster
         {
             try
             {
-                //Wenn der RegKey nicht gestetzt ist, soll der Nutzer gefragt werden
-                if (!RegistryManagement.CheckNoInteractiveServicesRegKey())
+                //Ask the user if the key is no set
+                if (!RegistryManagement.CheckInteractiveServices())
                 {
                     MessageBoxResult result = MessageBox.Show(_resManager.GetString("interactive_service_regkey_not_set"), _resManager.GetString("question"), MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if (result == MessageBoxResult.Yes)
-                    {
-                        if (!RegistryManagement.EnableInteractiveServices(true))
-                        {
-                            MessageBox.Show(_resManager.GetString("problem_occurred"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-                            return false;
-                        }
+                    if (result != MessageBoxResult.Yes)
+                        return false;
 
+                    if (RegistryManagement.EnableInteractiveServices(true)) 
                         return true;
-                    }
+
+                    MessageBox.Show(_resManager.GetString("problem_occurred"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
                 }
 
                 return false;
@@ -318,8 +316,8 @@ namespace DaemonMaster
                 }
                 _processCollection.Remove(_processCollection.Single(i => i.ServiceName == serviceListViewItem.ServiceName));
 
-                MessageBox.Show(_resManager.GetString("the_service_deletion_was_successful"),
-                    _resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
+                //MessageBox.Show(_resManager.GetString("the_service_deletion_was_successful"),
+                //    _resManager.GetString("success"), MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (ServiceNotStoppedException)
             {
@@ -528,7 +526,7 @@ namespace DaemonMaster
             if (DaemonMasterUtils.CheckUi0DetectService())
             {
                 //if its Windows 10 then showing a warning message
-                if (DaemonMasterUtils.IsSupportedWindows10VersionForIwd)
+                if (Environment.OSVersion.Version.Major == 10)
                 {
                     MessageBoxResult result =
                         MessageBox.Show(_resManager.GetString("windows10_mouse_keyboard", CultureInfo.CurrentUICulture),

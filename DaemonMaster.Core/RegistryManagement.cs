@@ -74,8 +74,6 @@ namespace DaemonMaster.Core
                     parameters.SetValue("UseCtrlC", serviceDefinition.UseCtrlC, RegistryValueKind.DWord);
                     parameters.SetValue("CanInteractWithDesktop", serviceDefinition.CanInteractWithDesktop, RegistryValueKind.DWord);
                     parameters.SetValue("UseEventLog", serviceDefinition.UseEventLog, RegistryValueKind.DWord);
-
-                    parameters.Close();
                 }
 
 
@@ -119,8 +117,6 @@ namespace DaemonMaster.Core
 
                         #endregion
                     }
-
-                    processInfo.Close();
                 }
             }
         }
@@ -189,7 +185,7 @@ namespace DaemonMaster.Core
 
             if (ConfigManagement.GetConfig.UseOldNameBasedSearchSystemWithTheNewSystem)
             {
-                services.AddRange(LoadInstalledServicesOldSystem().Where(x => services.All(y => y.ServiceName != x.ServiceName)));
+                services.AddRange(LoadInstalledServicesOldSystem().Where(x => services.All(y => y.ServiceName != x.ServiceName))); //TODO: remove in one of the next releases
             }
 
             return services;
@@ -293,7 +289,7 @@ namespace DaemonMaster.Core
             //Just read here, so that restricted services crash not here
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + serviceName + "\\Parameters", false))
             {
-                 username = Convert.ToString(key.GetValue("StartInSessionAs", string.Empty));
+                username = Convert.ToString(key.GetValue("StartInSessionAs", string.Empty));
             }
 
             if (string.IsNullOrWhiteSpace(username))
@@ -311,24 +307,29 @@ namespace DaemonMaster.Core
 
         public static bool IsDaemonMasterService(string serviceName)
         {
-            //For new system
-            using (RegistryKey keyNew = Registry.LocalMachine.OpenSubKey(RegPath + serviceName, false))
+            try
             {
-                if (keyNew != null)
+                //For new system
+                using (RegistryKey keyNew = Registry.LocalMachine.OpenSubKey(RegPath + serviceName, false))
                 {
-                    if (serviceName.Contains("DaemonMaster_"))
-                        return true; //Old system
+                    if (keyNew != null)
+                    {
+                        //Get the exe path of the service to determine later if its a service from DaemonMaster
+                        string serviceExePath = Convert.ToString(keyNew.GetValue("ImagePath") ?? string.Empty);
 
-                    //Get the exe path of the service to determine later if its a service from DaemonMaster
-                    string serviceExePath = Convert.ToString(keyNew.GetValue("ImagePath") ?? string.Empty);
-
-                    //Check the path
-                    if (!string.IsNullOrWhiteSpace(serviceExePath) && serviceExePath.Contains(ServiceControlManager.DmServiceExe))
-                        return true; //New system
+                        //Check the path
+                        if (!string.IsNullOrWhiteSpace(serviceExePath) && serviceExePath.Contains(ServiceControlManager.DmServiceExe))
+                            return true; //New system
+                    }
                 }
-            }
 
-            return false;
+                return false;
+
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public static string[] GetAllServiceGroups()
@@ -342,15 +343,8 @@ namespace DaemonMaster.Core
 
 
 
-
-
-        //Set NoInteractiveServices to 0
         public static bool EnableInteractiveServices(bool enable)
         {
-            //If Windows10 1803 or higher return false (UI0Detect service does not exist anymore)
-            if (!DaemonMasterUtils.IsSupportedWindows10VersionForIwd)
-                return false;
-
             try
             {
                 using (RegistryKey regKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Windows", true))
@@ -359,7 +353,6 @@ namespace DaemonMaster.Core
                         return false;
 
                     regKey.SetValue("NoInteractiveServices", enable ? 0 : 1, RegistryValueKind.DWord);
-                    regKey.Close();
                     return true;
                 }
             }
@@ -369,18 +362,13 @@ namespace DaemonMaster.Core
             }
         }
 
-        //Check if NoInteractiveServices is 0
-        public static bool CheckNoInteractiveServicesRegKey()
+        public static bool CheckInteractiveServices()
         {
-            //If Windows10 1803 or higher return false (UI0Detect service does not exist anymore)
-            if (!DaemonMasterUtils.IsSupportedWindows10VersionForIwd)
-                return false;
-
             try
             {
                 using (RegistryKey regKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Windows", false))
                 {
-                    return regKey != null && !Convert.ToBoolean(regKey.GetValue("NoInteractiveServices"));
+                    return regKey != null && Convert.ToBoolean(regKey.GetValue("NoInteractiveServices", false));
                 }
             }
             catch
