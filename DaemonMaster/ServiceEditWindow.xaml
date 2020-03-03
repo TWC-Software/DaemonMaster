@@ -51,7 +51,7 @@
                                 <wpf:PlaceholderTextBox.IsEnabled>
                                     <MultiBinding Converter="{StaticResource AddConverter}">
                                         <Binding ElementName="CheckBoxUseLocalSystem" Path="IsChecked" TargetNullValue="false" Converter="{StaticResource InvertBoolConverter}"/>
-                                        <Binding ElementName="CheckBoxUseVirtualAccount" Path="IsChecked" TargetNullValue="false" Converter="{StaticResource InvertBoolConverter}"/>
+                                        <!--<Binding ElementName="CheckBoxUseVirtualAccount" Path="IsChecked" TargetNullValue="false" Converter="{StaticResource InvertBoolConverter}"/>-->
                                     </MultiBinding>
                                 </wpf:PlaceholderTextBox.IsEnabled>
                             </wpf:PlaceholderTextBox>

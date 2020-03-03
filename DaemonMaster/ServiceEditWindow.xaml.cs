@@ -31,6 +31,7 @@ using System.ServiceProcess;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media;
 using DaemonMaster.Core;
 using DaemonMaster.Core.Win32;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
@@ -83,7 +84,12 @@ namespace DaemonMaster
             if (!string.IsNullOrWhiteSpace(_tempServiceConfig.ServiceName))
                 TextBoxServiceName.Text = _tempServiceConfig.ServiceName;
 
-            TextBoxServiceName.IsReadOnly = !_createNewService;
+            if (!_createNewService)
+            {
+                TextBoxServiceName.IsReadOnly = true;
+                TextBoxServiceName.Foreground = Brushes.Gray;
+                TextBoxServiceName.BorderBrush = Brushes.LightGray;
+            }
 
             TextBoxDisplayName.Text = _tempServiceConfig.DisplayName;
 
@@ -347,7 +353,11 @@ namespace DaemonMaster
 
         private void CheckBoxUseVirtualAccount_OnUnchecked(object sender, RoutedEventArgs e)
         {
+            TextBoxUsername.IsReadOnly = false;
+            TextBoxUsername.Foreground = Brushes.Black;
+            TextBoxUsername.BorderBrush = Brushes.DarkGray;
             TextBoxUsername.Clear();
+
             TextBoxPassword.Clear();
         }
      
@@ -442,6 +452,10 @@ namespace DaemonMaster
                 return;
 
             TextBoxUsername.Text = "NT SERVICE\\" + TextBoxServiceName.Text;
+            TextBoxUsername.IsReadOnly = true;
+            TextBoxUsername.Foreground = Brushes.Gray;
+            TextBoxUsername.BorderBrush = Brushes.LightGray;
+
             TextBoxPassword.Clear();
         }
 
