@@ -14,10 +14,10 @@ You can download the pre-release here: [Click here](https://github.com/TWC-Softw
 - Works with .bat files
 - Automatic service-startup with Windows itself (Manual, Automatic with delay and Disabled works also)
 - Custom username and password for a service
+- Support for "Virtual accounts" (virtual service accounts) 
 - Works very well for game servers (tested on DayZ/Arma and Minecraft, but should work well with other games as well; if not, any bug reports are welcome)
-
+- Command line parameters (expertimental)
 ## Planned Features
-- Command line parameters
 
 ## Thanks to 
 - **Advanced Installer (for the open source license)** 
@@ -29,6 +29,7 @@ You can download the pre-release here: [Click here](https://github.com/TWC-Softw
 ## Used Libraries
 - Newtonsoft.Json - James Newton - King - MIT License
 - NLog - Jaroslaw Kowalski, Kim Christensen, Julian Verdurmen - BSD 3 clause "New" or "Revised" License
+- AutoUpdater.NET - RBSoft - MIT License
 - Active Directory Object Picker - Tulpep - MS-PL License
 - ListView Layout Manager - Jani Giannoudis - CPOL License
 - Command Line Parser Library for CLR and NetStandard - Giacomo Stelluti Scala & Contributors - MIT License
