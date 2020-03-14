@@ -246,30 +246,26 @@ namespace DaemonMaster
             }
         }
 
-        private bool AskToEnableInteractiveServices()
+        private void AskToEnableInteractiveServices()
         {
             try
             {
                 //Ask the user if the key is no set
-                if (!RegistryManagement.CheckInteractiveServices())
-                {
-                    MessageBoxResult result = MessageBox.Show(_resManager.GetString("interactive_service_regkey_not_set"), _resManager.GetString("question"), MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if (result != MessageBoxResult.Yes)
-                        return false;
+                if (RegistryManagement.CheckInteractiveServices()) 
+                    return;
 
-                    if (RegistryManagement.EnableInteractiveServices(true)) 
-                        return true;
+                MessageBoxResult result = MessageBox.Show(_resManager.GetString("interactive_service_regkey_not_set"), _resManager.GetString("question"), MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (result != MessageBoxResult.Yes)
+                    return;
 
-                    MessageBox.Show(_resManager.GetString("problem_occurred"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-                    return false;
-                }
+                if (RegistryManagement.EnableInteractiveServices(true)) 
+                    return;
 
-                return false;
+                MessageBox.Show(_resManager.GetString("problem_occurred"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
                 MessageBox.Show(_resManager.GetString("failed_to_set_interServ") + "\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
             }
         }
 

@@ -368,7 +368,7 @@ namespace DaemonMaster.Core
             {
                 using (RegistryKey regKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Windows", false))
                 {
-                    return regKey != null && Convert.ToBoolean(regKey.GetValue("NoInteractiveServices", false));
+                    return regKey != null && !Convert.ToBoolean(regKey.GetValue("NoInteractiveServices", true));
                 }
             }
             catch
