@@ -21,8 +21,8 @@ namespace DaemonMasterService
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly KillChildProcessJob _killChildProcessJob = new KillChildProcessJob();
         private readonly DmServiceDefinition _serviceDefinition;
+        private KillChildProcessJob _killChildProcessJob = new KillChildProcessJob();
         private Process _process;
 
 
@@ -38,17 +38,10 @@ namespace DaemonMasterService
         {
             get
             {
-                try
-                {
-                    if (IsRunning())
-                        return (uint)_process.Id;
+                if (_process != null)
+                    return (uint)_process.Id;
 
-                    return 0;
-                }
-                catch
-                {
-                    return 0;
-                }
+                return 0;
             }
         }
 
@@ -117,192 +110,125 @@ namespace DaemonMasterService
         #region Start/Stop/Pause/Resume/etc
 
         /// <summary>
-        /// Starts the in process in the service session.
-        /// </summary>
-        internal void StartInServiceSession()
-        {
-            //Reset last start in user session
-            _lastStartInUserSession = false;
-
-            //Close old instances
-            Close();
-
-            //Create a new instance 
-            _process = new Process();
-
-            //Create the start info for the process
-            var startInfo = new ProcessStartInfo
-            {
-                UseShellExecute = false
-            };
-
-            //Support for .bat files
-            try
-            {
-                if (Path.GetExtension(_serviceDefinition.BinaryPath) == ".bat")
-                {
-                    startInfo.FileName = "cmd.exe";
-                    startInfo.Arguments = "/c " + BuildDoubleQuotedString(_serviceDefinition.BinaryPath) + _serviceDefinition.Arguments;
-                    startInfo.WorkingDirectory = Path.GetDirectoryName(_serviceDefinition.BinaryPath) ?? throw new InvalidOperationException();
-                }
-                else
-                {
-                    startInfo.FileName = _serviceDefinition.BinaryPath;
-                    startInfo.Arguments = _serviceDefinition.Arguments;
-                }
-            }
-            catch
-            {
-                startInfo.FileName = _serviceDefinition.BinaryPath;
-                startInfo.Arguments = _serviceDefinition.Arguments;
-            }
-
-
-            _process.StartInfo = startInfo;
-
-            //Enable raising events for auto restart
-            _process.EnableRaisingEvents = true;
-            _process.Exited += ProcessOnExited;
-            _process.Start();
-
-            //Assign process to job
-            if (KillChildProcessJob.IsSupportedWindowsVersion)
-                _killChildProcessJob.AssignProcess(_process);
-
-            //Set process priority
-            _process.PriorityClass = _serviceDefinition.ProcessPriority;
-
-            _lastRestartTime = DateTime.UtcNow;
-
-            //Trigger event to update pid
-            OnUpdateProcessPid();
-        }
-
-        /// <summary>
-        /// Starts the process in the user session.
+        /// Start the process.
         /// </summary>
         /// <exception cref="Win32Exception"></exception>
-        internal void StartInUserSession(string username)
+        internal void StartProcess(string username)
         {
-            //Set last start in user session
-            _lastStartInUserSession = true;
-            _lastSessionUsername = username;
+            //CloseProcess old instances
+            StopProcess();
 
-            //Close old instances
-            Close();
-
-            var startupInfo = new Advapi32.StartupInfo();
-            var processInformation = new Advapi32.ProcessInformation();
-            var processSecurityAttributes = new Kernel32.SecurityAttributes();
-            var threadSecurityAttributes = new Kernel32.SecurityAttributes();
+            var startupInfo = new Kernel32.StartupInfo();
+            var processInformation = new Kernel32.ProcessInformation();
             IntPtr environment = IntPtr.Zero;
 
 
             //Flags that specify the priority and creation method of the process
-            Advapi32.CreationFlags creationFlags = Advapi32.CreationFlags.CreateUnicodeEnvironment | Advapi32.CreationFlags.CreateNewConsole; //Windows 7+ always using the unicode environment 
+            Kernel32.CreationFlags creationFlags = Kernel32.CreationFlags.CreateUnicodeEnvironment | //Windows 7+ always using the unicode environment 
+                                                   Kernel32.CreationFlags.CreateNewConsole | 
+                                                   _serviceDefinition.ProcessPriority.ConvertToCreationFlag();
 
             //Set the startupinfo
             startupInfo.cb = (uint)Marshal.SizeOf(startupInfo);
-            startupInfo.desktop = "winsta0\\default";
+            //startupInfo.desktop = "winsta0\\default";
 
-            //Process priority
-            switch (_serviceDefinition.ProcessPriority)
+            //Create command line arguments
+            var cmdLine = new StringBuilder();
+            if (Path.GetExtension(_serviceDefinition.BinaryPath) == ".bat")
             {
-                case ProcessPriorityClass.Idle:
-                    creationFlags |= Advapi32.CreationFlags.IdlePriorityClass;
-                    break;
-                case ProcessPriorityClass.High:
-                    creationFlags |= Advapi32.CreationFlags.HighPriorityClass;
-                    break;
-                case ProcessPriorityClass.RealTime:
-                    creationFlags |= Advapi32.CreationFlags.RealtimePriorityClass;
-                    break;
-                case ProcessPriorityClass.BelowNormal:
-                    creationFlags |= Advapi32.CreationFlags.BelowNormalPriorityClass;
-                    break;
-                case ProcessPriorityClass.AboveNormal:
-                    creationFlags |= Advapi32.CreationFlags.AboveNormalPriorityClass;
-                    break;
-                case ProcessPriorityClass.Normal:
-                    creationFlags |= Advapi32.CreationFlags.NormalPriorityClass;
-                    break;
+                cmdLine.Append(BuildDoubleQuotedString("cmd.exe"));
+                cmdLine.Append(" /c ");
             }
 
-            //Create default process security attributes
-            processSecurityAttributes.length = (uint)Marshal.SizeOf(processSecurityAttributes);
+            cmdLine.Append(BuildDoubleQuotedString(_serviceDefinition.BinaryPath));
 
-            //Create default thread security attributes
-            threadSecurityAttributes.length = (uint)Marshal.SizeOf(threadSecurityAttributes);
-
-            //Get user token
-            using (TokenHandle currentUserToken = TokenHandle.GetSessionTokenByUsername(username))
+            if (!string.IsNullOrWhiteSpace(_serviceDefinition.Arguments))
             {
-                try
+                cmdLine.Append(" ");
+                cmdLine.Append(_serviceDefinition.Arguments);
+            }
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(username))
                 {
-                    StringBuilder cmdLine;
-                    if (Path.GetExtension(_serviceDefinition.BinaryPath) == ".bat")   //Cmd mode: (.bat)
-                    {
-                        cmdLine = new StringBuilder();
-                        cmdLine.Append(BuildDoubleQuotedString("cmd.exe"));
-                        cmdLine.Append(" /c ");
-                        cmdLine.Append(BuildDoubleQuotedString(_serviceDefinition.BinaryPath));
-                        cmdLine.Append(" ");
-                        cmdLine.Append(_serviceDefinition.Arguments);
-                    }
-                    else //Normal mode (.exe, etc)
-                    {
-                        cmdLine = BuildCommandLineString(_serviceDefinition.BinaryPath, _serviceDefinition.Arguments);
-                    }
+                    //Set last start in user session
+                    _lastStartInUserSession = false;
+                    _lastSessionUsername = string.Empty;
 
-                    //Create environment block
-                    if (!Userenv.CreateEnvironmentBlock(ref environment, currentUserToken, false))
-                    {
-                        throw new Exception("StartInUserSession: CreateEnvironmentBlock failed.");
-                    }
-
-                    if (!Advapi32.CreateProcessAsUser(
-                        currentUserToken,
+                    if (!Kernel32.CreateProcess(
                         null,
                         cmdLine,
-                        processSecurityAttributes,
-                        threadSecurityAttributes,
+                        null,
+                        null,
                         false,
                         creationFlags,
-                        environment,
+                        IntPtr.Zero, //TODO: Change
                         Path.GetDirectoryName(_serviceDefinition.BinaryPath),
                         ref startupInfo,
                         out processInformation))
                     {
                         throw new Win32Exception(Marshal.GetLastWin32Error());
                     }
-
-                    _process = Process.GetProcessById((int)processInformation.processId);
-
-                    //Enable raising events
-                    _process.EnableRaisingEvents = true;
-                    _process.Exited += ProcessOnExited;
-
-                    //Assign process to job
-                    if (KillChildProcessJob.IsSupportedWindowsVersion)
-                        _killChildProcessJob.AssignProcess(_process);
-
-                    _lastRestartTime = DateTime.UtcNow;
-
-                    //Trigger event to update pid
-                    OnUpdateProcessPid();
                 }
-                finally
+                else
                 {
-                    if (environment != IntPtr.Zero)
-                        Userenv.DestroyEnvironmentBlock(environment);
+                    //Set last start in user session
+                    _lastStartInUserSession = true;
+                    _lastSessionUsername = username;
 
-                    if (processInformation.processHandle != IntPtr.Zero)
-                        Kernel32.CloseHandle(processInformation.processHandle);
+                    //Get user token
+                    using (TokenHandle currentUserToken = TokenHandle.GetSessionTokenByUsername(username))
+                    {
+                        //Create environment block
+                        if (!Userenv.CreateEnvironmentBlock(ref environment, currentUserToken, false))
+                        {
+                            throw new Exception("StartInUserSession: CreateEnvironmentBlock failed.");
+                        }
 
-                    if (processInformation.threadHandle != IntPtr.Zero)
-                        Kernel32.CloseHandle(processInformation.threadHandle);
+                        if (!Advapi32.CreateProcessAsUser(
+                            currentUserToken,
+                            null,
+                            cmdLine,
+                            null,
+                            null,
+                            false,
+                            creationFlags,
+                            environment,
+                            Path.GetDirectoryName(_serviceDefinition.BinaryPath),
+                            ref startupInfo,
+                            out processInformation))
+                        {
+                            throw new Win32Exception(Marshal.GetLastWin32Error());
+                        }
+                    }
                 }
             }
+            finally
+            {
+                if (environment != IntPtr.Zero)
+                    Userenv.DestroyEnvironmentBlock(environment);
+
+                if (processInformation.processHandle != IntPtr.Zero)
+                    Kernel32.CloseHandle(processInformation.processHandle);
+
+                if (processInformation.threadHandle != IntPtr.Zero)
+                    Kernel32.CloseHandle(processInformation.threadHandle);
+            }
+
+            //Get process and enable raising events
+            _process = Process.GetProcessById((int)processInformation.processId);
+            _process.EnableRaisingEvents = true;
+            _process.Exited += ProcessOnExited;
+
+            //Assign process to job
+            if (KillChildProcessJob.IsSupportedWindowsVersion)
+                _killChildProcessJob.AssignProcess(_process);
+
+            _lastRestartTime = DateTime.UtcNow;
+
+            //Trigger event to update pid
+            OnUpdateProcessPid(processInformation.processId);
         }
 
         /// <summary>
@@ -316,7 +242,10 @@ namespace DaemonMasterService
 
             //If process already stopped return
             if (!IsRunning())
+            {
+                CloseProcess();
                 return true;
+            }
 
             //Disable raising events (disable auto restart)
             _process.EnableRaisingEvents = false;
@@ -335,15 +264,13 @@ namespace DaemonMasterService
                     {
                         if (!CloseConsoleApplication(_serviceDefinition.UseCtrlC))
                         {
-                            Logger.Warn("Close console application is failed, killing process now...");
+                            Logger.Warn("CloseProcess console application is failed, killing process now...");
                             _process.Kill();
-                            return true;
                         }
                     }
                     else
                     {
                         _process.Kill();
-                        return true;
                     }
                 }
 
@@ -354,21 +281,13 @@ namespace DaemonMasterService
                     return false;
                 }
 
+                CloseProcess();
                 return true;
             }
             catch (Exception ex)
             {
-                _process.Kill();
-
                 Logger.Error(ex, ex.Message);
                 return false;
-            }
-            finally
-            {
-                Close();
-
-                //Trigger event to update pid
-                OnUpdateProcessPid();
             }
         }
 
@@ -376,29 +295,21 @@ namespace DaemonMasterService
         /// Kills the process.
         /// </summary>
         /// <returns></returns>
-        internal bool KillProcess()
+        internal void KillProcess()
         {
             Logger.Info("Killing process...");
+
             //If process already stopped return
             if (!IsRunning())
-                return true;
+            {
+                CloseProcess();
+                return;
+            }
 
             //Disable raising events (disable auto restart)
             _process.EnableRaisingEvents = false;
-
-            try
-            {
-                _process.Kill();
-            }
-            finally
-            {
-                Close();
-
-                //Trigger event to update pid
-                OnUpdateProcessPid();
-            }
-
-            return true;
+            _process.Kill();
+            CloseProcess();
         }
 
         /// <summary>
@@ -420,9 +331,6 @@ namespace DaemonMasterService
 
         private void ProcessOnExited(object sender, EventArgs eventArgs)
         {
-            //Trigger event to update pid
-            OnUpdateProcessPid(0);
-
             if (_serviceDefinition.CounterResetTime != 0)
             {
                 //Reset the counter if secondsBetweenCrashes is greater than or equal to CounterResetTime 
@@ -447,14 +355,7 @@ namespace DaemonMasterService
                 Logger.Info("Restart process...");
                 Thread.Sleep(_serviceDefinition.ProcessRestartDelay);
 
-                if (_lastStartInUserSession)
-                {
-                    StartInUserSession(_lastSessionUsername);
-                }
-                else
-                {
-                    StartInServiceSession();
-                }
+                StartProcess(_lastStartInUserSession ? _lastSessionUsername : null);
 
                 _restarts++;
                 _lastRestartTime = DateTime.UtcNow;
@@ -487,10 +388,7 @@ namespace DaemonMasterService
         /// <returns></returns>
         private bool CloseConsoleApplication(bool useCtrlC)
         {
-            if (_process == null)
-                return true;
-
-            return Kernel32.GenerateConsoleCtrlEvent(useCtrlC ? Kernel32.CtrlEvent.CtrlC : Kernel32.CtrlEvent.CtrlBreak, (uint)_process.Id);
+            return _process == null || Kernel32.GenerateConsoleCtrlEvent(useCtrlC ? Kernel32.CtrlEvent.CtrlC : Kernel32.CtrlEvent.CtrlBreak, (uint)_process.Id);
         }
 
         /// <summary>
@@ -571,9 +469,14 @@ namespace DaemonMasterService
 
         #region Dispose
 
-        public void Close()
+        public void CloseProcess()
         {
-            _process?.Dispose();
+            if (_process != null)
+            {
+                _process.EnableRaisingEvents = false;
+                _process.Dispose();
+                _process = null;
+            }
 
             OnUpdateProcessPid();
         }
@@ -590,8 +493,12 @@ namespace DaemonMasterService
         {
             if (disposing)
             {
-                _process?.Dispose();
+                CloseProcess();
+
                 _killChildProcessJob?.Dispose();
+                _killChildProcessJob = null;
+
+                OnUpdateProcessPid();
             }
 
             // Free any unmanaged objects here.

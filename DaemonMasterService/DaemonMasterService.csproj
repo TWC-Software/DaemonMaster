@@ -38,6 +38,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -78,6 +79,7 @@
   <ItemGroup>
     <Compile Include="CmdLineOptions.cs" />
     <Compile Include="DmProcess.cs" />
+    <Compile Include="ProcessWaitHandle.cs" />
     <Compile Include="Service.cs">
       <SubType>Component</SubType>
     </Compile>

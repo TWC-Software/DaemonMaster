@@ -6,7 +6,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Kernel32
     public static partial class Kernel32
     {
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct SecurityAttributes
+        public class SecurityAttributes
         {
             public uint length;
             public IntPtr securityDescriptor;

@@ -23,8 +23,10 @@ using System.Management;
 using System.ServiceProcess;
 using DaemonMaster.Core;
 using Microsoft.Win32;
+using System.Diagnostics;
 using NLog;
 using NLog.Targets;
+using System.Linq;
 
 namespace DaemonMasterService
 {
@@ -40,7 +42,7 @@ namespace DaemonMasterService
         //                                              CONST                                                   //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private const string RegPath = @"SYSTEM\CurrentControlSet\Services\";
+        private const string REG_PATH = @"SYSTEM\CurrentControlSet\Services\";
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                        SERVICE METHODS                                               //
@@ -82,12 +84,12 @@ namespace DaemonMasterService
                 if (string.IsNullOrWhiteSpace(sessionUsername))
                 {
                     Logger.Info("Starting the process in service session...");
-                    _dmProcess.StartInServiceSession();
+                    _dmProcess.StartProcess(null);
                 }
                 else
                 {
                     Logger.Info("Starting the process in user session...");
-                    _dmProcess.StartInUserSession(sessionUsername);
+                    _dmProcess.StartProcess(sessionUsername);
                 }
             }
             catch (Exception ex)
@@ -105,7 +107,12 @@ namespace DaemonMasterService
                 if (_serviceDefinition != null)
                     RequestAdditionalTime(_serviceDefinition.ProcessTimeoutTime + 1000);
 
-                _dmProcess.StopProcess();
+                if (_dmProcess != null)
+                {
+                    _dmProcess.StopProcess();
+                    _dmProcess.Dispose();
+                    _dmProcess = null;
+                }
             }
             catch (Exception ex)
             {
@@ -121,20 +128,33 @@ namespace DaemonMasterService
             switch (command)
             {
                 case (int)ServiceCommands.ServiceKillProcessAndStop:
-                    if (_dmProcess != null && _dmProcess.KillProcess())
+                    if (_dmProcess != null)
                     {
+                        try
+                        {
+                            _dmProcess.KillProcess();
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Error(e, "OnCustomCommand: Failed to kill process.");
+                        }
+
                         Stop();
                     }
-                    else
-                    {
-                        Logger.Error("OnCustomCommand: Failed to kill process.");
-                    }
+
                     break;
 
                 case (int)ServiceCommands.ServiceKillProcess:
-                    if (_dmProcess != null && !_dmProcess.KillProcess())
+                    if (_dmProcess != null)
                     {
-                        Logger.Error("OnCustomCommand: Failed to kill process.");
+                        try
+                        {
+                            _dmProcess.KillProcess();
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Error(e, "OnCustomCommand: Failed to kill process.");
+                        }
                     }
                     break;
 
@@ -161,7 +181,7 @@ namespace DaemonMasterService
                 if (_oldProcessPid == pid)
                     return;
 
-                using (RegistryKey processKey = Registry.LocalMachine.OpenSubKey(RegPath + _serviceName + @"\ProcessInfo", true))
+                using (RegistryKey processKey = Registry.LocalMachine.OpenSubKey(REG_PATH + _serviceName + @"\ProcessInfo", true))
                 {
                     if (processKey == null)
                         return;
@@ -189,17 +209,9 @@ namespace DaemonMasterService
         /// <exception cref="Exception">Can't get the service name.</exception>
         private static string GetServiceName()
         {
-            int processId = System.Diagnostics.Process.GetCurrentProcess().Id;
-            string query = "SELECT * FROM Win32_Service where ProcessId = " + processId;
-            var searcher = new ManagementObjectSearcher(query);
-
-            foreach (ManagementBaseObject o in searcher.Get())
-            {
-                var queryObj = (ManagementObject)o;
-                return queryObj["Name"].ToString();
-            }
-
-            throw new Exception("Can't get the service name.");
+            int processId = Process.GetCurrentProcess().Id;
+            var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Service where ProcessId = " + processId);
+            return searcher.Get().Cast<ManagementObject>().Single()["Name"].ToString();
         }
 
         private static void SetupEventLogService()

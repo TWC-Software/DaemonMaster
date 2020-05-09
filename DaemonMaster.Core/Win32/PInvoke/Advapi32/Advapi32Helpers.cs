@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Text;
 
 namespace DaemonMaster.Core.Win32.PInvoke.Advapi32

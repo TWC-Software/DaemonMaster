@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Security;
+using System.Text;
 using Microsoft.Win32.SafeHandles;
 
 namespace DaemonMaster.Core.Win32.PInvoke.Kernel32
@@ -39,5 +40,28 @@ namespace DaemonMaster.Core.Win32.PInvoke.Kernel32
 
         [DllImport(DllName, SetLastError = true, ExactSpelling = true, CharSet = CharSet.Unicode)]
         public static extern int CompareStringOrdinal(IntPtr string1, int charCount1, IntPtr string2, int charCount2, bool ignoreCase);
+
+        [DllImport(DllName, SetLastError = true, CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool CreateProcess
+        (
+            string applicationName,
+            StringBuilder commandLineArgs,
+            SecurityAttributes processAttributes,
+            SecurityAttributes threadAttributes,
+            bool inheritHandles,
+            CreationFlags creationFlags,
+            IntPtr lpEnvironment,
+            string currentDirectory,
+            ref StartupInfo startupInfo,
+            out ProcessInformation processInformation
+        );
+
+        [DllImport(DllName, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool TerminateProcess(
+            SafeProcessHandle processHandle,
+            int exitCode
+        );
     }
 }

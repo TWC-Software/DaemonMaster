@@ -26,9 +26,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Resources;
-using System.Security;
 using System.ServiceProcess;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
@@ -36,7 +34,6 @@ using DaemonMaster.Core;
 using DaemonMaster.Core.Win32;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using DaemonMaster.Language;
-using DaemonMasterService;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Tulpep.ActiveDirectoryObjectPicker;
@@ -360,7 +357,7 @@ namespace DaemonMaster
 
             TextBoxPassword.Clear();
         }
-     
+
         private void CheckBoxUseVirtualAccount_OnChecked(object sender, RoutedEventArgs e)
         {
             RenewVirtualAccountName();
@@ -495,7 +492,7 @@ namespace DaemonMaster
                 {
                     _tempServiceConfig.Credentials = ServiceCredentials.LocalSystem;
                 }
-                else if (CheckBoxUseVirtualAccount.IsChecked ?? false)            
+                else if (CheckBoxUseVirtualAccount.IsChecked ?? false)
                 {
                     _tempServiceConfig.Credentials = new ServiceCredentials(TextBoxUsername.Text, ServiceCredentials.EmptyPassword);
                 }
@@ -711,13 +708,21 @@ namespace DaemonMaster
                 if (openFileDialog.ShowDialog() == true)
                 {
                     _createNewService = true;
-                    using (StreamReader streamReader = File.OpenText(openFileDialog.FileName))
-                    {
-                        var serializer = new JsonSerializer();
-                        _tempServiceConfig = (DmServiceDefinition)serializer.Deserialize(streamReader, typeof(DmServiceDefinition));
-                    }
 
-                    LoadServiceInfos();
+                    using (StreamReader streamReader = File.OpenText(openFileDialog.FileName))
+                    using (JsonTextReader jsonTextReader = new JsonTextReader(streamReader))
+                    {
+                        {
+                            var serializer = new JsonSerializer()
+                            {
+                                TypeNameHandling = TypeNameHandling.None,
+                            };
+
+                            _tempServiceConfig = serializer.Deserialize<DmServiceDefinition>(jsonTextReader);
+                        }
+
+                        LoadServiceInfos();
+                    }
                 }
             }
             catch (Exception ex)
@@ -744,12 +749,16 @@ namespace DaemonMaster
                 if (saveFileDialog.ShowDialog() == true)
                 {
                     using (StreamWriter streamWriter = File.CreateText(saveFileDialog.FileName))
+                    using (JsonTextWriter jsonWriter = new JsonTextWriter(streamWriter))
                     {
                         var serializer = new JsonSerializer
                         {
-                            Formatting = Formatting.Indented
+                            Formatting = Formatting.Indented,
+                            TypeNameHandling = TypeNameHandling.None,
                         };
-                        serializer.Serialize(streamWriter, _tempServiceConfig);
+
+                        serializer.Serialize(jsonWriter, _tempServiceConfig);
+                        jsonWriter.Flush();
                     }
                 }
             }

@@ -1540,7 +1540,7 @@
       <xs:enumeration value="Encrypted" />
       <xs:enumeration value="WriteThrough" />
       <xs:enumeration value="NoBuffering" />
-      <xs:enumeration value="DeleteOnClose" />
+      <xs:enumeration value="DeleteOnCloseProcess" />
       <xs:enumeration value="PosixSemantics" />
     </xs:restriction>
   </xs:simpleType>

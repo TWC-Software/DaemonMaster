@@ -64,16 +64,17 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ActiveDirectoryObjectPicker">
-      <HintPath>..\..\..\..\Documents\Visual Studio 2017\DLLs\ActiveDirectoryObjectPicker.dll</HintPath>
+    <Reference Include="ActiveDirectoryObjectPicker, Version=3.0.4.0, Culture=neutral, PublicKeyToken=515ab092c8839750, processorArchitecture=MSIL">
+      <HintPath>..\packages\Tulpep.ActiveDirectoryObjectPicker.3.0.4\lib\net452\ActiveDirectoryObjectPicker.dll</HintPath>
     </Reference>
-    <Reference Include="Itenso.Windows.Controls.ListViewLayout">
-      <HintPath>..\..\..\..\Documents\Visual Studio 2017\DLLs\Itenso.Windows.Controls.ListViewLayout.dll</HintPath>
+    <Reference Include="Itenso.Windows.Controls.ListViewLayout, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WPF.ListViewLayoutManager.2.0.0\lib\net40\Itenso.Windows.Controls.ListViewLayout.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Windows.Forms" />

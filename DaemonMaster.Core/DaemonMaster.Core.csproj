@@ -60,14 +60,14 @@
     <Compile Include="Win32\LsaPolicyHandle.cs" />
     <Compile Include="Win32\PInvoke\Advapi32\Advapi32.cs" />
     <Compile Include="Win32\PInvoke\Advapi32\Advapi32Helpers.cs" />
-    <Compile Include="Win32\PInvoke\Advapi32\CreationFlags.cs" />
+    <Compile Include="Win32\PInvoke\Kernel32\CreationFlags.cs" />
     <Compile Include="Win32\PInvoke\Advapi32\ErrorControl.cs" />
     <Compile Include="Win32\PInvoke\Advapi32\LogonProvider.cs" />
     <Compile Include="Win32\PInvoke\Advapi32\LogonType.cs" />
     <Compile Include="Win32\PInvoke\Advapi32\LsaObjectAttributes.cs" />
     <Compile Include="Win32\PInvoke\Advapi32\LsaUnicodeString.cs" />
-    <Compile Include="Win32\PInvoke\Advapi32\ProcessInformation.cs" />
-    <Compile Include="Win32\PInvoke\Advapi32\ProcessStartInfo.cs" />
+    <Compile Include="Win32\PInvoke\Kernel32\ProcessInformation.cs" />
+    <Compile Include="Win32\PInvoke\Kernel32\ProcessStartInfo.cs" />
     <Compile Include="Win32\PInvoke\Advapi32\ScAction.cs" />
     <Compile Include="Win32\PInvoke\Advapi32\ScActionType.cs" />
     <Compile Include="Win32\PInvoke\Advapi32\ServiceAccessRights.cs" />
@@ -95,6 +95,7 @@
     <Compile Include="Win32\PInvoke\Kernel32\JobObjectInfoType.cs" />
     <Compile Include="Win32\PInvoke\Kernel32\JobObjectLimit.cs" />
     <Compile Include="Win32\PInvoke\Kernel32\Kernel32.cs" />
+    <Compile Include="Win32\PInvoke\Kernel32\Kernel32Helper.cs" />
     <Compile Include="Win32\PInvoke\Kernel32\SecurityAttributes.cs" />
     <Compile Include="Win32\PInvoke\Kernel32\ThreadAccess.cs" />
     <Compile Include="Win32\PInvoke\Userenv\Userenv.cs" />
@@ -113,5 +114,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

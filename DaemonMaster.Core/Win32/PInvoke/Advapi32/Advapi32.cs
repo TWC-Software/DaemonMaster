@@ -159,11 +159,11 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
             Kernel32.Kernel32.SecurityAttributes processAttributes,
             Kernel32.Kernel32.SecurityAttributes threadAttributes,
             bool inheritHandles,
-            CreationFlags creationFlags,
+            Kernel32.Kernel32.CreationFlags creationFlags,
             IntPtr lpEnvironment,
             string currentDirectory,
-            ref StartupInfo startupInfo,
-            out ProcessInformation processInformation
+            ref Kernel32.Kernel32.StartupInfo startupInfo,
+            out Kernel32.Kernel32.ProcessInformation processInformation
        );
 
         //LSA 
