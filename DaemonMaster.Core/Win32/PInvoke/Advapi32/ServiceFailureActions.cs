@@ -8,25 +8,28 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
         public struct ServiceFailureActions : IEquatable<ServiceFailureActions>
         {
             /// <summary>
-            ///  Time that is necessary after the last failure, to restet the failure count.
+            ///  Time that is necessary after the last failure, to reset the failure count.
             /// </summary>
             public TimeSpan ResetPeriode { get; }
 
             /// <summary>
-            /// The reboot message (only when a reboot action failure is configured)
+            /// The message to be broadcast to server users before rebooting (only when a reboot action failure is configured).
+            /// If this value is NULL, the reboot message is unchanged. If the value is an empty string (""), the reboot message is deleted and no message is broadcast.
             /// </summary>
             public string RebootMessage { get; }
 
             /// <summary>
-            /// The command line of a process that excecute as response to an "run command" action.
+            /// The command line of the process.
+            /// If this value is NULL, the command is unchanged. If the value is an empty string (""), the command is deleted and no program is run when the service fails.
+            /// This process runs under the same account as the service.
             /// </summary>
             public string Command { get; }
 
             /// <summary>
             /// Array of actions.
-            /// When this value is null, the actionsLength and resetPeriode members are ignored.
+            /// When this value is null <see cref="ResetPeriode"/> are ignored.
             /// </summary>
-            public IReadOnlyCollection<ScAction> Actions { get; }
+            public IReadOnlyList<ScAction> Actions { get; }
 
             /// <summary>
             /// Initializes a new instance of the <see cref="ServiceFailureActions"/> struct.
@@ -35,7 +38,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
             /// <param name="rebootMessage">The reboot message.</param>
             /// <param name="command">The command.</param>
             /// <param name="actions">The actions.</param>
-            public ServiceFailureActions(TimeSpan resetPeriode, string rebootMessage, string command, IReadOnlyCollection<ScAction> actions)
+            public ServiceFailureActions(TimeSpan resetPeriode, string rebootMessage, string command, IReadOnlyList<ScAction> actions)
             {
                 ResetPeriode = resetPeriode;
                 RebootMessage = rebootMessage;
@@ -46,7 +49,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
             /// <summary>
             /// The default values from windows.
             /// </summary>
-            public static ServiceFailureActions Default = new ServiceFailureActions(TimeSpan.Zero, "", "", null);
+            public static ServiceFailureActions Default = new ServiceFailureActions(TimeSpan.Zero, null, null, null);
 
 
             /// <summary>

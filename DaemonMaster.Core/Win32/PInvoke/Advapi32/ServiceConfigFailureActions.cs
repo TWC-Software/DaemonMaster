@@ -11,7 +11,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
             /// <summary>
             ///  Time that is necessary after the last failure, to restet the failure count.
             /// </summary>
-            public TimeSpan resetPeriode;
+            public uint resetPeriode;
 
             /// <summary>
             /// The reboot message (only when a reboot action failure is configured)
@@ -33,8 +33,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
             /// Array of actions.
             /// When this value is null, the actionsLength and resetPeriode members are ignored.
             /// </summary>
-            [MarshalAs(UnmanagedType.LPArray)]
-            public ScAction[] actions;
+            public IntPtr actions;
         }
     }
 }

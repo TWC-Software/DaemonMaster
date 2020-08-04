@@ -5,8 +5,8 @@
         public enum ScActionType
         {
             None = 0,
-            Reboot = 2,
             Restart = 1,
+            Reboot = 2,
             RunCommand = 3
         }
     }

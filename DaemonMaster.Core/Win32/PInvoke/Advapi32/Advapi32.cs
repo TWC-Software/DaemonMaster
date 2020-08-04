@@ -62,7 +62,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
         (
             ServiceHandle serviceHandle,
             uint numberOfArgs,
-            string[] args
+            IntPtr args
         );
 
         [DllImport(DllName, SetLastError = true, ExactSpelling = true)]

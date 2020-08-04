@@ -8,6 +8,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Kernel32
 {
     public static partial class Kernel32
     {
+        public const uint Infinite = 0xFFFFFFFF;
         public const uint NoActiveConsoleSession = 0xFFFFFFFF;
         public const uint CstrLessThan = 1;     // string 1 < string 2
         public const uint CstrEqual = 2;        // string 1 == string 2

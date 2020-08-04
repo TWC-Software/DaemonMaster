@@ -19,6 +19,7 @@
 
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Security;
 using System.Security.Principal;
 using System.ServiceProcess;
@@ -143,6 +144,13 @@ namespace DaemonMaster.Core
         public static string SurroundWith(this string s, string value)
         {
             return value + s + value;
+        }
+
+        public static bool ComparePaths(string path1, string path2)
+        {
+            return string.Equals(path1.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+                path2.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+                StringComparison.OrdinalIgnoreCase);
         }
     }
 }

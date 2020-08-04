@@ -1,10 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Threading;
 using DaemonMaster.Core.Exceptions;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
+using DaemonMaster.Core.Win32.PInvoke.Kernel32;
 using Microsoft.Win32.SafeHandles;
 
 namespace DaemonMaster.Core.Win32
@@ -38,8 +42,29 @@ namespace DaemonMaster.Core.Win32
         /// <param name="arguments"></param>
         public void Start(string[] arguments)
         {
-            if (!Advapi32.StartService(serviceHandle: this, numberOfArgs: (uint)arguments.Length, args: arguments))
-                throw new Win32Exception(Marshal.GetLastWin32Error());
+            IntPtr[] ptrArgs = new IntPtr[arguments.Length];
+            try
+            {
+                for (int i = 0; i < ptrArgs.Length; i++)
+                    ptrArgs[i] = Marshal.StringToHGlobalUni(arguments[i]);
+
+                GCHandle stringPtrHandle = GCHandle.Alloc(ptrArgs, GCHandleType.Pinned);
+                try
+                {
+                    if (!Advapi32.StartService(this, (uint)ptrArgs.Length, stringPtrHandle.AddrOfPinnedObject()))
+                        throw new Win32Exception(Marshal.GetLastWin32Error());
+                }
+                finally
+                {
+                    if (stringPtrHandle.IsAllocated)
+                        stringPtrHandle.Free();
+                }
+            }
+            finally
+            {
+                for (int i = 0; i < ptrArgs.Length; i++)
+                    Marshal.FreeHGlobal(ptrArgs[i]);
+            }
         }
 
         /// <summary>
@@ -85,6 +110,9 @@ namespace DaemonMaster.Core.Win32
 
             //Set delayed start
             ChangeDelayedStart(serviceDefinition.DelayedStart);
+
+            //Change failure actions
+            ChangeFailureActions(serviceDefinition.FailureActions);
 
             //Set the failure actions on non crash failures
             ChangeFailureActionsOnNonCrashFailures(serviceDefinition.FailureActionsOnNonCrashFailures);
@@ -276,33 +304,63 @@ namespace DaemonMaster.Core.Win32
         /// <exception cref="Win32Exception"></exception>
         public void ChangeFailureActions(Advapi32.ServiceFailureActions failureActions)
         {
-            if (QueryServiceStatus().currentState != Advapi32.ServiceCurrentState.Stopped)
-                throw new ServiceNotStoppedException();
-
-            IntPtr ptr = IntPtr.Zero;
-
-            //Create the unmanaged struct
-            Advapi32.ServiceConfigFailureActions serviceConfigFailureActions;
-            serviceConfigFailureActions.resetPeriode = failureActions.ResetPeriode;
-            serviceConfigFailureActions.rebootMessage = failureActions.RebootMessage;
-            serviceConfigFailureActions.command = failureActions.Command;
-            serviceConfigFailureActions.actionsLength = (uint)failureActions.Actions.Count;
-            serviceConfigFailureActions.actions = failureActions.Actions.ToArray();
-
+            int size = Marshal.SizeOf<Advapi32.ScAction>();
+            IntPtr ptr = failureActions.Actions != null ? Marshal.AllocHGlobal(size * failureActions.Actions.Count) : IntPtr.Zero;
             try
             {
-                // Copy the struct to unmanaged memory
-                ptr = Marshal.AllocHGlobal(Marshal.SizeOf(serviceConfigFailureActions));
-                Marshal.StructureToPtr(serviceConfigFailureActions, ptr, fDeleteOld: false);
+                if (ptr != IntPtr.Zero)
+                {
+                    IntPtr nextAction = ptr;
+                    for (int i = 0; i < failureActions.Actions.Count; i++)
+                    {
+                        Marshal.StructureToPtr(failureActions.Actions[i], nextAction, false);
+                        nextAction = IntPtr.Add(nextAction, size);
+                    }
+                }
 
-                //Call ChangeServiceConfig2
-                if (!Advapi32.ChangeServiceConfig2(this, Advapi32.ServiceInfoLevel.FailureActions, ptr))
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                //Create the unmanaged struct
+                var serviceConfigFailureActions = new Advapi32.ServiceConfigFailureActions
+                {
+                    resetPeriode = failureActions.ResetPeriode == TimeSpan.MaxValue || failureActions.ResetPeriode == Timeout.InfiniteTimeSpan ? Kernel32.Infinite : (uint)Math.Round(failureActions.ResetPeriode.TotalSeconds),
+                    rebootMessage = failureActions.RebootMessage,
+                    command = failureActions.Command,
+                    actionsLength = (uint)(failureActions.Actions?.Count ?? 0),
+                    actions = ptr
+                };
+
+                IntPtr ptrServiceFailureActions = Marshal.AllocHGlobal(Marshal.SizeOf<Advapi32.ServiceConfigFailureActions>());
+                try
+                {
+                    //Copy struct to unmanaged memory 
+                    Marshal.StructureToPtr(serviceConfigFailureActions, ptrServiceFailureActions, false);
+                    try
+                    {
+                        if (!Advapi32.ChangeServiceConfig2(this, Advapi32.ServiceInfoLevel.FailureActions, ptrServiceFailureActions))
+                            throw new Win32Exception(Marshal.GetLastWin32Error());
+                    }
+                    finally
+                    {
+                        Marshal.DestroyStructure<Advapi32.ServiceConfigFailureActions>(ptrServiceFailureActions);
+                    }
+                }
+                finally
+                {
+                    Marshal.FreeHGlobal(ptrServiceFailureActions);
+                }
             }
             finally
             {
                 if (ptr != IntPtr.Zero)
+                {
+                    IntPtr nextAction = ptr;
+                    for (int i = 0; i < failureActions.Actions.Count; i++)
+                    {
+                        Marshal.DestroyStructure<Advapi32.ScAction>(nextAction);
+                        nextAction = IntPtr.Add(nextAction, size);
+                    }
+
                     Marshal.FreeHGlobal(ptr);
+                }
             }
         }
 

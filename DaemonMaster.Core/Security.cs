@@ -15,24 +15,42 @@ namespace DaemonMaster.Core
         #region Security
 
         /// <summary>
-        /// Convert the given string to a SecureString
+        /// Convert the given string to a SecureString.
         /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        public static SecureString ConvertStringToSecureString(this string data)
+        /// <param name="s">The string that should be encrypted.</param>
+        /// <returns>A secure string with the contend of the normal string or null if the string was invalid or empty.</returns>
+        [Obsolete("Use instead ConvertStringToSecureString because this method is much slower than the unsafe method.")]
+        public static SecureString ConvertStringToSecureStringSave(this string s)
         {
-            if (string.IsNullOrWhiteSpace(data))
+            if (string.IsNullOrWhiteSpace(s))
                 return null;
 
             var secString = new SecureString();
-
-            if (data.Length <= 0) return null;
-
-            foreach (char c in data)
+            foreach (char c in s)
             {
                 secString.AppendChar(c);
             }
+
+            secString.MakeReadOnly();
             return secString;
+        }
+
+        /// <summary>
+        /// Convert the given string to a SecureString.
+        /// </summary>
+        /// <param name="s">The string that should be encrypted.</param>
+        /// <returns>A secure string with the contend of the normal string or null if the string was invalid or empty.</returns>
+        public static unsafe SecureString ConvertStringToSecureString(this string s)
+        {
+            if (string.IsNullOrWhiteSpace(s))
+                return null;
+
+            fixed (char* ptrChar = s)
+            {
+                var secString = new SecureString(ptrChar, s.Length);
+                secString.MakeReadOnly();
+                return secString;
+            }
         }
 
         /// <summary>

@@ -86,13 +86,15 @@ namespace DaemonMaster.Core.Win32
             if (serviceDefinition.Credentials == null)
                 throw new ArgumentNullException(nameof(serviceDefinition.Credentials));
 
+
+            ServiceHandle serviceHandle;
             try
             {
                 //Only call marshal if a password is set (SecureString != null), otherwise leave IntPtr.Zero
                 if (serviceDefinition.Credentials.Password != null)
                     passwordHandle = Marshal.SecureStringToGlobalAllocUnicode(serviceDefinition.Credentials.Password);
 
-                ServiceHandle serviceHandle = Advapi32.CreateService
+                serviceHandle = Advapi32.CreateService
                 (
                     this,
                     serviceDefinition.ServiceName,
@@ -111,14 +113,31 @@ namespace DaemonMaster.Core.Win32
 
                 if (serviceHandle.IsInvalid)
                     throw new Win32Exception(Marshal.GetLastWin32Error());
-
-                return serviceHandle;
             }
             finally
             {
                 if (passwordHandle != IntPtr.Zero)
                     Marshal.ZeroFreeGlobalAllocUnicode(passwordHandle);
             }
+
+
+            //Set the description
+            if (!string.IsNullOrWhiteSpace(serviceDefinition.Description))
+                serviceHandle.ChangeDescription(serviceDefinition.Description);
+
+            //Set delayed start
+            if (serviceDefinition.DelayedStart)
+                serviceHandle.ChangeDelayedStart(serviceDefinition.DelayedStart);
+
+            //Change failure actions
+            if (!serviceDefinition.FailureActions.Equals(Advapi32.ServiceFailureActions.Default))
+                serviceHandle.ChangeFailureActions(serviceDefinition.FailureActions);
+
+            //Set the failure actions on non crash failures
+            if (serviceDefinition.FailureActionsOnNonCrashFailures)
+                serviceHandle.ChangeFailureActionsOnNonCrashFailures(serviceDefinition.FailureActionsOnNonCrashFailures);
+
+            return serviceHandle;
         }
 
         /// <summary>

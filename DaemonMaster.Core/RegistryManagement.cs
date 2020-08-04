@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
@@ -245,9 +246,9 @@ namespace DaemonMaster.Core
                         if (string.IsNullOrWhiteSpace(serviceExePath))
                             continue;
 
-                        if (!serviceExePath.Contains(ServiceControlManager.DmServiceExe))
+                        if (!DaemonMasterUtils.ComparePaths(serviceExePath, ServiceControlManager.DmServiceExe))
                             continue;
-
+  
                         var serviceDefinition = new DmServiceDefinition(serviceName)
                         {
                             DisplayName = Convert.ToString(key.GetValue("DisplayName")),

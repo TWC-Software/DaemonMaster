@@ -494,7 +494,7 @@ namespace DaemonMaster
                 }
                 else if (CheckBoxUseVirtualAccount.IsChecked ?? false)
                 {
-                    _tempServiceConfig.Credentials = new ServiceCredentials(TextBoxUsername.Text, ServiceCredentials.EmptyPassword);
+                    _tempServiceConfig.Credentials = new ServiceCredentials(TextBoxUsername.Text, null);
                 }
                 else if (string.Equals(TextBoxPassword.Password, PLACEHOLDER_PASSWORD) && //Nothing has changed (null safe)
                          string.Equals(TextBoxUsername.Text, _tempServiceConfig.Credentials.Username)) //Nothing has changed (null safe
