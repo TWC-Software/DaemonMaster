@@ -20,6 +20,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
+using DaemonMaster.Win32.PInvoke;
 using Microsoft.Win32.SafeHandles;
 
 namespace DaemonMaster.Core.Win32
@@ -106,7 +107,7 @@ namespace DaemonMaster.Core.Win32
                     DmServiceExe,
                     serviceDefinition.LoadOrderGroup,
                     tagId: 0, //Tags are only evaluated for driver services that have SERVICE_BOOT_START or SERVICE_SYSTEM_START start types.
-                    Advapi32.ConvertDependenciesArraysToDoubleNullTerminatedString(serviceDefinition.DependOnService, serviceDefinition.DependOnGroup),
+                    Advapi32.ConvertDependenciesArraysToWin32String(serviceDefinition.DependOnService, serviceDefinition.DependOnGroup),
                     serviceDefinition.Credentials.Username,
                     passwordHandle
                 );
@@ -180,7 +181,7 @@ namespace DaemonMaster.Core.Win32
                 {
                     int result = Marshal.GetLastWin32Error();
 
-                    if (result != 0x7A) //ERROR_INSUFFICIENT_BUFFER
+                    if (result != Win32ErrorCodes.ERROR_INSUFFICIENT_BUFFER)
                         throw new Win32Exception(result);
                 }
 

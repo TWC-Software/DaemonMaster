@@ -1,4 +1,4 @@
-﻿namespace DaemonMaster.Core.Win32.PInvoke.Core
+﻿namespace DaemonMaster.Core.Win32.PInvoke
 {
     //https://www.pinvoke.net/default.aspx/Enums.NtStatus
     public enum NtStatus : uint

@@ -47,7 +47,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Kernel32
         public static extern bool CreateProcess
         (
             string applicationName,
-            StringBuilder commandLineArgs,
+            string commandLineArgs,
             SecurityAttributes processAttributes,
             SecurityAttributes threadAttributes,
             bool inheritHandles,

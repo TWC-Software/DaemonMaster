@@ -133,20 +133,14 @@ namespace DaemonMasterService
             //startupInfo.desktop = "winsta0\\default";
 
             //Create command line arguments
-            var cmdLine = new StringBuilder();
-            if (Path.GetExtension(_serviceDefinition.BinaryPath) == ".bat")
-            {
-                cmdLine.Append(BuildDoubleQuotedString("cmd.exe"));
-                cmdLine.Append(" /c ");
-            }
+            var cmdLine = "";
+            if (string.Equals(Path.GetExtension(_serviceDefinition.BinaryPath), ".bat", StringComparison.OrdinalIgnoreCase))
+                cmdLine = "cmd.exe /c";
 
-            cmdLine.Append(BuildDoubleQuotedString(_serviceDefinition.BinaryPath));
+            cmdLine += BuildDoubleQuotedString(_serviceDefinition.BinaryPath);
 
             if (!string.IsNullOrWhiteSpace(_serviceDefinition.Arguments))
-            {
-                cmdLine.Append(" ");
-                cmdLine.Append(_serviceDefinition.Arguments);
-            }
+                cmdLine += " " + _serviceDefinition.Arguments;
 
             try
             {

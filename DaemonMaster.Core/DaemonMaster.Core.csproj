@@ -61,6 +61,7 @@
     <Compile Include="Win32\LsaPolicyHandle.cs" />
     <Compile Include="Win32\PInvoke\Advapi32\Advapi32.cs" />
     <Compile Include="Win32\PInvoke\Advapi32\Advapi32Helpers.cs" />
+    <Compile Include="Win32\PInvoke\Advapi32\QUERY_SERVICE_CONFIG.cs" />
     <Compile Include="Win32\PInvoke\Kernel32\CreationFlags.cs" />
     <Compile Include="Win32\PInvoke\Advapi32\ErrorControl.cs" />
     <Compile Include="Win32\PInvoke\Advapi32\LogonProvider.cs" />
@@ -87,7 +88,7 @@
     <Compile Include="Win32\PInvoke\Advapi32\ServiceType.cs" />
     <Compile Include="Win32\PInvoke\Advapi32\SecurityImpersonationLevel.cs" />
     <Compile Include="Win32\PInvoke\Advapi32\TokenType.cs" />
-    <Compile Include="Win32\PInvoke\Core\NtStatus.cs" />
+    <Compile Include="Win32\PInvoke\NtStatus.cs" />
     <Compile Include="Win32\PInvoke\Kernel32\AccessMask.cs" />
     <Compile Include="Win32\PInvoke\Kernel32\CtrlEvent.cs" />
     <Compile Include="Win32\PInvoke\Kernel32\IoCounters.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="Win32\PInvoke\Kernel32\SecurityAttributes.cs" />
     <Compile Include="Win32\PInvoke\Kernel32\ThreadAccess.cs" />
     <Compile Include="Win32\PInvoke\Userenv\Userenv.cs" />
+    <Compile Include="Win32\PInvoke\Win32ErrorCodes.cs" />
     <Compile Include="Win32\PInvoke\Winsta\Winsta.cs" />
     <Compile Include="Win32\PInvoke\Wtsapi32\Wtsapi32.cs" />
     <Compile Include="Win32\PInvoke\Wtsapi32\WtsConnectstateClass.cs" />

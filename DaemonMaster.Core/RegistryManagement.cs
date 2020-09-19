@@ -17,18 +17,17 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Security.AccessControl;
-using System.Security.Principal;
-using System.ServiceProcess;
 using DaemonMaster.Core.Config;
 using DaemonMaster.Core.Win32;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Security.AccessControl;
+using System.Security.Principal;
+using System.ServiceProcess;
 
 namespace DaemonMaster.Core
 {
@@ -83,7 +82,7 @@ namespace DaemonMaster.Core
                 {
                     #region Setting permissions
                     //Only needed when user account has changed
-                    if (!Equals(serviceDefinition.Credentials, ServiceCredentials.NoChange))
+                    if (processInfo != null && !Equals(serviceDefinition.Credentials, ServiceCredentials.NoChange))
                     {
                         //Create a new RegistrySecurity object
                         var rs = new RegistrySecurity();
@@ -111,7 +110,8 @@ namespace DaemonMaster.Core
                         }
                         else
                         {
-                            rs.AddAccessRule(new RegistryAccessRule(new NTAccount(serviceDefinition.Credentials.Username), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
+                            string account = DaemonMasterUtils.IsLocalDomain(serviceDefinition.Credentials.Username) ? DaemonMasterUtils.GetLoginFromUsername(serviceDefinition.Credentials.Username) : serviceDefinition.Credentials.Username;
+                            rs.AddAccessRule(new RegistryAccessRule(new NTAccount(account), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
                         }
 
                         processInfo.SetAccessControl(rs);
@@ -122,7 +122,7 @@ namespace DaemonMaster.Core
             }
         }
 
-        public static DmServiceDefinition LoadServiceStartInfosFromRegistry(string serviceName)
+        public static DmServiceDefinition LoadFromRegistry(string serviceName)
         {
             //Open Regkey folder
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + serviceName, RegistryKeyPermissionCheck.ReadSubTree))
@@ -180,20 +180,61 @@ namespace DaemonMaster.Core
             }
         }
 
-        public static List<DmServiceDefinition> LoadInstalledServices()
-        {
-            List<DmServiceDefinition> services = LoadInstalledServicesNewSystem();
 
-            if (ConfigManagement.GetConfig.UseOldNameBasedSearchSystemWithTheNewSystem)
+
+        public static List<DmServiceDefinition> GetInstalledServices()
+        {
+            var services = new List<DmServiceDefinition>();
+
+            using RegistryKey mainKey = Registry.LocalMachine.OpenSubKey(RegPath, RegistryKeyPermissionCheck.ReadSubTree);
+            if (mainKey == null)
+                return services;
+
+            foreach (string serviceName in mainKey.GetSubKeyNames())
             {
-                services.AddRange(LoadInstalledServicesOldSystem().Where(x => services.All(y => y.ServiceName != x.ServiceName))); //TODO: remove in one of the next releases
+                using (RegistryKey key = mainKey.OpenSubKey(serviceName, RegistryKeyPermissionCheck.ReadSubTree))
+                {
+                    //If the key invalid, skip this service
+                    if (key == null)
+                        continue;
+
+                    //Get the exe path of the service to determine later if its a service from DaemonMaster
+                    string serviceExePath = Convert.ToString(key.GetValue("ImagePath"));
+
+                    //Check service path
+                    if (string.IsNullOrWhiteSpace(serviceExePath) || !DaemonMasterUtils.ComparePaths(serviceExePath, ServiceControlManager.DmServiceExe))
+                        continue;
+
+                    var serviceDefinition = new DmServiceDefinition(serviceName)
+                    {
+                        DisplayName = Convert.ToString(key.GetValue("DisplayName")),
+                        Credentials = new ServiceCredentials(Convert.ToString(key.GetValue("ObjectName", ServiceCredentials.LocalSystem)), null),
+                    };
+
+                    using (RegistryKey parameters = key.OpenSubKey("Parameters", RegistryKeyPermissionCheck.ReadSubTree))
+                    {
+                        //If the key invalid, skip it (this key is not important for the service)
+                        if (parameters != null)
+                        {
+                            serviceDefinition.BinaryPath = Convert.ToString(parameters.GetValue("BinaryPath"));
+                        }
+                    }
+
+                    services.Add(serviceDefinition);
+                }
+            }
+
+
+            if (ConfigManagement.GetConfig.UseCompatibilityModeForSearchSystem)
+            {
+                services.AddRange(GetInstalledServicesCompMode().Where(x => services.All(y => y.ServiceName != x.ServiceName)));
             }
 
             return services;
         }
 
-        [Obsolete("Later it gets replaced with the new one, but for now it rest as the default system.", false)]
-        public static List<DmServiceDefinition> LoadInstalledServicesOldSystem()
+        [Obsolete("Just for compatibility mode here.", false)]
+        private static List<DmServiceDefinition> GetInstalledServicesCompMode()
         {
             var daemons = new List<DmServiceDefinition>();
 
@@ -225,56 +266,11 @@ namespace DaemonMaster.Core
             return daemons;
         }
 
-        public static List<DmServiceDefinition> LoadInstalledServicesNewSystem()
-        {
-            var daemons = new List<DmServiceDefinition>();
-
-            using (RegistryKey mainKey = Registry.LocalMachine.OpenSubKey(RegPath, RegistryKeyPermissionCheck.ReadSubTree))
-            {
-                foreach (string serviceName in mainKey.GetSubKeyNames())
-                {
-                    using (RegistryKey key = mainKey.OpenSubKey(serviceName, RegistryKeyPermissionCheck.ReadSubTree))
-                    {
-                        //If the key invalid, skip this service
-                        if (key == null)
-                            continue;
-
-                        //Get the exe path of the service to determine later if its a service from DaemonMaster
-                        string serviceExePath = Convert.ToString(key.GetValue("ImagePath") ?? string.Empty);
-
-                        //If the serviceExePath is invalid skip this service
-                        if (string.IsNullOrWhiteSpace(serviceExePath))
-                            continue;
-
-                        if (!DaemonMasterUtils.ComparePaths(serviceExePath, ServiceControlManager.DmServiceExe))
-                            continue;
-  
-                        var serviceDefinition = new DmServiceDefinition(serviceName)
-                        {
-                            DisplayName = Convert.ToString(key.GetValue("DisplayName")),
-                            Credentials = new ServiceCredentials(Convert.ToString(key.GetValue("ObjectName", ServiceCredentials.LocalSystem)), null),
-                        };
-
-                        using (RegistryKey parameters = key.OpenSubKey("Parameters", RegistryKeyPermissionCheck.ReadSubTree))
-                        {
-                            serviceDefinition.BinaryPath = Convert.ToString(parameters.GetValue("BinaryPath"));
-                        }
-
-                        daemons.Add(serviceDefinition);
-                    }
-                }
-
-            }
-
-            return daemons;
-        }
-
-
 
         public static void WriteSessionUsername(string serviceName, string username)
         {
             if (string.IsNullOrWhiteSpace(username))
-                throw new Exception("WriteSessionUsername: Invalid username.");
+                throw new ArgumentException("WriteSessionUsername: Invalid username.");
 
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(RegPath + serviceName + "\\Parameters", true))
             {
@@ -292,16 +288,17 @@ namespace DaemonMaster.Core
             {
                 username = Convert.ToString(key.GetValue("StartInSessionAs", string.Empty));
             }
-
+            
             if (string.IsNullOrWhiteSpace(username))
-                return username;
+                return string.Empty;
 
             //Write only when a name was in it
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + serviceName + "\\Parameters", true))
             {
                 key.SetValue("StartInSessionAs", string.Empty, RegistryValueKind.String);
-                return username;
             }
+
+            return username;
         }
 
 
@@ -319,7 +316,7 @@ namespace DaemonMaster.Core
                         string serviceExePath = Convert.ToString(keyNew.GetValue("ImagePath") ?? string.Empty);
 
                         //Check the path
-                        if (!string.IsNullOrWhiteSpace(serviceExePath) && serviceExePath.Contains(ServiceControlManager.DmServiceExe))
+                        if (!string.IsNullOrWhiteSpace(serviceExePath) && DaemonMasterUtils.ComparePaths(serviceExePath, ServiceControlManager.DmServiceExe))
                             return true; //New system
                     }
                 }

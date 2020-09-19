@@ -9,6 +9,7 @@ using System.Threading;
 using DaemonMaster.Core.Exceptions;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using DaemonMaster.Core.Win32.PInvoke.Kernel32;
+using DaemonMaster.Win32.PInvoke;
 using Microsoft.Win32.SafeHandles;
 
 namespace DaemonMaster.Core.Win32
@@ -21,6 +22,11 @@ namespace DaemonMaster.Core.Win32
     {
         public ServiceHandle() : base(ownsHandle: true)
         {
+        }
+
+        public ServiceHandle(IntPtr ptr, bool ownsHandle) : base(ownsHandle)
+        {
+            SetHandle(ptr);
         }
 
         protected override bool ReleaseHandle()
@@ -144,9 +150,6 @@ namespace DaemonMaster.Core.Win32
             string[] dependOnGroup
          )
         {
-            if (QueryServiceStatus().currentState != Advapi32.ServiceCurrentState.Stopped)
-                throw new ServiceNotStoppedException();
-
             var serviceType = Advapi32.ServiceType.Win32OwnProcess; //DM only supports Win32OwnProcess
             if (Equals(credentials, ServiceCredentials.LocalSystem) && canInteractWithDesktop)
             {
@@ -173,7 +176,7 @@ namespace DaemonMaster.Core.Win32
                     ServiceControlManager.DmServiceExe,
                     loadOrderGroup,
                     tagId: 0, // Tags are only evaluated for driver services that have SERVICE_BOOT_START or SERVICE_SYSTEM_START start types.
-                    Advapi32.ConvertDependenciesArraysToDoubleNullTerminatedString(dependOnService, dependOnGroup),
+                    Advapi32.ConvertDependenciesArraysToWin32String(dependOnService, dependOnGroup),
                     credentials.Username,
                     passwordHandle,
                     displayName
@@ -196,22 +199,14 @@ namespace DaemonMaster.Core.Win32
         /// <exception cref="ArgumentException"></exception>
         public void ChangeDescription(string description)
         {
-            if (QueryServiceStatus().currentState != Advapi32.ServiceCurrentState.Stopped)
-                throw new ServiceNotStoppedException();
-
-            if (description == null)
-                throw new ArgumentNullException(nameof(description));
-
-            IntPtr ptr = IntPtr.Zero;
-
             //Create the struct
             Advapi32.ServiceConfigDescription serviceDescription;
             serviceDescription.description = description;
 
+            IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(serviceDescription));
             try
             {
                 // Copy the struct to unmanaged memory
-                ptr = Marshal.AllocHGlobal(Marshal.SizeOf(serviceDescription));
                 Marshal.StructureToPtr(serviceDescription, ptr, fDeleteOld: false);
 
                 //Call ChangeServiceConfig2
@@ -220,8 +215,7 @@ namespace DaemonMaster.Core.Win32
             }
             finally
             {
-                if (ptr != IntPtr.Zero)
-                    Marshal.FreeHGlobal(ptr);
+                Marshal.FreeHGlobal(ptr);
             }
         }
 
@@ -234,19 +228,14 @@ namespace DaemonMaster.Core.Win32
         /// </param>
         public void ChangeDelayedStart(bool enable)
         {
-            if (QueryServiceStatus().currentState != Advapi32.ServiceCurrentState.Stopped)
-                throw new ServiceNotStoppedException();
-
-            IntPtr ptr = IntPtr.Zero;
-
             //Create the struct
             Advapi32.ServiceConfigDelayedAutoStartInfo serviceDelayedAutoStartInfo;
             serviceDelayedAutoStartInfo.DelayedAutostart = enable;
 
+            IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(serviceDelayedAutoStartInfo));
             try
             {
                 // Copy the struct to unmanaged memory
-                ptr = Marshal.AllocHGlobal(Marshal.SizeOf(serviceDelayedAutoStartInfo));
                 Marshal.StructureToPtr(serviceDelayedAutoStartInfo, ptr, fDeleteOld: false);
 
                 //Call ChangeServiceConfig2
@@ -255,8 +244,7 @@ namespace DaemonMaster.Core.Win32
             }
             finally
             {
-                if (ptr != IntPtr.Zero)
-                    Marshal.FreeHGlobal(ptr);
+                Marshal.FreeHGlobal(ptr);
             }
         }
 
@@ -271,19 +259,16 @@ namespace DaemonMaster.Core.Win32
         /// <exception cref="Win32Exception"></exception>
         public void ChangeFailureActionsOnNonCrashFailures(bool enable)
         {
-            if (QueryServiceStatus().currentState != Advapi32.ServiceCurrentState.Stopped)
-                throw new ServiceNotStoppedException();
 
-            IntPtr ptr = IntPtr.Zero;
 
             //Create the struct
             Advapi32.ServiceConfigFailureActionsFlag serviceConfigFailureActionsFlag;
             serviceConfigFailureActionsFlag.failureActionsOnNonCrashFailures = enable;
 
+            IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(serviceConfigFailureActionsFlag));
             try
             {
                 // Copy the struct to unmanaged memory
-                ptr = Marshal.AllocHGlobal(Marshal.SizeOf(serviceConfigFailureActionsFlag));
                 Marshal.StructureToPtr(serviceConfigFailureActionsFlag, ptr, fDeleteOld: false);
 
                 //Call ChangeServiceConfig2
@@ -292,8 +277,7 @@ namespace DaemonMaster.Core.Win32
             }
             finally
             {
-                if (ptr != IntPtr.Zero)
-                    Marshal.FreeHGlobal(ptr);
+                Marshal.FreeHGlobal(ptr);
             }
         }
 
@@ -304,6 +288,9 @@ namespace DaemonMaster.Core.Win32
         /// <exception cref="Win32Exception"></exception>
         public void ChangeFailureActions(Advapi32.ServiceFailureActions failureActions)
         {
+            if (QueryServiceStatus().currentState != Advapi32.ServiceCurrentState.Stopped)
+                throw new ServiceNotStoppedException();
+
             int size = Marshal.SizeOf<Advapi32.ScAction>();
             IntPtr ptr = failureActions.Actions != null ? Marshal.AllocHGlobal(size * failureActions.Actions.Count) : IntPtr.Zero;
             try
@@ -381,32 +368,124 @@ namespace DaemonMaster.Core.Win32
         /// <returns>Service status process instance</returns>
         public Advapi32.ServiceStatusProcess QueryServiceStatus()
         {
-            IntPtr bufferPtr = IntPtr.Zero;
+            uint bytesNeeded = 0;
 
+            //Determine the required buffer size => buffer and bufferSize must be null
+            if (!Advapi32.QueryServiceStatusEx(serviceHandle: this, Advapi32.ScStatusProcessInfo, buffer: IntPtr.Zero, 0, ref bytesNeeded))
+            {
+                int result = Marshal.GetLastWin32Error();
+
+                if (result != Win32ErrorCodes.ERROR_INSUFFICIENT_BUFFER)
+                    throw new Win32Exception(result);
+            }
+
+            //Allocate the required buffer size
+            IntPtr bufferPtr = Marshal.AllocHGlobal((int)bytesNeeded);
             try
             {
-                //Determine the required buffer size => buffer and bufferSize must be null
-                if (!Advapi32.QueryServiceStatusEx(serviceHandle: this, Advapi32.ScStatusProcessInfo, buffer: IntPtr.Zero, 0, out uint bytesNeeded))
-                {
-                    int result = Marshal.GetLastWin32Error();
-
-                    if (result != 0x7A) //ERROR_INSUFFICIENT_BUFFER
-                        throw new Win32Exception(result);
-                }
-
-                //Allocate the required buffer size
-                bufferPtr = Marshal.AllocHGlobal((int)bytesNeeded);
-
-
-                if (!Advapi32.QueryServiceStatusEx(serviceHandle: this, Advapi32.ScStatusProcessInfo, buffer: bufferPtr, bufferSize: bytesNeeded, out bytesNeeded))
+                if (!Advapi32.QueryServiceStatusEx(serviceHandle: this, Advapi32.ScStatusProcessInfo, buffer: bufferPtr, bufferSize: bytesNeeded, ref bytesNeeded))
                     throw new Win32Exception(Marshal.GetLastWin32Error());
 
-                return (Advapi32.ServiceStatusProcess)Marshal.PtrToStructure(bufferPtr, typeof(Advapi32.ServiceStatusProcess));
+                return Marshal.PtrToStructure<Advapi32.ServiceStatusProcess>(bufferPtr);
             }
             finally
             {
-                if (bufferPtr != IntPtr.Zero)
-                    Marshal.FreeHGlobal(bufferPtr);
+                Marshal.FreeHGlobal(bufferPtr);
+            }
+        }
+
+        /// <summary>
+        /// Query the current config of the service
+        /// </summary> 
+        /// <returns>Service status process instance</returns>
+        public Advapi32.QUERY_SERVICE_CONFIG QueryServiceConfig()
+        {
+            uint bytesNeeded = 0;
+
+            //Determine the required buffer size => buffer and bufferSize must be null
+            if (!Advapi32.QueryServiceConfig(this, IntPtr.Zero, 0, ref bytesNeeded))
+            {
+                int result = Marshal.GetLastWin32Error();
+
+                if (result != Win32ErrorCodes.ERROR_INSUFFICIENT_BUFFER)
+                    throw new Win32Exception(result);
+            }
+
+            //Allocate the required buffer size
+            IntPtr bufferPtr = Marshal.AllocHGlobal((int)bytesNeeded);
+            try
+            {
+                if (!Advapi32.QueryServiceConfig(this, bufferPtr, bytesNeeded, ref bytesNeeded))
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+
+                return Marshal.PtrToStructure<Advapi32.QUERY_SERVICE_CONFIG>(bufferPtr);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(bufferPtr);
+            }
+        }
+
+        /// <summary>
+        /// Query the description of the service
+        /// </summary>
+        /// <exception cref="ArgumentException"></exception>
+        public string QueryDescription()
+        {
+            uint bytesNeeded = 0;
+
+            //Call QueryServiceConfig2
+            if (!Advapi32.QueryServiceConfig2(this, Advapi32.ServiceInfoLevel.Description, IntPtr.Zero, 0, ref bytesNeeded))
+            {
+                int result = Marshal.GetLastWin32Error();
+
+                if (result != Win32ErrorCodes.ERROR_INSUFFICIENT_BUFFER)
+                    throw new Win32Exception(result);
+            }
+
+            //Allocate the required buffer size
+            IntPtr bufferPtr = Marshal.AllocHGlobal((int)bytesNeeded);
+            try
+            {
+                if (!Advapi32.QueryServiceConfig2(this, Advapi32.ServiceInfoLevel.Description, bufferPtr, bytesNeeded, ref bytesNeeded))
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+
+                return Marshal.PtrToStructure<Advapi32.ServiceConfigDescription>(bufferPtr).description;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(bufferPtr);
+            }
+        }
+
+        /// <summary>
+        /// Query the delayed start flag of the service
+        /// </summary>
+        public bool QueryDelayedStart()
+        {
+            uint bytesNeeded = 0;
+
+            //Call QueryServiceConfig2
+            if (!Advapi32.QueryServiceConfig2(this, Advapi32.ServiceInfoLevel.Description, IntPtr.Zero, 0, ref bytesNeeded))
+            {
+                int result = Marshal.GetLastWin32Error();
+
+                if (result != Win32ErrorCodes.ERROR_INSUFFICIENT_BUFFER)
+                    throw new Win32Exception(result);
+            }
+
+            //Allocate the required buffer size
+            IntPtr bufferPtr = Marshal.AllocHGlobal((int)bytesNeeded);
+            try
+            {
+                if (!Advapi32.QueryServiceConfig2(this, Advapi32.ServiceInfoLevel.Description, bufferPtr, bytesNeeded, ref bytesNeeded))
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+
+                return Marshal.PtrToStructure<Advapi32.ServiceConfigDelayedAutoStartInfo>(bufferPtr).DelayedAutostart;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(bufferPtr);
             }
         }
 
@@ -417,7 +496,7 @@ namespace DaemonMaster.Core.Win32
         public void ExecuteCommand(int command)
         {
             if (command < 128 || command > 255)
-                throw new ArgumentException("Only a range of 128-255 is allowed.");
+                throw new ArgumentException("Only a range of 128-255 is allowed for custom commands.");
 
             var serviceStatus = new Advapi32.ServiceStatus();
             Advapi32.ControlService(this, command, ref serviceStatus);

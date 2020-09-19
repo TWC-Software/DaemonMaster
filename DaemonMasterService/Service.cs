@@ -63,7 +63,7 @@ namespace DaemonMasterService
                 _serviceName = GetServiceName();
 
                 //Get data from registry 
-                _serviceDefinition = RegistryManagement.LoadServiceStartInfosFromRegistry(_serviceName);
+                _serviceDefinition = RegistryManagement.LoadFromRegistry(_serviceName);
 
                 //--------------------------------------------------------------------
 

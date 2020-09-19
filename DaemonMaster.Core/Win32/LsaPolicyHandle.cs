@@ -27,8 +27,8 @@ using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text;
+using DaemonMaster.Core.Win32.PInvoke;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
-using DaemonMaster.Core.Win32.PInvoke.Core;
 using DaemonMaster.Core.Win32.PInvoke.Kernel32;
 using Microsoft.Win32.SafeHandles;
 
@@ -147,6 +147,10 @@ namespace DaemonMaster.Core.Win32
                 {
                     //Enumerate account rights
                     NtStatus ret = Advapi32.LsaEnumerateAccountRights(this, win32Sid.Pointer, out rightsPtr, out countOfRights);
+
+                    if (ret == NtStatus.ObjectNameNotFound) //When you use a user account does not have privileges explicitly assigned to it the function will return NtStatus.ObjectNameNotFound.
+                        return Array.Empty<Advapi32.LsaUnicodeString>();
+
                     if (ret != NtStatus.Success)
                         throw new Win32Exception(Advapi32.LsaNtStatusToWinError(ret));
                 }

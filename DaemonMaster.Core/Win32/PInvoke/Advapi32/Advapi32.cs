@@ -2,7 +2,6 @@
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
-using DaemonMaster.Core.Win32.PInvoke.Core;
 
 namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
 {
@@ -10,6 +9,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
     {
         public const uint ServiceNoChange = 0xFFFFFFFF;
         public const uint ScStatusProcessInfo = 0;
+        public const string ScGroupIdentifier = "+";
 
         private const string DllName = "advapi32.dll";
 
@@ -26,7 +26,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
             string binaryPathName,
             string loadOrderGroup,
             uint tagId,
-            StringBuilder dependencies,
+            string dependencies,
             string serviceUsername,
             IntPtr servicePassword
         );
@@ -91,15 +91,36 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
         );
 
 
-        [DllImport(DllName, SetLastError = true)]
+        [DllImport(DllName, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern bool QueryServiceStatusEx
         (
             ServiceHandle serviceHandle,
             uint infoLevel,
             IntPtr buffer,
             uint bufferSize,
-            out uint bytesNeeded
+            ref uint bytesNeeded
         );
+
+        [DllImport(DllName, SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern bool QueryServiceConfig
+        (
+            ServiceHandle serviceHandle,
+            IntPtr buffer,
+            uint bufferSize,
+            ref uint bytesNeeded
+        );
+
+        [DllImport(DllName, SetLastError = true, CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool QueryServiceConfig2
+        (
+            ServiceHandle serviceHandle,
+            ServiceInfoLevel infoLevel,
+            IntPtr buffer,
+            uint bufferSize,
+            ref uint bytesNeeded
+        );
+
 
         [DllImport(DllName, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -112,9 +133,9 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
             string binaryPathName,
             string loadOrderGroup,
             uint tagId,
-            StringBuilder dependencies,
+            string dependencies,
             string serviceUsername,
-            IntPtr serviceassword,
+            IntPtr servicePassword,
             string displayName
         );
 
@@ -155,7 +176,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
         (
             TokenHandle logonToken,
             string applicationName,
-            StringBuilder commandLineArgs,
+            string commandLineArgs,
             Kernel32.Kernel32.SecurityAttributes processAttributes,
             Kernel32.Kernel32.SecurityAttributes threadAttributes,
             bool inheritHandles,
@@ -169,7 +190,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
         //LSA 
 
         [DllImport(DllName, CharSet = CharSet.Unicode, SetLastError = true)]
-        public static extern bool LookupAccountName(string systemName, string accountName, IntPtr pSid, ref uint cbSid, StringBuilder referencedDomainName, ref uint cbReferencedDomainName, out uint use);
+        public static extern bool LookupAccountName(string systemName, string accountName, IntPtr sid, ref uint sidSize, StringBuilder referencedDomainName, ref uint referencedDomainNameSize, out uint sidType);
 
         [DllImport(DllName)]
         public static extern void FreeSid(IntPtr pSid);

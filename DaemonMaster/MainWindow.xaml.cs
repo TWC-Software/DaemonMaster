@@ -64,7 +64,7 @@ namespace DaemonMaster
 
 
             //Fill the list and subs to the event
-            _processCollection = new ObservableCollection<ServiceListViewItem>(RegistryManagement.LoadInstalledServices().ConvertAll(x => new ServiceListViewItem(x.ServiceName, x.DisplayName, x.BinaryPath, Equals(x.Credentials, ServiceCredentials.LocalSystem))));
+            _processCollection = new ObservableCollection<ServiceListViewItem>(RegistryManagement.GetInstalledServices().ConvertAll(x => new ServiceListViewItem(x.ServiceName, x.DisplayName, x.BinaryPath, Equals(x.Credentials, ServiceCredentials.LocalSystem))));
             _processCollection.CollectionChanged += ProcessCollectionOnCollectionChanged;
 
             //Start ListView updater
@@ -196,7 +196,7 @@ namespace DaemonMaster
             //Clear the list and refill it so that the event gets fired
             _processCollection.Clear();
 
-            List<ServiceListViewItem> list = RegistryManagement.LoadInstalledServices().ConvertAll(x => new ServiceListViewItem(x.ServiceName, x.DisplayName, x.BinaryPath, Equals(x.Credentials, ServiceCredentials.LocalSystem)));
+            List<ServiceListViewItem> list = RegistryManagement.GetInstalledServices().ConvertAll(x => new ServiceListViewItem(x.ServiceName, x.DisplayName, x.BinaryPath, Equals(x.Credentials, ServiceCredentials.LocalSystem)));
             foreach (ServiceListViewItem item in list)
             {
                 _processCollection.Add(item);
@@ -373,7 +373,7 @@ namespace DaemonMaster
             try
             {
                 //Open service edit window with the data from registry
-                var serviceEditWindow = new ServiceEditWindow(RegistryManagement.LoadServiceStartInfosFromRegistry(serviceListViewItem.ServiceName));
+                var serviceEditWindow = new ServiceEditWindow(RegistryManagement.LoadFromRegistry(serviceListViewItem.ServiceName));
                 //stops until windows has been closed
                 bool? dialogResult = serviceEditWindow.ShowDialog();
                 //Check result

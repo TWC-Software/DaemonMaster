@@ -12,7 +12,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
         /// <param name="stringServiceDependencies">String array of services on which the service is dependent</param>
         /// <param name="stringGroupDependencies">String array of groups on which the service is dependent</param>
         /// <returns>The converted string</returns>
-        public static StringBuilder ConvertDependenciesArraysToDoubleNullTerminatedString(string[] stringServiceDependencies, string[] stringGroupDependencies)
+        public static string ConvertDependenciesArraysToWin32String(string[] stringServiceDependencies, string[] stringGroupDependencies)
         {
             var stringBuilder = new StringBuilder();
 
@@ -23,13 +23,13 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
 
             foreach (string item in stringGroupDependencies)
             {
-                stringBuilder.Append("+" + item.Trim()).Append("\0"); // + = SC_GROUP_IDENTIFIER
+                stringBuilder.Append(ScGroupIdentifier + item.Trim()).Append("\0");
             }
 
             //Double null termination
             stringBuilder.Append("\0");
 
-            return stringBuilder;
+            return stringBuilder.ToString();
         }
 
         public static LsaUnicodeString ToLsaString(this string s)

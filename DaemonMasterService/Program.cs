@@ -100,7 +100,7 @@ namespace DaemonMasterService
                 }
 
                 //Load data from registry
-                serviceDefinition = RegistryManagement.LoadServiceStartInfosFromRegistry(realServiceName);
+                serviceDefinition = RegistryManagement.LoadFromRegistry(realServiceName);
             }
             catch (Exception)
             {
@@ -199,7 +199,7 @@ namespace DaemonMasterService
             {
                 Console.WriteLine("Number:  service name / display name");
 
-                List<DmServiceDefinition> services = RegistryManagement.LoadInstalledServices();
+                List<DmServiceDefinition> services = RegistryManagement.GetInstalledServices();
                 for (var i = 0; i < services.Count; i++)
                 {
                     var sb = new StringBuilder();
