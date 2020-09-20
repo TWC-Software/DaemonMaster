@@ -33,4 +33,3 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("0.2.10.0")]
 [assembly: AssemblyFileVersion("0.2.10.0")]
-[assembly: AssemblyCopyrightAttribute("Copyright © 2017-2020 Mike Cremer / Stephan André")]
