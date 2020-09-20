@@ -251,14 +251,14 @@ namespace DaemonMaster
             try
             {
                 //Ask the user if the key is no set
-                if (RegistryManagement.CheckInteractiveServices()) 
+                if (RegistryManagement.CheckInteractiveServices())
                     return;
 
                 MessageBoxResult result = MessageBox.Show(_resManager.GetString("interactive_service_regkey_not_set"), _resManager.GetString("question"), MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result != MessageBoxResult.Yes)
                     return;
 
-                if (RegistryManagement.EnableInteractiveServices(true)) 
+                if (RegistryManagement.EnableInteractiveServices(true))
                     return;
 
                 MessageBox.Show(_resManager.GetString("problem_occurred"), _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
@@ -571,7 +571,8 @@ namespace DaemonMaster
                 }
             }
 
-            _ = Updater.Updater.StartAsync("https://github.com/TWC-Software/DaemonMaster");
+            if (!_config.DisableCheckForUpdates)
+                _ = Updater.Updater.StartAsync("https://github.com/TWC-Software/DaemonMaster");
         }
 
         private void ProcessCollectionOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)

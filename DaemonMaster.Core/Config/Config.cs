@@ -39,6 +39,9 @@ namespace DaemonMaster.Core.Config
         }
 
         public string Language { get; set; } = "windows";
+
+        public bool DisableCheckForUpdates { get; set; } = false;
+
         public bool ActivateLegacyFunctions { get; set; } = false;
         public bool UseExperimentalFunctions { get; set; } = false;
 
