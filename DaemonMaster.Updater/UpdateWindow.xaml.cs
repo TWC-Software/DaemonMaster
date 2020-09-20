@@ -53,6 +53,12 @@ namespace DaemonMaster.Updater
             DialogResult = false;
         }
 
+        private void ButtonSkip_Click(object sender, RoutedEventArgs e)
+        {
+            Updater.PersistenceProvider.SetSkippedVersion(Updater.LastGitHubRelease.Version);
+            DialogResult = false;
+        }
+
         private bool OpenDownloadProgressWindow()
         {
             try
@@ -80,6 +86,5 @@ namespace DaemonMaster.Updater
 
             return Path.GetFileName(uri.LocalPath);
         }
-
     }
 }

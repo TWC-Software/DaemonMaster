@@ -115,4 +115,7 @@
   <data name="error" xml:space="preserve">
     <value>Error!</value>
   </data>
+  <data name="skip" xml:space="preserve">
+    <value>Skip</value>
+  </data>
 </root>

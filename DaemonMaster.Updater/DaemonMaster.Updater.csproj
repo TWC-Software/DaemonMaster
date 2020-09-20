@@ -78,6 +78,7 @@
       <DependentUpon>DownloadProgressWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="GitHub\GitHubApi.cs" />
+    <Compile Include="Persistence\IPersistenceProvider.cs" />
     <Compile Include="Lang\downloadProgressWindowLang.de.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -123,6 +124,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>updaterWindowLang.fr.resx</DependentUpon>
     </Compile>
+    <Compile Include="Persistence\JsonPersistenceProvider.cs" />
+    <Compile Include="Persistence\RegistryPersistenceProvider.cs" />
     <Compile Include="Updater.cs" />
     <Compile Include="UpdateWindow.xaml.cs">
       <DependentUpon>UpdateWindow.xaml</DependentUpon>
@@ -192,5 +195,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

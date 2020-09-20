@@ -40,6 +40,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using DaemonMaster.Updater.GitHub;
 using DaemonMaster.Updater.Lang;
+using DaemonMaster.Updater.Persistence;
 
 namespace DaemonMaster.Updater
 {
@@ -49,6 +50,8 @@ namespace DaemonMaster.Updater
 
 
         private static bool _working = false;
+
+        internal static IPersistenceProvider PersistenceProvider;
 
         /// <summary>
         /// GitHub repo path
@@ -76,6 +79,11 @@ namespace DaemonMaster.Updater
         public static string AppName { get; private set; }
 
         /// <summary>
+        /// Name of the company (usually this will be set automatically, but you can set it manually if you want :))
+        /// </summary>
+        public static string CompanyName { get; private set; }
+
+        /// <summary>
         /// Last release from GitHub
         /// </summary>
         internal static GitHubApi.GitHubRelease LastGitHubRelease { get; private set; }
@@ -84,6 +92,7 @@ namespace DaemonMaster.Updater
         /// StartAsync seeking for updates
         /// </summary>
         /// <param name="gitHubRepoPath">Path to the GitHub repo (like: https://github.com/myuser/myrepo )</param>
+        /// <param name="showDialogs">Show error dialogs. (false = silent mode)</param>
         /// <param name="acceptPrerelease">If you want to accept prereleases as updates</param>
         /// <param name="accessToken">If you have an access token for the repo put it down here</param>
         /// <param name="myAssembly">If you want an other assembly the the calling assembly of the updater DLL file</param>
@@ -103,25 +112,33 @@ namespace DaemonMaster.Updater
 
                 if (myAssembly == null)
                 {
+                    myAssembly = Assembly.GetEntryAssembly();
+
                     //Return if the caller is an unmanaged application (= null)
-                    if (Assembly.GetEntryAssembly() != null)
-                    {
-                        myAssembly = Assembly.GetEntryAssembly();
-                    }
-                    else
-                    {
+                    if (myAssembly == null)
                         return;
-                    }
                 }
 
-                AppName = myAssembly.GetName().Name;
-                CurrentVersion = myAssembly.GetName().Version;
-
+                var fileVersion = FileVersionInfo.GetVersionInfo(myAssembly.Location);
+                CompanyName = fileVersion.CompanyName;
+                AppName = string.IsNullOrWhiteSpace(fileVersion.ProductName) ? myAssembly.GetName().Name : fileVersion.ProductName;
+                CurrentVersion = new Version(fileVersion.ProductVersion);
+           
+                if (PersistenceProvider == null)
+                {
+                    string registryLocation = !string.IsNullOrEmpty(CompanyName) ? $@"Software\{CompanyName}\{AppName}\Updater" : $@"Software\{AppName}\Updater";
+                    PersistenceProvider = new RegistryPersistenceProvider(registryLocation);
+                }
+                
                 LastGitHubRelease = await GitHubApi.GitHubGetLastReleaseAsync(GitHubRepoPath, AccessToken);
 
 
-                if (LastGitHubRelease.Version > CurrentVersion)
+                Version skippedVersion = PersistenceProvider.GetSkippedVersion();
+                if (LastGitHubRelease.Version > CurrentVersion && (skippedVersion == null || LastGitHubRelease.Version != skippedVersion))
                 {
+                    if (skippedVersion != null)
+                        PersistenceProvider.SetSkippedVersion(null);
+
                     if (Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
                     {
                         ShowUpdateWindow();

@@ -52,7 +52,6 @@ namespace DaemonMaster.Core.Win32
         /// <summary>
         /// Opens a new policy handle.
         /// </summary>
-        /// <param name="systemName">Name of the system. (nothing = local system)</param>
         /// <returns></returns>
         /// <exception cref="Win32Exception"></exception>
         public static LsaPolicyHandle OpenPolicyHandle()
@@ -65,9 +64,9 @@ namespace DaemonMaster.Core.Win32
                 Attributes = 0,
                 SecurityDescriptor = IntPtr.Zero,
                 SecurityQualityOfService = IntPtr.Zero,
-                Length = Marshal.SizeOf(typeof(LsaObjectAttributes))
+                Length = Marshal.SizeOf<LsaObjectAttributes>()
             };
-
+            
             //Create a new LSA policy handle
             NtStatus ret = Advapi32.LsaOpenPolicy(ref systemName, ref lsaObjectAttributes, Kernel32.AccessMask.PolicySpecificRights.PolicyAllAccess, out LsaPolicyHandle policyHandle); //systemName = null (Local System)
             if (ret != NtStatus.Success)
@@ -139,7 +138,6 @@ namespace DaemonMaster.Core.Win32
         public Advapi32.LsaUnicodeString[] EnumeratePrivileges(string account)
         {
             IntPtr rightsPtr = IntPtr.Zero;
-
             try
             {
                 uint countOfRights;
@@ -148,19 +146,20 @@ namespace DaemonMaster.Core.Win32
                     //Enumerate account rights
                     NtStatus ret = Advapi32.LsaEnumerateAccountRights(this, win32Sid.Pointer, out rightsPtr, out countOfRights);
 
-                    if (ret == NtStatus.ObjectNameNotFound) //When you use a user account does not have privileges explicitly assigned to it the function will return NtStatus.ObjectNameNotFound.
+                    if (ret == NtStatus.ObjectNameNotFound) //When you use a user account that does not have privileges explicitly assigned to it, the function will return NtStatus.ObjectNameNotFound.
                         return Array.Empty<Advapi32.LsaUnicodeString>();
 
                     if (ret != NtStatus.Success)
                         throw new Win32Exception(Advapi32.LsaNtStatusToWinError(ret));
                 }
 
+                var lsaUnicodeStringSize = Marshal.SizeOf<Advapi32.LsaUnicodeString>();
                 var privileges = new Advapi32.LsaUnicodeString[countOfRights];
                 IntPtr tempPtr = rightsPtr;
                 for (var i = 0; i < countOfRights; i++)
                 {
-                    privileges[i] = (Advapi32.LsaUnicodeString)Marshal.PtrToStructure(tempPtr, typeof(Advapi32.LsaUnicodeString));
-                    tempPtr = tempPtr + Marshal.SizeOf<Advapi32.LsaUnicodeString>();
+                    privileges[i] = Marshal.PtrToStructure<Advapi32.LsaUnicodeString>(tempPtr);
+                    IntPtr.Add(tempPtr, lsaUnicodeStringSize);
                 }
 
                 return privileges;

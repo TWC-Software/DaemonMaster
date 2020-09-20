@@ -12,5 +12,6 @@
         <Button x:Name="ButtonUpdate" Content="{x:Static resx:updaterWindowLang.update}" Margin="0,0,12.667,3.667" Click="ButtonUpdate_Click" HorizontalAlignment="Right" Width="100" Height="20" VerticalAlignment="Bottom"/>
         <Label x:Name="LabelUpdate" Content="{x:Static resx:updaterWindowLang.label_update}" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontWeight="Bold" FontStyle="Italic"/>
         <Label x:Name="LabelDescription" Content="{x:Static resx:updaterWindowLang.label_description}" HorizontalAlignment="Left" Margin="10,22,0,0" VerticalAlignment="Top" FontSize="10"/>
+        <Button x:Name="ButtonSkip" Content="{x:Static lang:updaterWindowLang.skip}" HorizontalAlignment="Left" Margin="185,0,0,4" Width="100" Click="ButtonSkip_Click" Height="20" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>

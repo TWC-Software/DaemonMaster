@@ -97,6 +97,15 @@ namespace DaemonMaster.Updater.Lang {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Skip ähnelt.
+        /// </summary>
+        public static string skip {
+            get {
+                return ResourceManager.GetString("skip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Update ähnelt.
         /// </summary>
         public static string update {
