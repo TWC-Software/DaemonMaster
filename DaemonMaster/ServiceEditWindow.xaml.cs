@@ -63,7 +63,7 @@ namespace DaemonMaster
             set
             {
                 SetValue(ReadOnlyModeProperty, value);
-                SetValue(TitelProperty, ResManager.GetString("window_edit_add", CultureInfo.CurrentUICulture) + (value ? " [" + ResManager.GetString("read_only") + "]" : string.Empty));
+                SetValue(TitelProperty, ResManager.GetString("window_edit_add", CultureInfo.CurrentUICulture) + (value ? " [" + ResManager.GetString("read_only", CultureInfo.CurrentUICulture) + "]" : string.Empty));
             }
         }
 
