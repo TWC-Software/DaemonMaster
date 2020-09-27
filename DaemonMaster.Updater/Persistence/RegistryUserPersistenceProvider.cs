@@ -3,13 +3,13 @@ using System;
 
 namespace DaemonMaster.Updater.Persistence
 {
-    internal class RegistryPersistenceProvider : IPersistenceProvider
+    public class RegistryUserPersistenceProvider : IPersistenceProvider
     {
         public string RegistryPath { get; }
 
         private const string SkippedVersionRegKey = "SkippedVersion";
 
-        public RegistryPersistenceProvider(string regPath)
+        public RegistryUserPersistenceProvider(string regPath)
         {
             RegistryPath = regPath;
         }

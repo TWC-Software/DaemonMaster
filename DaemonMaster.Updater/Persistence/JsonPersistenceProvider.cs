@@ -4,7 +4,7 @@ using System.IO;
 
 namespace DaemonMaster.Updater.Persistence
 {
-    internal class JsonPersistenceProvider : IPersistenceProvider
+    public class JsonPersistenceProvider : IPersistenceProvider
     {
         private readonly string filePath = string.Empty;
         private JsonSettings settings = new JsonSettings();

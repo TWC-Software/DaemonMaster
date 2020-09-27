@@ -46,12 +46,9 @@ namespace DaemonMaster.Updater
 {
     public sealed class Updater
     {
-        private static readonly ResourceManager _resManager = new ResourceManager(typeof(updaterLang));
-
-
+        private static readonly ResourceManager ResManager = new ResourceManager(typeof(updaterLang));
         private static bool _working = false;
 
-        internal static IPersistenceProvider PersistenceProvider;
 
         /// <summary>
         /// GitHub repo path
@@ -76,12 +73,17 @@ namespace DaemonMaster.Updater
         /// <summary>
         /// Name of the application to update (usually this will be set automatically, but you can set it manually if you want :))
         /// </summary>
-        public static string AppName { get; private set; }
+        public static string AppName { get; set; }
 
         /// <summary>
         /// Name of the company (usually this will be set automatically, but you can set it manually if you want :))
         /// </summary>
-        public static string CompanyName { get; private set; }
+        public static string CompanyName { get; set; }
+
+        /// <summary>
+        /// Gets or sets a custom persistence provider.
+        /// </summary>
+        public static IPersistenceProvider PersistenceProvider { get; set; }
 
         /// <summary>
         /// Last release from GitHub
@@ -123,11 +125,12 @@ namespace DaemonMaster.Updater
                 CompanyName = fileVersion.CompanyName;
                 AppName = string.IsNullOrWhiteSpace(fileVersion.ProductName) ? myAssembly.GetName().Name : fileVersion.ProductName;
                 CurrentVersion = new Version(fileVersion.ProductVersion);
-           
+
+                //Use default persistence provider when it is null
                 if (PersistenceProvider == null)
                 {
                     string registryLocation = !string.IsNullOrEmpty(CompanyName) ? $@"Software\{CompanyName}\{AppName}\Updater" : $@"Software\{AppName}\Updater";
-                    PersistenceProvider = new RegistryPersistenceProvider(registryLocation);
+                    PersistenceProvider = new RegistryUserPersistenceProvider(registryLocation);
                 }
                 
                 LastGitHubRelease = await GitHubApi.GitHubGetLastReleaseAsync(GitHubRepoPath, AccessToken);
@@ -155,7 +158,7 @@ namespace DaemonMaster.Updater
                 else
                 {
                     if (showDialogs)
-                        MessageBox.Show(_resManager.GetString("no_update_found_text", CultureInfo.CurrentUICulture), _resManager.GetString("no_update_found", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show(ResManager.GetString("no_update_found_text", CultureInfo.CurrentUICulture), ResManager.GetString("no_update_found", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Information);
                 }
 
                 _working = false;
@@ -165,7 +168,7 @@ namespace DaemonMaster.Updater
                 _working = false;
 
                 if (showDialogs)
-                    MessageBox.Show(ex.Message, _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(ex.Message, ResManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -184,37 +187,42 @@ namespace DaemonMaster.Updater
         /// Close all running instances with the same name and path 
         /// (this method is derived from AutoUpdater.NETs method 'Exit' / Copyright to RBSoft)
         /// </summary>
-        private static void CloseAllRunningInstances()
+        private static void CloseAllRunningInstances(bool askForClose = false)
         {
             Process currentProcess = Process.GetCurrentProcess();
             foreach (Process process in Process.GetProcessesByName(currentProcess.ProcessName))
             {
+                if (string.IsNullOrWhiteSpace(currentProcess.MainModule?.FileName))
+                    return;
+
                 string fileName;
                 try
                 {
-                    fileName = process.MainModule.FileName;
+                    fileName = process?.MainModule?.FileName;
+                    if(string.IsNullOrWhiteSpace(fileName))
+                        continue;
                 }
-                catch (Win32Exception)
+                catch(Win32Exception)
                 {
                     //If the search fails here, then it is not one of the processes that were are looking for
                     continue;
                 }
 
-                //if (process.Id == currentProcess.Id)
-                //    continue;
-
-
                 if (fileName == currentProcess.MainModule.FileName)
                 {
-                    MessageBoxResult result = MessageBox.Show(_resManager.GetString("close_app_for_update", CultureInfo.CurrentUICulture), _resManager.GetString("question", CultureInfo.CurrentUICulture), MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if (result == MessageBoxResult.No)
-                        return;
+                    MessageBoxResult result;
+                    if (askForClose)
+                    {
+                        result = MessageBox.Show(ResManager.GetString("close_app_for_update", CultureInfo.CurrentUICulture), ResManager.GetString("question", CultureInfo.CurrentUICulture), MessageBoxButton.YesNo, MessageBoxImage.Question);
+                        if (result == MessageBoxResult.No)
+                            return;
+                    }
 
                     if (process.CloseMainWindow()) //Send a message to the process that he must close 
                     {
                         if (!process.WaitForExit(TimeSpan.FromSeconds(10).Milliseconds)) //Wait 10 seconds before the process get killed
                         {
-                            result = MessageBox.Show(_resManager.GetString("warning_process_will_be_killed", CultureInfo.CurrentUICulture), _resManager.GetString("warning"), MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                            result = MessageBox.Show(ResManager.GetString("warning_process_will_be_killed", CultureInfo.CurrentUICulture), ResManager.GetString("warning"), MessageBoxButton.OKCancel, MessageBoxImage.Warning);
                             if (result == MessageBoxResult.Cancel)
                                 return;
 

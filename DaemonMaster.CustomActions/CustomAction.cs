@@ -34,6 +34,9 @@ namespace DaemonMaster.CustomActions
                     List<string> serviceNameList = new List<string>();
                     using (RegistryKey mainKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\", RegistryKeyPermissionCheck.ReadSubTree))
                     {
+                        if (mainKey == null)
+                            return ActionResult.Failure;
+
                         foreach (string serviceName in mainKey.GetSubKeyNames())
                         {
                             using (RegistryKey key = mainKey.OpenSubKey(serviceName, RegistryKeyPermissionCheck.ReadSubTree))
@@ -45,11 +48,8 @@ namespace DaemonMaster.CustomActions
                                 //Get the exe path of the service to determine later if its a service from DaemonMaster
                                 string serviceExePath = Convert.ToString(key.GetValue("ImagePath") ?? string.Empty);
 
-                                //If the serviceExePath is invalid skip this service
-                                if (string.IsNullOrWhiteSpace(serviceExePath))
-                                    continue;
 
-                                if (!serviceExePath.Contains(appFolder + ServiceControlManager.DmServiceFileName)) //Not possible to use ServiceControlManager.DmServiceExe because the AppDomain changed here => so that we need to rebuilt the path.
+                                if (string.IsNullOrWhiteSpace(serviceExePath) || !DaemonMasterUtils.ComparePaths(serviceExePath, appFolder + ServiceControlManager.DmServiceFileName)) //Not possible to use ServiceControlManager.DmServiceExe because the AppDomain changed here => so that we need to rebuilt the path.
                                     continue;
 
                                 serviceNameList.Add(serviceName);

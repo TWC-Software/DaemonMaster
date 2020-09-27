@@ -110,8 +110,7 @@ namespace DaemonMaster.Core
                         }
                         else
                         {
-                            string account = DaemonMasterUtils.IsLocalDomain(serviceDefinition.Credentials.Username) ? DaemonMasterUtils.GetLoginFromUsername(serviceDefinition.Credentials.Username) : serviceDefinition.Credentials.Username;
-                            rs.AddAccessRule(new RegistryAccessRule(new NTAccount(account), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
+                            rs.AddAccessRule(new RegistryAccessRule(new NTAccount(DaemonMasterUtils.GetDomainFromUsername(serviceDefinition.Credentials.Username), DaemonMasterUtils.GetLoginFromUsername(serviceDefinition.Credentials.Username)), RegistryRights.WriteKey, InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
                         }
 
                         processInfo.SetAccessControl(rs);

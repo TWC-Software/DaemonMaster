@@ -2,7 +2,7 @@
 
 namespace DaemonMaster.Updater.Persistence
 {
-    interface IPersistenceProvider
+    public interface IPersistenceProvider
     {
         /// <summary>
         /// Gets the currently skipped version.

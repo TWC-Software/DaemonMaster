@@ -26,8 +26,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Resources;
+using System.Security;
 using System.ServiceProcess;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using DaemonMaster.Core;
@@ -45,11 +47,11 @@ namespace DaemonMaster
     /// </summary>
     public partial class ServiceEditWindow : Window
     {
+        private const string PlaceholderPasswordString = "88301CEB-1E6E-435C-A355-D055F9F8D430";
+        private static readonly SecureString PlaceholderPassword = PlaceholderPasswordString.ConvertStringToSecureString();
+        private static readonly ResourceManager ResManager = new ResourceManager(typeof(lang));
+
         public DmServiceDefinition GetServiceStartInfo() => _tempServiceConfig;
-
-        private const string PLACEHOLDER_PASSWORD = "88301CEB-1E6E-435C-A355-D055F9F8D430";
-
-        private readonly ResourceManager _resManager = new ResourceManager(typeof(lang));
 
         private ObservableCollection<ServiceInfo> _dependOnServiceObservableCollection;
         private ObservableCollection<ServiceInfo> _allServicesObservableCollection;
@@ -130,11 +132,12 @@ namespace DaemonMaster
             {
                 CheckBoxUseVirtualAccount.IsChecked = true;
                 CheckBoxUseLocalSystem.IsChecked = false;
+                RenewVirtualAccountName();
             }
             else
             {
                 TextBoxUsername.Text = _tempServiceConfig.Credentials.Username;
-                TextBoxPassword.Password = _createNewService ? string.Empty : PLACEHOLDER_PASSWORD;
+                TextBoxPassword.Password = _createNewService ? string.Empty : PlaceholderPasswordString;
                 CheckBoxUseLocalSystem.IsChecked = false;
                 CheckBoxUseVirtualAccount.IsChecked = false;
             }
@@ -204,18 +207,25 @@ namespace DaemonMaster
             _dependOnServiceObservableCollection = new ObservableCollection<ServiceInfo>();
             foreach (string dep in _tempServiceConfig.DependOnService)
             {
-                var serviceInfo = new ServiceInfo
+                try
                 {
-                    ServiceName = dep
-                };
+                    var serviceInfo = new ServiceInfo
+                    {
+                        ServiceName = dep
+                    };
 
-                //Get display name
-                using (var serviceController = new ServiceController(dep))
-                {
-                    serviceInfo.DisplayName = serviceController.DisplayName;
+                    //Get display name
+                    using (var serviceController = new ServiceController(dep))
+                    {
+                        serviceInfo.DisplayName = serviceController.DisplayName;
+                    }
+
+                    _dependOnServiceObservableCollection.Add(serviceInfo);
                 }
-
-                _dependOnServiceObservableCollection.Add(serviceInfo);
+                catch
+                {
+                    // ignored -> continue
+                }
             }
 
             //Sort the list in alphabetical order
@@ -231,14 +241,21 @@ namespace DaemonMaster
             _allServicesObservableCollection = new ObservableCollection<ServiceInfo>();
             foreach (ServiceController service in ServiceController.GetServices())
             {
-                var serviceInfo = new ServiceInfo
+                try
                 {
-                    DisplayName = service.DisplayName,
-                    ServiceName = service.ServiceName
-                };
+                    var serviceInfo = new ServiceInfo
+                    {
+                        DisplayName = service.DisplayName,
+                        ServiceName = service.ServiceName
+                    };
 
-                if (_dependOnServiceObservableCollection.All(x => x.ServiceName != serviceInfo.ServiceName))
-                    _allServicesObservableCollection.Add(serviceInfo);
+                    if (_dependOnServiceObservableCollection.All(x => x.ServiceName != serviceInfo.ServiceName))
+                        _allServicesObservableCollection.Add(serviceInfo);
+                }
+                catch
+                {
+                    // ignored -> continue
+                }
             }
 
             //Sort the list in alphabetical order
@@ -327,7 +344,15 @@ namespace DaemonMaster
             {
                 if (pickerDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    TextBoxUsername.Text = ".\\" + pickerDialog.SelectedObject.Name;  // ".\\" = Local computer
+                    if (string.IsNullOrWhiteSpace(pickerDialog.SelectedObject.Upn))
+                    {
+                        TextBoxUsername.Text = ".\\" + pickerDialog.SelectedObject.Name;  // ".\\" = Local computer
+                    }
+                    else
+                    {
+                        //TODO: test...
+                        TextBoxUsername.Text = NameTranslator.TranslateUpnToDownLevel(pickerDialog.SelectedObject.Upn);
+                    }
                 }
             }
         }
@@ -348,14 +373,21 @@ namespace DaemonMaster
             ExportConfiguration();
         }
 
+        private void CheckBoxUseLocalSystem_OnUnchecked(object sender, RoutedEventArgs e)
+        {
+            ClearPasswordAndUsername();
+        }
+
+        private void CheckBoxUseLocalSystem_OnChecked(object sender, RoutedEventArgs e)
+        {
+            ClearPasswordAndUsername();
+        }
+
         private void CheckBoxUseVirtualAccount_OnUnchecked(object sender, RoutedEventArgs e)
         {
-            TextBoxUsername.IsReadOnly = false;
-            TextBoxUsername.Foreground = Brushes.Black;
-            TextBoxUsername.BorderBrush = Brushes.DarkGray;
-            TextBoxUsername.Clear();
-
-            TextBoxPassword.Clear();
+            //TextBoxUsername.Foreground = Brushes.Black;
+            //TextBoxUsername.BorderBrush = Brushes.DarkGray;
+            ClearPasswordAndUsername();
         }
 
         private void CheckBoxUseVirtualAccount_OnChecked(object sender, RoutedEventArgs e)
@@ -363,7 +395,7 @@ namespace DaemonMaster
             RenewVirtualAccountName();
         }
 
-        private void TextBoxServiceName_OnLostFocus(object sender, RoutedEventArgs routedEventArgs)
+        private void TextBoxServiceName_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             RenewVirtualAccountName();
         }
@@ -445,15 +477,20 @@ namespace DaemonMaster
 
         private void RenewVirtualAccountName()
         {
-            if (!CheckBoxUseVirtualAccount.IsChecked ?? false)
+            if (TextBoxUsername == null || (!CheckBoxUseVirtualAccount?.IsChecked ?? false))
                 return;
 
             TextBoxUsername.Text = "NT SERVICE\\" + TextBoxServiceName.Text;
-            TextBoxUsername.IsReadOnly = true;
-            TextBoxUsername.Foreground = Brushes.Gray;
-            TextBoxUsername.BorderBrush = Brushes.LightGray;
+            //TextBoxUsername.Foreground = Brushes.Gray;
+            //TextBoxUsername.BorderBrush = Brushes.LightGray;
 
-            TextBoxPassword.Clear();
+            TextBoxPassword?.Clear();
+        }
+
+        private void ClearPasswordAndUsername()
+        {
+            TextBoxUsername?.Clear();
+            TextBoxPassword?.Clear();
         }
 
         private void SaveConfiguration()
@@ -464,8 +501,8 @@ namespace DaemonMaster
                 if (!Directory.Exists(Path.GetDirectoryName(TextBoxFilePath.Text)) ||
                     !File.Exists(TextBoxFilePath.Text))
                 {
-                    MessageBox.Show(_resManager.GetString("invalid_path", CultureInfo.CurrentUICulture),
-                        _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
+                    MessageBox.Show(ResManager.GetString("invalid_path", CultureInfo.CurrentUICulture),
+                        ResManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
                         MessageBoxImage.Error);
                     return;
                 }
@@ -480,8 +517,8 @@ namespace DaemonMaster
                     (CheckBoxIsConsoleApp.IsChecked ?? false) && !(RadioButtonUseCtrlBreak.IsChecked ?? true) &&
                     !(RadioButtonUseCtrlC.IsChecked ?? true))
                 {
-                    MessageBox.Show(_resManager.GetString("invalid_values", CultureInfo.CurrentUICulture),
-                        _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
+                    MessageBox.Show(ResManager.GetString("invalid_values", CultureInfo.CurrentUICulture),
+                        ResManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
                         MessageBoxImage.Error);
                     return;
                 }
@@ -496,8 +533,8 @@ namespace DaemonMaster
                 {
                     _tempServiceConfig.Credentials = new ServiceCredentials(TextBoxUsername.Text, null);
                 }
-                else if (string.Equals(TextBoxPassword.Password, PLACEHOLDER_PASSWORD) && //Nothing has changed (null safe)
-                         string.Equals(TextBoxUsername.Text, _tempServiceConfig.Credentials.Username)) //Nothing has changed (null safe
+                else if (TextBoxPassword.SecurePassword.IsEquals(PlaceholderPassword) && //Nothing has changed (null safe)
+                         string.Equals(TextBoxUsername.Text, _tempServiceConfig.Credentials.Username)) //Nothing has changed (null safe)
                 {
                     _tempServiceConfig.Credentials = ServiceCredentials.NoChange; //Null stands for nothing has changed 
                 }
@@ -506,8 +543,8 @@ namespace DaemonMaster
                     //No date has been written in the textfields
                     if (string.IsNullOrWhiteSpace(TextBoxUsername.Text))
                     {
-                        MessageBox.Show(_resManager.GetString("invalid_pw_user", CultureInfo.CurrentUICulture),
-                            _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
+                        MessageBox.Show(ResManager.GetString("invalid_pw_user", CultureInfo.CurrentUICulture),
+                            ResManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
                             MessageBoxImage.Error);
                         return;
                     }
@@ -515,8 +552,8 @@ namespace DaemonMaster
                     //When its not a local user...
                     if (!DaemonMasterUtils.IsLocalDomain(TextBoxUsername.Text))
                     {
-                        MessageBox.Show(_resManager.GetString("extern_domain_user_error", CultureInfo.CurrentUICulture),
-                            _resManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
+                        MessageBox.Show(ResManager.GetString("extern_domain_user_error", CultureInfo.CurrentUICulture),
+                            ResManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
                             MessageBoxImage.Error);
                         return;
                     }
@@ -615,7 +652,7 @@ namespace DaemonMaster
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, _resManager.GetString("error", CultureInfo.CurrentUICulture),
+                MessageBox.Show(ex.Message, ResManager.GetString("error", CultureInfo.CurrentUICulture),
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -640,7 +677,7 @@ namespace DaemonMaster
                         bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(username).Any(x => x.Buffer == "SeServiceLogonRight");
                         if (!hasRightToStartAsService)
                         {
-                            MessageBoxResult result = MessageBox.Show(_resManager.GetString("logon_as_a_service", CultureInfo.CurrentUICulture), _resManager.GetString("question", CultureInfo.CurrentUICulture), MessageBoxButton.YesNo, MessageBoxImage.Question);
+                            MessageBoxResult result = MessageBox.Show(ResManager.GetString("logon_as_a_service", CultureInfo.CurrentUICulture), ResManager.GetString("question", CultureInfo.CurrentUICulture), MessageBoxButton.YesNo, MessageBoxImage.Question);
                             if (result != MessageBoxResult.Yes)
                                 return;
 
@@ -683,7 +720,7 @@ namespace DaemonMaster
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    _resManager.GetString("the_service_installation_was_unsuccessful",
+                    ResManager.GetString("the_service_installation_was_unsuccessful",
                         CultureInfo.CurrentUICulture) + "\n" + ex.Message, "Error", MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
@@ -727,7 +764,7 @@ namespace DaemonMaster
             }
             catch (Exception ex)
             {
-                MessageBox.Show(_resManager.GetString("cannot_import_daemon") + "\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ResManager.GetString("cannot_import_daemon") + "\n" + ex.Message, ResManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -764,7 +801,7 @@ namespace DaemonMaster
             }
             catch (Exception ex)
             {
-                MessageBox.Show(_resManager.GetString("cannot_export_daemon") + "\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ResManager.GetString("cannot_export_daemon") + "\n" + ex.Message, ResManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

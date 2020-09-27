@@ -26,6 +26,7 @@ using System.Windows;
 using DaemonMaster.Core;
 using DaemonMaster.Core.Config;
 using DaemonMaster.Language;
+using DaemonMaster.Updater.Persistence;
 
 namespace DaemonMaster
 {
@@ -34,7 +35,9 @@ namespace DaemonMaster
     /// </summary>
     public partial class App : Application
     {
-        private const string EventLogSource = "DaemonMaster";
+        internal const string DaemonMasterAppRegPath = @"SOFTWARE\TWC-Software\DaemonMaster";
+        internal const string EventLogSource = "DaemonMaster";
+
         private static readonly ResourceManager ResManager = new ResourceManager(typeof(lang));
 
         App()
@@ -49,6 +52,9 @@ namespace DaemonMaster
 
             //Load and apply config
             Config config = ConfigManagement.LoadConfig();
+
+            //Setup Updater
+            Updater.Updater.PersistenceProvider = new RegistryMachinePersistenceProvider(DaemonMasterAppRegPath);
 
             #region Chose language
 

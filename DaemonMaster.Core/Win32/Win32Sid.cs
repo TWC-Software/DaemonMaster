@@ -32,12 +32,12 @@ namespace DaemonMaster.Core.Win32
             if (string.IsNullOrWhiteSpace(account))
                 throw new ArgumentException("Win32Sid: Account name is empty or null.");
 
-            //When the user is from the local domain, just use the username
+            //When the user is from the local domain, just use the username else error
             account = DaemonMasterUtils.IsLocalDomain(account) ? DaemonMasterUtils.GetLoginFromUsername(account) : account;
 
             uint sidSize = 0;
             uint referencedDomainNameSize = 0;
-            if (!Advapi32.LookupAccountName(null, account, IntPtr.Zero, ref sidSize, null, ref referencedDomainNameSize, out uint sidType))
+            if (!Advapi32.LookupAccountName(null, account, IntPtr.Zero, ref sidSize, null, ref referencedDomainNameSize, out uint sidType ))
             {
                 int result = Marshal.GetLastWin32Error();
 

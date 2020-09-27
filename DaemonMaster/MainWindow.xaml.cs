@@ -40,6 +40,7 @@ using DaemonMaster.Core.Win32;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using DaemonMaster.Core.Win32.PInvoke.Winsta;
 using DaemonMaster.Language;
+using DaemonMaster.Updater.Persistence;
 using DaemonMasterService;
 using TimeoutException = System.ServiceProcess.TimeoutException;
 
@@ -61,7 +62,6 @@ namespace DaemonMaster
 
             //Get the configuration
             _config = ConfigManagement.GetConfig;
-
 
             //Fill the list and subs to the event
             _processCollection = new ObservableCollection<ServiceListViewItem>(RegistryManagement.GetInstalledServices().ConvertAll(x => new ServiceListViewItem(x.ServiceName, x.DisplayName, x.BinaryPath, Equals(x.Credentials, ServiceCredentials.LocalSystem))));

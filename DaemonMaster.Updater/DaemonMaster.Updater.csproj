@@ -125,7 +125,8 @@
       <DependentUpon>updaterWindowLang.fr.resx</DependentUpon>
     </Compile>
     <Compile Include="Persistence\JsonPersistenceProvider.cs" />
-    <Compile Include="Persistence\RegistryPersistenceProvider.cs" />
+    <Compile Include="Persistence\RegistryUserPersistenceProvider.cs" />
+    <Compile Include="Persistence\RegistryMachinePersistenceProvider.cs" />
     <Compile Include="Updater.cs" />
     <Compile Include="UpdateWindow.xaml.cs">
       <DependentUpon>UpdateWindow.xaml</DependentUpon>

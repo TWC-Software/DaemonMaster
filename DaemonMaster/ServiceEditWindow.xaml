@@ -22,7 +22,7 @@
             <TabItem Header="{x:Static resx:lang.tabitem_general}" IsSelected="True">
                 <Grid>
                     <Label x:Name="LabelServiceName" Content="{x:Static resx:lang.label_service_name}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-                    <wpf:PlaceholderTextBox x:Name="TextBoxServiceName" Height="23" Margin="147,14,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_service_name}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" LostFocus="TextBoxServiceName_OnLostFocus" />
+                    <wpf:PlaceholderTextBox x:Name="TextBoxServiceName" Height="23" Margin="147,14,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_service_name}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" TextChanged="TextBoxServiceName_OnTextChanged"/>
                     <Label x:Name="LabelDisplayName" Content="{x:Static resx:lang.label_display_name}" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top"/>
                     <wpf:PlaceholderTextBox x:Name="TextBoxDisplayName" Height="23" Margin="147,42,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_display_name}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
                     <Label x:Name="LabelDescription" Content="{x:Static resx:lang.label_description}" HorizontalAlignment="Left" Margin="10,66,0,0" VerticalAlignment="Top"/>
@@ -43,17 +43,17 @@
 
                     <GroupBox x:Name="GroupBoxCustomUsername" Header="{x:Static resx:lang.groupbox_custom_user}" HorizontalAlignment="Left" Height="116" Margin="486,-3,0,0" VerticalAlignment="Top" Width="378">
                         <Grid HorizontalAlignment="Left" Height="100" Margin="0,0,-2,-6" VerticalAlignment="Top" Width="267">
-                            <CheckBox x:Name="CheckBoxUseLocalSystem" Content="{x:Static resx:lang.checkbox_use_local_system_account}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" IsChecked="True" IsEnabled="{Binding ElementName=CheckBoxUseVirtualAccount, Path=IsChecked, TargetNullValue=false, Converter={StaticResource InvertBoolConverter}}" Width="168"/>
+                            <CheckBox x:Name="CheckBoxUseLocalSystem" Content="{x:Static resx:lang.checkbox_use_local_system_account}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" IsChecked="True" Unchecked="CheckBoxUseLocalSystem_OnUnchecked" Checked="CheckBoxUseLocalSystem_OnChecked" IsEnabled="{Binding ElementName=CheckBoxUseVirtualAccount, Path=IsChecked, TargetNullValue=false, Converter={StaticResource InvertBoolConverter}}" Width="168"/>
                             <CheckBox x:Name="CheckBoxUseVirtualAccount" Content="{x:Static resx:lang.checkbox_use_virtual_account}" HorizontalAlignment="Left" Margin="183,10,-94,0" VerticalAlignment="Top" IsChecked="False" Unchecked="CheckBoxUseVirtualAccount_OnUnchecked" Checked="CheckBoxUseVirtualAccount_OnChecked" IsEnabled="{Binding ElementName=CheckBoxUseLocalSystem, Path=IsChecked, TargetNullValue=false, Converter={StaticResource InvertBoolConverter}}" Width="178"/>
 
                             <Label x:Name="LabelUsername" Content="{x:Static resx:lang.label_username}" HorizontalAlignment="Left" Margin="4,32,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.258,0.487"/>
-                            <wpf:PlaceholderTextBox x:Name="TextBoxUsername" HorizontalAlignment="Left" Height="23" Margin="93,32,-35,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_username}" VerticalAlignment="Top" Width="209" IsReadOnly="False">
-                                <wpf:PlaceholderTextBox.IsEnabled>
+                            <wpf:PlaceholderTextBox x:Name="TextBoxUsername" HorizontalAlignment="Left" Height="23" Margin="93,32,-35,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_username}" VerticalAlignment="Top" Width="209" IsReadOnly="false" IsEnabled="False">
+                                <!--<wpf:PlaceholderTextBox.IsEnabled>
                                     <MultiBinding Converter="{StaticResource AddConverter}">
                                         <Binding ElementName="CheckBoxUseLocalSystem" Path="IsChecked" TargetNullValue="false" Converter="{StaticResource InvertBoolConverter}"/>
-                                        <!--<Binding ElementName="CheckBoxUseVirtualAccount" Path="IsChecked" TargetNullValue="false" Converter="{StaticResource InvertBoolConverter}"/>-->
+                                        <Binding ElementName="CheckBoxUseVirtualAccount" Path="IsChecked" TargetNullValue="false" Converter="{StaticResource InvertBoolConverter}"/>
                                     </MultiBinding>
-                                </wpf:PlaceholderTextBox.IsEnabled>
+                                </wpf:PlaceholderTextBox.IsEnabled>-->
                             </wpf:PlaceholderTextBox>
 
                             <Button x:Name="ButtonOpenAdop" Content="{x:Static resx:lang.button_search}" HorizontalAlignment="Left" Margin="307,32,-94,0" VerticalAlignment="Top" Width="54" Height="23" Click="buttonOpenAdop_OnClick">
