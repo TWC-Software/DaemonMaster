@@ -548,4 +548,7 @@
   <data name="groupeBox_logging" xml:space="preserve">
     <value>Logging</value>
   </data>
+  <data name="read_only" xml:space="preserve">
+    <value>Read-Only</value>
+  </data>
 </root>

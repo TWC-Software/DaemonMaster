@@ -1,4 +1,5 @@
 <Window x:Class="DaemonMaster.ServiceEditWindow"
+        x:Name="this"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,7 +8,7 @@
         xmlns:resx="clr-namespace:DaemonMaster.Language"
         xmlns:wpf="clr-namespace:DaemonMaster.WPF"
         mc:Ignorable="d"
-        Title="{x:Static resx:lang.window_edit_add}" Height="343.496" Width="893.398" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
+        Title="{Binding ElementName=this, Path=MyTitel}" Height="343.496" Width="893.398" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
 
     <Window.Resources>
         <wpf:InvertBooleanConverter x:Key="InvertBoolConverter"/>
@@ -15,16 +16,16 @@
     </Window.Resources>
 
     <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,0,0" Height="308" Width="890">
-        <Button x:Name="ButtonSave" Content="{x:Static resx:lang.button_save}" Margin="10,276,0,0" Click="buttonSave_OnClick" Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139"/>
+        <Button x:Name="ButtonSave" Content="{x:Static resx:lang.button_save}" Margin="10,276,0,0" Click="buttonSave_OnClick" Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139" IsEnabled="{Binding ElementName=this, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
         <Button x:Name="ButtonCancel" Content="{x:Static resx:lang.button_cancel}" Margin="741,276,0,0"  Click="buttonCancel_OnClick"  Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139"/>
 
         <TabControl VerticalContentAlignment="Center" Margin="0,0,0,42" RenderTransformOrigin="0,0">
             <TabItem Header="{x:Static resx:lang.tabitem_general}" IsSelected="True">
-                <Grid>
+                <wpf:ReadOnlyGridEx IsReadOnly="{Binding ElementName=this, Path=ReadOnlyMode}">
                     <Label x:Name="LabelServiceName" Content="{x:Static resx:lang.label_service_name}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-                    <wpf:PlaceholderTextBox x:Name="TextBoxServiceName" Height="23" Margin="147,14,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_service_name}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321" TextChanged="TextBoxServiceName_OnTextChanged"/>
+                    <wpf:PlaceholderTextBoxAutoShrink x:Name="TextBoxServiceName" Height="23" Margin="147,14,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_service_name}" VerticalAlignment="Top" Grid.ZIndex="13" HorizontalAlignment="Left" Width="321" TextChanged="TextBoxServiceName_OnTextChanged"/>
                     <Label x:Name="LabelDisplayName" Content="{x:Static resx:lang.label_display_name}" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top"/>
-                    <wpf:PlaceholderTextBox x:Name="TextBoxDisplayName" Height="23" Margin="147,42,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_display_name}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="321"/>
+                    <wpf:PlaceholderTextBoxAutoShrink x:Name="TextBoxDisplayName" Height="23" Margin="147,42,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_display_name}" VerticalAlignment="Top" Grid.ZIndex="12" HorizontalAlignment="Left" Width="321"/>
                     <Label x:Name="LabelDescription" Content="{x:Static resx:lang.label_description}" HorizontalAlignment="Left" Margin="10,66,0,0" VerticalAlignment="Top"/>
                     <wpf:PlaceholderTextBoxAutoShrink x:Name="TextBoxDescription" Height="23" Margin="147,70,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_description}" VerticalAlignment="Top" SpellCheck.IsEnabled="True" Grid.ZIndex="11" HorizontalAlignment="Left" Width="321"/>
                     <Label x:Name="LabelParam" Content="{x:Static resx:lang.label_parameters}" HorizontalAlignment="Left" Margin="10,95,0,0" VerticalAlignment="Top"/>
@@ -37,7 +38,7 @@
                         <ComboBoxItem Content="{x:Static resx:lang.starttype_disabled}"/>
                     </ComboBox>
                     <Label x:Name="LabelFilePath" Content="{x:Static resx:lang.label_file_path}" HorizontalAlignment="Left" Margin="10,162,0,0" VerticalAlignment="Top"/>
-                    <wpf:PlaceholderTextBox x:Name="TextBoxFilePath" Height="23" Margin="147,166,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_file_path}" VerticalAlignment="Top" IsReadOnly="True" HorizontalAlignment="Left" Width="717" UndoLimit="0" />
+                    <wpf:PlaceholderTextBoxAutoShrink x:Name="TextBoxFilePath" Height="23" Margin="147,166,0,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_file_path}" VerticalAlignment="Top" IsReadOnly="True" Grid.ZIndex="9" HorizontalAlignment="Left" Width="717" UndoLimit="0" />
                     <Button x:Name="ButtonSearchPath" Content="{x:Static resx:lang.button_search_file}" HorizontalAlignment="Left" Margin="147,194,0,0" VerticalAlignment="Top" Width="717" Click="buttonSearchPath_OnClick"/>
                     <Label x:Name="LabelWarningPasswords" Content="{x:Static resx:lang.warning_file_access}" HorizontalAlignment="Left" Margin="271,213,0,0" VerticalAlignment="Top"/>
 
@@ -47,14 +48,14 @@
                             <CheckBox x:Name="CheckBoxUseVirtualAccount" Content="{x:Static resx:lang.checkbox_use_virtual_account}" HorizontalAlignment="Left" Margin="183,10,-94,0" VerticalAlignment="Top" IsChecked="False" Unchecked="CheckBoxUseVirtualAccount_OnUnchecked" Checked="CheckBoxUseVirtualAccount_OnChecked" IsEnabled="{Binding ElementName=CheckBoxUseLocalSystem, Path=IsChecked, TargetNullValue=false, Converter={StaticResource InvertBoolConverter}}" Width="178"/>
 
                             <Label x:Name="LabelUsername" Content="{x:Static resx:lang.label_username}" HorizontalAlignment="Left" Margin="4,32,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.258,0.487"/>
-                            <wpf:PlaceholderTextBox x:Name="TextBoxUsername" HorizontalAlignment="Left" Height="23" Margin="93,32,-35,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_username}" VerticalAlignment="Top" Width="209" IsReadOnly="false" IsEnabled="False">
+                            <wpf:PlaceholderTextBoxAutoShrink x:Name="TextBoxUsername" HorizontalAlignment="Left" Height="23" Margin="93,32,-35,0" TextWrapping="Wrap" Placeholder="{x:Static resx:lang.placeholder_username}" VerticalAlignment="Top" Width="209" IsReadOnly="false" IsEnabled="False" Grid.ZIndex="10">
                                 <!--<wpf:PlaceholderTextBox.IsEnabled>
                                     <MultiBinding Converter="{StaticResource AddConverter}">
                                         <Binding ElementName="CheckBoxUseLocalSystem" Path="IsChecked" TargetNullValue="false" Converter="{StaticResource InvertBoolConverter}"/>
                                         <Binding ElementName="CheckBoxUseVirtualAccount" Path="IsChecked" TargetNullValue="false" Converter="{StaticResource InvertBoolConverter}"/>
                                     </MultiBinding>
                                 </wpf:PlaceholderTextBox.IsEnabled>-->
-                            </wpf:PlaceholderTextBox>
+                            </wpf:PlaceholderTextBoxAutoShrink>
 
                             <Button x:Name="ButtonOpenAdop" Content="{x:Static resx:lang.button_search}" HorizontalAlignment="Left" Margin="307,32,-94,0" VerticalAlignment="Top" Width="54" Height="23" Click="buttonOpenAdop_OnClick">
                                 <Button.IsEnabled>
@@ -78,10 +79,10 @@
                     </GroupBox>
                     <Button x:Name="ButtonImport" Content="{x:Static resx:lang.button_import}" Margin="530,126,210,90" Click="buttonImport_Click"/>
                     <Button x:Name="ButtonExport" Content="{x:Static resx:lang.button_export}" Margin="679,126,61,90" Click="buttonExport_Click"/>
-                </Grid>
+                </wpf:ReadOnlyGridEx>
             </TabItem>
             <TabItem Header="{x:Static resx:lang.tabitem_advanced}">
-                <Grid>
+                <wpf:ReadOnlyGridEx IsReadOnly="{Binding ElementName=this, Path=ReadOnlyMode}">
                     <Label x:Name="LabelMaxRestarts" Content="{x:Static resx:lang.label_max_restarts}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
                     <wpf:PlaceholderTextBox x:Name="TextBoxMaxRestarts" HorizontalAlignment="Left" Height="23" Margin="239,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" Placeholder="{x:Static resx:lang.placeholder_max_restarts}"/>
                     <Label x:Name="LabelProcessTimeoutTime" Content="{x:Static resx:lang.label_process_kill_time}" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577"/>
@@ -115,10 +116,10 @@
                             <CheckBox x:Name="CheckBoxUseEventLog" Content="{x:Static resx:lang.checkbox_use_eventlog}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                         </Grid>
                     </GroupBox>
-                </Grid>
+                </wpf:ReadOnlyGridEx>
             </TabItem>
             <TabItem Header="{x:Static resx:lang.tabitem_dependencies}">
-                <Grid>
+                <wpf:ReadOnlyGridEx IsReadOnly="{Binding ElementName=this, Path=ReadOnlyMode}">
                     <Label x:Name="LabelDependOnService" Content="{x:Static resx:lang.label_depend_on_service}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                     <Button x:Name="ButtonAddDependentService" Content="{x:Static resx:lang.button_add}" Margin="26,41,777,171" Click="buttonAddDependentService_Click"/>
                     <Button x:Name="ButtonRemoveDependentService" Content="{x:Static resx:lang.button_remove}" Margin="26,72,777,140" Click="buttonRemoveDependentService_Click"/>
@@ -130,7 +131,7 @@
                     <Button x:Name="ButtonRemoveDependentGroup" Content="{x:Static resx:lang.button_remove}" Margin="26,181,777,31" Click="buttonRemoveDependentGroup_Click"/>
                     <ListBox x:Name="ListBoxDependOnGroup" HorizontalAlignment="Left" Height="104" Margin="147,119,0,0" VerticalAlignment="Top" Width="360"/>
                     <ListBox x:Name="ListBoxAllGroups" Margin="514,119,10,15"/>
-                </Grid>
+                </wpf:ReadOnlyGridEx>
             </TabItem>
         </TabControl>
     </Grid>

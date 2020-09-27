@@ -51,7 +51,22 @@ namespace DaemonMaster
         private static readonly SecureString PlaceholderPassword = PlaceholderPasswordString.ConvertStringToSecureString();
         private static readonly ResourceManager ResManager = new ResourceManager(typeof(lang));
 
+        private static readonly DependencyProperty TitelProperty = DependencyProperty.Register("MyTitel", typeof(string), typeof(ServiceEditWindow), new UIPropertyMetadata(ResManager.GetString("window_edit_add", CultureInfo.CurrentUICulture)));
+        private static readonly DependencyProperty ReadOnlyModeProperty = DependencyProperty.Register("ReadOnlyMode", typeof(bool), typeof(ServiceEditWindow), new UIPropertyMetadata(false));
+
+
         public DmServiceDefinition GetServiceStartInfo() => _tempServiceConfig;
+
+        public bool ReadOnlyMode
+        {
+            get => (bool)GetValue(ReadOnlyModeProperty);
+            set
+            {
+                SetValue(ReadOnlyModeProperty, value);
+                SetValue(TitelProperty, ResManager.GetString("window_edit_add", CultureInfo.CurrentUICulture) + (value ? " [" + ResManager.GetString("read_only") + "]" : string.Empty));
+            }
+        }
+
 
         private ObservableCollection<ServiceInfo> _dependOnServiceObservableCollection;
         private ObservableCollection<ServiceInfo> _allServicesObservableCollection;
@@ -60,6 +75,7 @@ namespace DaemonMaster
 
         private DmServiceDefinition _tempServiceConfig;
         private bool _createNewService;
+
 
         public ServiceEditWindow(DmServiceDefinition daemon)
         {

@@ -1052,6 +1052,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Read-Only ähnelt.
+        /// </summary>
+        public static string read_only {
+            get {
+                return ResourceManager.GetString("read_only", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Service ähnelt.
         /// </summary>
         public static string service {

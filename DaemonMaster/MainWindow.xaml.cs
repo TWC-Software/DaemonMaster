@@ -338,63 +338,67 @@ namespace DaemonMaster
 
             var serviceListViewItem = (ServiceListViewItem)ListViewDaemons.SelectedItem;
 
-            //Stop service first
+
             using (var serviceController = new ServiceController(serviceListViewItem.ServiceName))
             {
-                if (serviceController.Status != ServiceControllerStatus.Stopped)
+                //if (serviceController.Status != ServiceControllerStatus.Stopped)
+                //{
+                //    MessageBoxResult result = MessageBox.Show(_resManager.GetString("you_must_stop_the_service_first"),
+                //        _resManager.GetString("information"), MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+
+                //    if (result == MessageBoxResult.Yes)
+                //    {
+                //        StopService(serviceListViewItem);
+
+                //        try
+                //        {
+                //            serviceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(10));
+                //        }
+                //        catch (TimeoutException ex)
+                //        {
+                //            //TODO: Better message
+                //            MessageBox.Show("Cannot stop the service:\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                //            return;
+                //        }
+                //    }
+                //    else
+                //    {
+                //        return;
+                //    }
+                //}
+
+
+                try
                 {
-                    MessageBoxResult result = MessageBox.Show(_resManager.GetString("you_must_stop_the_service_first"),
-                        _resManager.GetString("information"), MessageBoxButton.YesNo, MessageBoxImage.Information);
-
-
-                    if (result == MessageBoxResult.Yes)
+                    //Open service edit window with the data from registry (when not stopped open in read only mode)
+                    var serviceEditWindow = new ServiceEditWindow(RegistryManagement.LoadFromRegistry(serviceListViewItem.ServiceName))
                     {
-                        StopService(serviceListViewItem);
+                        ReadOnlyMode = serviceController.Status != ServiceControllerStatus.Stopped
+                    };
 
-                        try
-                        {
-                            serviceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(10));
-                        }
-                        catch (TimeoutException ex)
-                        {
-                            //TODO: Better message
-                            MessageBox.Show("Cannot stop the service:\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-                            return;
-                        }
-                    }
-                    else
+                    //stops until windows has been closed
+                    bool? dialogResult = serviceEditWindow.ShowDialog();
+                    //Check result
+                    if (dialogResult.HasValue && dialogResult.Value)
                     {
-                        return;
+                        DmServiceDefinition serviceDefinition = serviceEditWindow.GetServiceStartInfo();
+                        if (string.Equals(serviceDefinition.ServiceName, serviceListViewItem.ServiceName))
+                        {
+                            //Update serviceListViewItem
+                            _processCollection[_processCollection.IndexOf(serviceListViewItem)] = ServiceListViewItem.CreateFromServiceDefinition(serviceDefinition);
+                        }
+                        else
+                        {
+                            //Create new daemon (Import as happend with a diffrent service name => create new service with that name)
+                            _processCollection.Add(ServiceListViewItem.CreateFromServiceDefinition(serviceDefinition));
+                        }
                     }
                 }
-            }
-
-
-            try
-            {
-                //Open service edit window with the data from registry
-                var serviceEditWindow = new ServiceEditWindow(RegistryManagement.LoadFromRegistry(serviceListViewItem.ServiceName));
-                //stops until windows has been closed
-                bool? dialogResult = serviceEditWindow.ShowDialog();
-                //Check result
-                if (dialogResult.HasValue && dialogResult.Value)
+                catch (Exception ex)
                 {
-                    DmServiceDefinition serviceDefinition = serviceEditWindow.GetServiceStartInfo();
-                    if (string.Equals(serviceDefinition.ServiceName, serviceListViewItem.ServiceName))
-                    {
-                        //Update serviceListViewItem
-                        _processCollection[_processCollection.IndexOf(serviceListViewItem)] = ServiceListViewItem.CreateFromServiceDefinition(serviceDefinition);
-                    }
-                    else
-                    {
-                        //Create new daemon (Import as happend with a diffrent service name => create new service with that name)
-                        _processCollection.Add(ServiceListViewItem.CreateFromServiceDefinition(serviceDefinition));
-                    }
+                    MessageBox.Show(_resManager.GetString("cannot_load_data_from_registry") + "\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(_resManager.GetString("cannot_load_data_from_registry") + "\n" + ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
