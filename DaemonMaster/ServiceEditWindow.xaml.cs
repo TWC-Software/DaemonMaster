@@ -51,8 +51,9 @@ namespace DaemonMaster
         private static readonly SecureString PlaceholderPassword = PlaceholderPasswordString.ConvertStringToSecureString();
         private static readonly ResourceManager ResManager = new ResourceManager(typeof(lang));
 
-        private static readonly DependencyProperty TitelProperty = DependencyProperty.Register("MyTitel", typeof(string), typeof(ServiceEditWindow), new UIPropertyMetadata(ResManager.GetString("window_edit_add", CultureInfo.CurrentUICulture)));
+        private static readonly DependencyProperty MyTitelProperty = DependencyProperty.Register("MyTitel", typeof(string), typeof(ServiceEditWindow), new UIPropertyMetadata(ResManager.GetString("window_edit_add", CultureInfo.CurrentUICulture)));
         private static readonly DependencyProperty ReadOnlyModeProperty = DependencyProperty.Register("ReadOnlyMode", typeof(bool), typeof(ServiceEditWindow), new UIPropertyMetadata(false));
+        private static readonly DependencyProperty NewServiceProperty = DependencyProperty.Register("NewService", typeof(bool), typeof(ServiceEditWindow), new UIPropertyMetadata(false));
 
 
         public DmServiceDefinition GetServiceStartInfo() => _tempServiceConfig;
@@ -63,10 +64,22 @@ namespace DaemonMaster
             set
             {
                 SetValue(ReadOnlyModeProperty, value);
-                SetValue(TitelProperty, ResManager.GetString("window_edit_add", CultureInfo.CurrentUICulture) + (value ? " [" + ResManager.GetString("read_only", CultureInfo.CurrentUICulture) + "]" : string.Empty));
+                MyTitel = ResManager.GetString("window_edit_add", CultureInfo.CurrentUICulture) + (value ? " [" + ResManager.GetString("read_only", CultureInfo.CurrentUICulture) + "]" : string.Empty);
             }
         }
 
+
+        private string MyTitel
+        {
+            get => (string)GetValue(MyTitelProperty);
+            set => SetValue(MyTitelProperty, value);
+        }
+
+        private bool NewService
+        {
+            get => (bool)GetValue(NewServiceProperty);
+            set => SetValue(NewServiceProperty, value);
+        }
 
         private ObservableCollection<ServiceInfo> _dependOnServiceObservableCollection;
         private ObservableCollection<ServiceInfo> _allServicesObservableCollection;
@@ -74,7 +87,6 @@ namespace DaemonMaster
         private ObservableCollection<string> _allGroupsObservableCollection;
 
         private DmServiceDefinition _tempServiceConfig;
-        private bool _createNewService;
 
 
         public ServiceEditWindow(DmServiceDefinition daemon)
@@ -85,7 +97,7 @@ namespace DaemonMaster
 
             //Create a new service when the service name is empty
             if (string.IsNullOrWhiteSpace(_tempServiceConfig.ServiceName))
-                _createNewService = true;
+                NewService = true;
 
             //Show the information on the UI
             LoadServiceInfos();
@@ -99,12 +111,12 @@ namespace DaemonMaster
             if (!string.IsNullOrWhiteSpace(_tempServiceConfig.ServiceName))
                 TextBoxServiceName.Text = _tempServiceConfig.ServiceName;
 
-            if (!_createNewService)
-            {
-                TextBoxServiceName.IsReadOnly = true;
-                TextBoxServiceName.Foreground = Brushes.Gray;
-                TextBoxServiceName.BorderBrush = Brushes.LightGray;
-            }
+            //if (!NewService)
+            //{
+            //    TextBoxServiceName.IsReadOnly = true;
+            //    TextBoxServiceName.Foreground = Brushes.Gray;
+            //    TextBoxServiceName.BorderBrush = Brushes.LightGray;
+            //}
 
             TextBoxDisplayName.Text = _tempServiceConfig.DisplayName;
 
@@ -153,7 +165,7 @@ namespace DaemonMaster
             else
             {
                 TextBoxUsername.Text = _tempServiceConfig.Credentials.Username;
-                TextBoxPassword.Password = _createNewService ? string.Empty : PlaceholderPasswordString;
+                TextBoxPassword.Password = NewService ? string.Empty : PlaceholderPasswordString;
                 CheckBoxUseLocalSystem.IsChecked = false;
                 CheckBoxUseVirtualAccount.IsChecked = false;
             }
@@ -703,7 +715,7 @@ namespace DaemonMaster
                     }
                 }
 
-                if (_createNewService)
+                if (NewService)
                 {
                     using (ServiceControlManager scm = ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.CreateService))
                     {
@@ -760,7 +772,7 @@ namespace DaemonMaster
             {
                 if (openFileDialog.ShowDialog() == true)
                 {
-                    _createNewService = true;
+                    NewService = true;
 
                     using (StreamReader streamReader = File.OpenText(openFileDialog.FileName))
                     using (JsonTextReader jsonTextReader = new JsonTextReader(streamReader))

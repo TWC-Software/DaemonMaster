@@ -67,6 +67,9 @@
     <Reference Include="ActiveDirectoryObjectPicker, Version=3.0.4.0, Culture=neutral, PublicKeyToken=515ab092c8839750, processorArchitecture=MSIL">
       <HintPath>..\packages\Tulpep.ActiveDirectoryObjectPicker.3.0.4\lib\net452\ActiveDirectoryObjectPicker.dll</HintPath>
     </Reference>
+    <Reference Include="DotNetProjects.Wpf.Extended.Toolkit, Version=4.6.86.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetProjects.Extended.Wpf.Toolkit.4.6.86\lib\net40\DotNetProjects.Wpf.Extended.Toolkit.dll</HintPath>
+    </Reference>
     <Reference Include="Itenso.Windows.Controls.ListViewLayout, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\WPF.ListViewLayoutManager.2.0.0\lib\net40\Itenso.Windows.Controls.ListViewLayout.dll</HintPath>
     </Reference>
@@ -74,6 +77,7 @@
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Design" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.Drawing" />
@@ -89,9 +93,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="WPF\OrConverter.cs" />
     <Compile Include="WPF\AndConverter.cs" />
-    <Compile Include="WPF\PlaceholderTextBoxAutoShrink.cs" />
-    <Compile Include="WPF\ReadOnlyGridEx.cs" />
+    <Compile Include="WPF\WatermarkTextBoxAutoShrink.cs" />
     <Compile Include="WPF\TextBoxAutoShrink.cs" />
     <Page Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -117,7 +121,6 @@
     </Compile>
     <Compile Include="ServiceListViewItem.cs" />
     <Compile Include="WPF\InvertBooleanConverter.cs" />
-    <Compile Include="WPF\PlaceholderTextBox.cs" />
     <Compile Include="WPF\ServiceControllerStatusConverter.cs" />
     <Page Include="CreditsWindow.xaml">
       <SubType>Designer</SubType>
