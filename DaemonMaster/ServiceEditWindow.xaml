@@ -35,10 +35,16 @@
                         <wpf:WatermarkTextBoxAutoShrink.Style>
                             <Style TargetType="wpf:WatermarkTextBoxAutoShrink">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=This, Path=NewService}" Value="false">
-                                        <Setter Property="Foreground" Value="Gray"/>
-                                        <Setter Property="BorderBrush" Value="LightGray"/>
-                                    </DataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding ElementName=This, Path=NewService}" Value="false"/>
+                                            <Condition Binding="{Binding ElementName=This, Path=ReadOnlyMode}" Value="false" />
+                                        </MultiDataTrigger.Conditions>
+                                        <MultiDataTrigger.Setters>
+                                            <Setter Property="Foreground" Value="Gray"/>
+                                            <Setter Property="BorderBrush" Value="LightGray"/>
+                                        </MultiDataTrigger.Setters>
+                                    </MultiDataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </wpf:WatermarkTextBoxAutoShrink.Style>
@@ -89,7 +95,7 @@
                             <CheckBox x:Name="CheckBoxUseVirtualAccount" Content="{x:Static resx:lang.checkbox_use_virtual_account}" HorizontalAlignment="Left" Margin="183,10,-94,0" VerticalAlignment="Top" IsChecked="False" Unchecked="CheckBoxUseVirtualAccount_OnUnchecked" Checked="CheckBoxUseVirtualAccount_OnChecked" IsEnabled="{Binding ElementName=CheckBoxUseLocalSystem, Path=IsChecked, TargetNullValue=false, Converter={StaticResource InvertBoolConverter}}" IsHitTestVisible="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}" Focusable="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}" Width="178"/>
 
                             <Label x:Name="LabelUsername" Content="{x:Static resx:lang.label_username}" HorizontalAlignment="Left" Margin="4,32,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.258,0.487"/>
-                            <wpf:TextBoxAutoShrink x:Name="TextBoxUsername" HorizontalAlignment="Left" Height="23" Margin="93,32,-35,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="209" IsReadOnly="true" Foreground="Gray" BorderBrush="LightGray" Grid.ZIndex="10"/>
+                            <wpf:TextBoxAutoShrink x:Name="TextBoxUsername" HorizontalAlignment="Left" Height="23" Margin="93,32,-35,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="209" IsReadOnly="true" Grid.ZIndex="10"/>
 
                             <Button x:Name="ButtonOpenAdop" Content="{x:Static resx:lang.button_search}" HorizontalAlignment="Left" Margin="307,32,-94,0" VerticalAlignment="Top" Width="54" Height="23" Click="buttonOpenAdop_OnClick">
                                 <Button.IsEnabled>
