@@ -66,6 +66,10 @@ jobs:
     #- run: |
     #   make bootstrap
     #   make release
+    - name: Build .NET with CodeQL
+      run: |
+        nuget restore DaemonMaster.sln
+        msbuild DaemonMaster.sln /p:UseSharedCompilation=false /t:rebuild /p:Platform="Any CPU" /p:Configuration="Debug" /p:MvcBuildViews=true
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
