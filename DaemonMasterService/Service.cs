@@ -136,7 +136,7 @@ namespace DaemonMasterService
                         }
                         catch (Exception e)
                         {
-                            Logger.Error(e, "OnCustomCommand: Failed to kill process.");
+                            Logger.Error(e, "OnCustomCommand - Failed to kill process: " + e.Message);
                         }
 
                         Stop();
@@ -153,7 +153,7 @@ namespace DaemonMasterService
                         }
                         catch (Exception e)
                         {
-                            Logger.Error(e, "OnCustomCommand: Failed to kill process.");
+                            Logger.Error(e, "OnCustomCommand - Failed to kill process: " + e.Message);
                         }
                     }
                     break;
@@ -222,7 +222,7 @@ namespace DaemonMasterService
             //Create targets and adding rules
             var serviceEventLogTarget = new EventLogTarget("eventLogTarget")
             {
-                Layout = "Service: " + _serviceName + "\n" + @"${date:format=HH\:mm\:ss} ${level:uppercase=true} ${message} ${exception}",
+                Layout = "Service: " + _serviceName + @"${newline} ${date:format=HH\:mm\:ss} ${level:uppercase=true} ${message} ${newline} ${exception:format=ToString}",
                 OptimizeBufferReuse = true,
                 Source = EventLogManager.EventSource,
                 Name = EventLogManager.EventLogName

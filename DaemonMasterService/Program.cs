@@ -357,7 +357,7 @@ namespace DaemonMasterService
             }
             catch (Exception ex)
             {
-                Logger.Error("Failed to start the service: \n" + ex.Message);
+                Logger.Error(ex, "Failed to start the service: " + ex.Message);
                 return 1;
             }
         }
@@ -382,7 +382,7 @@ namespace DaemonMasterService
             //Create targets and adding rules
             var consoleTarget = new ColoredConsoleTarget("consoleTarget")
             {
-                Layout = @"${date:format=HH\:mm\:ss} ${level:uppercase=true} ${message} ${exception}",
+                Layout = @"${date:format=HH\:mm\:ss} ${level:uppercase=true} ${message} ${newline} ${exception:format=ToString}",
                 DetectConsoleAvailable = true
             };
             config.AddTarget(consoleTarget);

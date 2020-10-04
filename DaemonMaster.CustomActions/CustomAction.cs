@@ -116,7 +116,7 @@ namespace DaemonMaster.CustomActions
                 string appFolder = session.CustomActionData["APPDIR"];
 
                 DirectoryInfo di = new DirectoryInfo(appFolder);
-                if (!string.IsNullOrWhiteSpace(appFolder) && di.Exists)
+                if (di.Exists)
                 {
                     di.Delete(true);
 

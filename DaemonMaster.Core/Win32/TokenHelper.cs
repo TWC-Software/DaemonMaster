@@ -9,30 +9,21 @@ using Microsoft.Win32.SafeHandles;
 
 namespace DaemonMaster.Core.Win32
 {
-    public class TokenHandle : SafeHandleZeroOrMinusOneIsInvalid
+    public static class TokenHelper
     {
-        public TokenHandle() : base(ownsHandle: true)
-        {
-        }
-
-        protected override bool ReleaseHandle()
-        {
-            return Kernel32.CloseHandle(handle);
-        }
-
         /// <summary>
         /// Allows you to get the user token from a user logon
         /// </summary>
         /// <param name="username">The username</param>
         /// <param name="password">The password to login</param>
         /// <param name="logonTyp">The logon type</param>
-        /// <returns>A <see cref="TokenHandle"/> or null if no valid sessions was found.</returns>
-        public static TokenHandle GetUserTokenFromLogon(string username, SecureString password, Advapi32.LogonType logonTyp)
+        /// <returns>A <see cref="TokenHelper"/> or null if no valid sessions was found.</returns>
+        public static SafeAccessTokenHandle GetUserTokenFromLogon(string username, SecureString password, Advapi32.LogonType logonTyp)
         {
             IntPtr passwordHandle = Marshal.SecureStringToGlobalAllocUnicode(password);
             try
             {
-                if (!Advapi32.LogonUser(DaemonMasterUtils.GetLoginFromUsername(username), DaemonMasterUtils.GetDomainFromUsername(username), passwordHandle, logonTyp, Advapi32.LogonProvider.Default, out TokenHandle token))
+                if (!Advapi32.LogonUser(DaemonMasterUtils.GetLoginFromUsername(username), DaemonMasterUtils.GetDomainFromUsername(username), passwordHandle, logonTyp, Advapi32.LogonProvider.Default, out SafeAccessTokenHandle token))
                     throw new Win32Exception(Marshal.GetLastWin32Error());
 
                 return token;
@@ -48,9 +39,9 @@ namespace DaemonMaster.Core.Win32
         /// </summary>
         /// <param name="sessionId">Session ID</param>
         /// <returns></returns>
-        public static TokenHandle GetPrimaryTokenFromSessionId(uint sessionId)
+        public static SafeAccessTokenHandle GetPrimaryTokenFromSessionId(uint sessionId)
         {
-            if (!Wtsapi32.WTSQueryUserToken(sessionId, out TokenHandle currentUserToken))
+            if (!Wtsapi32.WTSQueryUserToken(sessionId, out SafeAccessTokenHandle currentUserToken))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
 
             return currentUserToken;
@@ -59,9 +50,9 @@ namespace DaemonMaster.Core.Win32
         /// <summary>
         /// Gets the primary token of the first found active user session.
         /// </summary>
-        /// <returns>A <see cref="TokenHandle"/> or null if no valid sessions was found.</returns>
+        /// <returns>A <see cref="TokenHelper"/> or null if no valid sessions was found.</returns>
         /// <exception cref="Win32Exception"></exception>
-        public static TokenHandle GetPrimaryTokenOfFirstActiveSession()
+        public static SafeAccessTokenHandle GetPrimaryTokenOfFirstActiveSession()
         {
             //!!! Parts are from Copyright (c) 2014 Justin Murray - MIT-License, thanks to him !!!
             // https://github.com/murrayju/CreateProcessAsUser, 18.08.2019
@@ -113,10 +104,10 @@ namespace DaemonMaster.Core.Win32
         /// Gets the primary token from an first active user session with the given username.
         /// </summary>
         /// <param name="username">The username.</param>
-        /// <returns>A <see cref="TokenHandle"/> or null if no valid sessions was found.</returns>
+        /// <returns>A <see cref="SafeAccessTokenHandle"/> or null if no valid sessions was found.</returns>
         /// <exception cref="Win32Exception">
         /// </exception>
-        public static TokenHandle GetPrimaryTokenByUsername(string username)
+        public static SafeAccessTokenHandle GetPrimaryTokenByUsername(string username)
         {
             //!!! Parts are from Copyright (c) 2014 Justin Murray - MIT-License, thanks to him !!!
             // https://github.com/murrayju/CreateProcessAsUser, 18.08.2019
@@ -212,13 +203,12 @@ namespace DaemonMaster.Core.Win32
         /// <param name="userToken">The user token.</param>
         /// <returns>A primary token.</returns>
         /// <exception cref="Win32Exception"></exception>
-        public static TokenHandle ConvertTokenToPrimaryToken(TokenHandle userToken)
+        public static SafeAccessTokenHandle ConvertTokenToPrimaryToken(SafeAccessTokenHandle userToken)
         {
-            TokenHandle primTokenHandle = new TokenHandle();
-            if (!Advapi32.DuplicateTokenEx(userToken, 0, IntPtr.Zero, (int)Advapi32.SecurityImpersonationLevel.SecurityImpersonation, (int)Advapi32.TokenType.TokenPrimary, ref primTokenHandle))
+            if (!Advapi32.DuplicateTokenEx(userToken, 0, IntPtr.Zero, (int)Advapi32.SecurityImpersonationLevel.SecurityImpersonation, (int)Advapi32.TokenType.TokenPrimary, out SafeAccessTokenHandle primTokenWrapper))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
 
-            return primTokenHandle;
+            return primTokenWrapper;
         }
     }
 }

@@ -174,7 +174,7 @@ namespace DaemonMasterService
                     _lastSessionUsername = username;
 
                     //Get user token
-                    using (TokenHandle token = TokenHandle.GetPrimaryTokenByUsername(username))
+                    using (SafeAccessTokenHandle token = TokenHelper.GetPrimaryTokenByUsername(username))
                     {
                         if (token == null)
                             throw new Exception("GetPrimaryTokenByUsername: No valid session found.");
@@ -182,22 +182,25 @@ namespace DaemonMasterService
                         //Create environment block
                         if (!Userenv.CreateEnvironmentBlock(ref environment, token, false))
                             throw new Exception("StartInUserSession: CreateEnvironmentBlock failed.");
-                        
-                        if (!Advapi32.CreateProcessAsUser(
-                            token,
-                            null,
-                            cmdLine,
-                            null,
-                            null,
-                            false,
-                            creationFlags,
-                            environment,
-                            Path.GetDirectoryName(_serviceDefinition.BinaryPath),
-                            ref startupInfo,
-                            out processInformation))
+
+                        WindowsIdentity.RunImpersonated(token, () =>
                         {
-                            throw new Win32Exception(Marshal.GetLastWin32Error());
-                        }
+                            if (!Advapi32.CreateProcessAsUser(
+                                token,
+                                null,
+                                cmdLine,
+                                null,
+                                null,
+                                false,
+                                creationFlags,
+                                environment,
+                                Path.GetDirectoryName(_serviceDefinition.BinaryPath),
+                                ref startupInfo,
+                                out processInformation))
+                            {
+                                throw new Win32Exception(Marshal.GetLastWin32Error());
+                            }
+                        });
                     }
                 }
             }

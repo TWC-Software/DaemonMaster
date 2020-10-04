@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
 namespace DaemonMaster.Core.Win32.PInvoke.Userenv
 {
@@ -8,7 +9,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Userenv
         private const string DllName = "userenv.dll";
 
         [DllImport(DllName, SetLastError = true)]
-        public static extern bool CreateEnvironmentBlock(ref IntPtr environment, TokenHandle token, bool inherit);
+        public static extern bool CreateEnvironmentBlock(ref IntPtr environment, SafeAccessTokenHandle token, bool inherit);
 
         [DllImport(DllName, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]

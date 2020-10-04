@@ -25,6 +25,7 @@ using System.Security.Principal;
 using System.ServiceProcess;
 using DaemonMaster.Core.Win32;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
+using Microsoft.Win32.SafeHandles;
 
 namespace DaemonMaster.Core
 {
@@ -97,7 +98,7 @@ namespace DaemonMaster.Core
 
             try
             {
-                using (TokenHandle tokenHandle = TokenHandle.GetUserTokenFromLogon(username, password, Advapi32.LogonType.Interactive))
+                using (SafeAccessTokenHandle tokenHandle = TokenHelper.GetUserTokenFromLogon(username, password, Advapi32.LogonType.Interactive))
                 {
                     return !tokenHandle.IsInvalid;
                 }

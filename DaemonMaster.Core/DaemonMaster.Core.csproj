@@ -112,7 +112,7 @@
     <Compile Include="Win32\ServiceCredentials.cs" />
     <Compile Include="Win32\ServiceHandle.cs" />
     <Compile Include="Win32\ShellLinkWrapper.cs" />
-    <Compile Include="Win32\TokenHandle.cs" />
+    <Compile Include="Win32\TokenHelper.cs" />
     <Compile Include="Win32\Win32Sid.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
 namespace DaemonMaster.Core.Win32.PInvoke.Wtsapi32
 {
@@ -12,7 +13,7 @@ namespace DaemonMaster.Core.Win32.PInvoke.Wtsapi32
 
         [DllImport(DllName, SetLastError = true, ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool WTSQueryUserToken(uint sessionId, out TokenHandle tokenHandle);
+        public static extern bool WTSQueryUserToken(uint sessionId, out SafeAccessTokenHandle tokenHandle);
 
 
         [DllImport(DllName, SetLastError = true, CharSet = CharSet.Unicode)]

@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
+using Microsoft.Win32.SafeHandles;
 
 namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
 {
@@ -167,14 +168,14 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
             IntPtr password,
             LogonType dwLogonType,
             LogonProvider dwLogonProvider,
-            out TokenHandle logonToken
+            out SafeAccessTokenHandle logonToken
         );
 
         [DllImport(DllName, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CreateProcessAsUser
         (
-            TokenHandle logonToken,
+            SafeAccessTokenHandle logonToken,
             string applicationName,
             string commandLineArgs,
             Kernel32.Kernel32.SecurityAttributes processAttributes,
@@ -251,12 +252,12 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
         [DllImport(DllName, ExactSpelling = true)]
         public static extern bool DuplicateTokenEx
         (
-            TokenHandle existingTokenHandle,
+            SafeAccessTokenHandle existingTokenHandle,
             uint desiredAccess,
             IntPtr threadAttributes,
             int tokenType,
             int impersonationLevel,
-            ref TokenHandle duplicateTokenHandle
+            out SafeAccessTokenHandle duplicateTokenHandle
         );
     }
 }
