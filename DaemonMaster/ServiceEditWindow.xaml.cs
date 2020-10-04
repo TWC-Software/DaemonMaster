@@ -401,26 +401,29 @@ namespace DaemonMaster
             ExportConfiguration();
         }
 
-        private void CheckBoxUseLocalSystem_OnUnchecked(object sender, RoutedEventArgs e)
+        private void CheckBoxUseLocalSystem_OnClick(object sender, RoutedEventArgs e)
         {
+            CheckBox checkBox = (CheckBox)sender;
+            if (!checkBox.IsLoaded)
+                return;
+
             ClearPasswordAndUsername();
         }
 
-        private void CheckBoxUseLocalSystem_OnChecked(object sender, RoutedEventArgs e)
+        private void CheckBoxUseVirtualAccount_OnClick(object sender, RoutedEventArgs e)
         {
-            ClearPasswordAndUsername();
-        }
+            CheckBox checkBox = (CheckBox) sender;
+            if (!checkBox.IsLoaded || !checkBox.IsChecked.HasValue)
+                return;
 
-        private void CheckBoxUseVirtualAccount_OnUnchecked(object sender, RoutedEventArgs e)
-        {
-            //TextBoxUsername.Foreground = Brushes.Black;
-            //TextBoxUsername.BorderBrush = Brushes.DarkGray;
-            ClearPasswordAndUsername();
-        }
-
-        private void CheckBoxUseVirtualAccount_OnChecked(object sender, RoutedEventArgs e)
-        {
-            RenewVirtualAccountName();
+            if (checkBox.IsChecked.Value)
+            {
+                RenewVirtualAccountName();
+            }
+            else
+            {
+                ClearPasswordAndUsername();
+            }
         }
 
         private void TextBoxServiceName_OnTextChanged(object sender, TextChangedEventArgs e)

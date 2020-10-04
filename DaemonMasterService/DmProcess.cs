@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -13,6 +14,7 @@ using DaemonMaster.Core.Win32;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using DaemonMaster.Core.Win32.PInvoke.Kernel32;
 using DaemonMaster.Core.Win32.PInvoke.Userenv;
+using Microsoft.Win32.SafeHandles;
 using NLog;
 
 namespace DaemonMasterService
@@ -125,12 +127,12 @@ namespace DaemonMasterService
 
             //Flags that specify the priority and creation method of the process
             Kernel32.CreationFlags creationFlags = Kernel32.CreationFlags.CreateUnicodeEnvironment | //Windows 7+ always using the unicode environment 
-                                                   Kernel32.CreationFlags.CreateNewConsole | 
+                                                   Kernel32.CreationFlags.CreateNewConsole |
                                                    _serviceDefinition.ProcessPriority.ConvertToCreationFlag();
 
             //Set the startupinfo
             startupInfo.cb = (uint)Marshal.SizeOf(startupInfo);
-            //startupInfo.desktop = "winsta0\\default";
+            startupInfo.desktop = "winsta0\\default";
 
             //Create command line arguments
             var cmdLine = "";
@@ -172,16 +174,17 @@ namespace DaemonMasterService
                     _lastSessionUsername = username;
 
                     //Get user token
-                    using (TokenHandle currentUserToken = TokenHandle.GetSessionTokenByUsername(username))
+                    using (TokenHandle token = TokenHandle.GetPrimaryTokenByUsername(username))
                     {
-                        //Create environment block
-                        if (!Userenv.CreateEnvironmentBlock(ref environment, currentUserToken, false))
-                        {
-                            throw new Exception("StartInUserSession: CreateEnvironmentBlock failed.");
-                        }
+                        if (token == null)
+                            throw new Exception("GetPrimaryTokenByUsername: No valid session found.");
 
+                        //Create environment block
+                        if (!Userenv.CreateEnvironmentBlock(ref environment, token, false))
+                            throw new Exception("StartInUserSession: CreateEnvironmentBlock failed.");
+                        
                         if (!Advapi32.CreateProcessAsUser(
-                            currentUserToken,
+                            token,
                             null,
                             cmdLine,
                             null,

@@ -21,11 +21,34 @@ namespace DaemonMaster.Core.Win32
         }
 
         /// <summary>
-        /// Gets the logon token from a session ID. Only possible if the caller has LocalSystem rights
+        /// Allows you to get the user token from a user logon
+        /// </summary>
+        /// <param name="username">The username</param>
+        /// <param name="password">The password to login</param>
+        /// <param name="logonTyp">The logon type</param>
+        /// <returns>A <see cref="TokenHandle"/> or null if no valid sessions was found.</returns>
+        public static TokenHandle GetUserTokenFromLogon(string username, SecureString password, Advapi32.LogonType logonTyp)
+        {
+            IntPtr passwordHandle = Marshal.SecureStringToGlobalAllocUnicode(password);
+            try
+            {
+                if (!Advapi32.LogonUser(DaemonMasterUtils.GetLoginFromUsername(username), DaemonMasterUtils.GetDomainFromUsername(username), passwordHandle, logonTyp, Advapi32.LogonProvider.Default, out TokenHandle token))
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+
+                return token;
+            }
+            finally
+            {
+                Marshal.ZeroFreeGlobalAllocUnicode(passwordHandle);
+            }
+        }
+
+        /// <summary>
+        /// Gets the primary token from a session ID. Only possible if the caller has LocalSystem rights
         /// </summary>
         /// <param name="sessionId">Session ID</param>
         /// <returns></returns>
-        public static TokenHandle GetTokenFromSessionId(uint sessionId)
+        public static TokenHandle GetPrimaryTokenFromSessionId(uint sessionId)
         {
             if (!Wtsapi32.WTSQueryUserToken(sessionId, out TokenHandle currentUserToken))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -34,43 +57,15 @@ namespace DaemonMaster.Core.Win32
         }
 
         /// <summary>
-        /// Allows you to get the token from a user logon
+        /// Gets the primary token of the first found active user session.
         /// </summary>
-        /// <param name="username">The username</param>
-        /// <param name="password">The password to login</param>
-        /// <param name="logonTyp">The logon type</param>
-        /// <returns></returns>
-        public static TokenHandle GetTokenFromLogon(string username, SecureString password, Advapi32.LogonType logonTyp)
-        {
-            IntPtr passwordHandle = IntPtr.Zero;
-
-            try
-            {
-                passwordHandle = Marshal.SecureStringToGlobalAllocUnicode(password);
-                if (!Advapi32.LogonUser(DaemonMasterUtils.GetLoginFromUsername(username), DaemonMasterUtils.GetDomainFromUsername(username), passwordHandle, logonTyp, Advapi32.LogonProvider.Default, out TokenHandle token))
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
-
-                return token;
-            }
-            finally
-            {
-                if (passwordHandle != IntPtr.Zero)
-                    Marshal.ZeroFreeGlobalAllocUnicode(passwordHandle);
-            }
-        }
-
-        /// <summary>
-        /// Gets the active session user token.
-        /// </summary>
-        /// <param name="userToken">The user token.</param>
-        /// <returns></returns>
+        /// <returns>A <see cref="TokenHandle"/> or null if no valid sessions was found.</returns>
         /// <exception cref="Win32Exception"></exception>
-        public static TokenHandle GetActiveSessionUserToken()
+        public static TokenHandle GetPrimaryTokenOfFirstActiveSession()
         {
             //!!! Parts are from Copyright (c) 2014 Justin Murray - MIT-License, thanks to him !!!
             // https://github.com/murrayju/CreateProcessAsUser, 18.08.2019
 
-            var primTokenHandle = new TokenHandle();
             uint activeSessionId = Wtsapi32.InvalidSessionId;
             IntPtr sessionInfos = IntPtr.Zero;
             var sessionCount = 0;
@@ -80,17 +75,18 @@ namespace DaemonMaster.Core.Win32
                 //Get a handle to the user access token for the current active session.
                 if (Wtsapi32.WTSEnumerateSessions(Wtsapi32.WtsCurrentServerHandle, 0, 1, ref sessionInfos, ref sessionCount))
                 {
-                    int arrayElementSize = Marshal.SizeOf(typeof(Wtsapi32.WtsSessionInfo));
+                    int arrayElementSize = Marshal.SizeOf<Wtsapi32.WtsSessionInfo>();
                     IntPtr current = sessionInfos;
 
                     for (var i = 0; i < sessionCount; i++)
                     {
-                        var sessionInfo = (Wtsapi32.WtsSessionInfo)Marshal.PtrToStructure(current, typeof(Wtsapi32.WtsSessionInfo));
+                        var sessionInfo = Marshal.PtrToStructure<Wtsapi32.WtsSessionInfo>(current);
                         current += arrayElementSize;
 
                         if (sessionInfo.State == Wtsapi32.WtsConnectstateClass.WTSActive)
                         {
                             activeSessionId = (uint)sessionInfo.SessionID;
+                            break;
                         }
                     }
                 }
@@ -107,93 +103,89 @@ namespace DaemonMaster.Core.Win32
                 activeSessionId = Kernel32.WTSGetActiveConsoleSessionId();
 
                 if (activeSessionId == Wtsapi32.InvalidSessionId)
-                    throw new Exception("No valid session found.");
+                    return null;
             }
 
-            var impersonationToken = new TokenHandle();
-            try
-            {
-                //Get token
-                if (!Wtsapi32.WTSQueryUserToken(activeSessionId, out impersonationToken))
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
-
-                //Convert the impersonation token to a primary token
-                if (!Advapi32.DuplicateTokenEx(impersonationToken, 0, IntPtr.Zero, (int)Advapi32.SecurityImpersonationLevel.SecurityImpersonation, (int)Advapi32.TokenType.TokenPrimary, ref primTokenHandle))
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
-            }
-            finally
-            {
-                impersonationToken.Close();
-            }
-
-            return primTokenHandle;
+            return GetPrimaryTokenFromSessionId(activeSessionId);
         }
 
         /// <summary>
-        /// Gets the session token by the username.
+        /// Gets the primary token from an first active user session with the given username.
         /// </summary>
         /// <param name="username">The username.</param>
-        /// <returns></returns>
-        /// <exception cref="Exception">No valid session found.</exception>
+        /// <returns>A <see cref="TokenHandle"/> or null if no valid sessions was found.</returns>
         /// <exception cref="Win32Exception">
         /// </exception>
-        public static TokenHandle GetSessionTokenByUsername(string username)
+        public static TokenHandle GetPrimaryTokenByUsername(string username)
         {
             //!!! Parts are from Copyright (c) 2014 Justin Murray - MIT-License, thanks to him !!!
             // https://github.com/murrayju/CreateProcessAsUser, 18.08.2019
 
-            var primTokenHandle = new TokenHandle();
             uint activeSessionId = Wtsapi32.InvalidSessionId;
             IntPtr sessionInfos = IntPtr.Zero;
-            IntPtr usernamePtr = IntPtr.Zero;
-            IntPtr domainPtr = IntPtr.Zero;
             var sessionCount = 0;
 
             try
             {
                 //Get a handle to the user access token for the current active session.
-                if (Wtsapi32.WTSEnumerateSessions(Wtsapi32.WtsCurrentServerHandle, 0, 1, ref sessionInfos, ref sessionCount))
+                if (Wtsapi32.WTSEnumerateSessions(Wtsapi32.WtsCurrentServerHandle, 0, 1, ref sessionInfos,
+                    ref sessionCount))
                 {
-                    int arrayElementSize = Marshal.SizeOf(typeof(Wtsapi32.WtsSessionInfo));
+                    int arrayElementSize = Marshal.SizeOf<Wtsapi32.WtsSessionInfo>();
                     IntPtr current = sessionInfos;
 
                     for (var i = 0; i < sessionCount; i++)
                     {
-                        var sessionInfo = (Wtsapi32.WtsSessionInfo)Marshal.PtrToStructure(current, typeof(Wtsapi32.WtsSessionInfo));
-                        current += arrayElementSize;
+                        IntPtr usernamePtr = IntPtr.Zero;
+                        IntPtr domainPtr = IntPtr.Zero;
+                        try
+                        {
+                            var sessionInfo = Marshal.PtrToStructure<Wtsapi32.WtsSessionInfo>(current);
+                            current += arrayElementSize;
 
-                        //If the session is not active, go to the next
-                        if (sessionInfo.State != Wtsapi32.WtsConnectstateClass.WTSActive)
-                            continue;
+                            //If the session is not active, go to the next
+                            if (sessionInfo.State != Wtsapi32.WtsConnectstateClass.WTSActive)
+                                continue;
 
-                        //Get the username
-                        if (!Wtsapi32.WTSQuerySessionInformation(Wtsapi32.WtsCurrentServerHandle, sessionInfo.SessionID, Wtsapi32.WtsInfoClass.WtsUserName, out usernamePtr, out uint bytesReturnedUsername))
-                            throw new Win32Exception(Marshal.GetLastWin32Error());
+                            //Get the username
+                            if (!Wtsapi32.WTSQuerySessionInformation(Wtsapi32.WtsCurrentServerHandle, sessionInfo.SessionID, Wtsapi32.WtsInfoClass.WtsUserName, out usernamePtr, out uint bytesReturnedUsername))
+                                throw new Win32Exception(Marshal.GetLastWin32Error());
 
-                        //continue when no bytes returned
-                        if (bytesReturnedUsername <= 0)
-                            continue;
+                            //continue when no bytes returned
+                            if (bytesReturnedUsername <= 0)
+                                continue;
 
-                        string sessionUsername = Marshal.PtrToStringUni(usernamePtr);
+                            string sessionUsername = Marshal.PtrToStringUni(usernamePtr);
 
-                        //Get the domain name
-                        if (!Wtsapi32.WTSQuerySessionInformation(Wtsapi32.WtsCurrentServerHandle, sessionInfo.SessionID, Wtsapi32.WtsInfoClass.WtsDomainName, out domainPtr, out uint bytesReturnedDomainName))
-                            throw new Win32Exception(Marshal.GetLastWin32Error());
+                            //Get the domain name
+                            if (!Wtsapi32.WTSQuerySessionInformation(Wtsapi32.WtsCurrentServerHandle, sessionInfo.SessionID, Wtsapi32.WtsInfoClass.WtsDomainName, out domainPtr, out uint bytesReturnedDomainName))
+                                throw new Win32Exception(Marshal.GetLastWin32Error());
 
-                        //continue when no bytes returned
-                        if (bytesReturnedDomainName <= 0)
-                            continue;
+                            //continue when no bytes returned
+                            if (bytesReturnedDomainName <= 0)
+                                continue;
 
-                        string sessionDomainName = Marshal.PtrToStringUni(domainPtr);
+                            string sessionDomainName = Marshal.PtrToStringUni(domainPtr);
 
-                        //If the username is not the same, go to the next
-                        string sessionFullUsername = sessionDomainName.ConvertNullTerminatedStringToString() + "\\" + sessionUsername.ConvertNullTerminatedStringToString();
-                        if (sessionUsername == null || !string.Equals(username.Trim(), sessionFullUsername, StringComparison.CurrentCultureIgnoreCase))
-                            continue;
+                            //If the username is not the same, go to the next
+                            string sessionFullUsername = sessionDomainName.ConvertNullTerminatedStringToString() + "\\" + sessionUsername.ConvertNullTerminatedStringToString();
 
-                        //If the session is found break the for
-                        activeSessionId = (uint)sessionInfo.SessionID;
-                        break;
+
+                            //If the session is found break the for
+                            if (!string.IsNullOrWhiteSpace(sessionFullUsername) && sessionFullUsername.Equals(username.Trim(), StringComparison.OrdinalIgnoreCase))
+                            {
+                                activeSessionId = (uint)sessionInfo.SessionID;
+                                break;
+                            }
+                        }
+                        finally
+                        {
+                            if (usernamePtr != IntPtr.Zero)
+                                Wtsapi32.WTSFreeMemory(usernamePtr);
+
+                            if (domainPtr != IntPtr.Zero)
+                                Wtsapi32.WTSFreeMemory(domainPtr);
+                        }
                     }
                 }
                 else
@@ -203,35 +195,28 @@ namespace DaemonMaster.Core.Win32
             }
             finally
             {
-                if (usernamePtr != IntPtr.Zero)
-                    Wtsapi32.WTSFreeMemory(usernamePtr);
-
-                if (domainPtr != IntPtr.Zero)
-                    Wtsapi32.WTSFreeMemory(domainPtr);
-
                 if (sessionInfos != IntPtr.Zero)
                     Wtsapi32.WTSFreeMemory(sessionInfos);
             }
 
             //If enumerating not working throw an exception
             if (activeSessionId == Wtsapi32.InvalidSessionId)
-                throw new Exception("No valid session found.");
+                return null;
 
-            var impersonationToken = new TokenHandle();
-            try
-            {
-                //Get token
-                if (!Wtsapi32.WTSQueryUserToken(activeSessionId, out impersonationToken))
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
+            return GetPrimaryTokenFromSessionId(activeSessionId);
+        }
 
-                //Convert the impersonation token to a primary token
-                if (!Advapi32.DuplicateTokenEx(impersonationToken, 0, IntPtr.Zero, (int)Advapi32.SecurityImpersonationLevel.SecurityImpersonation, (int)Advapi32.TokenType.TokenPrimary, ref primTokenHandle))
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
-            }
-            finally
-            {
-                impersonationToken.Close();
-            }
+        /// <summary>
+        /// Converts the user token to a primary token.
+        /// </summary>
+        /// <param name="userToken">The user token.</param>
+        /// <returns>A primary token.</returns>
+        /// <exception cref="Win32Exception"></exception>
+        public static TokenHandle ConvertTokenToPrimaryToken(TokenHandle userToken)
+        {
+            TokenHandle primTokenHandle = new TokenHandle();
+            if (!Advapi32.DuplicateTokenEx(userToken, 0, IntPtr.Zero, (int)Advapi32.SecurityImpersonationLevel.SecurityImpersonation, (int)Advapi32.TokenType.TokenPrimary, ref primTokenHandle))
+                throw new Win32Exception(Marshal.GetLastWin32Error());
 
             return primTokenHandle;
         }

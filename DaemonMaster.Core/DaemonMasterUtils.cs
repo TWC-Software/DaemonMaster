@@ -97,7 +97,7 @@ namespace DaemonMaster.Core
 
             try
             {
-                using (TokenHandle tokenHandle = TokenHandle.GetTokenFromLogon(username, password, Advapi32.LogonType.Interactive))
+                using (TokenHandle tokenHandle = TokenHandle.GetUserTokenFromLogon(username, password, Advapi32.LogonType.Interactive))
                 {
                     return !tokenHandle.IsInvalid;
                 }
