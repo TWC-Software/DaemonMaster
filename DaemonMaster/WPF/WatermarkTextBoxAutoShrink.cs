@@ -17,7 +17,9 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
+using System;
 using System.Windows;
+using System.Windows.Controls;
 using Xceed.Wpf.Toolkit;
 
 namespace DaemonMaster.WPF
@@ -25,21 +27,64 @@ namespace DaemonMaster.WPF
     public class WatermarkTextBoxAutoShrink : WatermarkTextBox
     {
         private double _originalHeight;
+        private bool _autoSize;
 
         public WatermarkTextBoxAutoShrink()
         {
             Loaded += (sender, args) => _originalHeight = Height;
         }
 
+        protected override void OnInitialized(EventArgs e)
+        {
+            base.OnInitialized(e);
+
+            _originalHeight = Height;
+        }
+
         protected override void OnGotFocus(RoutedEventArgs e)
         {
             base.OnGotFocus(e);
-            Height = double.NaN; //AUTO-Size
+
+            StartAutoSize();
+        }
+
+        protected override void OnTextChanged(TextChangedEventArgs e)
+        {
+            base.OnTextChanged(e);
+
+            if (LineCount > 1)
+            {
+                StartAutoSize();
+            }
+            else
+            {
+                StopAutoSize();
+            }
         }
 
         protected override void OnLostFocus(RoutedEventArgs e)
         {
             base.OnLostFocus(e);
+
+            StopAutoSize();
+        }
+
+        private void StartAutoSize()
+        {
+            if (_autoSize || LineCount <= 1) 
+                return;
+
+            _autoSize = true;
+            _originalHeight = Height;
+            Height = double.NaN; //AUTO-Size
+        }
+
+        private void StopAutoSize()
+        {
+            if (!_autoSize) 
+                return;
+
+            _autoSize = false;
             Height = _originalHeight;
         }
     }

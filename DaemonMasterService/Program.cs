@@ -321,7 +321,7 @@ namespace DaemonMasterService
                 //Check if he has the right to start as service
                 using (LsaPolicyHandle lsaWrapper = LsaPolicyHandle.OpenPolicyHandle())
                 {
-                    bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(serviceDefinition.Credentials.Username).Any(x => x.Buffer == "SeServiceLogonRight");
+                    bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(serviceDefinition.Credentials.Username).Any(x => x == "SeServiceLogonRight");
                     if (!hasRightToStartAsService)
                     {
                         Console.WriteLine("The user doesn't have the right to start as service. Do you want to give him that right? [Yes/No]");
@@ -332,7 +332,7 @@ namespace DaemonMasterService
                             case "y":
                             case "Y":
                                 //Give the account the right to start as service
-                                lsaWrapper.AddPrivileges(serviceDefinition.Credentials.Username, "SeServiceLogonRight");
+                                lsaWrapper.AddPrivilege(serviceDefinition.Credentials.Username, "SeServiceLogonRight");
                                 break;
 
                             default:

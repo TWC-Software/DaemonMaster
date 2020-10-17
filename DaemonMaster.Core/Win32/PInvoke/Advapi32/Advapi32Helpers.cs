@@ -32,18 +32,22 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
             return stringBuilder.ToString();
         }
 
+        /// <summary>
+        /// Converts a string to an LSA_UNICODE_STRING.
+        /// </summary>
+        /// <param name="s">The string that should be converted.</param>
+        /// <returns>The converted string</returns>
+        /// <exception cref="ArgumentException">String too long to create a LSA_UNICODE_STRING. - s</exception>
         public static LsaUnicodeString ToLsaString(this string s)
         {
             // Unicode strings max. 32KB
-            if (s.Length > 0x7ffe)
-                throw new ArgumentException("String to long for converting into a LSA_UNICODE_STRING.");
+            if (s.Length > 0x7FFE)
+                throw new ArgumentException("String too long to create a LSA_UNICODE_STRING.", nameof(s));
 
-            var lus = new LsaUnicodeString
-            {
-                //Buffer = s, //TODO
-                Length = (ushort)(s.Length * UnicodeEncoding.CharSize),
-                MaximumLength = (ushort)((s.Length + 1) * UnicodeEncoding.CharSize)
-            };
+            LsaUnicodeString lus = new LsaUnicodeString();
+            lus.Buffer = s;
+            lus.Length = (ushort)(s.Length * UnicodeEncoding.CharSize);
+            lus.MaximumLength = (ushort)(lus.Length + UnicodeEncoding.CharSize);
 
             return lus;
         }

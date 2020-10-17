@@ -705,7 +705,7 @@ namespace DaemonMaster
 
                     using (LsaPolicyHandle lsaWrapper = LsaPolicyHandle.OpenPolicyHandle())
                     {
-                        bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(username).Any(x => x.Buffer == "SeServiceLogonRight");
+                        bool hasRightToStartAsService = lsaWrapper.EnumeratePrivileges(username).Any(x => x == "SeServiceLogonRight");
                         if (!hasRightToStartAsService)
                         {
                             MessageBoxResult result = MessageBox.Show(ResManager.GetString("logon_as_a_service", CultureInfo.CurrentUICulture), ResManager.GetString("question", CultureInfo.CurrentUICulture), MessageBoxButton.YesNo, MessageBoxImage.Question);
@@ -713,7 +713,7 @@ namespace DaemonMaster
                                 return;
 
                             //Give the account the right to start as service
-                            lsaWrapper.AddPrivileges(username, "SeServiceLogonRight");
+                            lsaWrapper.AddPrivilege(username, "SeServiceLogonRight");
                         }
                     }
                 }

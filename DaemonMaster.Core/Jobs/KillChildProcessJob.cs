@@ -39,11 +39,13 @@ namespace DaemonMaster.Core.Jobs
                 throw new NotSupportedException("KillChildProcessJob is not supported in your windows version.");
 
             //Create default security attributes
-            var securityAttributes = new Kernel32.SecurityAttributes();
-            securityAttributes.length = (uint)Marshal.SizeOf(securityAttributes);
+            var securityAttributes = new Kernel32.SecurityAttributes
+            {
+                length = (uint) Marshal.SizeOf<Kernel32.SecurityAttributes>()
+            };
 
             //Create a job handle
-            _jobHandle = JobHandle.CreateJob(securityAttributes, "KillChildProcessJob" + Process.GetCurrentProcess().Id);
+            _jobHandle = JobHandle.CreateJob(securityAttributes, "DM_KCP_" + Guid.NewGuid());
 
             //Create basic limit infos
             var jobBasicLimitInformation = new Kernel32.JobObjectBasicLimitInformation()
@@ -58,7 +60,7 @@ namespace DaemonMaster.Core.Jobs
             };
 
             //Set the information for the job handle
-            int length = Marshal.SizeOf(jobExtendedLimitInformation);
+            int length = Marshal.SizeOf<Kernel32.JobObjectExtendedLimitInformation>();
             IntPtr jobExtendedLimitInformationHandle = Marshal.AllocHGlobal(length);
             try
             {

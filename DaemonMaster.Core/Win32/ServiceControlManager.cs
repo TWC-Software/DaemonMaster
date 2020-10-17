@@ -171,36 +171,32 @@ namespace DaemonMaster.Core.Win32
         /// </exception>
         public string GetServiceName(string displayName)
         {
-            IntPtr bufferPtr = IntPtr.Zero;
             uint bytesNeeded = 0;
 
+            //Determine the required buffer size => buffer and bufferSize must be null
+            if (!Advapi32.GetServiceKeyName(this, displayName, IntPtr.Zero, ref bytesNeeded))
+            {
+                int result = Marshal.GetLastWin32Error();
+
+                if (result != Win32ErrorCodes.ERROR_INSUFFICIENT_BUFFER)
+                    throw new Win32Exception(result);
+            }
+
+            //+1 for NULL terminator
+            bytesNeeded++;
+
+            //Allocate the required buffer size
+            IntPtr bufferPtr = Marshal.AllocHGlobal((int)bytesNeeded);
             try
             {
-                //Determine the required buffer size => buffer and bufferSize must be null
-                if (!Advapi32.GetServiceKeyName(this, displayName, IntPtr.Zero, ref bytesNeeded))
-                {
-                    int result = Marshal.GetLastWin32Error();
-
-                    if (result != Win32ErrorCodes.ERROR_INSUFFICIENT_BUFFER)
-                        throw new Win32Exception(result);
-                }
-
-                //+1 for NULL terminator
-                bytesNeeded++;
-
-                //Allocate the required buffer size
-                bufferPtr = Marshal.AllocHGlobal((int)bytesNeeded);
-
-
                 if (!Advapi32.GetServiceKeyName(this, displayName, bufferPtr, ref bytesNeeded))
                     throw new Win32Exception(Marshal.GetLastWin32Error());
 
-                return Marshal.PtrToStringUni(bufferPtr, (int)bytesNeeded);
+                return Marshal.PtrToStringUni(bufferPtr);
             }
             finally
             {
-                if (bufferPtr != IntPtr.Zero)
-                    Marshal.FreeHGlobal(bufferPtr);
+                Marshal.FreeHGlobal(bufferPtr);
             }
         }
     }
