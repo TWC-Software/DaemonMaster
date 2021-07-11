@@ -21,16 +21,16 @@ using System;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace DaemonMaster.Core.Config
+namespace DaemonMaster.Config
 {
     public static class ConfigManagement
     {
         private static readonly string ConfigFile = AppDomain.CurrentDomain.BaseDirectory + "settings.config";
 
-        public static Config GetConfig { get; private set; } = new Config();
+        public static DaemonMaster.Config.Config GetConfig { get; private set; } = new DaemonMaster.Config.Config();
 
 
-        public static Config LoadConfig()
+        public static DaemonMaster.Config.Config LoadConfig()
         {
             if (!File.Exists(ConfigFile))
                 SaveConfig();
@@ -43,7 +43,7 @@ namespace DaemonMaster.Core.Config
                     TypeNameHandling = TypeNameHandling.None,
                 };
 
-                GetConfig = serializer.Deserialize<Config>(jsonTextReader);
+                GetConfig = serializer.Deserialize<DaemonMaster.Config.Config>(jsonTextReader);
                 return GetConfig;
             }
         }

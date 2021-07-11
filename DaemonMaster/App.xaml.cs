@@ -23,10 +23,11 @@ using System.Globalization;
 using System.Resources;
 using System.Threading;
 using System.Windows;
+using DaemonMaster.Config;
 using DaemonMaster.Core;
-using DaemonMaster.Core.Config;
 using DaemonMaster.Language;
 using DaemonMaster.Updater.Persistence;
+using DaemonMaster.Views;
 
 namespace DaemonMaster
 {
@@ -50,14 +51,12 @@ namespace DaemonMaster
         {
             CreateAndCheckEventLogSource();
 
-            //Load and apply config
-            Config config = ConfigManagement.LoadConfig();
-
-            //Setup Updater
-            Updater.Updater.PersistenceProvider = new RegistryMachinePersistenceProvider(DaemonMasterAppRegPath);
+            #region Config
+            var config = ConfigManagement.LoadConfig();
+            ConfigManagement.SaveConfig(); //Create one with default loaded values
+            #endregion
 
             #region Chose language
-
             //Set the language of the threads
             CultureInfo cultureInfo;
             if (string.IsNullOrWhiteSpace(config.Language) || config.Language == "windows")
@@ -80,12 +79,17 @@ namespace DaemonMaster
             Thread.CurrentThread.CurrentUICulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
-
             #endregion
 
+            #region AutoUpdater
+            Updater.Updater.PersistenceProvider = new RegistryMachinePersistenceProvider(DaemonMasterAppRegPath);
+
+            if (!ConfigManagement.GetConfig.DisableCheckForUpdates)
+                _ = Updater.Updater.StartAsync("https://github.com/TWC-Software/DaemonMaster");
+            #endregion
 
             //////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //                                             START                                                    //
+            //                                             MAINWINDOW                                               //
             //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             var app = new App();

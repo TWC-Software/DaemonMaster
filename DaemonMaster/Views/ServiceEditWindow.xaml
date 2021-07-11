@@ -1,4 +1,4 @@
-<Window x:Class="DaemonMaster.ServiceEditWindow"
+<Window x:Class="DaemonMaster.Views.ServiceEditWindow"
         x:Name="This"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -8,20 +8,21 @@
         xmlns:resx="clr-namespace:DaemonMaster.Language"
         xmlns:wpf="clr-namespace:DaemonMaster.WPF"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:converters="clr-namespace:DaemonMaster.Utilities.Converters"
         mc:Ignorable="d"
         Title="{Binding ElementName=This, Path=MyTitel}" Height="343.496" Width="893.398" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
 
     <Window.Resources>
-        <wpf:InvertBooleanConverter x:Key="InvertBoolConverter"/>
-        <wpf:AndConverter x:Key="AddConverter"/>
-        <wpf:OrConverter x:Key="OrConverter"/>
+        <converters:InvertBooleanConverter x:Key="InvertBoolConverter"/>
+        <converters:AndConverter x:Key="AddConverter"/>
+        <converters:OrConverter x:Key="OrConverter"/>
     </Window.Resources>
 
     <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,0,0" Height="308" Width="890">
         <Button x:Name="ButtonSave" Content="{x:Static resx:lang.button_save}" Margin="10,276,0,0" Click="buttonSave_OnClick" Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139" IsEnabled="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
         <Button x:Name="ButtonCancel" Content="{x:Static resx:lang.button_cancel}" Margin="741,276,0,0"  Click="buttonCancel_OnClick"  Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139"/>
 
-        <TabControl VerticalContentAlignment="Center" Margin="0,0,0,42" RenderTransformOrigin="0,0">
+        <TabControl VerticalContentAlignment="Center" RenderTransformOrigin="0,0" Margin="0,0,0,42">
             <TabItem Header="{x:Static resx:lang.tabitem_general}" IsSelected="True">
                 <Grid>
                     <Label x:Name="LabelServiceName" Content="{x:Static resx:lang.label_service_name}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>

@@ -31,13 +31,7 @@ namespace DaemonMaster.Core
 {
     public static class DaemonMasterUtils
     {
-        public static bool IsSupportedWindows10VersionForIwd
-        {
-            get
-            {
-                return Config.ConfigManagement.GetConfig.UnlockInteractiveServiceCreationOnNotSupportedSystem || Environment.OSVersion.Version.Major < 10 || (Environment.OSVersion.Version.Major == 10 && Environment.OSVersion.Version.Build < 17134);
-            }
-        }
+        public static bool IsSupportedWindows10VersionForIwd => Environment.OSVersion.Version.Major < 10 || (Environment.OSVersion.Version.Major == 10 && Environment.OSVersion.Version.Build < 17134);
 
         public static bool IsNt
         {

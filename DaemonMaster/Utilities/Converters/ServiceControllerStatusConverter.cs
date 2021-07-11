@@ -5,7 +5,7 @@ using System.ServiceProcess;
 using System.Windows.Data;
 using DaemonMaster.Language;
 
-namespace DaemonMaster.WPF
+namespace DaemonMaster.Utilities.Converters
 {
     [ValueConversion(typeof(ServiceControllerStatus), typeof(string))]
     public class ServiceControllerStatusConverter : IValueConverter

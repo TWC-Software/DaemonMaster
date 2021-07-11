@@ -1,23 +1,13 @@
-/////////////////////////////////////////////////////////////////////////////////////////
-//  DaemonMaster: ServiceEditWindow
-//  
-//  This file is part of DeamonMaster.
-// 
-//  DeamonMaster is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//   DeamonMaster is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU General Public License for more details.
-//
-//   You should have received a copy of the GNU General Public License
-//   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
-/////////////////////////////////////////////////////////////////////////////////////////
-
-
+using DaemonMaster.Core;
+using DaemonMaster.Core.Win32;
+using DaemonMaster.Core.Win32.PInvoke.Advapi32;
+using DaemonMaster.Language;
+using DaemonMaster.Models;
+using DaemonMaster.Utilities.Messages;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Messaging;
+using Microsoft.Win32;
+using Newtonsoft.Json;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -31,16 +21,9 @@ using System.ServiceProcess;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media;
-using DaemonMaster.Core;
-using DaemonMaster.Core.Win32;
-using DaemonMaster.Core.Win32.PInvoke.Advapi32;
-using DaemonMaster.Language;
-using Microsoft.Win32;
-using Newtonsoft.Json;
 using Tulpep.ActiveDirectoryObjectPicker;
 
-namespace DaemonMaster
+namespace DaemonMaster.Views
 {
     /// <summary>
     /// Interaktionslogik für ServiceEditWindow.xaml
@@ -93,6 +76,13 @@ namespace DaemonMaster
         {
             InitializeComponent();
 
+            Closing += (sender, args) =>
+            {
+                //Messenger.Default.Send(new LockServiceItemMessage(obj.ServiceItem, true));
+                (DataContext as ICleanup)?.Cleanup(); // cleanup view model
+                Cleanup(); // cleanup view
+            };
+
             _tempServiceConfig = daemon ?? new DmServiceDefinition(serviceName: null);
 
             //Create a new service when the service name is empty
@@ -101,6 +91,20 @@ namespace DaemonMaster
 
             //Show the information on the UI
             LoadServiceInfos();
+        }
+
+        public ServiceListViewItem OriginalItem { get; set; }
+
+        public string WindowIdentifier { get; set; }
+
+        private void SendResult()
+        {
+            Messenger.Default.Send(new UpdateServiceItemMessage(this, OriginalItem, new ServiceListViewItem(_tempServiceConfig)));
+        }
+
+        private void Cleanup()
+        {
+
         }
 
         private void LoadServiceInfos()
@@ -387,7 +391,7 @@ namespace DaemonMaster
 
         private void buttonCancel_OnClick(object sender, RoutedEventArgs e)
         {
-            DialogResult = false;
+            //DialogResult = false;
             Close();
         }
 
@@ -412,7 +416,7 @@ namespace DaemonMaster
 
         private void CheckBoxUseVirtualAccount_OnClick(object sender, RoutedEventArgs e)
         {
-            CheckBox checkBox = (CheckBox) sender;
+            CheckBox checkBox = (CheckBox)sender;
             if (!checkBox.IsLoaded || !checkBox.IsChecked.HasValue)
                 return;
 
@@ -648,8 +652,8 @@ namespace DaemonMaster
 
                 _tempServiceConfig.IsConsoleApplication = CheckBoxIsConsoleApp.IsChecked ?? false;
                 _tempServiceConfig.UseCtrlC = _tempServiceConfig.IsConsoleApplication &&
-                                             (RadioButtonUseCtrlC.IsChecked ?? true) &&
-                                             !(RadioButtonUseCtrlBreak.IsChecked ?? false);
+                                              (RadioButtonUseCtrlC.IsChecked ?? true) &&
+                                              !(RadioButtonUseCtrlBreak.IsChecked ?? false);
 
                 _tempServiceConfig.CanInteractWithDesktop = CheckBoxInteractDesk.IsChecked ?? false;
                 _tempServiceConfig.UseEventLog = CheckBoxUseEventLog.IsChecked ?? false;
@@ -745,7 +749,9 @@ namespace DaemonMaster
                 //Save settings in registry after no error is occured
                 RegistryManagement.SaveInRegistry(_tempServiceConfig);
 
-                DialogResult = true;
+                //DialogResult = true;
+
+                SendResult();
                 Close();
             }
             catch (Exception ex)

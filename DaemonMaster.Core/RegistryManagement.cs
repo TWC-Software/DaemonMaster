@@ -17,7 +17,6 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
-using DaemonMaster.Core.Config;
 using DaemonMaster.Core.Win32;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using Microsoft.Win32;
@@ -44,8 +43,8 @@ namespace DaemonMaster.Core
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-        private const string RegPath = @"SYSTEM\CurrentControlSet\Services\";
-        private const string RegPathServiceGroups = @"SYSTEM\CurrentControlSet\Control\ServiceGroupOrder\";
+        public const string ServiceRegPath = @"SYSTEM\CurrentControlSet\Services\";
+        public const string RegPathServiceGroups = @"SYSTEM\CurrentControlSet\Control\ServiceGroupOrder\";
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                             METHODS                                                  //
@@ -53,7 +52,7 @@ namespace DaemonMaster.Core
 
         public static void SaveInRegistry(DmServiceDefinition serviceDefinition)
         {
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(RegPath + serviceDefinition.ServiceName, RegistryKeyPermissionCheck.ReadWriteSubTree))
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(ServiceRegPath + serviceDefinition.ServiceName, RegistryKeyPermissionCheck.ReadWriteSubTree))
             {
                 //Open Parameters SubKey
                 using (RegistryKey parameters = key.CreateSubKey("Parameters", RegistryKeyPermissionCheck.ReadWriteSubTree))
@@ -124,7 +123,7 @@ namespace DaemonMaster.Core
         public static DmServiceDefinition LoadFromRegistry(string serviceName)
         {
             //Open Regkey folder
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + serviceName, RegistryKeyPermissionCheck.ReadSubTree))
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(ServiceRegPath + serviceName, RegistryKeyPermissionCheck.ReadSubTree))
             {
 
                 var serviceDefinition = new DmServiceDefinition(Convert.ToString(serviceName))
@@ -169,23 +168,11 @@ namespace DaemonMaster.Core
             }
         }
 
-
-
-        public static object GetParameterFromRegistry(string serviceName, string parameterName, string subkey = "\\Parameters")
-        {
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + serviceName + subkey, false))
-            {
-                return key.GetValue(parameterName, null);
-            }
-        }
-
-
-
         public static List<DmServiceDefinition> GetInstalledServices()
         {
             var services = new List<DmServiceDefinition>();
 
-            using RegistryKey mainKey = Registry.LocalMachine.OpenSubKey(RegPath, RegistryKeyPermissionCheck.ReadSubTree);
+            using RegistryKey mainKey = Registry.LocalMachine.OpenSubKey(ServiceRegPath, RegistryKeyPermissionCheck.ReadSubTree);
             if (mainKey == null)
                 return services;
 
@@ -223,55 +210,15 @@ namespace DaemonMaster.Core
                 }
             }
 
-
-            if (ConfigManagement.GetConfig.UseCompatibilityModeForSearchSystem)
-            {
-                services.AddRange(GetInstalledServicesCompMode().Where(x => services.All(y => y.ServiceName != x.ServiceName)));
-            }
-
             return services;
         }
-
-        [Obsolete("Just for compatibility mode here.", false)]
-        private static List<DmServiceDefinition> GetInstalledServicesCompMode()
-        {
-            var daemons = new List<DmServiceDefinition>();
-
-            ServiceController[] sc = ServiceController.GetServices();
-
-            foreach (ServiceController service in sc)
-            {
-                if (!service.ServiceName.Contains("DaemonMaster_"))
-                    continue;
-
-                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + service.ServiceName, false))
-                {
-                    if (key == null)
-                        throw new Exception("Can't open registry key!");
-
-                    var serviceDefinition = new DmServiceDefinition(Convert.ToString(service.ServiceName))
-                    {
-                        DisplayName = service.DisplayName, //Convert.ToString(key.GetValue("DisplayName")),
-                        Credentials = new ServiceCredentials(Convert.ToString(key.GetValue("ObjectName", ServiceCredentials.LocalSystem)), null),
-                    };
-
-                    using (RegistryKey parameters = key.OpenSubKey("Parameters", false))
-                    {
-                        serviceDefinition.BinaryPath = Convert.ToString(parameters.GetValue("BinaryPath"));
-                    }
-                    daemons.Add(serviceDefinition);
-                }
-            }
-            return daemons;
-        }
-
 
         public static void WriteSessionUsername(string serviceName, string username)
         {
             if (string.IsNullOrWhiteSpace(username))
                 throw new ArgumentException("WriteSessionUsername: Invalid username.");
 
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(RegPath + serviceName + "\\Parameters", true))
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(ServiceRegPath + serviceName + "\\Parameters", true))
             {
                 key.SetValue("StartInSessionAs", username, RegistryValueKind.String);
             }
@@ -283,7 +230,7 @@ namespace DaemonMaster.Core
             string username;
 
             //Just read here, so that restricted services crash not here
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + serviceName + "\\Parameters", false))
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(ServiceRegPath + serviceName + "\\Parameters", false))
             {
                 username = Convert.ToString(key.GetValue("StartInSessionAs", string.Empty));
             }
@@ -292,7 +239,7 @@ namespace DaemonMaster.Core
                 return string.Empty;
 
             //Write only when a name was in it
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath + serviceName + "\\Parameters", true))
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(ServiceRegPath + serviceName + "\\Parameters", true))
             {
                 key.SetValue("StartInSessionAs", string.Empty, RegistryValueKind.String);
             }
@@ -307,7 +254,7 @@ namespace DaemonMaster.Core
             try
             {
                 //For new system
-                using (RegistryKey keyNew = Registry.LocalMachine.OpenSubKey(RegPath + serviceName, false))
+                using (RegistryKey keyNew = Registry.LocalMachine.OpenSubKey(ServiceRegPath + serviceName, false))
                 {
                     if (keyNew != null)
                     {

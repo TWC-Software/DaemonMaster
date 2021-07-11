@@ -19,7 +19,7 @@
 
 using Newtonsoft.Json;
 
-namespace DaemonMaster.Core.Config
+namespace DaemonMaster.Config
 {
     public class Config
     {

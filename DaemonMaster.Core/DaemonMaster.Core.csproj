@@ -44,8 +44,6 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Config\Config.cs" />
-    <Compile Include="Config\ConfigManagement.cs" />
     <Compile Include="DaemonMasterUtils.cs" />
     <Compile Include="DmServiceDefinition.cs" />
     <Compile Include="EventLogManager.cs" />
