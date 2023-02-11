@@ -1,0 +1,10 @@
+<Project>
+	<PropertyGroup>
+		<Version>0.2.15.0</Version>
+		<FileVersion>0.2.15.0</FileVersion>
+		<Authors>MCPC10,Stuffi3000</Authors>
+		<Company>TWC-Software</Company>
+		<Description>Daemon Master is a software which makes it possible to create and manage a Windows-service from any program.</Description>
+		<Copyright>Copyright 2017-2023 TWC-Software, MCPC10, Stuffi3000</Copyright>
+	</PropertyGroup>
+</Project>

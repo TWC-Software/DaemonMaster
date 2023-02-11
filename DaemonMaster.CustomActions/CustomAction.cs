@@ -1,3 +1,4 @@
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,8 +8,7 @@ using DaemonMaster.Core;
 using DaemonMaster.Core.Win32;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using DaemonMasterService;
-using Microsoft.Deployment.WindowsInstaller;
-using Microsoft.Win32;
+using WixToolset.Dtf.WindowsInstaller;
 
 namespace DaemonMaster.CustomActions
 {
