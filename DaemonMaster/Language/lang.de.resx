@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
+	<!-- 
     Microsoft ResX Schema 
     
     Version 2.0
@@ -59,494 +59,494 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
-    <xsd:element name="root" msdata:IsDataSet="true">
-      <xsd:complexType>
-        <xsd:choice maxOccurs="unbounded">
-          <xsd:element name="metadata">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
-              </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="assembly">
-            <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="data">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="resheader">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
-            </xsd:complexType>
-          </xsd:element>
-        </xsd:choice>
-      </xsd:complexType>
-    </xsd:element>
-  </xsd:schema>
-  <resheader name="resmimetype">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name="version">
-    <value>2.0</value>
-  </resheader>
-  <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <data name="add" xml:space="preserve">
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="metadata">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" />
+							</xsd:sequence>
+							<xsd:attribute name="name" use="required" type="xsd:string" />
+							<xsd:attribute name="type" type="xsd:string" />
+							<xsd:attribute name="mimetype" type="xsd:string" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="assembly">
+						<xsd:complexType>
+							<xsd:attribute name="alias" type="xsd:string" />
+							<xsd:attribute name="name" type="xsd:string" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="resheader">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" />
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>2.0</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<data name="add" xml:space="preserve">
     <value>Hinzufügen</value>
   </data>
-  <data name="all_processes_will_be_killed" xml:space="preserve">
+	<data name="all_processes_will_be_killed" xml:space="preserve">
     <value>Bei herunterfahren der Anwendung werden alle Prozesse "gekillt"! Sind Sie sich sicher?</value>
   </data>
-  <data name="button_add" xml:space="preserve">
+	<data name="button_add" xml:space="preserve">
     <value>Hinzufügen</value>
   </data>
-  <data name="button_cancel" xml:space="preserve">
+	<data name="button_cancel" xml:space="preserve">
     <value>Abbrechen</value>
   </data>
-  <data name="button_check_for_updates" xml:space="preserve">
+	<data name="button_check_for_updates" xml:space="preserve">
     <value>Nach Aktualisierungen suchen</value>
   </data>
-  <data name="button_credits" xml:space="preserve">
+	<data name="button_credits" xml:space="preserve">
     <value>Autoren</value>
   </data>
-  <data name="button_delete" xml:space="preserve">
+	<data name="button_delete" xml:space="preserve">
     <value>Löschen</value>
   </data>
-  <data name="button_edit" xml:space="preserve">
+	<data name="button_edit" xml:space="preserve">
     <value>Bearbeiten</value>
   </data>
-  <data name="button_export" xml:space="preserve">
+	<data name="button_export" xml:space="preserve">
     <value>Exportiere</value>
   </data>
-  <data name="button_file" xml:space="preserve">
+	<data name="button_file" xml:space="preserve">
     <value>Datei</value>
   </data>
-  <data name="button_help" xml:space="preserve">
+	<data name="button_help" xml:space="preserve">
     <value>Hilfe</value>
   </data>
-  <data name="button_import" xml:space="preserve">
+	<data name="button_import" xml:space="preserve">
     <value>Importiere</value>
   </data>
-  <data name="button_kill_service" xml:space="preserve">
+	<data name="button_kill_service" xml:space="preserve">
     <value>Dienst "killen"</value>
   </data>
-  <data name="button_load_shortcut" xml:space="preserve">
+	<data name="button_load_shortcut" xml:space="preserve">
     <value>Lade Informationen aus einer Verknüpfung (veraltet)</value>
   </data>
-  <data name="button_remove" xml:space="preserve">
+	<data name="button_remove" xml:space="preserve">
     <value>Löschen</value>
   </data>
-  <data name="button_save" xml:space="preserve">
+	<data name="button_save" xml:space="preserve">
     <value>Speichern</value>
   </data>
-  <data name="button_search" xml:space="preserve">
+	<data name="button_search" xml:space="preserve">
     <value>Suchen</value>
   </data>
-  <data name="button_search_file" xml:space="preserve">
+	<data name="button_search_file" xml:space="preserve">
     <value>Suche Datei</value>
   </data>
-  <data name="button_start" xml:space="preserve">
+	<data name="button_start" xml:space="preserve">
     <value>Dienst auf Desktop starten</value>
   </data>
-  <data name="button_start_service" xml:space="preserve">
+	<data name="button_start_service" xml:space="preserve">
     <value>Dienst starten</value>
   </data>
-  <data name="button_stop_service" xml:space="preserve">
+	<data name="button_stop_service" xml:space="preserve">
     <value>Dienst stoppen</value>
   </data>
-  <data name="button_switch_to_session_0" xml:space="preserve">
+	<data name="button_switch_to_session_0" xml:space="preserve">
     <value>Wechsle zu Sitzung 0</value>
   </data>
-  <data name="cannot_delete_deamonfile" xml:space="preserve">
-    <value>Die Deamon-Datei kann nicht gelöscht werden!\n</value>
+	<data name="cannot_delete_deamonfile" xml:space="preserve">
+    <value>Deamon-Datei kann nicht gelöscht werden!\n</value>
   </data>
-  <data name="cannot_delete_regkeys" xml:space="preserve">
-    <value>Die Registery-Schlüssel können nicht gelöscht werden!\n</value>
+	<data name="cannot_delete_regkeys" xml:space="preserve">
+    <value>Registery-Schlüssel können nicht gelöscht werden!\n</value>
   </data>
-  <data name="cannot_export_daemon" xml:space="preserve">
+	<data name="cannot_export_daemon" xml:space="preserve">
     <value>Daemon konnte nicht exportiert werden :(</value>
   </data>
-  <data name="cannot_import_daemon" xml:space="preserve">
+	<data name="cannot_import_daemon" xml:space="preserve">
     <value>Daemon konnte nicht importiert werden :(</value>
   </data>
-  <data name="cannot_load_data_from_registry" xml:space="preserve">
+	<data name="cannot_load_data_from_registry" xml:space="preserve">
     <value>Daten konnten nicht von der Registry geladen werden!</value>
   </data>
-  <data name="cannot_load_deamonfile" xml:space="preserve">
-    <value>Die Deamon-Datei kann nicht geladen werden!\n</value>
+	<data name="cannot_load_deamonfile" xml:space="preserve">
+    <value>Deamon-Datei kann nicht geladen werden!\n</value>
   </data>
-  <data name="cannot_save_deamonfile" xml:space="preserve">
-    <value>Die Deamon-Datei kann nicht gestartet werden!\n</value>
+	<data name="cannot_save_deamonfile" xml:space="preserve">
+    <value>Deamon-Datei kann nicht gestartet werden!\n</value>
   </data>
-  <data name="cannot_start_the_service" xml:space="preserve">
-    <value>Der Dienst kann nicht gestartet werden!</value>
+	<data name="cannot_start_the_service" xml:space="preserve">
+    <value>Dienst kann nicht gestartet werden!</value>
   </data>
-  <data name="cannot_start_the_service_already_running" xml:space="preserve">
-    <value>Der Dienst läuft bereits!</value>
+	<data name="cannot_start_the_service_already_running" xml:space="preserve">
+    <value>Dienst läuft bereits!</value>
   </data>
-  <data name="cannot_stop_the_service" xml:space="preserve">
-    <value>Der Dienst kann nicht gestoppt werden!</value>
+	<data name="cannot_stop_the_service" xml:space="preserve">
+    <value>Dienst kann nicht gestoppt werden!</value>
   </data>
-  <data name="cannot_stop_the_service_already_stopped" xml:space="preserve">
-    <value>Der Dienst wurde schon gestoppt!</value>
+	<data name="cannot_stop_the_service_already_stopped" xml:space="preserve">
+    <value>Dienst wurde schon gestoppt!</value>
   </data>
-  <data name="checkbox_is_console_app" xml:space="preserve">
+	<data name="checkbox_is_console_app" xml:space="preserve">
     <value>Konsolenanwendung</value>
   </data>
-  <data name="checkbox_use_local_system_account" xml:space="preserve">
+	<data name="checkbox_use_local_system_account" xml:space="preserve">
     <value>Nutze Systemkonto</value>
   </data>
-  <data name="currently_unavailable" xml:space="preserve">
+	<data name="currently_unavailable" xml:space="preserve">
     <value>Derzeit nicht verfügbar :(</value>
   </data>
-  <data name="data_cannot_be_saved" xml:space="preserve">
+	<data name="data_cannot_be_saved" xml:space="preserve">
     <value>Daten können nicht gespeichert werden!</value>
   </data>
-  <data name="data_will_be_overwritten" xml:space="preserve">
+	<data name="data_will_be_overwritten" xml:space="preserve">
     <value>Vorhandene Daten werden beim Laden überschrieben!</value>
   </data>
-  <data name="do_you_to_use_the_data_of_the_shortcut" xml:space="preserve">
+	<data name="do_you_to_use_the_data_of_the_shortcut" xml:space="preserve">
     <value>Wollen Sie die Daten der Verknüpfung nutzen? Alle vorhandenen Daten werden dabei überschrieben!</value>
   </data>
-  <data name="enum_continue_pending" xml:space="preserve">
+	<data name="enum_continue_pending" xml:space="preserve">
     <value>Fortsetzen...</value>
   </data>
-  <data name="enum_paused" xml:space="preserve">
+	<data name="enum_paused" xml:space="preserve">
     <value>Pausiert</value>
   </data>
-  <data name="enum_pause_pending" xml:space="preserve">
+	<data name="enum_pause_pending" xml:space="preserve">
     <value>Pausiere...</value>
   </data>
-  <data name="enum_running" xml:space="preserve">
+	<data name="enum_running" xml:space="preserve">
     <value>Läuft</value>
   </data>
-  <data name="enum_start_pending" xml:space="preserve">
+	<data name="enum_start_pending" xml:space="preserve">
     <value>Starte...</value>
   </data>
-  <data name="enum_stopped" xml:space="preserve">
+	<data name="enum_stopped" xml:space="preserve">
     <value>Gestoppt</value>
   </data>
-  <data name="enum_stop_pending" xml:space="preserve">
+	<data name="enum_stop_pending" xml:space="preserve">
     <value>Stoppe...</value>
   </data>
-  <data name="error" xml:space="preserve">
+	<data name="error" xml:space="preserve">
     <value>Fehler</value>
   </data>
-  <data name="error_ui0service" xml:space="preserve">
-    <value>Der Service UI0Detect konnte nicht gestartet werden!</value>
+	<data name="error_ui0service" xml:space="preserve">
+    <value>UI0Detect Service konnte nicht gestartet werden!</value>
   </data>
-  <data name="failed_start_UI0detect_service" xml:space="preserve">
+	<data name="failed_start_UI0detect_service" xml:space="preserve">
     <value>Fehler beim Starten des UI0Detect Service!</value>
   </data>
-  <data name="failed_to_set_interServ" xml:space="preserve">
+	<data name="failed_to_set_interServ" xml:space="preserve">
     <value>Fehler beim aktivieren der Interaktiven Dienste!</value>
   </data>
-  <data name="groupbox_custom_user" xml:space="preserve">
+	<data name="groupbox_custom_user" xml:space="preserve">
     <value>Benutzerdefinierter Nutzer (experimentell)</value>
   </data>
-  <data name="information" xml:space="preserve">
+	<data name="information" xml:space="preserve">
     <value>Information</value>
   </data>
-  <data name="interactive_service_regkey_not_set" xml:space="preserve">
-    <value>Ein Registrierungsschlüssel verhindert das ausführen von Interaktiven Prozessen. Wollen Sie diesen abschalten? (Die Anwendung funktioniert ohne Interaktive Prozesse nicht!)</value>
+	<data name="interactive_service_regkey_not_set" xml:space="preserve">
+    <value>Ein Registrierungsschlüssel verhindert das ausführen von interaktiven Prozessen. Wollen Sie diesen abschalten? (Die Anwendung funktioniert ohne Interaktive Prozesse nicht!)</value>
   </data>
-  <data name="invalid_path" xml:space="preserve">
-    <value>Es wurde ein ungültiger Pfad zur Datei angegeben oder die Datei existiert nicht mehr!</value>
+	<data name="invalid_path" xml:space="preserve">
+    <value>Pfad zur Datei ist ungültig oder Datei existiert nicht mehr!</value>
   </data>
-  <data name="invalid_shortcut" xml:space="preserve">
+	<data name="invalid_shortcut" xml:space="preserve">
     <value>Ungültige Verknüpfung</value>
   </data>
-  <data name="login_failed" xml:space="preserve">
-    <value>Der Nutzername oder das Passwort ist falsch!</value>
+	<data name="login_failed" xml:space="preserve">
+    <value>Nutzername oder Passwort falsch!</value>
   </data>
-  <data name="invalid_values" xml:space="preserve">
-    <value>Ungültige Werte!</value>
+	<data name="invalid_values" xml:space="preserve">
+    <value>Ungültige Werte</value>
   </data>
-  <data name="label_counter_reset_time" xml:space="preserve">
-    <value>"Max. Neustarts" rücksetz Zeit:</value>
+	<data name="label_counter_reset_time" xml:space="preserve">
+    <value>Max. Neustart-Rückstellzeit:</value>
   </data>
-  <data name="label_depend_on_group" xml:space="preserve">
+	<data name="label_depend_on_group" xml:space="preserve">
     <value>Abhänig von (Gruppe):</value>
   </data>
-  <data name="label_depend_on_service" xml:space="preserve">
+	<data name="label_depend_on_service" xml:space="preserve">
     <value>Abhängig von (Dienst):</value>
   </data>
-  <data name="label_description" xml:space="preserve">
+	<data name="label_description" xml:space="preserve">
     <value>Beschreibung:</value>
   </data>
-  <data name="label_display_name" xml:space="preserve">
+	<data name="label_display_name" xml:space="preserve">
     <value>Anzeigename:</value>
   </data>
-  <data name="label_file_path" xml:space="preserve">
+	<data name="label_file_path" xml:space="preserve">
     <value>Pfad:</value>
   </data>
-  <data name="label_filter" xml:space="preserve">
-    <value>Filter</value>
+	<data name="label_filter" xml:space="preserve">
+    <value>Filter:</value>
   </data>
-  <data name="label_max_restarts" xml:space="preserve">
+	<data name="label_max_restarts" xml:space="preserve">
     <value>Max. Neustarts:</value>
   </data>
-  <data name="label_parameters" xml:space="preserve">
+	<data name="label_parameters" xml:space="preserve">
     <value>Parameter:</value>
   </data>
-  <data name="label_password" xml:space="preserve">
+	<data name="label_password" xml:space="preserve">
     <value>Passwort:</value>
   </data>
-  <data name="label_process_kill_time" xml:space="preserve">
+	<data name="label_process_kill_time" xml:space="preserve">
     <value>Kill Zeit:</value>
   </data>
-  <data name="label_process_restart_delay" xml:space="preserve">
+	<data name="label_process_restart_delay" xml:space="preserve">
     <value>Neustart Verzögerung:</value>
   </data>
-  <data name="label_service_name" xml:space="preserve">
+	<data name="label_service_name" xml:space="preserve">
     <value>Dienstname:</value>
   </data>
-  <data name="label_shutdown_console_app" xml:space="preserve">
-    <value>Zum stoppen:</value>
+	<data name="label_shutdown_console_app" xml:space="preserve">
+    <value>Zum stoppen nutzen:</value>
   </data>
-  <data name="label_start_type" xml:space="preserve">
-    <value>Starteinstellung:</value>
+	<data name="label_start_type" xml:space="preserve">
+    <value>Start-Typ:</value>
   </data>
-  <data name="label_username" xml:space="preserve">
+	<data name="label_username" xml:space="preserve">
     <value>Nutzername:</value>
   </data>
-  <data name="max_limit_reached" xml:space="preserve">
-    <value>Es können derzeit Maximal 10 Programme hinzugefügt werden!</value>
+	<data name="max_limit_reached" xml:space="preserve">
+    <value>Maximales Limit des 10 Programme erreicht!</value>
   </data>
-  <data name="msg_warning_delete" xml:space="preserve">
+	<data name="msg_warning_delete" xml:space="preserve">
     <value>Sind Sie sicher das sie den Dienst dauerhaft löschen wollen?</value>
   </data>
-  <data name="placeholder_counter_reset_time" xml:space="preserve">
+	<data name="placeholder_counter_reset_time" xml:space="preserve">
     <value>Zeit bevor der Zähler zurückgesetzt wird</value>
   </data>
-  <data name="placeholder_description" xml:space="preserve">
+	<data name="placeholder_description" xml:space="preserve">
     <value>&lt;Bitte geben Sie eine Beschreibung an&gt;</value>
   </data>
-  <data name="placeholder_display_name" xml:space="preserve">
+	<data name="placeholder_display_name" xml:space="preserve">
     <value>&lt;Bitte geben Sie einen Anzeigenamen an&gt;</value>
   </data>
-  <data name="placeholder_file_path" xml:space="preserve">
-    <value>&lt;Klicken Sie auf "Suche Datei" zum suchen der .exe, etc&gt;</value>
+	<data name="placeholder_file_path" xml:space="preserve">
+    <value>&lt;Klicken Sie auf "Suche Datei" zum suchen der .exe, etc.&gt;</value>
   </data>
-  <data name="placeholder_max_restarts" xml:space="preserve">
+	<data name="placeholder_max_restarts" xml:space="preserve">
     <value>Unlimitierte Neustarts =&gt; -1</value>
   </data>
-  <data name="placeholder_process_kill_time" xml:space="preserve">
+	<data name="placeholder_process_kill_time" xml:space="preserve">
     <value>0 =&gt; ...</value>
   </data>
-  <data name="placeholder_process_restart_delay" xml:space="preserve">
-    <value>Zeit zwischen crash und Neustart</value>
+	<data name="placeholder_process_restart_delay" xml:space="preserve">
+    <value>Zeit zwischen Crash und Neustart</value>
   </data>
-  <data name="placeholder_service_name" xml:space="preserve">
-    <value>&lt;Bitte geben Sie einen Namen an&gt;</value>
+	<data name="placeholder_service_name" xml:space="preserve">
+    <value>&lt;Namen eingeben&gt;</value>
   </data>
-  <data name="placeholder_username" xml:space="preserve">
-    <value>&lt;Benutzernamen eingeben&gt;</value>
+	<data name="placeholder_username" xml:space="preserve">
+    <value>&lt;Dienst-Benutzernamen eingeben&gt;</value>
   </data>
-  <data name="problem_occurred" xml:space="preserve">
+	<data name="problem_occurred" xml:space="preserve">
     <value>Ein Problem ist aufgetreten</value>
   </data>
-  <data name="process_pid" xml:space="preserve">
+	<data name="process_pid" xml:space="preserve">
     <value>Prozess PID</value>
   </data>
-  <data name="question" xml:space="preserve">
+	<data name="question" xml:space="preserve">
     <value>Frage</value>
   </data>
-  <data name="radiobutton_use_ctrlbreak" xml:space="preserve">
+	<data name="radiobutton_use_ctrlbreak" xml:space="preserve">
     <value>Nutze Ctrl+Break</value>
   </data>
-  <data name="radiobutton_use_ctrlc" xml:space="preserve">
+	<data name="radiobutton_use_ctrlc" xml:space="preserve">
     <value>Nutze Ctrl+C</value>
   </data>
-  <data name="service" xml:space="preserve">
+	<data name="service" xml:space="preserve">
     <value>Dienst</value>
   </data>
-  <data name="service_pid" xml:space="preserve">
+	<data name="service_pid" xml:space="preserve">
     <value>Dienst PID</value>
   </data>
-  <data name="service_start_was_successful" xml:space="preserve">
-    <value>Der Start des Dienstes war erfolgreich!</value>
+	<data name="service_start_was_successful" xml:space="preserve">
+    <value>Dienst erfolgreich gestartet!</value>
   </data>
-  <data name="service_stop_was_successful" xml:space="preserve">
-    <value>Das Anhalten des Dienstes war erfolgreich!</value>
+	<data name="service_stop_was_successful" xml:space="preserve">
+    <value>Dienst erfolgreich angehalten!</value>
   </data>
-  <data name="starttype_automatic" xml:space="preserve">
+	<data name="starttype_automatic" xml:space="preserve">
     <value>Automatisch</value>
   </data>
-  <data name="starttype_automatic_with_delay" xml:space="preserve">
+	<data name="starttype_automatic_with_delay" xml:space="preserve">
     <value>Automatisch mit verzögertem Start</value>
   </data>
-  <data name="starttype_disabled" xml:space="preserve">
+	<data name="starttype_disabled" xml:space="preserve">
     <value>Deaktiviert</value>
   </data>
-  <data name="starttype_manual" xml:space="preserve">
+	<data name="starttype_manual" xml:space="preserve">
     <value>Manuel</value>
   </data>
-  <data name="start_was_successful" xml:space="preserve">
+	<data name="start_was_successful" xml:space="preserve">
     <value>Start war erfolgreich!</value>
   </data>
-  <data name="start_was_unsuccessful" xml:space="preserve">
+	<data name="start_was_unsuccessful" xml:space="preserve">
     <value>Start war nicht erfolgreich!</value>
   </data>
-  <data name="status" xml:space="preserve">
+	<data name="status" xml:space="preserve">
     <value>Status</value>
   </data>
-  <data name="success" xml:space="preserve">
+	<data name="success" xml:space="preserve">
     <value>Erfolgreich</value>
   </data>
-  <data name="switch_to_session_0" xml:space="preserve">
+	<data name="switch_to_session_0" xml:space="preserve">
     <value>Wechsle zu Sitzung 0</value>
   </data>
-  <data name="tabitem_advanced" xml:space="preserve">
+	<data name="tabitem_advanced" xml:space="preserve">
     <value>Erweitert</value>
   </data>
-  <data name="tabitem_dependencies" xml:space="preserve">
+	<data name="tabitem_dependencies" xml:space="preserve">
     <value>Abhängigkeiten</value>
   </data>
-  <data name="tabitem_general" xml:space="preserve">
+	<data name="tabitem_general" xml:space="preserve">
     <value>Haupteinstellungen</value>
   </data>
-  <data name="test" xml:space="preserve">
+	<data name="test" xml:space="preserve">
     <value>TEST GER</value>
   </data>
-  <data name="the_process_killing_was_successful" xml:space="preserve">
-    <value>Der Prozess wurde erfolgreich "gekillt"!</value>
+	<data name="the_process_killing_was_successful" xml:space="preserve">
+    <value>Prozess erfolgreich "gekillt"!</value>
   </data>
-  <data name="the_process_killing_was_unsuccessful" xml:space="preserve">
-    <value>Der Dienst konnte nicht "gekillt" werden</value>
+	<data name="the_process_killing_was_unsuccessful" xml:space="preserve">
+    <value>Prozess konnte nicht "gekillt" werden!</value>
   </data>
-  <data name="the_selected_process_does_not_exist" xml:space="preserve">
-    <value>Der gewählte Prozess existiert nicht!</value>
+	<data name="the_selected_process_does_not_exist" xml:space="preserve">
+    <value>Gewählter Prozess existiert nicht!</value>
   </data>
-  <data name="the_selected_process_is_already_started" xml:space="preserve">
-    <value>Der gewählte Prozess läuft bereits!</value>
+	<data name="the_selected_process_is_already_started" xml:space="preserve">
+    <value>Gewählter Prozess läuft bereits!</value>
   </data>
-  <data name="the_service_deletion_was_successful" xml:space="preserve">
-    <value>Das Löschen des Dienstes war erfolgreich!</value>
+	<data name="the_service_deletion_was_successful" xml:space="preserve">
+    <value>Löschen des Dienstes erfolgreich!</value>
   </data>
-  <data name="the_service_deletion_was_unsuccessful" xml:space="preserve">
-    <value>Der Löschen des Dienstes ist fehlgeschlagen!</value>
+	<data name="the_service_deletion_was_unsuccessful" xml:space="preserve">
+    <value>Löschen des Dienstes fehlgeschlagen!</value>
   </data>
-  <data name="the_service_installation_was_successful" xml:space="preserve">
-    <value>Die Installation des Dienstes war erfolgreich!</value>
+	<data name="the_service_installation_was_successful" xml:space="preserve">
+    <value>Installation des Dienstes erfolgreich!</value>
   </data>
-  <data name="the_service_installation_was_unsuccessful" xml:space="preserve">
-    <value>Die Installation des Dienstes ist fehlgeschlagen!</value>
+	<data name="the_service_installation_was_unsuccessful" xml:space="preserve">
+    <value>Installation des Dienstes fehlgeschlagen!</value>
   </data>
-  <data name="title" xml:space="preserve">
+	<data name="title" xml:space="preserve">
     <value>DaemonMaster Version 0.2.0.0</value>
   </data>
-  <data name="warning" xml:space="preserve">
+	<data name="warning" xml:space="preserve">
     <value>WARNUNG</value>
   </data>
-  <data name="warning_file_access" xml:space="preserve">
-    <value>WARNUNG: Der Nutzer muss Zugriff auf die gewählte .exe oder ähnliches haben!</value>
+	<data name="warning_file_access" xml:space="preserve">
+    <value>WARNUNG: Der Nutzer muss Zugriff auf den Programmordner und den Dateipfad haben!</value>
   </data>
-  <data name="windows10_1803_switch_session0" xml:space="preserve">
-    <value>Ab Windows 10 1803 ist es nicht mehr möglich in den Session 0 Desktop zu gelangen!</value>
+	<data name="windows10_1803_switch_session0" xml:space="preserve">
+    <value>Ab Windows 10 1803 ist es nicht mehr möglich in die Session 0 Desktop zu gelangen!</value>
   </data>
-  <data name="windows10_mouse_keyboard" xml:space="preserve">
+	<data name="windows10_mouse_keyboard" xml:space="preserve">
     <value>WARNUNG: In Windows 10 können sie ihre Maus und ihre Tastatur nicht benutzen!</value>
   </data>
-  <data name="window_edit_add" xml:space="preserve">
-    <value>Bearbeiten oder hinzufügen eines Prozesses</value>
+	<data name="window_edit_add" xml:space="preserve">
+    <value>Prozess bearbeiten / hinzufügen</value>
   </data>
-  <data name="you_must_stop_the_service_first" xml:space="preserve">
+	<data name="you_must_stop_the_service_first" xml:space="preserve">
     <value>Der Dienst muss zuerst gestoppt werden. Soll dieser jetzt gestoppt werden?</value>
   </data>
-  <data name="failed_to_create_a_new_service" xml:space="preserve">
-    <value>Der erstellen eines neuen Dienstes ist fehlgeschlagen!</value>
+	<data name="failed_to_create_a_new_service" xml:space="preserve">
+    <value>Erstellen eines neuen Dienstes fehlgeschlagen!</value>
   </data>
-  <data name="invalid_pw_user" xml:space="preserve">
-    <value>Das Passwort oder der Nutzername dürfen nicht leer sein!</value>
+	<data name="invalid_pw_user" xml:space="preserve">
+    <value>Benutzername oder Passwort dürfen nicht leer sein!</value>
   </data>
-  <data name="interact_with_desktop" xml:space="preserve">
-    <value>Der Dienst kann mit dem Desktop interagieren</value>
+	<data name="interact_with_desktop" xml:space="preserve">
+    <value>Dienst kann mit Desktop interagieren</value>
   </data>
-  <data name="logon_as_a_service" xml:space="preserve">
-    <value>Der Benutzer benötigt das Recht zum starten als Dienst. Wollen Sie diesem dieses Recht geben? (SIE MÜSSEN DAS RECHT MANUEL ENTFERNEN!)</value>
+	<data name="logon_as_a_service" xml:space="preserve">
+    <value>Das Konto benötigt das Recht als Dienst zu starten. Wollen Sie diesem dieses Recht erteilen? (SIE MÜSSEN ES MANUEL ENTFERNEN!)</value>
   </data>
-  <data name="extern_domain_user_error" xml:space="preserve">
-    <value>DaemonMaster unterstützt nur locale Nutzer!</value>
+	<data name="extern_domain_user_error" xml:space="preserve">
+    <value>DaemonMaster unterstützt nur lokale Nutzer!</value>
   </data>
-  <data name="label_loadOrderGroup" xml:space="preserve">
+	<data name="label_loadOrderGroup" xml:space="preserve">
     <value>Load Order Gruppe:</value>
   </data>
-  <data name="priority_aboveNormal" xml:space="preserve">
+	<data name="priority_aboveNormal" xml:space="preserve">
     <value>Über normal</value>
   </data>
-  <data name="priority_normal" xml:space="preserve">
+	<data name="priority_normal" xml:space="preserve">
     <value>Normal</value>
   </data>
-  <data name="priority_belowNormal" xml:space="preserve">
+	<data name="priority_belowNormal" xml:space="preserve">
     <value>Unter normal</value>
   </data>
-  <data name="priority_high" xml:space="preserve">
+	<data name="priority_high" xml:space="preserve">
     <value>Hoch</value>
   </data>
-  <data name="priority_idle" xml:space="preserve">
+	<data name="priority_idle" xml:space="preserve">
     <value>Leerlauf</value>
   </data>
-  <data name="priority_realtime" xml:space="preserve">
+	<data name="priority_realtime" xml:space="preserve">
     <value>Echtzeit</value>
   </data>
-  <data name="label_priority" xml:space="preserve">
+	<data name="label_priority" xml:space="preserve">
     <value>Priorität:</value>
   </data>
-  <data name="groupBox_process" xml:space="preserve">
+	<data name="groupBox_process" xml:space="preserve">
     <value>Prozess</value>
   </data>
-  <data name="placeholder_loadOrderGroup" xml:space="preserve">
+	<data name="placeholder_loadOrderGroup" xml:space="preserve">
     <value>Name der load order Gruppe</value>
   </data>
-  <data name="cannot_kill_service" xml:space="preserve">
+	<data name="cannot_kill_service" xml:space="preserve">
     <value>Dienst kann nicht gekillt werden</value>
   </data>
-  <data name="button_refresh_list" xml:space="preserve">
+	<data name="button_refresh_list" xml:space="preserve">
     <value>Aktualisiere Liste</value>
   </data>
-  <data name="button_restart_service" xml:space="preserve">
+	<data name="button_restart_service" xml:space="preserve">
     <value>Dienst neustarten</value>
   </data>
-  <data name="timeout_exception_service_restart" xml:space="preserve">
+	<data name="timeout_exception_service_restart" xml:space="preserve">
     <value>Der Neustart des Dienst braucht zulange!</value>
   </data>
-  <data name="checkbox_use_virtual_account" xml:space="preserve">
+	<data name="checkbox_use_virtual_account" xml:space="preserve">
     <value>Nutze virtuelles Dienstkonto</value>
   </data>
-  <data name="checkbox_use_eventlog" xml:space="preserve">
+	<data name="checkbox_use_eventlog" xml:space="preserve">
     <value>Ereignisanzeige verwenden</value>
   </data>
-  <data name="groupeBox_logging" xml:space="preserve">
+	<data name="groupeBox_logging" xml:space="preserve">
     <value>Ereignislogs</value>
   </data>
-  <data name="read_only" xml:space="preserve">
+	<data name="read_only" xml:space="preserve">
     <value>Schreibgeschützt</value>
   </data>
 </root>
