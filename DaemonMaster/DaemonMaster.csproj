@@ -19,10 +19,11 @@
 	  <None Remove="App.config" />
 	</ItemGroup>
 	<ItemGroup>
-		<Content Include="DeamonMaster.ico" />
+	  <Content Include="DeamonMaster.ico" />
 	</ItemGroup>
+
 	<ItemGroup>
-	  <None Include="..\Licenses\gpl-3.0.rtf">
+	  <None Include="..\Assets\Licenses\gpl-3.0.rtf">
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
@@ -62,8 +63,45 @@
 		<ProjectReference Include="..\DaemonMaster.Updater\DaemonMaster.Updater.csproj" />
 		<ProjectReference Include="..\DaemonMasterService\DaemonMasterService.csproj" />
 	</ItemGroup>
+	
 	<ItemGroup>
 		<Reference Include="System.ServiceProcess" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<Compile Update="**\*.Designer.cs">
+			<AutoGen>True</AutoGen>
+			<DesignTime>True</DesignTime>
+			<DependentUpon>$([System.String]::Copy('%(FileName)').Replace('.Designer', '.resx'))</DependentUpon>
+		</Compile>
+		<EmbeddedResource Update="**\*.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>$([System.String]::Copy('%(FileName)')).Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <Compile Update="Resources\LanguageResource.de.Designer.cs">
+	    <DependentUpon>LanguageResource.de.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="Resources\LanguageResource.Designer.cs">
+	    <DependentUpon>LanguageResource.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="Resources\LanguageResource.fr.Designer.cs">
+	    <DependentUpon>LanguageResource.fr.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Resources\LanguageResource.de.resx">
+	    <LastGenOutput>LanguageResource.de.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\LanguageResource.fr.resx">
+	    <LastGenOutput>LanguageResource.fr.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\LanguageResource.resx">
+	    <LastGenOutput>LanguageResource.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

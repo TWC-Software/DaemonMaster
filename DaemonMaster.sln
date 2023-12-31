@@ -9,6 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DaemonMaster", "DaemonMaste
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{10A8BD2F-8374-464F-858A-0341027CBCB3}"
+	ProjectSection(SolutionItems) = preProject
+		Assets\DeamonMaster.ico = Assets\DeamonMaster.ico
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Licences", "Licences", "{5909E6D3-0954-440A-83A9-D3D7E807909D}"
 	ProjectSection(SolutionItems) = preProject
@@ -110,9 +113,9 @@ Global
 		{5909E6D3-0954-440A-83A9-D3D7E807909D} = {10A8BD2F-8374-464F-858A-0341027CBCB3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		RESX_SaveFilesImmediatelyUponChange = True
-		RESX_ResXSortingComparison = OrdinalIgnoreCase
-		SolutionGuid = {637CC3EA-9C1C-402E-ABF0-F131C3E28C9C}
 		RESX_PrefixTranslations = False
+		SolutionGuid = {637CC3EA-9C1C-402E-ABF0-F131C3E28C9C}
+		RESX_ResXSortingComparison = OrdinalIgnoreCase
+		RESX_SaveFilesImmediatelyUponChange = True
 	EndGlobalSection
 EndGlobal

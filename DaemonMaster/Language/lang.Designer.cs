@@ -358,7 +358,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die The service is aleady running! ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Service is aleady running! ähnelt.
         /// </summary>
         public static string cannot_start_the_service_already_running {
             get {
@@ -376,7 +376,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die The service was already stopped! ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Service was already stopped! ähnelt.
         /// </summary>
         public static string cannot_stop_the_service_already_stopped {
             get {
@@ -458,7 +458,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Continue pending ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Continue pending... ähnelt.
         /// </summary>
         public static string enum_continue_pending {
             get {
@@ -467,7 +467,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Pause pending ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pause pending... ähnelt.
         /// </summary>
         public static string enum_pause_pending {
             get {
@@ -494,7 +494,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Start pending ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Start pending... ähnelt.
         /// </summary>
         public static string enum_start_pending {
             get {
@@ -503,7 +503,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Stop pending ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Stop pending... ähnelt.
         /// </summary>
         public static string enum_stop_pending {
             get {
@@ -530,7 +530,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die The UI0Detect Service cannot be started! ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die UI0Detect Service cannot be started! ähnelt.
         /// </summary>
         public static string error_ui0service {
             get {
@@ -611,7 +611,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Services can interact with the desktop ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Service can interact with desktop ähnelt.
         /// </summary>
         public static string interact_with_desktop {
             get {
@@ -638,7 +638,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die The username or the password cannot be empty! ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Username or password cannot be empty! ähnelt.
         /// </summary>
         public static string invalid_pw_user {
             get {
@@ -674,7 +674,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Depend on (Group): ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Depends on (Group): ähnelt.
         /// </summary>
         public static string label_depend_on_group {
             get {
@@ -683,7 +683,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Depend on (Service): ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Depends on (Service): ähnelt.
         /// </summary>
         public static string label_depend_on_service {
             get {
@@ -719,7 +719,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Filter ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Filter: ähnelt.
         /// </summary>
         public static string label_filter {
             get {
@@ -737,7 +737,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Max Restarts: ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Max. restarts: ähnelt.
         /// </summary>
         public static string label_max_restarts {
             get {
@@ -827,7 +827,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die The username or the password is incorrect! ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Username or password incorrect! ähnelt.
         /// </summary>
         public static string login_failed {
             get {
@@ -836,7 +836,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die The account need the right to start as a service. Do you want to give them the right? (YOU MUST MANUALLY REMOVE THAT RIGHT!) ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die The account needs the right to start as a service. Would you like to give it this right? (YOU MUST MANUALLY REMOVE IT!) ähnelt.
         /// </summary>
         public static string logon_as_a_service {
             get {
@@ -845,7 +845,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Max limit reached ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Max limit of 10 programs reached! ähnelt.
         /// </summary>
         public static string max_limit_reached {
             get {
@@ -863,7 +863,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Time befor the restart counter will be reset ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Time before the restart counter will be reset ähnelt.
         /// </summary>
         public static string placeholder_counter_reset_time {
             get {
@@ -890,7 +890,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die &lt;Click on &quot;Search file&quot; to locate the .exe, etc&gt; ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die &lt;Click on &quot;Search file&quot; to locate the .exe, etc.&gt; ähnelt.
         /// </summary>
         public static string placeholder_file_path {
             get {
@@ -935,7 +935,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die &lt;Please enter a Name&gt; ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die &lt;Enter Name&gt; ähnelt.
         /// </summary>
         public static string placeholder_service_name {
             get {
@@ -1007,7 +1007,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Problem occurred ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die A problem occurred ähnelt.
         /// </summary>
         public static string problem_occurred {
             get {
@@ -1214,7 +1214,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die The process killing was successful! ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Process killing successful! ähnelt.
         /// </summary>
         public static string the_process_killing_was_successful {
             get {
@@ -1223,7 +1223,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die The service killing was unsuccessful ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Process killing failed! ähnelt.
         /// </summary>
         public static string the_process_killing_was_unsuccessful {
             get {
@@ -1232,7 +1232,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die The selected process does not exist! ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Selected process does not exist! ähnelt.
         /// </summary>
         public static string the_selected_process_does_not_exist {
             get {
@@ -1241,7 +1241,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die The selected process is already started! ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Selected process is already started! ähnelt.
         /// </summary>
         public static string the_selected_process_is_already_started {
             get {
@@ -1250,7 +1250,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Service deletion was successful! ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Service deletion successful! ähnelt.
         /// </summary>
         public static string the_service_deletion_was_successful {
             get {
@@ -1259,7 +1259,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Service deletion was not successful! ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Service deletion failed! ähnelt.
         /// </summary>
         public static string the_service_deletion_was_unsuccessful {
             get {
@@ -1268,7 +1268,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Service-installation was successful! ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Service-installation successful! ähnelt.
         /// </summary>
         public static string the_service_installation_was_successful {
             get {
@@ -1277,7 +1277,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Service-installation was not succesful! ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Service-installation failed! ähnelt.
         /// </summary>
         public static string the_service_installation_was_unsuccessful {
             get {
@@ -1286,7 +1286,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die The restart of the service took to long! ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die The service&apos;s restart takes too long! ähnelt.
         /// </summary>
         public static string timeout_exception_service_restart {
             get {
@@ -1350,7 +1350,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die You must stop the service first. Do you want stop the service now ? ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die You must stop the service first. Would you like to do so now? ähnelt.
         /// </summary>
         public static string you_must_stop_the_service_first {
             get {

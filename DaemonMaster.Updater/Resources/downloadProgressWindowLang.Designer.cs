@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace DaemonMaster.Updater.Lang {
+namespace DaemonMaster.Updater.Resources {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace DaemonMaster.Updater.Lang {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DaemonMaster.Updater.Lang.downloadProgressWindowLang", typeof(downloadProgressWindowLang).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DaemonMaster.Updater.Resources.downloadProgressWindowLang", typeof(downloadProgressWindowLang).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

@@ -19,6 +19,54 @@
 		<Reference Include="System.Net.Http" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Compile Update="**\*.Designer.cs">
+			<AutoGen>True</AutoGen>
+			<DesignTime>True</DesignTime>
+			<DependentUpon>$([System.String]::Copy('%(FileName)').Replace('.Designer', '.resx'))</DependentUpon>
+		</Compile>
+		<EmbeddedResource Update="**\*.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>$([System.String]::Copy('%(FileName)')).Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Resources\downloadProgressWindowLang.de.Designer.cs">
+	    <DependentUpon>downloadProgressWindowLang.de.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="Resources\downloadProgressWindowLang.fr.Designer.cs">
+	    <DependentUpon>downloadProgressWindowLang.fr.resx</DependentUpon>
+	  </Compile>
+	  	  <Compile Update="Resources\downloadProgressWindowLang.Designer.cs">
+	    <DependentUpon>downloadProgressWindowLang.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Resources\updaterLang.de.resx">
+	    <LastGenOutput>updaterLang.de.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\updaterLang.fr.resx">
+	    <LastGenOutput>updaterLang.fr.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\updaterLang.resx">
+	    <LastGenOutput>updaterLang.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Resources\updaterWindowLang.de.resx">
+	    <LastGenOutput>updaterWindowLang.de.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\updaterWindowLang.fr.resx">
+	    <LastGenOutput>updaterWindowLang.fr.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\updaterWindowLang.resx">
+	    <LastGenOutput>updaterWindowLang.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="if $(ConfigurationName) == Release del *.pdb" />
 	</Target>
