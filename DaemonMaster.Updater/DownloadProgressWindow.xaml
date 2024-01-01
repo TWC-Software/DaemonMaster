@@ -1,16 +1,53 @@
-﻿<Window x:Class="DaemonMaster.Updater.DownloadProgressWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:resx="clr-namespace:DaemonMaster.Updater.Lang"
-        xmlns:lang="clr-namespace:DaemonMaster.Updater.Lang"
-        mc:Ignorable="d"
-        Title="{x:Static lang:downloadProgressWindowLang.titel}" SizeToContent="WidthAndHeight" ResizeMode="NoResize" Loaded="DownloadProgressWindow_OnLoaded">
-    <Grid Height="75" Width="400"  Margin="2">
-        <ProgressBar x:Name="DownloadProgressBar" Margin="10,21,11,0" RenderTransformOrigin="0.5,0.5" Height="19" VerticalAlignment="Top"/>
-        <Label x:Name="LabelDownload" Content="{x:Static resx:downloadProgressWindowLang.label_download}" Margin="5,0,0,0" FontStyle="Italic" HorizontalAlignment="Left" Width="166" Height="26" VerticalAlignment="Top"/>
-        <Button x:Name="ButtonCancel" Content="{x:Static resx:downloadProgressWindowLang.button_cancel}" Margin="10,0,0,6" Click="ButtonCancel_Click" HorizontalAlignment="Left" Width="100" Height="20" VerticalAlignment="Bottom"/>
-        <Label x:Name="LabelPercent" Content="0%&#xD;&#xA;" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="178,15,178,0" RenderTransformOrigin="0.5,0.5" Height="25" VerticalAlignment="Top" Width="44" FontSize="14"/>
+﻿<Window
+    x:Class="DaemonMaster.Updater.DownloadProgressWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:resx="clr-namespace:DaemonMaster.Updater.Resources"
+    Title="{x:Static resx:downloadProgressWindowLang.titel}"
+    Loaded="DownloadProgressWindow_OnLoaded"
+    ResizeMode="NoResize"
+    SizeToContent="WidthAndHeight"
+    mc:Ignorable="d">
+    <Grid
+        Width="400"
+        Height="75"
+        Margin="2">
+        <ProgressBar
+            x:Name="DownloadProgressBar"
+            Height="19"
+            Margin="10,21,11,0"
+            VerticalAlignment="Top"
+            RenderTransformOrigin="0.5,0.5" />
+        <Label
+            x:Name="LabelDownload"
+            Width="166"
+            Height="26"
+            Margin="5,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="{x:Static resx:downloadProgressWindowLang.label_download}"
+            FontStyle="Italic" />
+        <Button
+            x:Name="ButtonCancel"
+            Width="100"
+            Height="20"
+            Margin="10,0,0,6"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom"
+            Click="ButtonCancel_Click"
+            Content="{x:Static resx:downloadProgressWindowLang.button_cancel}" />
+        <Label
+            x:Name="LabelPercent"
+            Width="44"
+            Height="25"
+            Margin="178,15,178,0"
+            VerticalAlignment="Top"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center"
+            Content="0%&#xD;&#xA;"
+            FontSize="14"
+            RenderTransformOrigin="0.5,0.5" />
     </Grid>
 </Window>

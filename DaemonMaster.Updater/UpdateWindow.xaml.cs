@@ -17,30 +17,24 @@
 //   along with DeamonMaster.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////////////////
 
+using DaemonMaster.Updater.Resources;
 using System;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Resources;
 using System.Windows;
-using DaemonMaster.Updater.Lang;
 
 namespace DaemonMaster.Updater
 {
-    /// <summary>
-    /// Interaktionslogik für MainWindow.xaml
-    /// </summary>
     public partial class UpdateWindow : Window
     {
-        private readonly ResourceManager _resManager = new ResourceManager(typeof(updaterWindowLang));
         static readonly Uri SomeBaseUri = new Uri("http://canbeanything");
 
         public UpdateWindow()
         {
             InitializeComponent();
 
-            LabelUpdate.Content = string.Format(_resManager.GetString("label_update", CultureInfo.CurrentUICulture), Updater.AppName);
-            LabelDescription.Content = string.Format(_resManager.GetString("label_description", CultureInfo.CurrentUICulture), Updater.AppName, Updater.LastGitHubRelease.Version);
+            LabelUpdate.Content = string.Format(updaterWindowLang.label_update, Updater.AppName);
+            LabelDescription.Content = string.Format(updaterWindowLang.label_description, Updater.AppName, Updater.LastGitHubRelease.Version);
         }
 
         private void ButtonUpdate_Click(object sender, RoutedEventArgs e)
@@ -74,7 +68,7 @@ namespace DaemonMaster.Updater
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, _resManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, updaterWindowLang.error, MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
         }

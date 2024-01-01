@@ -39,14 +39,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using DaemonMaster.Updater.GitHub;
-using DaemonMaster.Updater.Lang;
+using DaemonMaster.Updater.Resources;
 using DaemonMaster.Updater.Persistence;
 
 namespace DaemonMaster.Updater
 {
     public sealed class Updater
     {
-        private static readonly ResourceManager ResManager = new ResourceManager(typeof(updaterLang));
         private static bool _working = false;
 
 
@@ -158,7 +157,7 @@ namespace DaemonMaster.Updater
                 else
                 {
                     if (showDialogs)
-                        MessageBox.Show(ResManager.GetString("no_update_found_text", CultureInfo.CurrentUICulture), ResManager.GetString("no_update_found", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show(updaterLang.no_update_found_text, updaterLang.no_update_found, MessageBoxButton.OK, MessageBoxImage.Information);
                 }
 
                 _working = false;
@@ -168,7 +167,7 @@ namespace DaemonMaster.Updater
                 _working = false;
 
                 if (showDialogs)
-                    MessageBox.Show(ex.Message, ResManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(ex.Message, updaterLang.error, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -213,7 +212,7 @@ namespace DaemonMaster.Updater
                     MessageBoxResult result;
                     if (askForClose)
                     {
-                        result = MessageBox.Show(ResManager.GetString("close_app_for_update", CultureInfo.CurrentUICulture), ResManager.GetString("question", CultureInfo.CurrentUICulture), MessageBoxButton.YesNo, MessageBoxImage.Question);
+                        result = MessageBox.Show(updaterLang.close_app_for_update, updaterLang.question, MessageBoxButton.YesNo, MessageBoxImage.Question);
                         if (result == MessageBoxResult.No)
                             return;
                     }
@@ -222,7 +221,7 @@ namespace DaemonMaster.Updater
                     {
                         if (!process.WaitForExit(TimeSpan.FromSeconds(10).Milliseconds)) //Wait 10 seconds before the process get killed
                         {
-                            result = MessageBox.Show(ResManager.GetString("warning_process_will_be_killed", CultureInfo.CurrentUICulture), ResManager.GetString("warning"), MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                            result = MessageBox.Show(updaterLang.warning_process_will_be_killed, updaterLang.warning, MessageBoxButton.OKCancel, MessageBoxImage.Warning);
                             if (result == MessageBoxResult.Cancel)
                                 return;
 

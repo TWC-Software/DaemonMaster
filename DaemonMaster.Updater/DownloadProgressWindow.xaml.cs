@@ -27,7 +27,7 @@ using System.Net.Cache;
 using System.Resources;
 using System.Threading.Tasks;
 using System.Windows;
-using DaemonMaster.Updater.Lang;
+using DaemonMaster.Updater.Resources;
 
 namespace DaemonMaster.Updater
 {
@@ -36,8 +36,6 @@ namespace DaemonMaster.Updater
     /// </summary>
     public partial class DownloadProgressWindow : Window
     {
-        private readonly ResourceManager _resManager = new ResourceManager(typeof(downloadProgressWindowLang));
-
         private readonly Uri _downloadUrl;
         private readonly WebProxy _webProxy;
         private WebClient _webClient;
@@ -164,7 +162,7 @@ namespace DaemonMaster.Updater
             }
             else
             {
-                MessageBox.Show(_resManager.GetString("msg_file_not_found", CultureInfo.CurrentUICulture), _resManager.GetString("msg_titel_error", CultureInfo.CurrentUICulture), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(downloadProgressWindowLang.msg_file_not_found, downloadProgressWindowLang.msg_titel_error, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
