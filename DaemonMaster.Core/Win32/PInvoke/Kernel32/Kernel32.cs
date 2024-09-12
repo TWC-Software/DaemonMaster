@@ -46,14 +46,14 @@ namespace DaemonMaster.Core.Win32.PInvoke.Kernel32
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CreateProcess
         (
-            string applicationName,
-            string commandLineArgs,
-            SecurityAttributes processAttributes,
-            SecurityAttributes threadAttributes,
+            string? applicationName,
+            string? commandLineArgs,
+            SecurityAttributes? processAttributes,
+            SecurityAttributes? threadAttributes,
             bool inheritHandles,
             CreationFlags creationFlags,
             IntPtr lpEnvironment,
-            string currentDirectory,
+            string? currentDirectory,
             ref StartupInfo startupInfo,
             out ProcessInformation processInformation
         );

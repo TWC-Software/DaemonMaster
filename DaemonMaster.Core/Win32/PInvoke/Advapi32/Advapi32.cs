@@ -176,14 +176,14 @@ namespace DaemonMaster.Core.Win32.PInvoke.Advapi32
         public static extern bool CreateProcessAsUser
         (
             SafeAccessTokenHandle logonToken,
-            string applicationName,
-            string commandLineArgs,
-            Kernel32.Kernel32.SecurityAttributes processAttributes,
-            Kernel32.Kernel32.SecurityAttributes threadAttributes,
+            string? applicationName,
+            string? commandLineArgs,
+            Kernel32.Kernel32.SecurityAttributes? processAttributes,
+            Kernel32.Kernel32.SecurityAttributes? threadAttributes,
             bool inheritHandles,
             Kernel32.Kernel32.CreationFlags creationFlags,
             IntPtr lpEnvironment,
-            string currentDirectory,
+            string? currentDirectory,
             ref Kernel32.Kernel32.StartupInfo startupInfo,
             out Kernel32.Kernel32.ProcessInformation processInformation
        );

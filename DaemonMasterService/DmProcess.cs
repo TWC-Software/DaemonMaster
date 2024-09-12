@@ -151,7 +151,8 @@ namespace DaemonMasterService
                     //Set last start in user session
                     _lastStartInUserSession = false;
                     _lastSessionUsername = string.Empty;
-
+                    
+                    var workingDir = string.IsNullOrWhiteSpace(_serviceDefinition.WorkingDirectory) ? null : _serviceDefinition.WorkingDirectory;
                     if (!Kernel32.CreateProcess(
                         null,
                         cmdLine,
@@ -160,7 +161,7 @@ namespace DaemonMasterService
                         false,
                         creationFlags,
                         IntPtr.Zero, //TODO: Change
-                        Path.GetDirectoryName(_serviceDefinition.BinaryPath),
+                        workingDir,
                         ref startupInfo,
                         out processInformation))
                     {
@@ -185,6 +186,7 @@ namespace DaemonMasterService
 
                         WindowsIdentity.RunImpersonated(token, () =>
                         {
+                            var workingDir = string.IsNullOrWhiteSpace(_serviceDefinition.WorkingDirectory) ? null : _serviceDefinition.WorkingDirectory;
                             if (!Advapi32.CreateProcessAsUser(
                                 token,
                                 null,
@@ -194,7 +196,7 @@ namespace DaemonMasterService
                                 false,
                                 creationFlags,
                                 environment,
-                                Path.GetDirectoryName(_serviceDefinition.BinaryPath),
+                                workingDir,
                                 ref startupInfo,
                                 out processInformation))
                             {

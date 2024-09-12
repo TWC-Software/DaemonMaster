@@ -59,6 +59,7 @@ namespace DaemonMaster.Core
                 {
                     //Strings
                     parameters.SetValue("BinaryPath", serviceDefinition.BinaryPath, RegistryValueKind.String);
+                    parameters.SetValue("WorkingDirectory", serviceDefinition.WorkingDirectory, RegistryValueKind.String);
                     parameters.SetValue("Arguments", serviceDefinition.Arguments, RegistryValueKind.String);
 
                     //Ints
@@ -152,6 +153,7 @@ namespace DaemonMaster.Core
                 using (RegistryKey parameters = key.OpenSubKey("Parameters", RegistryKeyPermissionCheck.ReadSubTree))
                 {
                     serviceDefinition.BinaryPath = Convert.ToString(parameters.GetValue("BinaryPath"));
+                    serviceDefinition.WorkingDirectory = Convert.ToString(parameters.GetValue("WorkingDirectory", string.Empty));
                     serviceDefinition.Arguments = Convert.ToString(parameters.GetValue("Arguments", string.Empty));
                     serviceDefinition.ProcessMaxRestarts = Convert.ToInt32(parameters.GetValue("ProcessMaxRestarts", 3));
                     serviceDefinition.ProcessTimeoutTime = Convert.ToInt32(parameters.GetValue("ProcessTimeoutTime", 9500));

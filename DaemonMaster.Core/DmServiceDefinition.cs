@@ -36,7 +36,7 @@ namespace DaemonMaster.Core
         public string BinaryPath { get; set; }
 
         /// <inheritdoc /> 
-        public string Description { get; set; } = "";
+        public string Description { get; set; } = string.Empty;
 
         /// <inheritdoc /> 
         public Advapi32.ServiceStartType StartType { get; set; } = Advapi32.ServiceStartType.AutoStart;
@@ -45,10 +45,10 @@ namespace DaemonMaster.Core
         public bool DelayedStart { get; set; } = false;
 
         /// <inheritdoc /> 
-        public string Arguments { get; set; } = "";
+        public string Arguments { get; set; } = string.Empty;
 
         /// <inheritdoc /> 
-        public string LoadOrderGroup { get; set; } = "";
+        public string LoadOrderGroup { get; set; } = string.Empty;
 
         /// <inheritdoc /> 
         public Advapi32.ErrorControl ErrorControl { get; set; } = Advapi32.ErrorControl.Normal;
@@ -74,7 +74,11 @@ namespace DaemonMaster.Core
 
         //----------------------------------------------------------------------------
 
-
+        /// <summary>
+        /// Get or set working directory. If the string is empty, just whitepsace or null the new process will have the same current drive and directory as the calling process
+        /// </summary>
+        public string WorkingDirectory { get; set; } = string.Empty;
+        
         /// <summary>
         /// Get or set the maximum restart count of the process
         /// </summary>
