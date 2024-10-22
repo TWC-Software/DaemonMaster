@@ -827,6 +827,15 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Working directory ähnelt.
+        /// </summary>
+        public static string label_working_dir {
+            get {
+                return ResourceManager.GetString("label_working_dir", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Username or password incorrect! ähnelt.
         /// </summary>
         public static string login_failed {
@@ -949,6 +958,15 @@ namespace DaemonMaster.Language {
         public static string placeholder_username {
             get {
                 return ResourceManager.GetString("placeholder_username", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die &lt;Working directory path or leave empty&gt; ähnelt.
+        /// </summary>
+        public static string placeholder_working_dir {
+            get {
+                return ResourceManager.GetString("placeholder_working_dir", resourceCulture);
             }
         }
         

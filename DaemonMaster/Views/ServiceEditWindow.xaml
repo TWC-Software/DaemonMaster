@@ -10,7 +10,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:converters="clr-namespace:DaemonMaster.Utilities.Converters"
         mc:Ignorable="d"
-        Title="{Binding ElementName=This, Path=MyTitel}" Height="343.496" Width="893.398" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
+        Title="{Binding ElementName=This, Path=MyTitel}" Height="367" Width="893.398" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
 
     <Window.Resources>
         <converters:InvertBooleanConverter x:Key="InvertBoolConverter"/>
@@ -18,9 +18,9 @@
         <converters:OrConverter x:Key="OrConverter"/>
     </Window.Resources>
 
-    <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,0,0" Height="308" Width="890">
-        <Button x:Name="ButtonSave" Content="{x:Static resx:lang.button_save}" Margin="10,276,0,0" Click="buttonSave_OnClick" Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139" IsEnabled="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
-        <Button x:Name="ButtonCancel" Content="{x:Static resx:lang.button_cancel}" Margin="741,276,0,0"  Click="buttonCancel_OnClick"  Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139"/>
+    <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,0,0" Height="346" Width="890">
+        <Button x:Name="ButtonSave" Content="{x:Static resx:lang.button_save}" Margin="10" Click="buttonSave_OnClick" Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="139" IsEnabled="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
+        <Button x:Name="ButtonCancel" Content="{x:Static resx:lang.button_cancel}" Margin="10"  Click="buttonCancel_OnClick"  Height="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="139"/>
 
         <TabControl VerticalContentAlignment="Center" RenderTransformOrigin="0,0" Margin="0,0,0,42">
             <TabItem Header="{x:Static resx:lang.tabitem_general}" IsSelected="True">
@@ -74,7 +74,7 @@
                         </wpf:TextBoxAutoShrink.IsReadOnly>
                     </wpf:TextBoxAutoShrink>
 
-                    <Label x:Name="LabelStartType" Content="{x:Static resx:lang.label_start_type}" HorizontalAlignment="Left" Margin="10,126,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="LabelStartType" Content="{x:Static resx:lang.label_start_type}" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center"/>
                     <ComboBox x:Name="ComboBoxStartType" HorizontalAlignment="Left" Margin="147,126,0,0" VerticalAlignment="Top" Width="321" RenderTransformOrigin="1.217,1.045" SelectedIndex="0" IsHitTestVisible ="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}" Focusable="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}">
                         <ComboBoxItem Content="{x:Static resx:lang.starttype_automatic}"/>
                         <ComboBoxItem Content="{x:Static resx:lang.starttype_automatic_with_delay}"/>
@@ -82,13 +82,14 @@
                         <ComboBoxItem Content="{x:Static resx:lang.starttype_disabled}"/>
                     </ComboBox>
 
+                    <Label x:Name="LabelWorkingDir" Content="{x:Static resx:lang.label_working_dir}" HorizontalAlignment="Left" Margin="10,154,0,0" VerticalAlignment="Top"/>
+                    <wpf:WatermarkTextBoxAutoShrink x:Name="TextBoxWorkingDir" Height="23" Margin="147,154,0,0" TextWrapping="Wrap" Watermark="{x:Static resx:lang.placeholder_working_dir}" VerticalAlignment="Top" Panel.ZIndex="12" HorizontalAlignment="Left" Width="321" IsReadOnly="{Binding ReadOnlyMode, ElementName=This}"/>
 
+                    <Label x:Name="LabelFilePath" Content="{x:Static resx:lang.label_file_path}" HorizontalAlignment="Left" Margin="10,180,0,0" VerticalAlignment="Top"/>
+                    <wpf:WatermarkTextBoxAutoShrink x:Name="TextBoxFilePath" Height="23" Margin="147,184,0,0" TextWrapping="Wrap" Watermark="{x:Static resx:lang.placeholder_file_path}" VerticalAlignment="Top" IsReadOnly="True" Grid.ZIndex="9" HorizontalAlignment="Left" Width="717" UndoLimit="0" />
 
-                    <Label x:Name="LabelFilePath" Content="{x:Static resx:lang.label_file_path}" HorizontalAlignment="Left" Margin="10,162,0,0" VerticalAlignment="Top"/>
-                    <wpf:WatermarkTextBoxAutoShrink x:Name="TextBoxFilePath" Height="23" Margin="147,166,0,0" TextWrapping="Wrap" Watermark="{x:Static resx:lang.placeholder_file_path}" VerticalAlignment="Top" IsReadOnly="True" Grid.ZIndex="9" HorizontalAlignment="Left" Width="717" UndoLimit="0" />
-
-                    <Button x:Name="ButtonSearchPath" Content="{x:Static resx:lang.button_search_file}" HorizontalAlignment="Left" Margin="147,194,0,0" VerticalAlignment="Top" Width="717" Click="buttonSearchPath_OnClick" IsEnabled="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
-                    <Label x:Name="LabelWarningPath" Content="{x:Static resx:lang.warning_file_access}" HorizontalAlignment="Left" Margin="271,213,0,0" VerticalAlignment="Top"/>
+                    <Button x:Name="ButtonSearchPath" Content="{x:Static resx:lang.button_search_file}" HorizontalAlignment="Left" Margin="147,212,0,0" VerticalAlignment="Top" Width="717" Click="buttonSearchPath_OnClick" IsEnabled="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
+                    <Label x:Name="LabelWarningPath" Content="{x:Static resx:lang.warning_file_access}" HorizontalAlignment="Left" Margin="271,231,0,0" VerticalAlignment="Top"/>
 
                     <GroupBox x:Name="GroupBoxCustomUsername" Header="{x:Static resx:lang.groupbox_custom_user}" HorizontalAlignment="Left" Height="116" Margin="486,-3,0,0" VerticalAlignment="Top" Width="378">
                         <Grid HorizontalAlignment="Left" Height="100" Margin="0,0,-2,-6" VerticalAlignment="Top" Width="267">
@@ -121,8 +122,8 @@
                         </Grid>
                     </GroupBox>
 
-                    <Button x:Name="ButtonImport" Content="{x:Static resx:lang.button_import}" Margin="530,126,210,90" Click="buttonImport_Click" IsEnabled="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
-                    <Button x:Name="ButtonExport" Content="{x:Static resx:lang.button_export}" Margin="679,126,61,90" Click="buttonExport_Click" IsEnabled="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
+                    <Button x:Name="ButtonImport" Content="{x:Static resx:lang.button_import}" Margin="530,126,210,120" Click="buttonImport_Click" IsEnabled="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
+                    <Button x:Name="ButtonExport" Content="{x:Static resx:lang.button_export}" Margin="679,126,61,120" Click="buttonExport_Click" IsEnabled="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
                 </Grid>
             </TabItem>
             <TabItem Header="{x:Static resx:lang.tabitem_advanced}">
@@ -165,9 +166,20 @@
                     <CheckBox x:Name="CheckBoxInteractDesk" Content="{x:Static resx:lang.interact_with_desktop}" Margin="497,50,121.14,171.65" IsEnabled="{Binding ElementName=CheckBoxUseLocalSystem, Path=IsChecked}" IsHitTestVisible="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}" Focusable="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
 
                     <GroupBox Header="{x:Static resx:lang.groupBox_process}" Margin="24,119,468.14,5.65" >
-                        <Grid Margin="0,0,-2.028,-0.86">
-                            <Label x:Name="LabelLoadOrderGroupCopy" Content="{x:Static resx:lang.label_priority}" Margin="10,2,248,0" VerticalAlignment="Top" RenderTransformOrigin="1.053,0.577" Height="27"/>
-                            <ComboBox x:Name="ComboBoxProcessPriority" HorizontalAlignment="Left" Margin="94,4,0,0" VerticalAlignment="Top" Width="283" RenderTransformOrigin="1.217,1.045" SelectedIndex="0" IsHitTestVisible="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}" Focusable="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}">
+                        <Grid Margin="0,5,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Label x:Name="LabelLoadPriority" Grid.Row="0" Grid.Column="0" Margin="1" Content="{x:Static resx:lang.label_priority}"  VerticalAlignment="Center"/>
+                            <ComboBox x:Name="ComboBoxProcessPriority" Grid.Row="0" Grid.Column="1" Margin="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" SelectedIndex="0" IsHitTestVisible="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}" Focusable="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}">
                                 <ComboBoxItem Content="{x:Static resx:lang.priority_idle}"/>
                                 <ComboBoxItem Content="{x:Static resx:lang.priority_belowNormal}"/>
                                 <ComboBoxItem Content="{x:Static resx:lang.priority_normal}"/>
@@ -176,10 +188,10 @@
                                 <ComboBoxItem Content="{x:Static resx:lang.priority_realtime}"/>
                             </ComboBox>
 
-                            <CheckBox x:Name="CheckBoxIsConsoleApp" Content="{x:Static resx:lang.checkbox_is_console_app}" HorizontalAlignment="Left" Margin="10,50,0,0" VerticalAlignment="Top" IsHitTestVisible="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}" Focusable="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
+                            <CheckBox x:Name="CheckBoxIsConsoleApp" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="1" Content="{x:Static resx:lang.checkbox_is_console_app}" HorizontalAlignment="Left" VerticalAlignment="Center" IsHitTestVisible="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}" Focusable="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
 
-                            <Label x:Name="LabelShutdownConsoleApp" Content="{x:Static resx:lang.label_shutdown_console_app}" HorizontalAlignment="Left" Margin="174,44,0,0" VerticalAlignment="Top"/>
-                            <RadioButton x:Name="RadioButtonUseCtrlBreak" Content="{x:Static resx:lang.radiobutton_use_ctrlbreak}" HorizontalAlignment="Left" Margin="262,51,0,0" VerticalAlignment="Top" IsChecked="True">
+                            <Label x:Name="LabelShutdownConsoleApp" Grid.Row="2" Grid.Column="0" Margin="1" Content="{x:Static resx:lang.label_shutdown_console_app}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <RadioButton x:Name="RadioButtonUseCtrlBreak" Grid.Row="2" Grid.Column="1" Margin="1" Content="{x:Static resx:lang.radiobutton_use_ctrlbreak}" HorizontalAlignment="Stretch" VerticalAlignment="Center" IsChecked="True">
                                 <RadioButton.IsEnabled>
                                     <MultiBinding Converter="{StaticResource AddConverter}">
                                         <Binding ElementName="CheckBoxIsConsoleApp" Path="IsChecked"/>
@@ -187,7 +199,7 @@
                                     </MultiBinding>
                                 </RadioButton.IsEnabled>
                             </RadioButton>
-                            <RadioButton x:Name="RadioButtonUseCtrlC" Content="{x:Static resx:lang.radiobutton_use_ctrlc}" HorizontalAlignment="Left" Margin="262,69,0,0" VerticalAlignment="Top">
+                            <RadioButton x:Name="RadioButtonUseCtrlC" Grid.Row="3" Grid.Column="1" Margin="1" Content="{x:Static resx:lang.radiobutton_use_ctrlc}" HorizontalAlignment="Stretch" VerticalAlignment="Center">
                                 <RadioButton.IsEnabled>
                                     <MultiBinding Converter="{StaticResource AddConverter}">
                                         <Binding ElementName="CheckBoxIsConsoleApp" Path="IsChecked"/>
@@ -198,28 +210,42 @@
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="{x:Static resx:lang.groupeBox_logging}" Margin="481,119,10.333,6.333" >
-                        <Grid Margin="0,0,-2.028,-0.86">
-                            <CheckBox x:Name="CheckBoxUseEventLog" Content="{x:Static resx:lang.checkbox_use_eventlog}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" IsHitTestVisible="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}" Focusable="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
+                        <Grid Margin="0,5,0,0">
+                            <CheckBox x:Name="CheckBoxUseEventLog" Content="{x:Static resx:lang.checkbox_use_eventlog}" HorizontalAlignment="Left" Margin="1" VerticalAlignment="Top" IsHitTestVisible="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}" Focusable="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
                         </Grid>
                     </GroupBox>
                 </Grid>
             </TabItem>
             <TabItem Header="{x:Static resx:lang.tabitem_dependencies}">
                 <Grid>
-                    <Button x:Name="ButtonAddDependentService" Content="{x:Static resx:lang.button_add}" Margin="26,41,777,171" Click="buttonAddDependentService_Click" IsEnabled="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
-                    <Button x:Name="ButtonRemoveDependentService" Content="{x:Static resx:lang.button_remove}" Margin="26,72,777,140" Click="buttonRemoveDependentService_Click" IsEnabled="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
 
-                    <Label x:Name="LabelDependOnService" Content="{x:Static resx:lang.label_depend_on_service}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-                    <ListBox x:Name="ListBoxDependOnService" HorizontalAlignment="Left" Height="104" Margin="147,10,0,0" VerticalAlignment="Top" Width="360" DisplayMemberPath="DisplayName"/>
-                    <ListBox x:Name="ListBoxAllServices" Margin="514,10,10,124" DisplayMemberPath="DisplayName"/>
+                    <Label x:Name="LabelDependOnService" Grid.Row="0" Grid.Column="0" Margin="10" Content="{x:Static resx:lang.label_depend_on_service}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Button x:Name="ButtonAddDependentService" Grid.Row="1" Grid.Column="0" Content="{x:Static resx:lang.button_add}" Margin="10" Click="buttonAddDependentService_Click" IsEnabled="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
+                    <Button x:Name="ButtonRemoveDependentService" Grid.Row="2" Grid.Column="0" Content="{x:Static resx:lang.button_remove}" Margin="10" Click="buttonRemoveDependentService_Click" IsEnabled="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
+
+                    <ListBox x:Name="ListBoxDependOnService" Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Margin="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" DisplayMemberPath="DisplayName"/>
+                    <ListBox x:Name="ListBoxAllServices" Grid.Row="0" Grid.RowSpan="3" Grid.Column="2" Margin="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" DisplayMemberPath="DisplayName"/>
 
 
-                    <Button x:Name="ButtonAddDependentGroup" Content="{x:Static resx:lang.button_add}" Margin="26,150,777,62" Click="buttonAddDependentGroup_Click" IsEnabled="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
-                    <Button x:Name="ButtonRemoveDependentGroup" Content="{x:Static resx:lang.button_remove}" Margin="26,181,777,31" Click="buttonRemoveDependentGroup_Click" IsEnabled="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
+                    <Label x:Name="LabelDependOnGroup" Grid.Row="3" Grid.Column="0" Margin="10" Content="{x:Static resx:lang.label_depend_on_group}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Button x:Name="ButtonAddDependentGroup" Grid.Row="4" Grid.Column="0" Margin="10" Content="{x:Static resx:lang.button_add}" Click="buttonAddDependentGroup_Click" IsEnabled="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
+                    <Button x:Name="ButtonRemoveDependentGroup" Grid.Row="5" Grid.Column="0" Margin="10" Content="{x:Static resx:lang.button_remove}" Click="buttonRemoveDependentGroup_Click" IsEnabled="{Binding ElementName=This, Path=ReadOnlyMode, Converter={StaticResource InvertBoolConverter}}"/>
 
-                    <Label x:Name="LabelDependOnGroup" Content="{x:Static resx:lang.label_depend_on_group}" HorizontalAlignment="Left" Margin="10,119,0,0" VerticalAlignment="Top"/>
-                    <ListBox x:Name="ListBoxDependOnGroup" HorizontalAlignment="Left" Height="104" Margin="147,119,0,0" VerticalAlignment="Top" Width="360"/>
-                    <ListBox x:Name="ListBoxAllGroups" Margin="514,119,10,15"/>
+                    <ListBox x:Name="ListBoxDependOnGroup" Grid.Row="3" Grid.RowSpan="3" Grid.Column="1" Margin="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    <ListBox x:Name="ListBoxAllGroups" Grid.Row="3" Grid.RowSpan="3" Grid.Column="2" Margin="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                 </Grid>
             </TabItem>
         </TabControl>

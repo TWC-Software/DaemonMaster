@@ -124,6 +124,9 @@ namespace DaemonMaster.Views
 
             TextBoxDisplayName.Text = _tempServiceConfig.DisplayName;
 
+            if (!string.IsNullOrWhiteSpace(_tempServiceConfig.WorkingDirectory))
+                TextBoxWorkingDir.Text = _tempServiceConfig.WorkingDirectory;
+
             if (!string.IsNullOrWhiteSpace(_tempServiceConfig.BinaryPath))
                 TextBoxFilePath.Text = _tempServiceConfig.BinaryPath;
 
@@ -543,7 +546,8 @@ namespace DaemonMaster.Views
                 }
 
                 //Invalid value error
-                if (string.IsNullOrWhiteSpace(TextBoxDisplayName.Text) ||
+                if ((!string.IsNullOrWhiteSpace(TextBoxWorkingDir.Text) && !Directory.Exists(TextBoxWorkingDir.Text)) ||
+                    string.IsNullOrWhiteSpace(TextBoxDisplayName.Text) ||
                     string.IsNullOrWhiteSpace(TextBoxServiceName.Text) ||
                     !int.TryParse(TextBoxMaxRestarts.Text, out int maxRestarts) ||
                     !int.TryParse(TextBoxProcessTimeoutTime.Text, out int processKillTime) ||
@@ -611,6 +615,7 @@ namespace DaemonMaster.Views
                 _tempServiceConfig.ServiceName = TextBoxServiceName.Text;
 
                 _tempServiceConfig.BinaryPath = TextBoxFilePath.Text;
+                _tempServiceConfig.WorkingDirectory = TextBoxWorkingDir.Text;
 
                 _tempServiceConfig.Arguments = TextBoxParam.Text;
                 _tempServiceConfig.Description = TextBoxDescription.Text;
