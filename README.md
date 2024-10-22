@@ -17,7 +17,10 @@ You can download the pre-release here: [Click here](https://github.com/TWC-Softw
 - Support for "Virtual accounts" (virtual service accounts) 
 - Works very well for game servers (tested on DayZ/Arma and Minecraft, but should work well with other games as well; if not, any bug reports are welcome)
 - Command line parameters (expertimental)
+  
 ## Planned Features
+- **Moving to .NET8 and a more modern looking UI**
+- Using CsWin32 instead of own DllImports
 
 ## Thanks to 
 - **Advanced Installer (for the open source license)** 
