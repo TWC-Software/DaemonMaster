@@ -35,8 +35,6 @@ namespace DaemonMaster.ViewModels
     internal class MainWindowViewModel : ViewModelBase
     {
         #region Private Members
-
-        private static readonly ResourceManager ResManager = new ResourceManager(typeof(lang));
         private readonly ObservableCollectionEx<ServiceListViewItem> _serviceList;
         #endregion
 
@@ -156,23 +154,23 @@ namespace DaemonMaster.ViewModels
                         return;
 
 
-                    MessageBoxResult result = MessageBoxService.Show(ResManager.GetString("interactive_service_regkey_not_set"), ResManager.GetString("question"), MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    MessageBoxResult result = MessageBoxService.Show(lang.interactive_service_regkey_not_set, lang.question, MessageBoxButton.YesNo, MessageBoxImage.Question);
                     if (result != MessageBoxResult.Yes)
                         return;
 
                     if (!RegistryManagement.EnableInteractiveServices(true))
-                        MessageBoxService.Show(ResManager.GetString("problem_occurred"), ResManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBoxService.Show(lang.problem_occurred, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 catch (Exception ex)
                 {
-                    MessageBoxService.Show(ResManager.GetString("failed_to_set_interServ") + "\n" + ex.Message, ResManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBoxService.Show(lang.failed_to_set_interServ + "\n" + ex.Message, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
                 }
 
                 //Check if UI0Detect service is running
                 if (!DaemonMasterUtils.CheckUi0DetectService())
                 {
-                    MessageBoxService.Show(ResManager.GetString("error_ui0service", CultureInfo.CurrentUICulture),
-                         ResManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
+                    MessageBoxService.Show(lang.error_ui0service,
+                         lang.error, MessageBoxButton.OK,
                          MessageBoxImage.Error);
                 }
             }
@@ -205,16 +203,16 @@ namespace DaemonMaster.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBoxService.Show(ex.Message + "\n StackTrace: " + ex.StackTrace, ResManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
-                //MessageBoxService.Show(ResManager.GetString("cannot_load_data_from_registry") + "\n" + ex.Message, ResManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBoxService.Show(ex.Message + "\n StackTrace: " + ex.StackTrace, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
+                //MessageBoxService.Show(lang.cannot_load_data_from_registry") + "\n" + ex.Message, lang.error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void CanExecutedDelete(object sender, CanExecuteRoutedEventArgs e) { e.CanExecute = SelectedService != null; }
         private void DeleteExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            MessageBoxResult result = MessageBoxService.Show(ResManager.GetString("msg_warning_delete"),
-                ResManager.GetString("question"),
+            MessageBoxResult result = MessageBoxService.Show(lang.msg_warning_delete,
+                lang.question,
                 MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result != MessageBoxResult.Yes)
@@ -230,8 +228,8 @@ namespace DaemonMaster.ViewModels
                     {
                         if (serviceHandle.QueryServiceStatus().currentState != Advapi32.ServiceCurrentState.Stopped)
                         {
-                            result = MessageBoxService.Show(ResManager.GetString("you_must_stop_the_service_first"),
-                                ResManager.GetString("information"), MessageBoxButton.YesNo,
+                            result = MessageBoxService.Show(lang.you_must_stop_the_service_first,
+                                lang.information, MessageBoxButton.YesNo,
                                 MessageBoxImage.Information);
 
                             if (result != MessageBoxResult.Yes)
@@ -257,8 +255,8 @@ namespace DaemonMaster.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBoxService.Show(ResManager.GetString("the_service_deletion_was_unsuccessful") + "\n" + ex.Message,
-                     ResManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBoxService.Show(lang.the_service_deletion_was_unsuccessful + "\n" + ex.Message,
+                     lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -277,8 +275,8 @@ namespace DaemonMaster.ViewModels
                 if (Environment.OSVersion.Version.Major == 10)
                 {
                     MessageBoxResult result =
-                       MessageBoxService.Show(ResManager.GetString("windows10_mouse_keyboard", CultureInfo.CurrentUICulture),
-                            ResManager.GetString("warning", CultureInfo.CurrentUICulture), MessageBoxButton.OKCancel,
+                       MessageBoxService.Show(lang.windows10_mouse_keyboard,
+                            lang.warning, MessageBoxButton.OKCancel,
                             MessageBoxImage.Warning);
 
                     if (result == MessageBoxResult.Cancel)
@@ -291,8 +289,8 @@ namespace DaemonMaster.ViewModels
             else
             {
                 MessageBoxService.Show(
-                     ResManager.GetString("failed_start_UI0detect_service", CultureInfo.CurrentUICulture),
-                     ResManager.GetString("error", CultureInfo.CurrentUICulture), MessageBoxButton.OK,
+                     lang.failed_start_UI0detect_service,
+                     lang.error, MessageBoxButton.OK,
                      MessageBoxImage.Error);
             }
         }
@@ -326,8 +324,8 @@ namespace DaemonMaster.ViewModels
                             else
                             {
                                 MessageBoxService.Show(
-                                     ResManager.GetString("cannot_kill_service", CultureInfo.CurrentUICulture),
-                                     ResManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                                     lang.cannot_kill_service,
+                                     lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
                             }
                         }
                     }
@@ -335,7 +333,7 @@ namespace DaemonMaster.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBoxService.Show(ex.Message, ResManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBoxService.Show(ex.Message, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -366,12 +364,12 @@ namespace DaemonMaster.ViewModels
             }
             catch (TimeoutException)
             {
-                MessageBoxService.Show(ResManager.GetString("timeout_exception_service_restart"),
-                     ResManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBoxService.Show(lang.timeout_exception_service_restart,
+                     lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
-                MessageBoxService.Show(ex.Message, ResManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBoxService.Show(ex.Message, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -392,7 +390,7 @@ namespace DaemonMaster.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBoxService.Show(ex.Message, ResManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBoxService.Show(ex.Message, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -423,7 +421,7 @@ namespace DaemonMaster.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBoxService.Show(ex.Message, ResManager.GetString("error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBoxService.Show(ex.Message, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
