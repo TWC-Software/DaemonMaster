@@ -20,24 +20,42 @@
 using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Management;
 using System.Security;
 using System.Security.Principal;
 using System.ServiceProcess;
 using DaemonMaster.Core.Win32;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using Microsoft.Win32.SafeHandles;
+using Newtonsoft.Json.Linq;
 
 namespace DaemonMaster.Core
 {
     public static class DaemonMasterUtils
     {
-        public static bool IsSupportedWindows10VersionForIwd => Environment.OSVersion.Version.Major < 10 || (Environment.OSVersion.Version.Major == 10 && Environment.OSVersion.Version.Build < 17134);
+        public static bool IsSupportedWindows10VersionForIwd
+        {
+            get
+            {
+                using (ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_OperatingSystem"))
+                {
+                    var information = searcher.Get().Cast<ManagementObject>().First();
+                    string version = information["Version"].ToString();
+                    if (long.TryParse(information["BuildNumber"].ToString(), out long buildNbr))
+                    {
+                        return buildNbr < 17134; //in Windows 10 1803 UI0Detect was removed
+                    }
+                }
+
+                return false;
+            }
+        }
 
         public static bool IsNt
         {
             get { return Environment.OSVersion.Platform == PlatformID.Win32NT; }
         }
-
 
         public static bool CheckUi0DetectService()
         {
