@@ -11,6 +11,7 @@
 		<Title>$(AssemblyName)</Title>
 		<PackageLicenseFile>gpl-3.0.rtf</PackageLicenseFile>
 		<FileVersion></FileVersion>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
 	</PropertyGroup>
 	<ItemGroup>
 	  <ApplicationDefinition Remove="App.xaml" />
