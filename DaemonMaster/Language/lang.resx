@@ -169,7 +169,7 @@
     <value>Search</value>
   </data>
   <data name="button_search_file" xml:space="preserve">
-    <value>Search file</value>
+    <value>...</value>
   </data>
   <data name="button_start" xml:space="preserve">
     <value>Start (in session)</value>
@@ -550,9 +550,6 @@
   </data>
   <data name="read_only" xml:space="preserve">
     <value>Read-Only</value>
-  </data>
-  <data name="placeholder_working_dir" xml:space="preserve">
-    <value>&lt;Working directory path or leave empty&gt;</value>
   </data>
   <data name="label_working_dir" xml:space="preserve">
     <value>Working directory</value>

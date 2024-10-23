@@ -169,7 +169,7 @@
     <value>Suchen</value>
   </data>
   <data name="button_search_file" xml:space="preserve">
-    <value>Suche Datei</value>
+    <value>...</value>
   </data>
   <data name="button_start" xml:space="preserve">
     <value>Dienst auf Desktop starten</value>
@@ -548,9 +548,6 @@
   </data>
   <data name="read_only" xml:space="preserve">
     <value>Schreibgeschützt</value>
-  </data>
-  <data name="placeholder_working_dir" xml:space="preserve">
-    <value>&lt;Arbeitsverzeichnis oder leer lassen&gt;</value>
   </data>
   <data name="label_working_dir" xml:space="preserve">
     <value>Arbeitsverzeichnis</value>

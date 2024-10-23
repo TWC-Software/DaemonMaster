@@ -163,7 +163,7 @@
     <value>Chercher</value>
   </data>
   <data name="button_search_file" xml:space="preserve">
-    <value>Rechercher fichier</value>
+    <value>...</value>
   </data>
   <data name="button_start" xml:space="preserve">
     <value>Démarrer le service sur desktop</value>
@@ -549,9 +549,6 @@
   <data name="read_only" xml:space="preserve">
 		<value>Lecture seule</value>
 	</data>
-  <data name="placeholder_working_dir" xml:space="preserve">
-    <value>&lt;Chemin du répertoire de travail ou laisser vide&gt;</value>
-  </data>
   <data name="label_working_dir" xml:space="preserve">
     <value>Répertoire de travail</value>
   </data>

@@ -339,7 +339,7 @@ namespace DaemonMaster.Views
         private void buttonSearchPath_OnClick(object sender, RoutedEventArgs e)
         {
             var openFileDialog =
-                new OpenFileDialog
+                new Microsoft.Win32.OpenFileDialog
                 {
                     InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
                     Filter = "Application files (*.exe, *.lnk, *.bat)|*.exe; *.lnk; *.bat|" +
@@ -360,6 +360,20 @@ namespace DaemonMaster.Views
                 if (string.IsNullOrWhiteSpace(TextBoxDisplayName.Text))
                 {
                     TextBoxDisplayName.Text = Path.GetFileNameWithoutExtension(openFileDialog.SafeFileName);
+                }
+            }
+        }
+
+        public void buttonSearchWorkingDir_OnClick(object sender, RoutedEventArgs e)
+        {
+            using (var fbd = new System.Windows.Forms.FolderBrowserDialog())
+            {
+                System.Windows.Forms.DialogResult result = fbd.ShowDialog();
+
+                if (result == System.Windows.Forms.DialogResult.OK
+                    && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                {
+                    TextBoxWorkingDir.Text = fbd.SelectedPath;
                 }
             }
         }

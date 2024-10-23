@@ -232,7 +232,7 @@ namespace DaemonMaster.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Search file ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die ... ähnelt.
         /// </summary>
         public static string button_search_file {
             get {
@@ -958,15 +958,6 @@ namespace DaemonMaster.Language {
         public static string placeholder_username {
             get {
                 return ResourceManager.GetString("placeholder_username", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die &lt;Working directory path or leave empty&gt; ähnelt.
-        /// </summary>
-        public static string placeholder_working_dir {
-            get {
-                return ResourceManager.GetString("placeholder_working_dir", resourceCulture);
             }
         }
         
