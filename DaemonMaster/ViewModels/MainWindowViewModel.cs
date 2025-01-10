@@ -12,7 +12,9 @@ using DaemonMaster.Utilities.Services;
 using DaemonMasterService;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
+using NaturalSort.Extension;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -80,7 +82,7 @@ namespace DaemonMaster.ViewModels
         }
 
 
-        public ICollectionView ServiceView { get; }
+        public ListCollectionView ServiceView { get; }
 
         private ICommand _onLoadedCommand;
         public ICommand OnLoadedCommand => _onLoadedCommand ??= new RelayCommand(OnLoadedExecute);
@@ -117,8 +119,9 @@ namespace DaemonMaster.ViewModels
 
 
             //Setup service view
-            ServiceView = CollectionViewSource.GetDefaultView(_serviceList);
+            ServiceView = (ListCollectionView)CollectionViewSource.GetDefaultView(_serviceList);
             ServiceView.Filter = o => ServiceViewFilter(o as ServiceListViewItem);
+            ServiceView.CustomSort = new SortServiceListView();
 
             //Register Messages
             MessengerInstance.Register<UpdateServiceItemMessage>(this, UpdateServiceItemMessageExecute);
@@ -469,6 +472,41 @@ namespace DaemonMaster.ViewModels
             //stopwatch.Stop();
             //Console.WriteLine(stopwatch.ElapsedMilliseconds);
             _updateItemsBusy = false;
+        }
+    }
+
+    public class SortServiceListView : IComparer, IComparer<ServiceListViewItem>
+    {
+        private readonly NaturalSortComparer _naturalSortComparer = new NaturalSortComparer(StringComparison.CurrentCultureIgnoreCase);
+
+        public int Compare(object? o1, object? o2)
+        {
+            var x = o1 as ServiceListViewItem;
+            var y = o2 as ServiceListViewItem;
+
+            if (x == null)
+                return 0;
+
+            if (y == null)
+                return 0;
+
+            return Compare(x, y);
+        }
+
+        public int Compare(ServiceListViewItem? x, ServiceListViewItem? y)
+        {
+            if (x == null)
+                return 0;
+
+            if (y == null)
+                return 0;
+
+            int result = 0;
+            result = _naturalSortComparer.Compare(x.DisplayName, y.DisplayName);
+            if(result != 0)
+                return result;
+
+           return _naturalSortComparer.Compare(x.ServiceName, y.ServiceName);
         }
     }
 }

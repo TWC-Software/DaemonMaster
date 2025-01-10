@@ -31,18 +31,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="DotNetProjects.Extended.Wpf.Toolkit">
-			<Version>5.0.103</Version>
+			<Version>5.0.124</Version>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="7.0.0" />
-		<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
+		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf">
-			<Version>1.1.39</Version>
+			<Version>1.1.135</Version>
 		</PackageReference>
 		<PackageReference Include="MvvmLight" Version="5.4.1.1" />
+		<PackageReference Include="NaturalSort.Extension" Version="4.3.0" />
 		<PackageReference Include="Newtonsoft.Json">
-			<Version>13.0.2</Version>
+			<Version>13.0.3</Version>
 		</PackageReference>
 		<PackageReference Include="Tulpep.ActiveDirectoryObjectPicker">
 			<Version>3.0.11</Version>
