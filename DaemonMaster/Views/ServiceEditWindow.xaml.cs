@@ -75,7 +75,6 @@ namespace DaemonMaster.Views
             Closing += (sender, args) =>
             {
                 WeakReferenceMessenger.Default.UnregisterAll(this);
-                (DataContext as IDisposable)?.Dispose(); // cleanup view model
             };
 
             _tempServiceConfig = daemon ?? new DmServiceDefinition(serviceName: null);
