@@ -10,7 +10,11 @@
 
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json">
-			<Version>13.0.1</Version>
+			<Version>13.0.3</Version>
+		</PackageReference>
+		<PackageReference Include="PolySharp" Version="1.15.0">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
 
