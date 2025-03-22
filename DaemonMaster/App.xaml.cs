@@ -27,19 +27,21 @@ using DaemonMaster.Config;
 using DaemonMaster.Core;
 using DaemonMaster.Language;
 using DaemonMaster.Updater.Persistence;
+using DaemonMaster.Utilities.Services;
+using DaemonMaster.ViewModels;
 using DaemonMaster.Views;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DaemonMaster
 {
-    /// <summary>
-    /// Interaktionslogik für "App.xaml"
-    /// </summary>
     public partial class App : Application
     {
         internal const string DaemonMasterAppRegPath = @"SOFTWARE\TWC-Software\DaemonMaster";
         internal const string EventLogSource = "DaemonMaster";
 
-        private static readonly ResourceManager ResManager = new ResourceManager(typeof(lang));
+        private static readonly ResourceManager ResManager = new ResourceManager(typeof(lang));        
+
+        public IServiceProvider ServiceProvider { get; private set; }
 
         App()
         {
@@ -93,8 +95,49 @@ namespace DaemonMaster
             //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             var app = new App();
-            var mainWindow = new MainWindow();
-            app.Run(mainWindow);
+            app.Run();
+        }
+
+        /// <inheritdoc />
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            var serviceCollection = new ServiceCollection();
+            ConfigureServices(serviceCollection);
+
+            ServiceProvider = serviceCollection.BuildServiceProvider();
+
+            var mainWindow = ServiceProvider.GetRequiredService<MainWindowView>();
+            mainWindow.Show();
+        }
+
+        /// <inheritdoc />
+        protected override void OnExit(ExitEventArgs e)
+        {
+            // Dispose of services if needed
+            if (ServiceProvider is IDisposable disposable)
+                disposable.Dispose();
+            
+            base.OnExit(e);
+        }
+
+        private void ConfigureServices(IServiceCollection services)
+        {
+            // Configure Logging
+            services.AddLogging();
+
+            // Register Services
+            services.AddSingleton<IMessageBoxService, MessageBoxService>();
+            services.AddSingleton<IEditWindowService, EditWindowService>();
+
+            // Register ViewModels
+            services.AddScoped<MainWindowViewModel>();
+            services.AddScoped<NewEditViewModel>();
+
+            // Register Views
+            services.AddScoped<MainWindowView>();
+            services.AddScoped<NewEditWindowView>();
         }
 
         private static void CreateAndCheckEventLogSource()
