@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Input;
 
 namespace DaemonMaster.Utilities
@@ -16,7 +17,7 @@ namespace DaemonMaster.Utilities
         {
             List<WeakReference<IRelayCommand>> commands = [];
 
-            foreach (var p in container.GetType().GetProperties())
+            foreach (var p in container.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
                 if (!typeof(IRelayCommand).IsAssignableFrom(p.PropertyType))
                     continue;
