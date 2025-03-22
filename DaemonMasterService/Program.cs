@@ -41,9 +41,10 @@ namespace DaemonMasterService
             {
                 Console.WriteLine(ex.Message);
             }
-
-            //Shutdown all logger
-            LogManager.Shutdown();
+            finally
+            {
+                LogManager.Shutdown();
+            }
         }
 
         private static int RunServiceAndReturnExitCode(ServiceOptions opts)
