@@ -1,4 +1,4 @@
-<Window x:Class="DaemonMaster.Views.MainWindow"
+<Window x:Class="DaemonMaster.Views.MainWindowView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -7,14 +7,13 @@
         xmlns:resx="clr-namespace:DaemonMaster.Language"
         xmlns:converters="clr-namespace:DaemonMaster.Utilities.Converters"
         xmlns:ctrl="clr-namespace:Itenso.Windows.Controls.ListViewLayout;assembly=Itenso.Windows.Controls.ListViewLayout"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:viewModels="clr-namespace:DaemonMaster.ViewModels"
         mc:Ignorable="d"
-        Title="DaemonMaster" Height="383.811" MinHeight="200" Width="525" MinWidth="400" Background="White" Foreground="Black" ResizeMode="CanResize" DataContext="{Binding Main, Source={StaticResource ViewModelLocator}}">
+        d:DataContext="{d:DesignInstance Type=viewModels:MainWindowViewModel, IsDesignTimeCreatable=False}"
+        Title="DaemonMaster" Height="383.811" MinHeight="200" Width="525" MinWidth="400" Background="White" Foreground="Black" ResizeMode="CanResize">
 
     <Window.Resources>
         <converters:ServiceControllerStatusConverter x:Key="ServiceControllerStatusConverter"/>
-        <sys:Boolean x:Key="FalseValue">False</sys:Boolean>
-        <sys:Boolean x:Key="TrueValue">True</sys:Boolean>
     </Window.Resources>
 
     <Grid>
@@ -25,7 +24,7 @@
 
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="Loaded">
-                <i:InvokeCommandAction Command="{Binding OnLoadedCommand}" />
+                <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
             </i:EventTrigger>
         </i:Interaction.Triggers>
 
@@ -44,7 +43,7 @@
                               Header="{Binding Text, Source={x:Static ApplicationCommands.Delete}}"/>
                     <Separator/>
                     <MenuItem  Name="MenuItemTopEditRefreshList" 
-                               Command="{Binding RefreshListView}"
+                               Command="{Binding RefreshListViewCommand}"
                                Header="{x:Static resx:lang.button_refresh_list}"/>
                 </MenuItem>
                 <MenuItem Name="MenuItemTopHelp" Header="{x:Static resx:lang.button_help}">
@@ -62,8 +61,7 @@
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDoubleClick">
                         <i:InvokeCommandAction 
-                        Command="ApplicationCommands.Open"
-                        CommandParameter="{Binding ElementName=ListViewDaemons, Path=SelectedItem}"/>
+                        Command="ApplicationCommands.Open"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
 
@@ -92,7 +90,6 @@
                         <Separator/>
                         <MenuItem Name="MenuItemStartService"
                                   Command="{Binding StartServiceCommand}"
-                                  CommandParameter="{StaticResource FalseValue}"
                                   Header="{x:Static resx:lang.button_start_service}"/>
                         <MenuItem Name="MenuItemStopService" 
                                   Command="{Binding StopServiceCommand}"
@@ -105,8 +102,7 @@
                                   Header="{x:Static resx:lang.button_kill_service}"/>
                         <Separator/>
                         <MenuItem Name="MenuItemStartInSession" 
-                                  Command="{Binding StartServiceCommand}" 
-                                  CommandParameter="{StaticResource TrueValue}" 
+                                  Command="{Binding StartServiceInUserSessionCommand}" 
                                   Header="{x:Static resx:lang.button_start}"/>
                         <Separator/>
                         <MenuItem Name="MenuItemDeleteService" 

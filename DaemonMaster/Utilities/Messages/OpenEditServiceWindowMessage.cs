@@ -1,19 +1,20 @@
 ﻿using DaemonMaster.Models;
-using GalaSoft.MvvmLight.Messaging;
 
 namespace DaemonMaster.Utilities.Messages
 {
-    public class OpenEditServiceWindowMessage : MessageBase
+    public class OpenEditServiceWindowMessage
     {
-        public ServiceListViewItem ServiceItem { get; }
+        public object Sender { get; }
+        public ServiceListViewItem? ServiceItem { get; }
         public bool ReadOnlyMode { get; }
 
         public OpenEditServiceWindowMessage(object sender) : this(sender, null, false)
         {
         }
 
-        public OpenEditServiceWindowMessage(object sender, ServiceListViewItem item, bool readOnlyMode) : base(sender)
+        public OpenEditServiceWindowMessage(object sender, ServiceListViewItem? item, bool readOnlyMode)
         {
+            Sender = sender;
             ServiceItem = item;
             ReadOnlyMode = readOnlyMode;
         }

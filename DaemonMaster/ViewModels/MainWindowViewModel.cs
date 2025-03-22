@@ -1,4 +1,4 @@
-﻿using CommonServiceLocator;
+﻿using CommunityToolkit.Mvvm.Input;
 using DaemonMaster.Core;
 using DaemonMaster.Core.Jobs;
 using DaemonMaster.Core.Win32;
@@ -10,17 +10,12 @@ using DaemonMaster.Utilities;
 using DaemonMaster.Utilities.Messages;
 using DaemonMaster.Utilities.Services;
 using DaemonMasterService;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.CommandWpf;
 using NaturalSort.Extension;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
-using System.Resources;
 using System.Security.Principal;
 using System.ServiceProcess;
 using System.Threading.Tasks;
@@ -28,87 +23,47 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using ConfigManagement = DaemonMaster.Config.ConfigManagement;
-using RelayCommand = GalaSoft.MvvmLight.Command.RelayCommand;
 using TimeoutException = System.TimeoutException;
 
 namespace DaemonMaster.ViewModels
 {
-    internal class MainWindowViewModel : ViewModelBase
+    public partial class MainWindowViewModel : ViewModelBase, IRecipient<UpdateServiceItemMessage>
     {
-        #region Private Members
+        private readonly IMessageBoxService _messageBoxService;
+        private readonly IEditWindowService _editWindowService;
         private readonly ObservableCollectionEx<ServiceListViewItem> _serviceList;
-        #endregion
+        private bool _updateItemsBusy;
 
-
-        #region Public Properties
-
-        private IMessageBoxService _messageBoxService;
-        public IMessageBoxService MessageBoxService => _messageBoxService ??= ServiceLocator.Current.GetInstance<IMessageBoxService>();
-
-        private IEditWindowService _editWindowService;
-        public IEditWindowService EditWindowService => _editWindowService ??= ServiceLocator.Current.GetInstance<IEditWindowService>();
-
-        private CommandBindingCollection _commands;
-        public CommandBindingCollection Commands
+        private CommandBindingCollection? _commands;
+        public override CommandBindingCollection Commands
         {
             get
             {
                 return _commands ??= new CommandBindingCollection
                 {
-                    new CommandBinding(ApplicationCommands.New, NewExecuted, CanExecutedNewService),
-                    new CommandBinding(ApplicationCommands.Delete, DeleteExecuted, CanExecutedDelete),
-                    new CommandBinding(ApplicationCommands.Open, OpenExecuted, CanExecutedOpen)
+                    new CommandBinding(ApplicationCommands.New, (sender, args) => New(),  (sender, args) => args.CanExecute = CanNew),
+                    new CommandBinding(ApplicationCommands.Delete,(sender, args) => Delete(),  (sender, args) => args.CanExecute = CanDelete),
+                    new CommandBinding(ApplicationCommands.Open, (sender, args) => Open(), (sender, args) => args.CanExecute = CanOpen)
                 };
             }
         }
 
-        private ServiceListViewItem _selectedService;
-        public ServiceListViewItem SelectedService
-        {
-            get => _selectedService;
-            set => Set(ref _selectedService, value);
-        }
+        [ObservableProperty]
+        private ServiceListViewItem? _selectedService;
 
-        private string _search;
-        public string Search
-        {
-            get => _search;
-            set
-            {
-                Set(ref _search, value);
-                ServiceView.Refresh(); // required    
-            }
-        }
-
+        [ObservableProperty]
+        private string? _search;
 
         public ListCollectionView ServiceView { get; }
 
-        private ICommand _onLoadedCommand;
-        public ICommand OnLoadedCommand => _onLoadedCommand ??= new RelayCommand(OnLoadedExecute);
-
-        private ICommand _refreshListView;
-        public ICommand RefreshListView => _refreshListView ??= new RelayCommand((() => {_ = UpdateItemsAsync(); }));
-
-        private ICommand _switchToServiceSessionCommand;
-        public ICommand SwitchToServiceSessionCommand => _switchToServiceSessionCommand ??= new RelayCommand(SwitchToServiceSessionExecute, CanExecutedSwitchToServiceSession);
-
-        private ICommand _startServiceCommand;
-        public ICommand StartServiceCommand => _startServiceCommand ??= new RelayCommand<bool>(StartServiceExecute, CanExecuteStartService);
-
-        private ICommand _stopServiceCommand;
-        public ICommand StopServiceCommand => _stopServiceCommand ??= new RelayCommand(StopServiceExecute, CanExecutedStopService);
-
-        private ICommand _restartServiceCommand;
-        public ICommand RestartServiceCommand => _restartServiceCommand ??= new RelayCommand(RestartServiceExecute, CanExecutedRestartService);
-
-        private ICommand _killServiceCommand;
-        public ICommand KillServiceCommand => _killServiceCommand ??= new RelayCommand(KillServiceExecute, CanExecutedKillService);
-        #endregion
-
-
-        public MainWindowViewModel()
+        public MainWindowViewModel(IMessageBoxService messageBoxService, IEditWindowService editWindowService)
         {
+            _messageBoxService = messageBoxService;
+            _editWindowService = editWindowService;
+
             //Setup ObservableCollection
             _serviceList = new ObservableCollectionEx<ServiceListViewItem>(ServiceListViewItem.GetInstalledServices());
             //BindingOperations.EnableCollectionSynchronization(_serviceList, _serviceListLock);
@@ -124,27 +79,14 @@ namespace DaemonMaster.ViewModels
             ServiceView.CustomSort = new SortServiceListView();
 
             //Register Messages
-            MessengerInstance.Register<UpdateServiceItemMessage>(this, UpdateServiceItemMessageExecute);
+            WeakReferenceMessenger.Default.Register(this);
 
             //Start Update Timer
             CreateAndStartGuiTimer();
         }
 
-        private void UpdateServiceItemMessageExecute(UpdateServiceItemMessage obj)
-        {
-            if (obj.OldServiceItem != null)
-            {
-                //Remove everything that has the same ID in the list
-                var toRemove = _serviceList.Where(x => x.Equals(obj.OldServiceItem)).ToList(); //Create a new list needed!!! (or InvalidOperationException)
-                if (toRemove.Count > 0)
-                    _serviceList.RemoveRange(toRemove);
-            }
-
-            _serviceList.Add(obj.NewServiceItem);
-        }
-
-
-        private void OnLoadedExecute()
+        [RelayCommand]
+        private void Loaded()
         {
             //If Windows 10 1803 installed don't ask for start the UI0Detect service
             if (DaemonMasterUtils.IsSupportedWindows10VersionForIwd)
@@ -157,22 +99,22 @@ namespace DaemonMaster.ViewModels
                         return;
 
 
-                    MessageBoxResult result = MessageBoxService.Show(lang.interactive_service_regkey_not_set, lang.question, MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    MessageBoxResult result = _messageBoxService.Show(lang.interactive_service_regkey_not_set, lang.question, MessageBoxButton.YesNo, MessageBoxImage.Question);
                     if (result != MessageBoxResult.Yes)
                         return;
 
                     if (!RegistryManagement.EnableInteractiveServices(true))
-                        MessageBoxService.Show(lang.problem_occurred, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
+                        _messageBoxService.Show(lang.problem_occurred, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 catch (Exception ex)
                 {
-                    MessageBoxService.Show(lang.failed_to_set_interServ + "\n" + ex.Message, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
+                    _messageBoxService.Show(lang.failed_to_set_interServ + "\n" + ex.Message, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
                 }
 
                 //Check if UI0Detect service is running
                 if (!DaemonMasterUtils.CheckUi0DetectService())
                 {
-                    MessageBoxService.Show(lang.error_ui0service,
+                    _messageBoxService.Show(lang.error_ui0service,
                          lang.error, MessageBoxButton.OK,
                          MessageBoxImage.Error);
                 }
@@ -194,27 +136,25 @@ namespace DaemonMaster.ViewModels
         }
 
 
-        private void CanExecutedOpen(object sender, CanExecuteRoutedEventArgs e) { e.CanExecute = SelectedService != null; }
-        private void OpenExecuted(object sender, ExecutedRoutedEventArgs e)
+        [RelayCommand(CanExecute = nameof(CanOpen))]
+        private void Open()
         {
             try
             {
-                using (var serviceController = new ServiceController(SelectedService.ServiceName))
-                {
-                    MessengerInstance.Send(new OpenEditServiceWindowMessage(this, SelectedService, serviceController.Status != ServiceControllerStatus.Stopped));
-                }
+                using var serviceController = new ServiceController(SelectedService.ServiceName);
+                WeakReferenceMessenger.Default.Send(new OpenEditServiceWindowMessage(this, SelectedService, serviceController.Status != ServiceControllerStatus.Stopped));
             }
             catch (Exception ex)
             {
-                MessageBoxService.Show(ex.Message + "\n StackTrace: " + ex.StackTrace, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
-                //MessageBoxService.Show(lang.cannot_load_data_from_registry") + "\n" + ex.Message, lang.error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                _messageBoxService.Show(ex.Message + "\n StackTrace: " + ex.StackTrace, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
+                //_messageBoxService.Show(lang.cannot_load_data_from_registry") + "\n" + ex.Message, lang.error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void CanExecutedDelete(object sender, CanExecuteRoutedEventArgs e) { e.CanExecute = SelectedService != null; }
-        private void DeleteExecuted(object sender, ExecutedRoutedEventArgs e)
+        [RelayCommand(CanExecute = nameof(CanDelete))]
+        private void Delete()
         {
-            MessageBoxResult result = MessageBoxService.Show(lang.msg_warning_delete,
+            MessageBoxResult result = _messageBoxService.Show(lang.msg_warning_delete,
                 lang.question,
                 MessageBoxButton.YesNo, MessageBoxImage.Question);
 
@@ -231,7 +171,7 @@ namespace DaemonMaster.ViewModels
                     {
                         if (serviceHandle.QueryServiceStatus().currentState != Advapi32.ServiceCurrentState.Stopped)
                         {
-                            result = MessageBoxService.Show(lang.you_must_stop_the_service_first,
+                            result = _messageBoxService.Show(lang.you_must_stop_the_service_first,
                                 lang.information, MessageBoxButton.YesNo,
                                 MessageBoxImage.Information);
 
@@ -258,19 +198,19 @@ namespace DaemonMaster.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBoxService.Show(lang.the_service_deletion_was_unsuccessful + "\n" + ex.Message,
+                _messageBoxService.Show(lang.the_service_deletion_was_unsuccessful + "\n" + ex.Message,
                      lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void CanExecutedNewService(object sender, CanExecuteRoutedEventArgs e) { e.CanExecute = _serviceList.Count < 200; }
-        private void NewExecuted(object sender, ExecutedRoutedEventArgs e)
+        [RelayCommand(CanExecute = nameof(CanNew))]
+        private void New()
         {
-            MessengerInstance.Send(new OpenEditServiceWindowMessage(this));
+            WeakReferenceMessenger.Default.Send(new OpenEditServiceWindowMessage(this));
         }
 
-        private bool CanExecutedSwitchToServiceSession() { return DaemonMasterUtils.IsSupportedWindows10VersionForIwd; }
-        private void SwitchToServiceSessionExecute()
+        [RelayCommand(CanExecute = nameof(CanSwitchToServiceSession))]
+        private void SwitchToServiceSession()
         {
             if (DaemonMasterUtils.CheckUi0DetectService())
             {
@@ -278,7 +218,7 @@ namespace DaemonMaster.ViewModels
                 if (Environment.OSVersion.Version.Major == 10)
                 {
                     MessageBoxResult result =
-                       MessageBoxService.Show(lang.windows10_mouse_keyboard,
+                       _messageBoxService.Show(lang.windows10_mouse_keyboard,
                             lang.warning, MessageBoxButton.OKCancel,
                             MessageBoxImage.Warning);
 
@@ -291,164 +231,190 @@ namespace DaemonMaster.ViewModels
             }
             else
             {
-                MessageBoxService.Show(
+                _messageBoxService.Show(
                      lang.failed_start_UI0detect_service,
                      lang.error, MessageBoxButton.OK,
                      MessageBoxImage.Error);
             }
         }
 
-        private bool CanExecutedKillService() { return SelectedService != null; }
-        private void KillServiceExecute()
+        [RelayCommand(CanExecute = nameof(CanKillService))]
+        private void KillService()
         {
             try
             {
-                using (ServiceControlManager scm =
-                    ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
-                {
-                    using (ServiceHandle serviceHandle = scm.OpenService(SelectedService.ServiceName,
-                        Advapi32.ServiceAccessRights.UserDefinedControl | Advapi32.ServiceAccessRights.QueryStatus))
-                    {
-                        if (serviceHandle.QueryServiceStatus().currentState == Advapi32.ServiceCurrentState.Stopped)
-                            return;
+                using ServiceControlManager scm =
+                    ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect);
+                using ServiceHandle serviceHandle = scm.OpenService(SelectedService.ServiceName,
+                    Advapi32.ServiceAccessRights.UserDefinedControl | Advapi32.ServiceAccessRights.QueryStatus);
+                if (serviceHandle.QueryServiceStatus().currentState == Advapi32.ServiceCurrentState.Stopped)
+                    return;
 
-                        try
-                        {
-                            serviceHandle.ExecuteCommand((int)ServiceCommands.ServiceKillProcessAndStop);
-                            serviceHandle.WaitForStatus(Advapi32.ServiceCurrentState.Stopped, TimeSpan.FromSeconds(2));
-                        }
-                        catch (TimeoutException)
-                        {
-                            if (KillChildProcessJob.IsSupportedWindowsVersion && SelectedService.ServicePid != null)
-                            {
-                                Process process = Process.GetProcessById((int)SelectedService.ServicePid);
-                                process.Kill();
-                            }
-                            else
-                            {
-                                MessageBoxService.Show(
-                                     lang.cannot_kill_service,
-                                     lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
-                            }
-                        }
+                try
+                {
+                    serviceHandle.ExecuteCommand((int)ServiceCommands.ServiceKillProcessAndStop);
+                    serviceHandle.WaitForStatus(Advapi32.ServiceCurrentState.Stopped, TimeSpan.FromSeconds(2));
+                }
+                catch (TimeoutException)
+                {
+                    if (KillChildProcessJob.IsSupportedWindowsVersion && SelectedService.ServicePid != null)
+                    {
+                        Process process = Process.GetProcessById((int)SelectedService.ServicePid);
+                        process.Kill();
+                    }
+                    else
+                    {
+                        _messageBoxService.Show(
+                            lang.cannot_kill_service,
+                            lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBoxService.Show(ex.Message, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
+                _messageBoxService.Show(ex.Message, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private bool CanExecutedRestartService() { return SelectedService != null; }
-        private void RestartServiceExecute()
+        [RelayCommand(CanExecute = nameof(CanRestartService))]
+        private void RestartService()
         {
             try
             {
-                using (ServiceControlManager scm =
-                    ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
-                {
-                    using (ServiceHandle serviceHandle = scm.OpenService(SelectedService.ServiceName,
-                        Advapi32.ServiceAccessRights.QueryStatus | Advapi32.ServiceAccessRights.Start |
-                        Advapi32.ServiceAccessRights.Stop))
-                    {
-                        var state = serviceHandle.QueryServiceStatus().currentState;
-                        if (state != Advapi32.ServiceCurrentState.Stopped &&
-                            state != Advapi32.ServiceCurrentState.StopPending)
-                            serviceHandle.Stop();
+                using ServiceControlManager scm =
+                    ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect);
+                using ServiceHandle serviceHandle = scm.OpenService(SelectedService.ServiceName,
+                    Advapi32.ServiceAccessRights.QueryStatus | Advapi32.ServiceAccessRights.Start |
+                    Advapi32.ServiceAccessRights.Stop);
+                var state = serviceHandle.QueryServiceStatus().currentState;
+                if (state != Advapi32.ServiceCurrentState.Stopped &&
+                    state != Advapi32.ServiceCurrentState.StopPending)
+                    serviceHandle.Stop();
 
-                        //Wait for stop
-                        serviceHandle.WaitForStatus(Advapi32.ServiceCurrentState.Stopped, TimeSpan.FromSeconds(10));
+                //Wait for stop
+                serviceHandle.WaitForStatus(Advapi32.ServiceCurrentState.Stopped, TimeSpan.FromSeconds(10));
 
-                        //Start service
-                        serviceHandle.Start();
-                    }
-                }
+                //Start service
+                serviceHandle.Start();
             }
             catch (TimeoutException)
             {
-                MessageBoxService.Show(lang.timeout_exception_service_restart,
+                _messageBoxService.Show(lang.timeout_exception_service_restart,
                      lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
-                MessageBoxService.Show(ex.Message, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
+                _messageBoxService.Show(ex.Message, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private bool CanExecutedStopService() { return SelectedService != null; }
-        private void StopServiceExecute()
+        [RelayCommand(CanExecute = nameof(CanStopService))]
+        private void StopService()
         {
             try
             {
-                using (ServiceControlManager scm =
-                    ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
-                {
-                    using (ServiceHandle serviceHandle =
-                        scm.OpenService(SelectedService.ServiceName, Advapi32.ServiceAccessRights.Stop))
-                    {
-                        serviceHandle.Stop();
-                    }
-                }
+                using ServiceControlManager scm =
+                    ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect);
+                using ServiceHandle serviceHandle =
+                    scm.OpenService(SelectedService.ServiceName, Advapi32.ServiceAccessRights.Stop);
+                serviceHandle.Stop();
             }
             catch (Exception ex)
             {
-                MessageBoxService.Show(ex.Message, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
+                _messageBoxService.Show(ex.Message, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private bool CanExecuteStartService(bool inUserSession)
+        [RelayCommand(CanExecute = nameof(CanStartService))]
+        private void StartService()
         {
-            return SelectedService != null && (!inUserSession || SelectedService.UseLocalSystem);
-        }
-        private void StartServiceExecute(bool inUserSession)
-        {
+            if (SelectedService == null)
+                return;
+
             try
             {
-                if (inUserSession)
-                {
-                    //Write username where the service should start the process
-                    RegistryManagement.WriteSessionUsername(SelectedService.ServiceName,
-                        WindowsIdentity.GetCurrent().Name);
-                }
-
-                using (ServiceControlManager scm =
-                    ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect))
-                {
-                    using (ServiceHandle serviceHandle =
-                        scm.OpenService(SelectedService.ServiceName, Advapi32.ServiceAccessRights.Start))
-                    {
-                        serviceHandle.Start();
-                    }
-                }
+                using var scm =
+                    ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect);
+                using ServiceHandle serviceHandle =
+                    scm.OpenService(SelectedService.ServiceName, Advapi32.ServiceAccessRights.Start);
+                serviceHandle.Start();
             }
             catch (Exception ex)
             {
-                MessageBoxService.Show(ex.Message, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
+                _messageBoxService.Show(ex.Message, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-
-        public override void Cleanup()
+        [RelayCommand(CanExecute = nameof(CanStartServiceInUserSession))]
+        private void StartServiceInUserSession()
         {
-            // Unregister its own messages, so that we risk no leak
-            //Messenger.Default.Unregister < ...> (this);
-            MessengerInstance.Unregister<UpdateServiceItemMessage>(this);
+            if (SelectedService == null)
+                return;
 
-            base.Cleanup();
+            try
+            {
+                //Write username where the service should start the process
+                RegistryManagement.WriteSessionUsername(SelectedService.ServiceName,
+                    WindowsIdentity.GetCurrent().Name);
+
+                using var scm =
+                    ServiceControlManager.Connect(Advapi32.ServiceControlManagerAccessRights.Connect);
+                using ServiceHandle serviceHandle =
+                    scm.OpenService(SelectedService.ServiceName, Advapi32.ServiceAccessRights.Start);
+                serviceHandle.Start();
+            }
+            catch (Exception ex)
+            {
+                _messageBoxService.Show(ex.Message, lang.error, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //                                        GUI Update Timer                                              //
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        [RelayCommand]
+        private async Task RefreshListViewAsync()
+        {
+            await UpdateItemsAsync();
+        }
+
+
+        private bool CanOpen => SelectedService != null;
+        private bool CanDelete => SelectedService != null;
+        private bool CanNew => _serviceList.Count < 200;
+        private bool CanSwitchToServiceSession => DaemonMasterUtils.IsSupportedWindows10VersionForIwd;
+        private bool CanKillService => SelectedService != null;
+        private bool CanRestartService => SelectedService != null;
+        private bool CanStopService => SelectedService != null;
+        private bool CanStartService => SelectedService != null;
+        private bool CanStartServiceInUserSession => SelectedService != null && SelectedService.UseLocalSystem;
+
+        partial void OnSearchChanged(string? value)
+        {
+            ServiceView.Refresh();
+        }
+
+        /// <inheritdoc />
+        public void Receive(UpdateServiceItemMessage message)
+        {
+            if (message.OldServiceItem != null)
+            {
+                //Remove everything that has the same ID in the list
+                var toRemove = _serviceList.Where(x => x.Equals(message.OldServiceItem)).ToList(); //Create a new list needed!!! (or InvalidOperationException)
+                if (toRemove.Count > 0)
+                    _serviceList.RemoveRange(toRemove);
+            }
+
+            _serviceList.Add(message.NewServiceItem);
+        }
 
         private void CreateAndStartGuiTimer()
         {
-            var guiDispatcherTimer = new DispatcherTimer();
-            guiDispatcherTimer.Interval = TimeSpan.FromSeconds(ConfigManagement.GetConfig.UpdateInterval);
+            var guiDispatcherTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(ConfigManagement.GetConfig.UpdateInterval)
+            };
+
             guiDispatcherTimer.Tick += (sender, args) =>
             {
-               _ = UpdateItemsAsync();
+                _ = UpdateItemsAsync();
             };
 
             guiDispatcherTimer.Start();
@@ -457,21 +423,21 @@ namespace DaemonMaster.ViewModels
             _ = UpdateItemsAsync();
         }
 
-        private bool _updateItemsBusy;
         private async Task UpdateItemsAsync()
         {
             if (_updateItemsBusy)
                 return;
 
             _updateItemsBusy = true;
-            //stopwatch.Restart();
-
-            IEnumerable<Task> listOfTasks = _serviceList.Select(item => item.UpdateStatusAsync()).ToList();
-            await Task.WhenAll(listOfTasks);
-
-            //stopwatch.Stop();
-            //Console.WriteLine(stopwatch.ElapsedMilliseconds);
-            _updateItemsBusy = false;
+            try
+            {
+                IEnumerable<Task> listOfTasks = _serviceList.Select(item => item.UpdateStatusAsync()).ToList();
+                await Task.WhenAll(listOfTasks);
+            }
+            finally
+            {
+                _updateItemsBusy = false;
+            }
         }
     }
 
@@ -503,10 +469,10 @@ namespace DaemonMaster.ViewModels
 
             int result = 0;
             result = _naturalSortComparer.Compare(x.DisplayName, y.DisplayName);
-            if(result != 0)
+            if (result != 0)
                 return result;
 
-           return _naturalSortComparer.Compare(x.ServiceName, y.ServiceName);
+            return _naturalSortComparer.Compare(x.ServiceName, y.ServiceName);
         }
     }
 }

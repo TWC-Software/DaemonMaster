@@ -4,8 +4,6 @@ using DaemonMaster.Core.Win32.PInvoke.Advapi32;
 using DaemonMaster.Language;
 using DaemonMaster.Models;
 using DaemonMaster.Utilities.Messages;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
@@ -21,13 +19,11 @@ using System.ServiceProcess;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using CommunityToolkit.Mvvm.Messaging;
 using Tulpep.ActiveDirectoryObjectPicker;
 
 namespace DaemonMaster.Views
 {
-    /// <summary>
-    /// Interaktionslogik für ServiceEditWindow.xaml
-    /// </summary>
     public partial class ServiceEditWindow : Window
     {
         private const string PlaceholderPasswordString = "88301CEB-1E6E-435C-A355-D055F9F8D430";
@@ -72,15 +68,14 @@ namespace DaemonMaster.Views
         private DmServiceDefinition _tempServiceConfig;
 
 
-        public ServiceEditWindow(DmServiceDefinition daemon)
+        public ServiceEditWindow(DmServiceDefinition? daemon)
         {
             InitializeComponent();
 
             Closing += (sender, args) =>
             {
-                //Messenger.Default.Send(new LockServiceItemMessage(obj.ServiceItem, true));
-                (DataContext as ICleanup)?.Cleanup(); // cleanup view model
-                Cleanup(); // cleanup view
+                WeakReferenceMessenger.Default.UnregisterAll(this);
+                (DataContext as IDisposable)?.Dispose(); // cleanup view model
             };
 
             _tempServiceConfig = daemon ?? new DmServiceDefinition(serviceName: null);
@@ -99,13 +94,9 @@ namespace DaemonMaster.Views
 
         private void SendResult()
         {
-            Messenger.Default.Send(new UpdateServiceItemMessage(this, OriginalItem, new ServiceListViewItem(_tempServiceConfig)));
+            WeakReferenceMessenger.Default.Send(new UpdateServiceItemMessage(this, OriginalItem, new ServiceListViewItem(_tempServiceConfig)));
         }
 
-        private void Cleanup()
-        {
-
-        }
 
         private void LoadServiceInfos()
         {

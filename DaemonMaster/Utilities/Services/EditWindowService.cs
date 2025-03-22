@@ -4,13 +4,13 @@ using DaemonMaster.Views;
 
 namespace DaemonMaster.Utilities.Services
 {
-    internal enum EditWindowServiceCommand
+    public enum EditWindowServiceCommand
     {
         EditOrCreate,
         ViewOnly
     }
 
-    internal interface IEditWindowService
+    public interface IEditWindowService
     {
         ServiceListViewItem Show();
         ServiceListViewItem Show(ServiceListViewItem item, EditWindowServiceCommand command);
@@ -25,7 +25,7 @@ namespace DaemonMaster.Utilities.Services
         }
 
         /// <inheritdoc />
-        public ServiceListViewItem Show(ServiceListViewItem item, EditWindowServiceCommand command = EditWindowServiceCommand.EditOrCreate)
+        public ServiceListViewItem Show(ServiceListViewItem? item, EditWindowServiceCommand command = EditWindowServiceCommand.EditOrCreate)
         {
             //TODO: MVVM
             var dialog = new ServiceEditWindow(item != null ? RegistryManagement.LoadFromRegistry(item.ServiceName) : null)

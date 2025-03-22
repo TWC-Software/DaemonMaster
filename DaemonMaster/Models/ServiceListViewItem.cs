@@ -7,89 +7,47 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using CommunityToolkit.Mvvm.ComponentModel;
 using DaemonMaster.Core;
 using DaemonMaster.Core.Win32;
 using DaemonMaster.Core.Win32.PInvoke.Advapi32;
-using GalaSoft.MvvmLight;
 using Microsoft.Win32;
 
 namespace DaemonMaster.Models
 {
-    public class ServiceListViewItem : ObservableObject
+    public partial class ServiceListViewItem : ObservableObject
     {
+        [ObservableProperty]
         private string _displayName;
-        public string DisplayName
-        {
-            get => _displayName;
-            set => Set(ref _displayName, value);
-        }
 
+        [ObservableProperty]
         private string _serviceName;
-        public string ServiceName
-        {
-            get => _serviceName;
-            set => Set(ref _serviceName, value);
-        }
 
+        [ObservableProperty]
         private ServiceControllerStatus _serviceState;
-        public ServiceControllerStatus ServiceState
-        {
-            get => _serviceState;
-            set => Set(ref _serviceState, value);
-        }
 
+        [ObservableProperty]
         private string _binaryPath;
-        public string BinaryPath
-        {
 
-            get => _binaryPath;
-            set
-            {
-                //Get the new BinaryIcon
-                BinaryIcon = GetIcon(value);
-                Set(ref _binaryPath, value);
-            }
-        }
-
+        [ObservableProperty, NotifyPropertyChangedFor(nameof(UseLocalSystem))]
         private ServiceCredentials _serviceCredentials;
-        public ServiceCredentials ServiceCredentials
-        {
-            get => _serviceCredentials;
-            set
-            {
-                Set(ref _serviceCredentials, value);
-                UseLocalSystem = Equals(ServiceCredentials, ServiceCredentials.LocalSystem);
-            }
-        }
 
-        private bool _useLocalSystem;
-        public bool UseLocalSystem
-        {
-            get => _useLocalSystem;
-            private set => Set(ref _useLocalSystem, value);
-        }
-
+        [ObservableProperty]
         private ImageSource _binaryIcon;
-        public ImageSource BinaryIcon
-        {
-            get => _binaryIcon;
-            private set => Set(ref _binaryIcon, value);
-        }
 
+        [ObservableProperty]
         private uint? _servicePid;
-        public uint? ServicePid
-        {
-            get => _servicePid;
-            set => Set(ref _servicePid, value);
-        }
 
+        [ObservableProperty]
         private uint? _processPid;
-        public uint? ProcessPid
-        {
-            get => _processPid;
-            set => Set(ref _processPid, value);
-        }
 
+        public bool UseLocalSystem => Equals(ServiceCredentials, ServiceCredentials.LocalSystem);
+
+
+        partial void OnBinaryPathChanged(string value)
+        {
+            BinaryIcon = GetIcon(value);
+        }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                        STATIC METHODS                                                //
